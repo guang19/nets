@@ -1,0 +1,8 @@
+ADD_EXECUTABLE(SingletonTest SingletonTest.cpp)
+TARGET_LINK_LIBRARIES(SingletonTest nets_base)
+
+ADD_EXECUTABLE(BlockingQueueTest BlockingQueueTest.cpp)
+TARGET_LINK_LIBRARIES(BlockingQueueTest nets_base_threadpool)
+
+ADD_EXECUTABLE(ThreadPoolTest ThreadPoolTest.cpp)
+TARGET_LINK_LIBRARIES(ThreadPoolTest nets_base_threadpool)

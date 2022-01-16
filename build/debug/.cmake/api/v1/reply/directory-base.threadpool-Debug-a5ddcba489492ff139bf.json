@@ -1,0 +1,62 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL"
+		],
+		"files" : 
+		[
+			"base/threadpool/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "/home/guang19/Projects/nets/build/debug/include/nets/base/threadpool",
+			"paths" : 
+			[
+				"base/threadpool/BlockingQueue.h",
+				"base/threadpool/ThreadPool.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "/home/guang19/Projects/nets/build/debug/lib",
+			"paths" : 
+			[
+				"base/threadpool/libnets_base_threadpool.so"
+			],
+			"targetId" : "nets_base_threadpool::@e299137c443c7334db92",
+			"targetIndex" : 4,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "base/threadpool",
+		"source" : "base/threadpool"
+	}
+}

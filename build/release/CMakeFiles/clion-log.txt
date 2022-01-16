@@ -1,0 +1,6 @@
+/usr/bin/cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_MAKE_PROGRAM=/usr/bin/make -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -G "Unix Makefiles" /home/guang19/Projects/nets
+-- ======CMAKE_BUILD_TYPE: Release======
+-- ======CMAKE_CXX_FLAGS:  -std=c++11 -g -Wall -Werror -Wextra -Wno-unused-parameter -O2 -DNDEBUG======
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/guang19/Projects/nets/build/release

@@ -1,0 +1,64 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"INSTALL"
+		],
+		"files" : 
+		[
+			"base/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 2,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 7,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "/home/guang19/Projects/nets/build/debug/include/nets/base",
+			"paths" : 
+			[
+				"base/copyable.h",
+				"base/noncopyable.h",
+				"base/Singleton.h",
+				"base/V.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "/home/guang19/Projects/nets/build/debug/lib",
+			"paths" : 
+			[
+				"base/libnets_base.so"
+			],
+			"targetId" : "nets_base::@4506b02e7a4fef989908",
+			"targetIndex" : 3,
+			"type" : "target"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "base",
+		"source" : "base"
+	}
+}

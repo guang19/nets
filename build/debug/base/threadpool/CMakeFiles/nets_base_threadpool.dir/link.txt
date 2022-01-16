@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC  -std=c++11 -g -Wall -Werror -Wextra -Wno-unused-parameter -g -shared -Wl,-soname,libnets_base_threadpool.so -o libnets_base_threadpool.so CMakeFiles/nets_base_threadpool.dir/ThreadPool.cpp.o  -Wl,-rpath,/home/guang19/Projects/nets/build/debug/base: ../libnets_base.so -lpthread 

@@ -1,0 +1,1 @@
+/usr/bin/g++  -std=c++11 -g -Wall -Werror -Wextra -Wno-unused-parameter -O2 -DNDEBUG -O3 -DNDEBUG CMakeFiles/BlockingQueueTest.dir/BlockingQueueTest.cpp.o -o BlockingQueueTest  -Wl,-rpath,/home/guang19/Projects/nets/build/release/base/threadpool:/home/guang19/Projects/nets/build/release/base ../threadpool/libnets_base_threadpool.so ../libnets_base.so -lpthread 

@@ -1,0 +1,1 @@
+/usr/bin/g++ -fPIC  -std=c++11 -g -Wall -Werror -Wextra -Wno-unused-parameter -g -shared -Wl,-soname,libnets_base.so -o libnets_base.so CMakeFiles/nets_base.dir/V.cpp.o  -lpthread 

@@ -1,0 +1,150 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"projectIndex" : 0,
+					"source" : "."
+				},
+				{
+					"build" : "base",
+					"childIndexes" : 
+					[
+						2,
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-base-Debug-5f136c6eed476fe03bf3.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 0,
+					"source" : "base",
+					"targetIndexes" : 
+					[
+						3
+					]
+				},
+				{
+					"build" : "base/threadpool",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-base.threadpool-Debug-a5ddcba489492ff139bf.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "base/threadpool",
+					"targetIndexes" : 
+					[
+						4
+					]
+				},
+				{
+					"build" : "base/tests",
+					"jsonFile" : "directory-base.tests-Debug-b6399ea9b6427a137aa0.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.22"
+					},
+					"parentIndex" : 1,
+					"projectIndex" : 0,
+					"source" : "base/tests",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3
+					],
+					"name" : "nets",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 3,
+					"id" : "BlockingQueueTest::@2c408e4d1913c8ab02e6",
+					"jsonFile" : "target-BlockingQueueTest-Debug-f29eed3ec90627baebf7.json",
+					"name" : "BlockingQueueTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "SingletonTest::@2c408e4d1913c8ab02e6",
+					"jsonFile" : "target-SingletonTest-Debug-84b5ce508b0615b396bf.json",
+					"name" : "SingletonTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "ThreadPoolTest::@2c408e4d1913c8ab02e6",
+					"jsonFile" : "target-ThreadPoolTest-Debug-f73f2dadb81265b98eb7.json",
+					"name" : "ThreadPoolTest",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "nets_base::@4506b02e7a4fef989908",
+					"jsonFile" : "target-nets_base-Debug-82998b9a95f17d633ff5.json",
+					"name" : "nets_base",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "nets_base_threadpool::@e299137c443c7334db92",
+					"jsonFile" : "target-nets_base_threadpool-Debug-246905377ce4b47a4fee.json",
+					"name" : "nets_base_threadpool",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/guang19/Projects/nets/build/debug",
+		"source" : "/home/guang19/Projects/nets"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 3
+	}
+}
