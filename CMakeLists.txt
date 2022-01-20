@@ -1,9 +1,9 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.22)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.21)
 
 PROJECT(nets LANGUAGES C CXX)
 
-SET(CMAKE_C_COMPILER "/usr/bin/gcc")
-SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
+#SET(CMAKE_C_COMPILER "/usr/bin/gcc")
+#SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g \
 -Wall -Werror -Wextra -Wno-unused-parameter")
 
