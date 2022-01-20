@@ -36,6 +36,7 @@ namespace nets
         template<class T>
         void Singleton<T>::destroy()
         {
+			// 单例类型必须是完整类型
             typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
             T_must_be_complete_type jugg;
             (void) jugg;
@@ -53,6 +54,7 @@ namespace nets
             std::call_once(onceFlag_, [](Args&& ...args)
             {
                 value_ = new T(std::forward<Args>(args)...);
+				// 自动释放内存
                 atexit(destroy);
             }, std::forward<Args>(args)...);
             return value_;
