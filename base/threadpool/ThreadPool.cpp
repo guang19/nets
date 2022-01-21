@@ -104,13 +104,20 @@ namespace nets
 				}
 				if (threadWrapperRawPtr->coreThread())
 				{
-					blockingQueuePtr_->take(threadWrapperRawPtr->getTask());
+					blockingQueuePtr_->take(threadWrapperRawPtr->getTask(), [&]
+					{
+						return running();
+					});
 				}
 				else
 				{
-					blockingQueuePtr_->take(threadWrapperRawPtr->getTask(), keepAliveTime_);
+					blockingQueuePtr_->take(threadWrapperRawPtr->getTask(), keepAliveTime_, [&]
+					{
+						return running();
+					});
 				}
                 if (threadWrapperRawPtr->getTask())
+
                 {
 					threadWrapperRawPtr->getTask()();
 					threadWrapperRawPtr->setTask(nullptr);
@@ -131,7 +138,7 @@ namespace nets
 		{
 			if (!running_)
 			{
-				// 没有运行不接受任务
+				// 没有运行，不接受任务
 				return;
 			}
 			uint32_t threadSize = pool_.size();
@@ -145,4 +152,4 @@ namespace nets
 			}
 		}
     } // namespace base
-} //namespace nets
+} // namespace nets
