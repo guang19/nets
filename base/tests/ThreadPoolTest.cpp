@@ -31,6 +31,10 @@ class Clazz
 
 int main(int argc, char** argv)
 {
-    Clazz c;
+    auto threadPool = new nets::base::ThreadPool(8, 10);
+    threadPool->init();
+    threadPool->execute([&]{
+        printf("hahaha");
+    });
     return 0;
 }

@@ -7,6 +7,7 @@
 
 #include <condition_variable>
 #include <deque>
+#include <functional>
 #include <mutex>
 #include "base/noncopyable.h"
 
@@ -18,12 +19,13 @@ namespace nets
         class BlockingQueue : noncopyable
         {
             public:
-                using container_type          = std::deque<T>;
                 using value_type              = T;
                 using reference_type          = value_type&;
                 using const_reference_type    = const value_type&;
+                using container_type          = std::deque<value_type>;
                 using size_type               = std::size_t;
-                using milliseconds_type       = std::chrono::duration<std::size_t, std::milli>;
+                using milliseconds_type       = std::chrono::milliseconds;
+                using predicate_type          = std::function<bool ()>;
                 using mutex_type              = std::recursive_mutex;
                 using condition_variable_type = std::condition_variable_any;
                 using lock_guard_type         = std::lock_guard<std::recursive_mutex>;
@@ -46,20 +48,23 @@ namespace nets
                     return queue_.size();
                 }
 
+                // 唤醒put线程和take线程
+                void notifyAll();
+
                 void put(const_reference_type el);
                 void take(reference_type el);
 
-				template<typename Predicate>
+				template<typename Predicate = predicate_type>
 				void put(const_reference_type el,  Predicate p);
-				template<typename Predicate>
+                template<typename Predicate = predicate_type>
 				void take(reference_type el, Predicate p);
 
                 bool put(const_reference_type el, const milliseconds_type& time);
                 bool take(reference_type el, const milliseconds_type& time);
 
-				template<typename Predicate>
+                template<typename Predicate = predicate_type>
 				bool put(const_reference_type el, const milliseconds_type& time, Predicate p);
-				template<typename Predicate>
+                template<typename Predicate = predicate_type>
 				bool take(reference_type el, const milliseconds_type& time, Predicate p);
 
                 bool tryPush(const_reference_type el);
@@ -78,6 +83,14 @@ namespace nets
                 condition_variable_type notFullCv_;
                 condition_variable_type notEmptyCv_;
         };
+
+        template<typename T>
+        void BlockingQueue<T>::notifyAll()
+        {
+            lock_guard_type lock(mtx_);
+            notFullCv_.notify_all();
+            notEmptyCv_.notify_all();
+        }
 
         template<typename T>
         void BlockingQueue<T>::put(const_reference_type el)

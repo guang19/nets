@@ -26,7 +26,7 @@ namespace nets
                 using size_type                 = std::size_t;
                 using atomic_bool_type          = std::atomic<bool>;
                 using task_type                 = std::function<void()>;
-                using milliseconds_type         = std::chrono::duration<std::size_t, std::milli>;
+                using milliseconds_type         = std::chrono::milliseconds;
 				using mutex_type              	= std::mutex;
 				using condition_variable_type 	= std::condition_variable;
 				using lock_guard_type         	= std::lock_guard<std::mutex>;

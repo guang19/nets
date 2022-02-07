@@ -14,7 +14,12 @@ namespace nets
 
         ThreadPool::ThreadWrapper::ThreadWrapper(uint32_t id, bool isCoreThread, const task_type& task, ThreadPoolRawPtr threadPoolRawPtr)
             : id_(id), isCoreThread_(isCoreThread), task_(task), thread_(&ThreadWrapper::startThread, this), threadPoolRawPtr_(threadPoolRawPtr)
-        {}
+        {
+            if (thread_.joinable())
+            {
+                thread_.detach();
+            }
+        }
 
         void ThreadPool::ThreadWrapper::startThread()
         {
@@ -69,7 +74,7 @@ namespace nets
 			lock_guard_type lock(mtx_);
 			if (running_)
 			{
-				// 正在运行已经初始化了
+				// 正在运行或者已经初始化了
 				return;
 			}
 			running_ = true;
@@ -86,7 +91,8 @@ namespace nets
 			if (running_)
 			{
 				running_ = false;
-			}
+			    blockingQueuePtr_->notifyAll();
+            }
 		}
 
         void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)
@@ -117,7 +123,6 @@ namespace nets
 					});
 				}
                 if (threadWrapperRawPtr->getTask())
-
                 {
 					threadWrapperRawPtr->getTask()();
 					threadWrapperRawPtr->setTask(nullptr);

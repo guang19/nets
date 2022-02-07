@@ -2,11 +2,11 @@
 // Created by guang19 on 2022/1/6.
 //
 
+#include <atomic>
 #include <deque>
 #include <iostream>
 #include <stdio.h>
 #include <thread>
-#include "base/Singleton.h"
 #include "base/threadpool/BlockingQueue.h"
 
 
@@ -61,10 +61,10 @@ F getF()
 
 int main(int argc, char** argv)
 {
-    auto blockingQueue =
-            nets::base::Singleton<nets::base::BlockingQueue<int32_t>>::getInstance(10);
+    auto blockingQueue = new nets::base::BlockingQueue<int32_t>(10);
     std::hash<std::thread::id> hasher;
-    for (int i = 0 ; i < 21; ++i)
+    std::atomic<bool> running(true);
+    for (int i = 0 ; i < 5; ++i)
     {
         std::thread([&]
                     {
@@ -73,12 +73,19 @@ int main(int argc, char** argv)
                         printf("thread: %zu put complete\n", hasher(std::this_thread::get_id()));
                     }).detach();
     }
-    for (int i = 0 ; i < 10; ++i)
+    for (int i = 0 ; i < 6; ++i)
     {
         std::thread([&]
                     {
                         int32_t n;
-                        blockingQueue->take(n);
+                        blockingQueue->take(n, [&] () -> bool
+                        {
+                            return running;
+                        });
+                        if (i == 4)
+                        {
+                            running = false;
+                        }
                         printf("thread: %zu take complete : %d\n", hasher(std::this_thread::get_id()), n);
                     }).detach();
     }
