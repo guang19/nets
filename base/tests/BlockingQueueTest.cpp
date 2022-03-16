@@ -2,93 +2,85 @@
 // Created by guang19 on 2022/1/6.
 //
 
+#include <gtest/gtest.h>
 #include <atomic>
 #include <deque>
 #include <iostream>
-#include <stdio.h>
 #include <thread>
-#include "base/threadpool/BlockingQueue.h"
+#include "base/threadpool/BlockingQueue.hpp"
 
-
-class F
+class BlockingQueueTest : public testing::Test
 {
-    public:
-        F()
-        {
-            std::cout << "construct\n";
-        }
+	public:
+		// Sets up the test fixture.
+		void SetUp()
+		{
+			blockingQueue = new nets::base::BlockingQueue<int32_t>(5);
+		}
 
-        F(int _a) : a(_a)
-        {
-            std::cout << "construct " << a << '\n';
-        }
+		// Tears down the test fixture.
+		void TearDown()
+		{
+			delete blockingQueue;
+			blockingQueue = nullptr;
+		}
 
-        F(const F& rhs)
-        {
-            std::cout << "copy construct\n";
-        }
-
-        F(F&& rhs)
-        {
-            std::cout << "moving copy construct\n";
-        }
-
-        ~F()
-        {
-            std::cout << "destruct\n";
-        }
-
-        int& getA()
-        {
-            return a;
-        }
-
-    private:
-        int a;
+	protected:
+		nets::base::BlockingQueue<int32_t>* blockingQueue;
 };
 
-void setIntRef(int& n)
+TEST_F(BlockingQueueTest, Put_Take)
 {
-    n = 5;
+	blockingQueue->put(1);
+	blockingQueue->put(2);
+	blockingQueue->put(3);
+	ASSERT_EQ(blockingQueue->size(), 3u);
+	int32_t data = 0;
+	blockingQueue->take(data);
+	ASSERT_EQ(data, 1);
+	blockingQueue->take(data);
+	ASSERT_EQ(data, 2);
+	blockingQueue->take(data);
+	ASSERT_EQ(data, 3);
+	ASSERT_EQ(blockingQueue->size(), 0u);
 }
 
-F getF()
+TEST_F(BlockingQueueTest, Put_Take_Predicate)
 {
-    F f;
-    return f;
+
 }
 
 
 int main(int argc, char** argv)
 {
-    auto blockingQueue = new nets::base::BlockingQueue<int32_t>(10);
-    std::hash<std::thread::id> hasher;
-    std::atomic<bool> running(true);
-    for (int i = 0 ; i < 5; ++i)
-    {
-        std::thread([&]
-                    {
-                        printf("thread: %zu put...\n", hasher(std::this_thread::get_id()));
-                        blockingQueue->put(i);
-                        printf("thread: %zu put complete\n", hasher(std::this_thread::get_id()));
-                    }).detach();
-    }
-    for (int i = 0 ; i < 6; ++i)
-    {
-        std::thread([&]
-                    {
-                        int32_t n;
-                        blockingQueue->take(n, [&] () -> bool
-                        {
-                            return running;
-                        });
-                        if (i == 4)
-                        {
-                            running = false;
-                        }
-                        printf("thread: %zu take complete : %d\n", hasher(std::this_thread::get_id()), n);
-                    }).detach();
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    return 0;
+//    auto blockingQueue = new nets::base::BlockingQueue<int32_t>(10);
+//    std::hash<std::thread::id> hasher;
+//    std::atomic<bool> running(true);
+//    for (int i = 0 ; i < 5; ++i)
+//    {
+//        std::thread([&]
+//                    {
+//                        printf("thread: %zu put...\n", hasher(std::this_thread::get_id()));
+//                        blockingQueue->put(i);
+//                        printf("thread: %zu put complete\n", hasher(std::this_thread::get_id()));
+//                    }).detach();
+//    }
+//    for (int i = 0 ; i < 6; ++i)
+//    {
+//        std::thread([&]
+//                    {
+//                        int32_t n;
+//                        blockingQueue->take(n, [&] () -> bool
+//                        {
+//                            return running;
+//                        });
+//                        if (i == 4)
+//                        {
+//                            running = false;
+//                        }
+//                        printf("thread: %zu take complete : %d\n", hasher(std::this_thread::get_id()), n);
+//                    }).detach();
+//    }
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

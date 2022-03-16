@@ -33,7 +33,9 @@ namespace nets
 
             public:
                 explicit BlockingQueue(size_type maxQueueSize) : maxQueueSize_(maxQueueSize)
-                {}
+				{
+				}
+
                 ~BlockingQueue() = default;
 
                 bool empty()
@@ -49,7 +51,7 @@ namespace nets
                 }
 
                 // 唤醒put线程和take线程
-                void notifyAll();
+                void notifyBlockingThread();
 
                 void put(const_reference_type el);
                 void take(reference_type el);
@@ -71,7 +73,8 @@ namespace nets
                 bool tryPop(reference_type el);
 
             private:
-                bool full() const
+                // 内部使用，所以不加锁
+				bool full() const
                 {
                     return maxQueueSize_ > 0 && queue_.size() >= maxQueueSize_;
                 }
@@ -85,7 +88,7 @@ namespace nets
         };
 
         template<typename T>
-        void BlockingQueue<T>::notifyAll()
+        void BlockingQueue<T>::notifyBlockingThread()
         {
             lock_guard_type lock(mtx_);
             notFullCv_.notify_all();

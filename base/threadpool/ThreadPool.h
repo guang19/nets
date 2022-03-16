@@ -14,7 +14,7 @@
 #include <thread>
 #include <vector>
 #include "base/noncopyable.h"
-#include "base/threadpool/BlockingQueue.h"
+#include "base/threadpool/BlockingQueue.hpp"
 
 namespace nets
 {

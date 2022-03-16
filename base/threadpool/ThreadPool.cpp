@@ -91,7 +91,7 @@ namespace nets
 			if (running_)
 			{
 				running_ = false;
-			    blockingQueuePtr_->notifyAll();
+			    blockingQueuePtr_->notifyBlockingThread();
             }
 		}
 
