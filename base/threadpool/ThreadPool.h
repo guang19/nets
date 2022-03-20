@@ -9,115 +9,146 @@
 #include <condition_variable>
 #include <functional>
 #include <mutex>
-#include <queue>
-#include <string>
 #include <thread>
-#include <vector>
-#include "base/noncopyable.h"
-#include "base/threadpool/BlockingQueue.hpp"
+#include <list>
+#include "base/Noncopyable.h"
+#include "base/threadpool/BoundedBlockingQueue.hpp"
 
 namespace nets
 {
     namespace base
     {
-        class ThreadPool : noncopyable
+        class ThreadPool : Noncopyable
         {
             public:
-                using size_type                 = std::size_t;
-                using atomic_bool_type          = std::atomic<bool>;
-                using task_type                 = std::function<void()>;
-                using milliseconds_type         = std::chrono::milliseconds;
-				using mutex_type              	= std::mutex;
-				using condition_variable_type 	= std::condition_variable;
-				using lock_guard_type         	= std::lock_guard<std::mutex>;
-				using unique_lock_type        	= std::unique_lock<std::mutex>;
+                using size_type                 = ::std::size_t;
+                using atomic_bool_type          = ::std::atomic<bool>;
+                using task_type                 = ::std::function<void()>;
+                using milliseconds_type         = ::std::chrono::milliseconds;
+				using mutex_type              	= ::std::mutex;
+				using condition_variable_type 	= ::std::condition_variable;
+				using lock_guard_type         	= ::std::lock_guard<::std::mutex>;
+				using unique_lock_type          = ::std::unique_lock<::std::mutex>;
                 using ThreadPoolRawPtr          = ThreadPool*;
-                using BlockingQueuePtr          = std::unique_ptr<BlockingQueue<task_type>>;
+                using BoundedBlockingQueuePtr   = ::std::unique_ptr<BoundedBlockingQueue<task_type>>;
 
             private:
-                class ThreadWrapper : noncopyable
+                struct ThreadWrapper : Noncopyable
                 {
                     public:
-                        ThreadWrapper(uint32_t id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr);
-                        ThreadWrapper(uint32_t id, bool isCoreThread, const task_type& task, ThreadPoolRawPtr threadPoolRawPtr);
+                        ThreadWrapper(size_type id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr);
+                        ThreadWrapper(size_type id, bool isCoreThread, const task_type& task, ThreadPoolRawPtr threadPoolRawPtr);
 						~ThreadWrapper() = default;
-
-						bool coreThread() const
-						{
-							return isCoreThread_;
-						}
-
-                        void setTask(const task_type& task)
-                        {
-                            task_ = task;
-                        }
-
-                        task_type& getTask()
-                        {
-                            return task_;
-                        }
 
                     private:
                         void startThread();
 
-                    private:
-                        uint32_t id_;
+                    public:
+						size_type id_;
                         bool isCoreThread_;
                         task_type task_;
-                        std::thread thread_;
+                        ::std::thread thread_;
                         ThreadPoolRawPtr threadPoolRawPtr_;
                 };
 
+				using ThreadWrapperRawPtr   = ThreadWrapper*;
+				using ThreadWrapperPtr      = ::std::unique_ptr<ThreadWrapper>;
+
+			private:
+				void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
+				void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
+				bool addThreadTask(const task_type& task, bool isCore, size_type currentThreadSize);
+
             public:
-                ThreadPool(uint32_t corePoolSize, uint32_t maxPoolSize);
-                ThreadPool(uint32_t corePoolSize, uint32_t maxPoolSize, const milliseconds_type& keepAliveTime);
-                ThreadPool(uint32_t corePoolSize, uint32_t maxPoolSize, const milliseconds_type& keepAliveTime,
+                ThreadPool(size_type corePoolSize, size_type maximumPoolSize);
+                ThreadPool(size_type corePoolSize, size_type maximumPoolSize, const milliseconds_type& keepAliveTime);
+                ThreadPool(size_type corePoolSize, size_type maximumPoolSize, const milliseconds_type& keepAliveTime,
                            size_type maxQueueSize);
-                ThreadPool(const std::string& name, uint32_t corePoolSize, uint32_t maxPoolSize);
-                ThreadPool(const std::string& name, uint32_t corePoolSize, uint32_t maxPoolSize,
+                ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize);
+                ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize,
                            const milliseconds_type& keepAliveTime);
-                ThreadPool(const std::string& name, uint32_t corePoolSize, uint32_t maxPoolSize,
+                ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize,
                            const milliseconds_type& keepAliveTime, size_type maxQueueSize);
 				~ThreadPool();
 
                 void init();
                 void shutdown();
-				void execute(const task_type& task);
 
-                bool running() const
+				template<typename Fn, typename... Args>
+				bool execute(Fn fun, Args... args);
+
+                bool isRunning() const
                 {
                     return running_;
                 }
 
-                const std::string& name() const
+                const ::std::string& name() const
                 {
                     return name_;
                 }
 
             private:
-                using ThreadWrapperRawPtr   = ThreadWrapper*;
-                using ThreadWrapperPtr      = std::unique_ptr<ThreadWrapper>;
-                void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-
-            private:
-                std::string name_;
+                ::std::string name_;
                 atomic_bool_type running_;
-                uint32_t corePoolSize_;
-                uint32_t maxPoolSize_;
+				// 核心线程数，这部分线程属于常驻线程，一旦被创造就会随着线程池的周期结束而销毁
+				size_type corePoolSize_;
+				// 线程池最大容纳的线程数
+				size_type maximumPoolSize_;
+				// 线程池中除了常驻线程外，其余{ 空闲线程 }能够存活的时间
                 milliseconds_type keepAliveTime_;
-				BlockingQueuePtr blockingQueuePtr_;
-                std::vector<ThreadWrapperPtr> pool_;
+				// 任务队列
+				BoundedBlockingQueuePtr taskQueue_;
+                ::std::list<ThreadWrapperPtr> pool_;
 				mutex_type mtx_;
-                condition_variable_type cv_;
+                condition_variable_type poolCv_;
 
-                static const std::string& defaultThreadPoolName_;
-                static const milliseconds_type& defaultKeepAliveTime_;
-                static const size_type defaultMaxQueueSize_;
+                static const ::std::string DefaultThreadPoolName;
+                static const milliseconds_type DefaultKeepAliveTime;
+                static const size_type DefaultMaxQueueSize;
         };
-        const std::string& ThreadPool::defaultThreadPoolName_ = "NetsThreadPool";
-        const ThreadPool::milliseconds_type& ThreadPool::defaultKeepAliveTime_ = milliseconds_type(30000);
-		// UINT32_MAX = 0xffffffffU  /* 4294967295U */
-        const ThreadPool::size_type ThreadPool::defaultMaxQueueSize_ = 0xffffffffU;
+        const ::std::string ThreadPool::DefaultThreadPoolName = "NetsThreadPool";
+        const ThreadPool::milliseconds_type ThreadPool::DefaultKeepAliveTime = milliseconds_type(30000);
+		// Default Max TaskQueue Size = INT32_MAX
+        const ThreadPool::size_type ThreadPool::DefaultMaxQueueSize = INT32_MAX;
+
+		template<typename Fn, typename... Args>
+		bool ThreadPool::execute(Fn fun, Args... args)
+		{
+			{
+				if (!running_)
+				{
+					return false;
+				}
+				lock_guard_type lock(mtx_);
+				std::function<typename std::result_of<Fn(Args...)>::type(Args...)> originFunc =
+						std::bind(std::forward<Fn>(fun), std::forward<Args>(args)...);
+				task_type task = std::bind(originFunc);
+				size_type threadSize = pool_.size();
+				// 如果核心线程池未满，就创建新核心线程执行任务
+				if (threadSize < corePoolSize_)
+				{
+					return addThreadTask(task, true, threadSize);
+				}
+				else
+				{
+					// 尝试直接添加到任务队列
+					if (taskQueue_->tryPush(task))
+					{
+						return true;
+					}
+					// 线程池还未满，创建非核心线程执行任务
+					if (threadSize < maximumPoolSize_)
+					{
+						return addThreadTask(task, false, threadSize);
+					}
+					else
+					{
+						// 拒绝策略
+						return false;
+					}
+				}
+			}
+		}
 	} // namespace base
 } // namespace nets
 

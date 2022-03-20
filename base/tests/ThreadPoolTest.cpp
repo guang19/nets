@@ -1,40 +1,34 @@
 //
 // Created by guang19 on 2022/1/3.
 //
+
+#include <functional>
+#include <gtest/gtest.h>
 #include <iostream>
 #include "base/threadpool/ThreadPool.h"
 
-class F
+TEST(ThreadPoolTest, ConstructException)
 {
-    public:
-        F()
-        {
-            std::cout << "construct\n";
-        }
-        ~F()
-        {
-            std::cout << "destruct\n";
-        }
-};
+	ASSERT_THROW(nets::base::ThreadPool(1,0), std::invalid_argument);
+}
 
-class Clazz
+TEST(ThreadPoolTest, ExecuteTask)
 {
-    public:
-        Clazz()
-        {
-            fp = std::unique_ptr<F>(new F);
-        }
-        ~Clazz() = default;
-    private:
-        std::unique_ptr<F> fp;
-};
+	nets::base::ThreadPool* threadPool = new nets::base::ThreadPool(1,1);
+	threadPool->init();
+	ASSERT_TRUE(threadPool->execute([]()
+	{
+		std::cout << "hello threadpool" << std::endl;
+	}));
+	ASSERT_TRUE(threadPool->execute([](int num)
+	{
+		std::cout << "your enter number is:" << num << std::endl;
+	}, 5));
+}
+}
 
 int main(int argc, char** argv)
 {
-    auto threadPool = new nets::base::ThreadPool(8, 10);
-    threadPool->init();
-    threadPool->execute([&]{
-        printf("hahaha");
-    });
-    return 0;
+	testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

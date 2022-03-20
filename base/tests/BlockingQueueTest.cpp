@@ -7,7 +7,7 @@
 #include <deque>
 #include <iostream>
 #include <thread>
-#include "base/threadpool/BlockingQueue.hpp"
+#include "base/threadpool/BoundedBlockingQueue.hpp"
 
 class BlockingQueueTest : public testing::Test
 {
@@ -15,7 +15,7 @@ class BlockingQueueTest : public testing::Test
 		// Sets up the test fixture.
 		void SetUp()
 		{
-			blockingQueue = new nets::base::BlockingQueue<int32_t>(5);
+			blockingQueue = new nets::base::BoundedBlockingQueue<int32_t>(5);
 		}
 
 		// Tears down the test fixture.
@@ -26,10 +26,10 @@ class BlockingQueueTest : public testing::Test
 		}
 
 	protected:
-		nets::base::BlockingQueue<int32_t>* blockingQueue;
+		nets::base::BoundedBlockingQueue<int32_t>* blockingQueue;
 };
 
-TEST_F(BlockingQueueTest, Put_Take)
+TEST_F(BlockingQueueTest, PutTake)
 {
 	blockingQueue->put(1);
 	blockingQueue->put(2);
@@ -45,42 +45,92 @@ TEST_F(BlockingQueueTest, Put_Take)
 	ASSERT_EQ(blockingQueue->size(), 0u);
 }
 
-TEST_F(BlockingQueueTest, Put_Take_Predicate)
+TEST_F(BlockingQueueTest, PutTakeMultiThread)
 {
-
+    for (int i = 0 ; i < 5; ++i)
+    {
+        ::std::thread([&]
+                    {
+                        blockingQueue->put(i);
+                    }).detach();
+		::std::thread([&]
+					{
+						int32_t n;
+						blockingQueue->take(n);
+					}).detach();
+    }
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
+	ASSERT_EQ(blockingQueue->size(), 0u);
 }
 
+TEST_F(BlockingQueueTest, PutTakeConditionVar)
+{
+	::std::atomic<bool> running(true);
+	ASSERT_EQ(blockingQueue->put(1, [&]() -> bool {
+		return !running;
+	}), true);
+	int32_t takeVal = 0;
+	ASSERT_EQ(blockingQueue->take(takeVal, [&]() -> bool {
+		return !running;
+	}), true);
+	ASSERT_EQ(takeVal, 1);
+	ASSERT_EQ(blockingQueue->put(2, [&]() -> bool {
+		return !running;
+	}), true);
+	running = false;
+	ASSERT_EQ(blockingQueue->take(takeVal, [&]() -> bool {
+		return !running;
+	}), false);
+	ASSERT_EQ(takeVal, 1);
+}
+
+TEST_F(BlockingQueueTest, PutTimeout)
+{
+	blockingQueue->put(1);
+	blockingQueue->put(2);
+	blockingQueue->put(3);
+	blockingQueue->put(4);
+	blockingQueue->put(5);
+	ASSERT_EQ(blockingQueue->size(), 5u);
+	int32_t takeVal = 0;
+	int64_t start =
+			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
+					.count();
+	ASSERT_EQ(blockingQueue->put(takeVal, ::std::chrono::milliseconds(3000)), false);
+	int64_t end =
+			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
+					.count();
+	ASSERT_GT(end, start);
+	ASSERT_GE(end - start, 3000);
+	ASSERT_EQ(takeVal, 0);
+}
+
+TEST_F(BlockingQueueTest, TakeTimeout)
+{
+	int32_t takeVal = 0;
+	int64_t start =
+			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
+			        .count();
+	ASSERT_EQ(blockingQueue->isEmpty(), true);
+	ASSERT_EQ(blockingQueue->take(takeVal, ::std::chrono::milliseconds(3000)), false);
+	int64_t end =
+			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
+					.count();
+	ASSERT_GT(end, start);
+	ASSERT_GE(end - start, 3000);
+	ASSERT_EQ(takeVal, 0);
+}
+
+TEST_F(BlockingQueueTest, TryPushPop)
+{
+	ASSERT_EQ(blockingQueue->tryPush(1), true);
+	int32_t takeVal = 0;
+	ASSERT_EQ(blockingQueue->tryPop(takeVal), true);
+	ASSERT_EQ(takeVal, 1);
+}
 
 int main(int argc, char** argv)
 {
-//    auto blockingQueue = new nets::base::BlockingQueue<int32_t>(10);
-//    std::hash<std::thread::id> hasher;
-//    std::atomic<bool> running(true);
-//    for (int i = 0 ; i < 5; ++i)
-//    {
-//        std::thread([&]
-//                    {
-//                        printf("thread: %zu put...\n", hasher(std::this_thread::get_id()));
-//                        blockingQueue->put(i);
-//                        printf("thread: %zu put complete\n", hasher(std::this_thread::get_id()));
-//                    }).detach();
-//    }
-//    for (int i = 0 ; i < 6; ++i)
-//    {
-//        std::thread([&]
-//                    {
-//                        int32_t n;
-//                        blockingQueue->take(n, [&] () -> bool
-//                        {
-//                            return running;
-//                        });
-//                        if (i == 4)
-//                        {
-//                            running = false;
-//                        }
-//                        printf("thread: %zu take complete : %d\n", hasher(std::this_thread::get_id()), n);
-//                    }).detach();
-//    }
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
 }

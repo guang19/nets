@@ -6,14 +6,14 @@
 #define NETS_BASE_SINGLETON_H
 
 #include <mutex>
-#include "base/noncopyable.h"
+#include "base/Noncopyable.h"
 
 namespace nets
 {
     namespace base
     {
         template<class T>
-        class Singleton : noncopyable
+        class Singleton : Noncopyable
         {
             public:
                 template<typename ...Args>
@@ -24,14 +24,14 @@ namespace nets
 
             private:
                 static T* value_;
-                static std::once_flag onceFlag_;
+                static ::std::once_flag onceFlag_;
         };
 
         template <class T>
         T* Singleton<T>::value_ = nullptr;
 
         template <class T>
-        std::once_flag Singleton<T>::onceFlag_;
+        ::std::once_flag Singleton<T>::onceFlag_;
 
         template<class T>
         void Singleton<T>::destroy()
@@ -51,12 +51,12 @@ namespace nets
         template<typename ...Args>
         T* Singleton<T>::getInstance(Args&& ...args)
         {
-            std::call_once(onceFlag_, [](Args&& ...args)
+            ::std::call_once(onceFlag_, [](Args&& ...args)
             {
-                value_ = new T(std::forward<Args>(args)...);
+                value_ = new T(::std::forward<Args>(args)...);
 				// 自动释放内存
                 atexit(destroy);
-            }, std::forward<Args>(args)...);
+            }, ::std::forward<Args>(args)...);
             return value_;
         }
     } // namespace base

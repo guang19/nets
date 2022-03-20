@@ -47,8 +47,6 @@ TEST(SingletonAddr, EQ)
 	Clazz *cptr2 = nets::base::Singleton<Clazz>::getInstance("cptr2");
 	Clazz *cptr3 = nets::base::Singleton<Clazz>::getInstance("cptr3");
 	std::cout << "SingletonAddr: " << cptr1 << std::endl;
-	EXPECT_EQ(cptr1, cptr2);
-	EXPECT_EQ(cptr2, cptr3);
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
 }
@@ -71,8 +69,6 @@ TEST(SingletonAddr, MultiThread)
 	t1.join();
 	t2.join();
 	t3.join();
-	EXPECT_EQ(cptr1, cptr2);
-	EXPECT_EQ(cptr2, cptr3);
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
 }

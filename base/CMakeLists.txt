@@ -1,4 +1,4 @@
-SET(BaseHeaders copyable.h noncopyable.h Singleton.hpp)
+SET(BaseHeaders Copyable.h Noncopyable.h Singleton.hpp)
 INSTALL(FILES ${BaseHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base)
 
 SET(BaseSrcs Singleton.hpp)
