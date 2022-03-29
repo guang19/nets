@@ -31,12 +31,6 @@ class Clazz
 			std::cout << "Clazz Destruct " << name_ << std::endl;
 		}
 
-		void print()
-		{
-			std::cout << "Clazz = " << name_ << " thread id: " << std::this_thread::get_id() << " " << this
-					  << std::endl;
-		}
-
 	private:
 		std::string name_;
 };

@@ -100,7 +100,7 @@ namespace nets
 		template<typename T, typename Container>
         void BoundedBlockingQueue<T, Container>::put(const_reference_type el)
         {
-			lock_guard_type lock(mtx_);
+			unique_lock_type lock(mtx_);
             notFullCv_.wait(lock, [&]
             {
                return !isFull();
@@ -112,7 +112,7 @@ namespace nets
 		template<typename T, typename Container>
         void BoundedBlockingQueue<T, Container>::take(reference_type el)
         {
-			lock_guard_type lock(mtx_);
+			unique_lock_type lock(mtx_);
             notEmptyCv_.wait(lock, [&]
             {
                 return !queue_.empty();
@@ -126,7 +126,7 @@ namespace nets
 		template<typename Predicate>
 		bool BoundedBlockingQueue<T, Container>::put(const_reference_type el, Predicate p)
 		{
-			lock_guard_type lock(mtx_);
+			unique_lock_type lock(mtx_);
 			notFullCv_.wait(lock, [&]
 			{
 				return !isFull() || p();

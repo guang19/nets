@@ -13,13 +13,13 @@ class BlockingQueueTest : public testing::Test
 {
 	public:
 		// Sets up the test fixture.
-		void SetUp()
+		void SetUp() override
 		{
 			blockingQueue = new nets::base::BoundedBlockingQueue<int32_t>(5);
 		}
 
 		// Tears down the test fixture.
-		void TearDown()
+		void TearDown() override
 		{
 			delete blockingQueue;
 			blockingQueue = nullptr;
