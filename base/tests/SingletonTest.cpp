@@ -8,39 +8,41 @@
 #include <thread>
 #include "base/Singleton.hpp"
 
+using namespace nets::base;
+
 class Clazz
 {
 	public:
 		Clazz() : name_()
 		{
-			std::cout << "default construct" << std::endl;
+			::std::cout << "default construct" << ::std::endl;
 		}
 
-		Clazz(const std::string &s) : name_(s)
+		Clazz(const ::std::string &s) : name_(s)
 		{
-			std::cout << "const reference copy construct" << std::endl;
+			::std::cout << "const reference copy construct" << ::std::endl;
 		}
 
-		Clazz(const std::string &&s) : name_(s)
+		Clazz(const ::std::string &&s) : name_(s)
 		{
-			std::cout << "rvalue reference construct " << std::endl;
+			::std::cout << "rvalue reference construct " << ::std::endl;
 		}
 
 		~Clazz()
 		{
-			std::cout << "Clazz Destruct " << name_ << std::endl;
+			::std::cout << "Clazz Destruct " << name_ << ::std::endl;
 		}
 
 	private:
-		std::string name_;
+		::std::string name_;
 };
 
 TEST(SingletonAddr, EQ)
 {
-	Clazz *cptr1 = nets::base::Singleton<Clazz>::getInstance();
-	Clazz *cptr2 = nets::base::Singleton<Clazz>::getInstance("cptr2");
-	Clazz *cptr3 = nets::base::Singleton<Clazz>::getInstance("cptr3");
-	std::cout << "SingletonAddr: " << cptr1 << std::endl;
+	Clazz *cptr1 = Singleton<Clazz>::getInstance();
+	Clazz *cptr2 = Singleton<Clazz>::getInstance("cptr2");
+	Clazz *cptr3 = Singleton<Clazz>::getInstance("cptr3");
+	::std::cout << "SingletonAddr: " << cptr1 << ::std::endl;
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
 }
@@ -50,15 +52,15 @@ TEST(SingletonAddr, MultiThread)
     Clazz* cptr1 = nullptr;
 	Clazz* cptr2 = nullptr;
 	Clazz* cptr3 = nullptr;
-    std::thread t1([&] {
-		cptr1 = nets::base::Singleton<Clazz>::getInstance("cp1");
+    ::std::thread t1([&] {
+		cptr1 = Singleton<Clazz>::getInstance("cp1");
     });
 
-    std::thread t2([&] {
-		cptr2 = nets::base::Singleton<Clazz>::getInstance("cp2");
+    ::std::thread t2([&] {
+		cptr2 = Singleton<Clazz>::getInstance("cp2");
     });
-	std::thread t3([&] {
-		cptr3 = nets::base::Singleton<Clazz>::getInstance("cp3");
+	::std::thread t3([&] {
+		cptr3 = Singleton<Clazz>::getInstance("cp3");
 	});
 	t1.join();
 	t2.join();

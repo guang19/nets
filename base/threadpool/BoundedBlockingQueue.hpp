@@ -47,8 +47,19 @@ namespace nets
                     return queue_.size();
                 }
 
+				void pop_back()
+				{
+					lock_guard_type lock(mtx_);
+					queue_.pop_back();
+				}
+
                 // 唤醒put线程和take线程
-                void notifyBlockingThread();
+                void notifyBlockingThread()
+				{
+					lock_guard_type lock(mtx_);
+					notFullCv_.notify_all();
+					notEmptyCv_.notify_all();
+				}
 
                 void put(const_reference_type el);
                 void take(reference_type el);
@@ -88,14 +99,6 @@ namespace nets
                 condition_variable_type notFullCv_;
                 condition_variable_type notEmptyCv_;
         };
-
-        template<typename T, typename Container>
-        void BoundedBlockingQueue<T, Container>::notifyBlockingThread()
-        {
-            lock_guard_type lock(mtx_);
-            notFullCv_.notify_all();
-            notEmptyCv_.notify_all();
-        }
 
 		template<typename T, typename Container>
         void BoundedBlockingQueue<T, Container>::put(const_reference_type el)

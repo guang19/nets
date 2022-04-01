@@ -7,15 +7,37 @@
 #include <iostream>
 #include "base/threadpool/ThreadPool.h"
 
-TEST(ThreadPoolTest, ConstructException)
+using namespace nets::base;
+
+class ThreadPoolTest : public testing::Test
 {
-	ASSERT_THROW(nets::base::ThreadPool(1,0), std::invalid_argument);
+	public:
+		// Sets up the test fixture.
+		void SetUp() override
+		{
+			threadPool = new ThreadPool(2, 2);
+			threadPool->init();
+		}
+
+		// Tears down the test fixture.
+		void TearDown() override
+		{
+			delete threadPool;
+			threadPool = nullptr;
+		}
+
+	protected:
+		ThreadPool* threadPool;
+};
+
+TEST_F(ThreadPoolTest, ConstructException)
+{
+	ASSERT_THROW(ThreadPool(1,0), std::invalid_argument);
 }
 
-TEST(ThreadPoolTest, ExecuteTask)
+TEST_F(ThreadPoolTest, ExecuteTask)
 {
-	nets::base::ThreadPool* threadPool = new nets::base::ThreadPool(1,1);
-	threadPool->init();
+
 	ASSERT_TRUE(threadPool->execute([]()
 	{
 		std::cout << "hello threadpool" << std::endl;
@@ -24,7 +46,7 @@ TEST(ThreadPoolTest, ExecuteTask)
 	{
 		std::cout << "your enter number is:" << num << std::endl;
 	}, 5));
-}
+
 }
 
 int main(int argc, char** argv)

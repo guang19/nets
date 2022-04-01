@@ -5,9 +5,11 @@
 #include <gtest/gtest.h>
 #include <atomic>
 #include <deque>
-#include <iostream>
 #include <thread>
 #include "base/threadpool/BoundedBlockingQueue.hpp"
+
+
+using namespace nets::base;
 
 class BlockingQueueTest : public testing::Test
 {
@@ -15,7 +17,7 @@ class BlockingQueueTest : public testing::Test
 		// Sets up the test fixture.
 		void SetUp() override
 		{
-			blockingQueue = new nets::base::BoundedBlockingQueue<int32_t>(5);
+			blockingQueue = new BoundedBlockingQueue<int32_t>(5);
 		}
 
 		// Tears down the test fixture.
@@ -26,7 +28,7 @@ class BlockingQueueTest : public testing::Test
 		}
 
 	protected:
-		nets::base::BoundedBlockingQueue<int32_t>* blockingQueue;
+		BoundedBlockingQueue<int32_t>* blockingQueue;
 };
 
 TEST_F(BlockingQueueTest, PutTake)

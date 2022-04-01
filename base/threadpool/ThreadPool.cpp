@@ -2,9 +2,9 @@
 // Created by guang19 on 2021/12/30.
 //
 
+#include "base/threadpool/ThreadPool.h"
 #include <iostream>
 #include <type_traits>
-#include "base/threadpool/ThreadPool.h"
 
 namespace nets
 {
@@ -58,19 +58,22 @@ namespace nets
         ThreadPool::ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize,
                                const milliseconds_type& keepAliveTime, size_type maxQueueSize)
 							   : name_(name), running_(false), corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize),
-							   keepAliveTime_(keepAliveTime), taskQueue_(new BoundedBlockingQueue<task_type>(maxQueueSize))
+							   keepAliveTime_(keepAliveTime), taskQueue_(new BoundedBlockingQueue<task_type>(maxQueueSize)),
+							   rejectionPolicy_(RejectionPolicy::DiscardPolicy)
+
 		{
 			if (corePoolSize <= 0 || corePoolSize > maximumPoolSize)
 			{
 				// 无效的核心线程数和最大线程数
 				throw ::std::invalid_argument("corePoolSize must be greater than 0 and maximumPoolSize must be greater than corePoolSize");
-				return;
 			}
 		}
 
 		ThreadPool::~ThreadPool()
 		{
 			shutdown();
+			std::cout << "任务：" << taskQueue_->size() << std::endl;
+			std::cout << "线程：" << pool_.size() << std::endl;
 		}
 
 		void ThreadPool::init()
@@ -162,6 +165,25 @@ namespace nets
 				return true;
 			}
 			return false;
+		}
+
+		bool ThreadPool::rejectedExecution(const ThreadPool::task_type &task)
+		{
+			switch (rejectionPolicy_)
+			{
+				case RejectionPolicy::DiscardPolicy:
+					return false;
+				case RejectionPolicy::DiscardOlderPolicy:
+				{
+					taskQueue_->pop_back();
+					return taskQueue_->tryPush(task);
+				}
+				case RejectionPolicy::CallerRunsPolicy:
+				{
+					task();
+					return true;
+				}
+			}
 		}
 	} // namespace base
 } // namespace nets
