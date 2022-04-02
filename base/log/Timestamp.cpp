@@ -2,7 +2,7 @@
 // Created by YangGuang on 2022/4/1.
 //
 
-#include "Timestamp.h"
+#include "base/log/Timestamp.h"
 
 namespace nets
 {
@@ -39,6 +39,11 @@ namespace nets
 			return *this;
 		}
 
+		Timestamp::operator bool() const
+		{
+			return microsecondsSingsEpoch_ > 0;
+		}
+
 		bool Timestamp::operator<(const Timestamp &rhs) const
 		{
 			return microsecondsSingsEpoch_ < rhs.microsecondsSingsEpoch_;
@@ -67,11 +72,6 @@ namespace nets
 		bool Timestamp::operator<=(const Timestamp& rhs) const
 		{
 			return microsecondsSingsEpoch_ <= rhs.microsecondsSingsEpoch_;
-		}
-
-		Timestamp::operator bool() const
-		{
-			return microsecondsSingsEpoch_ > 0;
 		}
 
 		Timestamp Timestamp::plusSeconds(int32_t seconds)

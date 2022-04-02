@@ -28,6 +28,7 @@ namespace nets
 				Timestamp(Timestamp&& rhs) noexcept ;
 				Timestamp& operator=(const Timestamp& rhs);
 				Timestamp& operator=(Timestamp&& rhs) noexcept ;
+				explicit operator bool() const;
 
 				bool operator<(const Timestamp& rhs) const;
 				bool operator>(const Timestamp& rhs) const;
@@ -35,7 +36,6 @@ namespace nets
 				bool operator!=(const Timestamp& rhs) const;
 				bool operator>=(const Timestamp& rhs) const;
 				bool operator<=(const Timestamp& rhs) const;
-				explicit operator bool() const;
 
 				Timestamp plusSeconds(int32_t seconds);
 				Timestamp plusMinutes(int32_t minutes);

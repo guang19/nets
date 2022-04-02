@@ -4,7 +4,6 @@
 
 #include "base/threadpool/ThreadPool.h"
 #include <iostream>
-#include <type_traits>
 
 namespace nets
 {
@@ -72,8 +71,6 @@ namespace nets
 		ThreadPool::~ThreadPool()
 		{
 			shutdown();
-			std::cout << "任务：" << taskQueue_->size() << std::endl;
-			std::cout << "线程：" << pool_.size() << std::endl;
 		}
 
 		void ThreadPool::init()

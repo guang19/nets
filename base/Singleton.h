@@ -5,7 +5,6 @@
 #ifndef NETS_BASE_SINGLETON_H
 #define NETS_BASE_SINGLETON_H
 
-#include <mutex>
 #include "base/Noncopyable.h"
 
 namespace nets

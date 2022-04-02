@@ -6,7 +6,7 @@
 #include <iostream>
 #include <string>
 #include <thread>
-#include "base/Singleton.hpp"
+#include "base/Singleton.h"
 
 using namespace nets::base;
 
