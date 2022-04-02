@@ -16,11 +16,11 @@ namespace nets
 		class Timestamp : public Copyable
 		{
 			public:
-				Timestamp() : microSecondsSingsEpoch_(0)
+				Timestamp() : microsecondsSingsEpoch_(0)
 				{
 				}
 
-				explicit Timestamp(uint64_t microSecondsSingsEpoch) : microSecondsSingsEpoch_(microSecondsSingsEpoch)
+				explicit Timestamp(uint64_t microSecondsSingsEpoch) : microsecondsSingsEpoch_(microSecondsSingsEpoch)
 				{
 				}
 
@@ -36,22 +36,32 @@ namespace nets
 				bool operator>=(const Timestamp& rhs) const;
 				bool operator<=(const Timestamp& rhs) const;
 				explicit operator bool() const;
-//				Timestamp operator+(const Timestamp& rhs);
-//				Timestamp operator-(const Timestamp& rhs);
 
-				::std::string formatTime(const char* formatter = DefaultDateTimeFormatter) const;
+				Timestamp plusSeconds(int32_t seconds);
+				Timestamp plusMinutes(int32_t minutes);
+				Timestamp plusHours(int32_t hours);
+				Timestamp plusDays(int32_t days);
+				::std::string formatTime(bool showMicroseconds = false) const;
 
 				static Timestamp fromUnixTime(::std::time_t seconds);
-				static Timestamp fromUnixTime(::std::time_t seconds, uint32_t microSeconds);
+				static Timestamp fromUnixTime(::std::time_t seconds, uint32_t microseconds);
 				static Timestamp now();
 
 			private:
-				uint64_t microSecondsSingsEpoch_;
-				const static uint32_t MicroSecondsPerSecond;
-				const static char* DefaultDateTimeFormatter;
+				uint32_t getMicroseconds() const
+				{
+					return static_cast<uint32_t>(microsecondsSingsEpoch_ % Timestamp::MicrosecondsPerSecond);
+				}
+
+				::std::time_t getSeconds() const
+				{
+					return static_cast<::std::time_t>(microsecondsSingsEpoch_ / Timestamp::MicrosecondsPerSecond);
+				}
+
+			private:
+				uint64_t microsecondsSingsEpoch_;
+				const static uint32_t MicrosecondsPerSecond = 1000000U;
 		};
-		const uint32_t Timestamp::MicroSecondsPerSecond = 1000000U;
-		const char* Timestamp::DefaultDateTimeFormatter = "%Y-%m-%d %H:%M:%S";
 	} // namespace base
 } // namespace nets
 

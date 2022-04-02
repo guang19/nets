@@ -3,8 +3,6 @@
 //
 
 #include "Timestamp.h"
-#include <iomanip>
-#include <sstream>
 
 namespace nets
 {
@@ -13,20 +11,20 @@ namespace nets
 
 		Timestamp::Timestamp(const Timestamp& rhs)
 		{
-			microSecondsSingsEpoch_ = rhs.microSecondsSingsEpoch_;
+			microsecondsSingsEpoch_ = rhs.microsecondsSingsEpoch_;
 		}
 
 		Timestamp::Timestamp(Timestamp&& rhs) noexcept
 		{
-			microSecondsSingsEpoch_ = rhs.microSecondsSingsEpoch_;
-			rhs.microSecondsSingsEpoch_ = 0;
+			microsecondsSingsEpoch_ = rhs.microsecondsSingsEpoch_;
+			rhs.microsecondsSingsEpoch_ = 0;
 		}
 
 		Timestamp& Timestamp::operator=(const Timestamp& rhs)
 		{
 			if (rhs && this != &rhs)
 			{
-				microSecondsSingsEpoch_ = rhs.microSecondsSingsEpoch_;
+				microsecondsSingsEpoch_ = rhs.microsecondsSingsEpoch_;
 			}
 			return *this;
 		}
@@ -35,53 +33,95 @@ namespace nets
 		{
 			if (rhs && this != &rhs)
 			{
-				microSecondsSingsEpoch_ = rhs.microSecondsSingsEpoch_;
-				rhs.microSecondsSingsEpoch_ = 0;
+				microsecondsSingsEpoch_ = rhs.microsecondsSingsEpoch_;
+				rhs.microsecondsSingsEpoch_ = 0;
 			}
 			return *this;
 		}
 
 		bool Timestamp::operator<(const Timestamp &rhs) const
 		{
-			return microSecondsSingsEpoch_ < rhs.microSecondsSingsEpoch_;
+			return microsecondsSingsEpoch_ < rhs.microsecondsSingsEpoch_;
 		}
 
 		bool Timestamp::operator>(const Timestamp &rhs) const
 		{
-			return microSecondsSingsEpoch_ > rhs.microSecondsSingsEpoch_;
+			return microsecondsSingsEpoch_ > rhs.microsecondsSingsEpoch_;
 		}
 
 		bool Timestamp::operator==(const Timestamp &rhs) const
 		{
-			return microSecondsSingsEpoch_ == rhs.microSecondsSingsEpoch_;
+			return microsecondsSingsEpoch_ == rhs.microsecondsSingsEpoch_;
 		}
 
 		bool Timestamp::operator!=(const Timestamp& rhs) const
 		{
-			return microSecondsSingsEpoch_ != rhs.microSecondsSingsEpoch_;
+			return microsecondsSingsEpoch_ != rhs.microsecondsSingsEpoch_;
 		}
 
 		bool Timestamp::operator>=(const Timestamp& rhs) const
 		{
-			return microSecondsSingsEpoch_ >= rhs.microSecondsSingsEpoch_;
+			return microsecondsSingsEpoch_ >= rhs.microsecondsSingsEpoch_;
 		}
 
 		bool Timestamp::operator<=(const Timestamp& rhs) const
 		{
-			return microSecondsSingsEpoch_ <= rhs.microSecondsSingsEpoch_;
+			return microsecondsSingsEpoch_ <= rhs.microsecondsSingsEpoch_;
 		}
 
 		Timestamp::operator bool() const
 		{
-			return microSecondsSingsEpoch_ > 0;
+			return microsecondsSingsEpoch_ > 0;
 		}
 
-		::std::string Timestamp::formatTime(const char* formatter) const
+		Timestamp Timestamp::plusSeconds(int32_t seconds)
 		{
-			::std::time_t seconds = static_cast<::std::time_t>(microSecondsSingsEpoch_ / Timestamp::MicroSecondsPerSecond);
-			::std::stringstream ss;
-			ss << ::std::put_time(localtime(&seconds), formatter);
-			return ss.str();
+			uint32_t microseconds = getMicroseconds();
+			::std::time_t calculateSeconds = getSeconds() + seconds;
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+		}
+
+		Timestamp Timestamp::plusMinutes(int32_t minutes)
+		{
+			uint32_t microseconds = getMicroseconds();
+			::std::time_t calculateSeconds = getSeconds() + (minutes * 60);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+		}
+
+		Timestamp Timestamp::plusHours(int32_t hours)
+		{
+			uint32_t microseconds = getMicroseconds();
+			::std::time_t calculateSeconds = getSeconds() + (hours * 3600);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+		}
+
+		Timestamp Timestamp::plusDays(int32_t days)
+		{
+			uint32_t microseconds = getMicroseconds();
+			::std::time_t calculateSeconds = getSeconds() + (days * 86400);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+		}
+
+		::std::string Timestamp::formatTime(bool showMicroseconds) const
+		{
+			::std::time_t seconds = getSeconds();
+			struct tm tmS {};
+			localtime_r(&seconds, &tmS);
+			if (showMicroseconds)
+			{
+				char timeStr[27] = {0};
+				snprintf(timeStr, sizeof(timeStr), "%04d-%02d-%02d %02d:%02d:%02d.%06d",
+						 tmS.tm_year + 1900, tmS.tm_mon, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec,
+						 getMicroseconds());
+				return timeStr;
+			}
+			else
+			{
+				char timeStr[20] = {0};
+				snprintf(timeStr, sizeof(timeStr), "%04d-%02d-%02d %02d:%02d:%02d",
+						 tmS.tm_year + 1900, tmS.tm_mon, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec);
+				return timeStr;
+			}
 		}
 
 		Timestamp Timestamp::fromUnixTime(::std::time_t seconds)
@@ -89,9 +129,9 @@ namespace nets
 			return fromUnixTime(seconds, 0);
 		}
 
-		Timestamp Timestamp::fromUnixTime(::std::time_t seconds, uint32_t microSeconds)
+		Timestamp Timestamp::fromUnixTime(::std::time_t seconds, uint32_t microseconds)
 		{
-			return Timestamp(static_cast<uint64_t>(seconds) * Timestamp::MicroSecondsPerSecond + microSeconds);
+			return Timestamp(static_cast<uint64_t>(seconds) * Timestamp::MicrosecondsPerSecond + microseconds);
 		}
 
 		Timestamp Timestamp::now()
