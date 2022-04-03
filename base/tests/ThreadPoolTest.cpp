@@ -32,7 +32,7 @@ class ThreadPoolTest : public testing::Test
 
 TEST_F(ThreadPoolTest, ConstructException)
 {
-	ASSERT_THROW(ThreadPool(1,0), std::invalid_argument);
+	ASSERT_THROW(ThreadPool(1,0), ::std::invalid_argument);
 }
 
 TEST_F(ThreadPoolTest, ExecuteTask)
@@ -40,11 +40,11 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 
 	ASSERT_TRUE(threadPool->execute([]()
 	{
-		std::cout << "hello threadpool" << std::endl;
+		::std::cout << "hello threadpool" << ::std::endl;
 	}));
 	ASSERT_TRUE(threadPool->execute([](int num)
 	{
-		std::cout << "your enter number is:" << num << std::endl;
+		::std::cout << "your enter number is:" << num << ::std::endl;
 	}, 5));
 
 }

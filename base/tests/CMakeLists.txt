@@ -15,3 +15,6 @@ TARGET_LINK_LIBRARIES(TimestampTest nets_base_log libgtest.a)
 
 ADD_EXECUTABLE(LogTest LogTest.cpp)
 TARGET_LINK_LIBRARIES(LogTest nets_base_log libgtest.a)
+
+ADD_EXECUTABLE(LogBufferTest LogBufferTest.cpp)
+TARGET_LINK_LIBRARIES(LogBufferTest nets_base_log libgtest.a)

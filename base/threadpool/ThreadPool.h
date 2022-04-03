@@ -163,7 +163,7 @@ namespace nets
 			lock_guard_type lock(mtx_);
 			::std::function<typename ::std::result_of<Fn(Args...)>::type ()> originFunc =
 					::std::bind(::std::forward<Fn>(fun), ::std::forward<Args>(args)...);
-			task_type task = std::bind(originFunc);
+			task_type task = ::std::bind(originFunc);
 			size_type threadSize = pool_.size();
 			// 如果核心线程池未满，就创建新核心线程执行任务
 			if (threadSize < corePoolSize_)

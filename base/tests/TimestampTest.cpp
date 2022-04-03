@@ -37,7 +37,7 @@ TEST(TimestampTest, ForMatter)
 TEST(TimestampTest, FromUnixTime)
 {
 	Timestamp t1 = Timestamp::now();
-	std::time_t tm;
+	::std::time_t tm;
 	time(&tm);
 	::std::cout << "formatter: " << t1.formatTime(true) << ::std::endl;
 	Timestamp t2 = Timestamp::fromUnixTime(tm);
