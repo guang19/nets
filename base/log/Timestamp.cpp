@@ -8,7 +8,6 @@ namespace nets
 {
 	namespace base
 	{
-
 		Timestamp::Timestamp(const Timestamp& rhs)
 		{
 			microsecondsSingsEpoch_ = rhs.microsecondsSingsEpoch_;
@@ -140,5 +139,14 @@ namespace nets
 				::std::chrono::system_clock::now().time_since_epoch()).count());
 		}
 
+		uint32_t Timestamp::getMicroseconds() const
+		{
+			return static_cast<uint32_t>(microsecondsSingsEpoch_ % Timestamp::MicrosecondsPerSecond);
+		}
+
+		::std::time_t Timestamp::getSeconds() const
+		{
+			return static_cast<::std::time_t>(microsecondsSingsEpoch_ / Timestamp::MicrosecondsPerSecond);
+		}
 	} // namespace base
 } // namespace nets

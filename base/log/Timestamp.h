@@ -48,15 +48,8 @@ namespace nets
 				static Timestamp now();
 
 			private:
-				uint32_t getMicroseconds() const
-				{
-					return static_cast<uint32_t>(microsecondsSingsEpoch_ % Timestamp::MicrosecondsPerSecond);
-				}
-
-				::std::time_t getSeconds() const
-				{
-					return static_cast<::std::time_t>(microsecondsSingsEpoch_ / Timestamp::MicrosecondsPerSecond);
-				}
+				uint32_t getMicroseconds() const;
+				::std::time_t getSeconds() const;
 
 			private:
 				uint64_t microsecondsSingsEpoch_;

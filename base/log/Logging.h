@@ -12,7 +12,7 @@ namespace nets
 		class Logger
 		{
 			public:
-				enum LogLevel
+				enum class LogLevel
 				{
 					TRACE = 0,
 					DEBUG,
@@ -20,6 +20,12 @@ namespace nets
 					WARN,
 					ERROR,
 					FATAL
+				};
+
+			private:
+				struct FileInfo
+				{
+
 				};
 		};
 	} // namespace base
