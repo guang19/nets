@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/1/3.
 //
 
-#include <functional>
 #include <gtest/gtest.h>
+#include <functional>
 #include <iostream>
 #include "base/threadpool/ThreadPool.h"
 

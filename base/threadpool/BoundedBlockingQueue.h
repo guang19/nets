@@ -93,11 +93,11 @@ namespace nets
                 }
 
             private:
-                size_type maxQueueSize_;
-                container_type queue_;
-                mutex_type mtx_;
-                condition_variable_type notFullCv_;
-                condition_variable_type notEmptyCv_;
+                size_type maxQueueSize_ { 0 };
+                container_type queue_ {};
+                mutex_type mtx_ {};
+                condition_variable_type notFullCv_ {};
+                condition_variable_type notEmptyCv_ {};
         };
 
 		template<typename T, typename Container>

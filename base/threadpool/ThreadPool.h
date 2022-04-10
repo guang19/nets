@@ -61,11 +61,11 @@ namespace nets
 						void startThread();
 
 					public:
-						size_type id_;
-						bool isCoreThread_;
-						task_type task_;
-						::std::thread thread_;
-						ThreadPoolRawPtr threadPoolRawPtr_;
+						size_type id_ { 0 };
+						bool isCoreThread_ { false };
+						task_type task_ { nullptr };
+						::std::thread thread_ {};
+						ThreadPoolRawPtr threadPoolRawPtr_ { nullptr };
 				};
 
 				using ThreadWrapperRawPtr = ThreadWrapper*;
@@ -99,7 +99,6 @@ namespace nets
 				~ThreadPool();
 
 				void init();
-
 				void shutdown();
 
 				template<typename Fn, typename... Args>
@@ -127,30 +126,24 @@ namespace nets
 				}
 
 			private:
-				::std::string name_;
-				atomic_bool_type running_;
+				::std::string name_ {};
+				atomic_bool_type running_ { false };
 				// 核心线程数，这部分线程属于常驻线程，一旦被创造就会随着线程池的周期结束而销毁
-				size_type corePoolSize_;
+				size_type corePoolSize_ { 0 };
 				// 线程池最大容纳的线程数
-				size_type maximumPoolSize_;
+				size_type maximumPoolSize_ { 0 };
 				// 线程池中除了常驻线程外，其余{ 空闲线程 }能够存活的时间
-				milliseconds_type keepAliveTime_;
+				milliseconds_type keepAliveTime_ { 0 };
 				// 任务队列
-				BoundedBlockingQueuePtr taskQueue_;
-				::std::list<ThreadWrapperPtr> pool_;
-				mutex_type mtx_;
-				condition_variable_type poolCv_;
+				BoundedBlockingQueuePtr taskQueue_ { nullptr };
+				::std::list<ThreadWrapperPtr> pool_ {};
+				mutex_type mtx_ {};
+				condition_variable_type poolCv_ {};
 				//拒绝策略
 				RejectionPolicy rejectionPolicy_;
-
-				static const ::std::string DefaultThreadPoolName;
-				static const milliseconds_type DefaultKeepAliveTime;
-				static const size_type DefaultMaxQueueSize;
 		};
 
-		const ::std::string ThreadPool::DefaultThreadPoolName = "NetsThreadPool";
-		const ThreadPool::milliseconds_type ThreadPool::DefaultKeepAliveTime = milliseconds_type(30000);
-		const ThreadPool::size_type ThreadPool::DefaultMaxQueueSize = INT32_MAX;
+
 
 		template<typename Fn, typename... Args>
 		bool ThreadPool::execute(Fn fun, Args... args)

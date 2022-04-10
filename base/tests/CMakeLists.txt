@@ -13,7 +13,7 @@ TARGET_LINK_LIBRARIES(ThreadPoolTest nets_base_threadpool libgtest.a)
 ADD_EXECUTABLE(TimestampTest TimestampTest.cpp)
 TARGET_LINK_LIBRARIES(TimestampTest nets_base_log libgtest.a)
 
-ADD_EXECUTABLE(LogTest LogTest.cpp)
+ADD_EXECUTABLE(LogTest LoggingTest.cpp)
 TARGET_LINK_LIBRARIES(LogTest nets_base_log libgtest.a)
 
 ADD_EXECUTABLE(LogBufferTest LogBufferTest.cpp)

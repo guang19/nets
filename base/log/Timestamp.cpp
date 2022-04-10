@@ -8,6 +8,11 @@ namespace nets
 {
 	namespace base
 	{
+		namespace
+		{
+			constexpr uint32_t MicrosecondsPerSecond = 1000000U;
+		}
+
 		Timestamp::Timestamp(const Timestamp& rhs)
 		{
 			microsecondsSingsEpoch_ = rhs.microsecondsSingsEpoch_;
@@ -77,28 +82,28 @@ namespace nets
 		{
 			uint32_t microseconds = getMicroseconds();
 			::std::time_t calculateSeconds = getSeconds() + seconds;
-			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * MicrosecondsPerSecond + microseconds);
 		}
 
 		Timestamp Timestamp::plusMinutes(int32_t minutes)
 		{
 			uint32_t microseconds = getMicroseconds();
 			::std::time_t calculateSeconds = getSeconds() + (minutes * 60);
-			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * MicrosecondsPerSecond + microseconds);
 		}
 
 		Timestamp Timestamp::plusHours(int32_t hours)
 		{
 			uint32_t microseconds = getMicroseconds();
 			::std::time_t calculateSeconds = getSeconds() + (hours * 3600);
-			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * MicrosecondsPerSecond + microseconds);
 		}
 
 		Timestamp Timestamp::plusDays(int32_t days)
 		{
 			uint32_t microseconds = getMicroseconds();
 			::std::time_t calculateSeconds = getSeconds() + (days * 86400);
-			return Timestamp(static_cast<uint64_t>(calculateSeconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+			return Timestamp(static_cast<uint64_t>(calculateSeconds) * MicrosecondsPerSecond + microseconds);
 		}
 
 		::std::string Timestamp::formatTime(bool showMicroseconds) const
@@ -130,7 +135,7 @@ namespace nets
 
 		Timestamp Timestamp::fromUnixTime(::std::time_t seconds, uint32_t microseconds)
 		{
-			return Timestamp(static_cast<uint64_t>(seconds) * Timestamp::MicrosecondsPerSecond + microseconds);
+			return Timestamp(static_cast<uint64_t>(seconds) * MicrosecondsPerSecond + microseconds);
 		}
 
 		Timestamp Timestamp::now()
@@ -141,12 +146,12 @@ namespace nets
 
 		uint32_t Timestamp::getMicroseconds() const
 		{
-			return static_cast<uint32_t>(microsecondsSingsEpoch_ % Timestamp::MicrosecondsPerSecond);
+			return static_cast<uint32_t>(microsecondsSingsEpoch_ % MicrosecondsPerSecond);
 		}
 
 		::std::time_t Timestamp::getSeconds() const
 		{
-			return static_cast<::std::time_t>(microsecondsSingsEpoch_ / Timestamp::MicrosecondsPerSecond);
+			return static_cast<::std::time_t>(microsecondsSingsEpoch_ / MicrosecondsPerSecond);
 		}
 	} // namespace base
 } // namespace nets

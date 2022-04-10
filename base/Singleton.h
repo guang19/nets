@@ -19,7 +19,18 @@ namespace nets
                 static T* getInstance(Args&& ...args);
 
             private:
-                static void destroy();
+                static void destroy()
+				{
+					// 单例类型必须是完整类型
+					typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
+					T_must_be_complete_type jugg;
+					(void) jugg;
+					if (value_ != nullptr)
+					{
+						delete value_;
+						value_ = nullptr;
+					}
+				}
 
             private:
                 static T* value_;
@@ -27,24 +38,10 @@ namespace nets
         };
 
         template <class T>
-        T* Singleton<T>::value_ = nullptr;
+        T* Singleton<T>::value_ { nullptr };
 
         template <class T>
-        ::std::once_flag Singleton<T>::onceFlag_;
-
-        template<class T>
-        void Singleton<T>::destroy()
-        {
-			// 单例类型必须是完整类型
-            typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
-            T_must_be_complete_type jugg;
-            (void) jugg;
-            if (value_ != nullptr)
-            {
-                delete value_;
-                value_ = nullptr;
-            }
-        }
+        ::std::once_flag Singleton<T>::onceFlag_ {};
 
         template<class T>
         template<typename ...Args>

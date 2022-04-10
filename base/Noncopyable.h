@@ -18,8 +18,8 @@ namespace nets
             public:
                 Noncopyable(const Noncopyable&) = delete;
                 Noncopyable(Noncopyable&&) = delete;
-                void operator=(const Noncopyable&) = delete;
-                void operator=(Noncopyable&&) = delete;
+				Noncopyable& operator=(const Noncopyable&) = delete;
+				Noncopyable& operator=(Noncopyable&&) = delete;
         };
     } // namespace base
 } // namespace nets

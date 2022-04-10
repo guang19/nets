@@ -8,6 +8,7 @@
 #include <chrono>
 #include <string>
 #include "base/Copyable.h"
+#include "base/log/LogBuffer.h"
 
 namespace nets
 {
@@ -41,7 +42,7 @@ namespace nets
 				Timestamp plusMinutes(int32_t minutes);
 				Timestamp plusHours(int32_t hours);
 				Timestamp plusDays(int32_t days);
-				::std::string formatTime(bool showMicroseconds = false) const;
+				::std::string formatTime(bool showMicroseconds = true) const;
 
 				static Timestamp fromUnixTime(::std::time_t seconds);
 				static Timestamp fromUnixTime(::std::time_t seconds, uint32_t microseconds);
@@ -52,8 +53,7 @@ namespace nets
 				::std::time_t getSeconds() const;
 
 			private:
-				uint64_t microsecondsSingsEpoch_;
-				const static uint32_t MicrosecondsPerSecond = 1000000U;
+				uint64_t microsecondsSingsEpoch_ { 0 };
 		};
 	} // namespace base
 } // namespace nets

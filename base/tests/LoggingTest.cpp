@@ -3,11 +3,14 @@
 //
 
 #include <gtest/gtest.h>
+#include "base/log/Logging.h"
 
+using namespace nets::base;
 
-TEST(TimeTest, UTCTime)
+TEST(LoggingTest, T)
 {
-
+	Logger logger;
+	logger.log(LogLevel::TRACE, __FILE__, __FUNCTION__, __LINE__);
 }
 
 int main(int argc, char** argv)

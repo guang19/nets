@@ -1,7 +1,7 @@
-SET(BaseHeaders Copyable.h Noncopyable.h Singleton.h)
+SET(BaseHeaders Copyable.h Noncopyable.h Singleton.h ThreadHelper.h)
 INSTALL(FILES ${BaseHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base)
 
-SET(BaseSrcs Copyable.h Noncopyable.h Singleton.h)
+SET(BaseSrcs ThreadHelper.cpp)
 ADD_LIBRARY(nets_base SHARED ${BaseSrcs})
 TARGET_LINK_LIBRARIES(nets_base pthread)
 SET_TARGET_PROPERTIES(nets_base PROPERTIES LINKER_LANGUAGE CXX)

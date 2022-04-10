@@ -9,6 +9,13 @@ namespace nets
 {
     namespace base
     {
+		namespace
+		{
+			constexpr const char* DefaultThreadPoolName { "NetsThreadPool" };
+			constexpr ThreadPool::milliseconds_type DefaultKeepAliveTime { 30000 };
+			constexpr ThreadPool::size_type DefaultMaxQueueSize { INT32_MAX };
+		}
+
         ThreadPool::ThreadWrapper::ThreadWrapper(size_type id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr)
 			: ThreadWrapper(id, false, nullptr, threadPoolRawPtr)
         {}
