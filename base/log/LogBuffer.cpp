@@ -3,33 +3,16 @@
 //
 
 #include "base/log/LogBuffer.h"
+
+#include <algorithm>
+#include <limits>
+#include <math.h>
 #include <string.h>
 
 namespace nets
 {
 	namespace base
 	{
-		LogBuffer::LogBuffer(uint32_t capacity) : capacity_(capacity), usedLen_(0)
-		{
-			buffer_ = new char[capacity_];
-			memset(buffer_, 0, capacity_);
-		}
-
-		LogBuffer::~LogBuffer()
-		{
-			if (buffer_ != nullptr)
-			{
-				delete[] buffer_;
-				buffer_ = nullptr;
-			}
-		}
-
-		void LogBuffer::clear()
-		{
-			memset(buffer_, 0, usedLen_);
-			usedLen_ = 0;
-		}
-
 		void LogBuffer::append(const char *data, uint32_t len)
 		{
 			if (available() > len)
@@ -37,82 +20,146 @@ namespace nets
 				memcpy(buffer_ + usedLen_, data, len);
 				usedLen_ += len;
 			}
-			else
+		}
+
+		namespace
+		{
+			constexpr char Digits[] = {"0123456789"};
+			constexpr char HexDigits[] = {"0123456789abcdef"};
+			constexpr uint32_t MaxNumSize = ::std::numeric_limits<uint64_t>::digits10 + 6;
+		}
+
+		template<typename Number>
+		uint32_t intToCstr(char *buffer, Number n, uint16_t base)
+		{
+			char *tmp = buffer;
+			if (base == 10)
 			{
-				char* newBuffer = nullptr;
-				try
+				do
 				{
-					uint32_t minCapacity = capacity_ + len + 1;
-					uint32_t newCapacity = capacity_ + (capacity_ >> 1);
-					if (newCapacity < minCapacity)
-					{
-						newCapacity = minCapacity;
-					}
-					newBuffer = new char[newCapacity];
-					memcpy(newBuffer, buffer_, usedLen_);
-					memcpy(newBuffer + usedLen_, data, len);
-					delete[] buffer_;
-					buffer_ = newBuffer;
-					usedLen_ += len;
-					capacity_ = newCapacity;
+					uint16_t lstIdx = static_cast<uint16_t>(n % 10);
+					*tmp = Digits[lstIdx];
+					++tmp;
+					n /= 10;
 				}
-				catch (...)
+				while (n > 0);
+				if (n < 0)
 				{
-					if (newBuffer != nullptr)
-					{
-						delete[] newBuffer;
-						newBuffer = nullptr;
-					}
-					abort();
+					*tmp = '-';
+					++tmp;
+				}
+				::std::reverse(buffer, tmp);
+			}
+			else if (base == 16)
+			{
+				tmp[0] = '0';
+				tmp[1] = 'x';
+				tmp += 2;
+				do
+				{
+					uint16_t lstIdx = static_cast<uint16_t>(n % 16);
+					*tmp = HexDigits[lstIdx];
+					++tmp;
+					n /= 16;
+				}
+				while (n > 0);
+				::std::reverse(buffer + 2, tmp);
+			}
+
+			return tmp - buffer;
+		}
+
+		template<typename Number>
+		void LogBuffer::appendInteger(Number n)
+		{
+			if (available() >= MaxNumSize)
+			{
+				usedLen_ += intToCstr(buffer_ + usedLen_, n, 10);
+			}
+		}
+
+		void LogBuffer::appendPointer(uintptr_t ptr)
+		{
+			if (available() >= MaxNumSize)
+			{
+				usedLen_ += intToCstr(buffer_ + usedLen_, ptr, 16);
+			}
+		}
+
+		template<typename Float>
+		void LogBuffer::appendFloat(Float n)
+		{
+			if (available() >= MaxNumSize)
+			{
+				char *cur = buffer_ + usedLen_;
+				if (isnan(n))
+				{
+					memcpy(cur, "nan", 3);
+					usedLen_ += 3;
+				}
+				else if (isinf(n))
+				{
+					memcpy(cur, "inf", 3);
+					usedLen_ += 3;
+				}
+				else
+				{
+					usedLen_ += snprintf(cur, MaxNumSize, "%.18g", n);
 				}
 			}
 		}
 
 		LogBuffer& LogBuffer::operator<<(int16_t n)
 		{
-			this->operator<<(static_cast<int32_t>(n));
+			appendInteger(n);
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(uint16_t n)
 		{
-			this->operator<<(static_cast<uint32_t>(n));
+			appendInteger(n);
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(int32_t n)
 		{
-			this->operator<<(::std::to_string(n));
+			appendInteger(n);
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(uint32_t n)
 		{
-			this->operator<<(::std::to_string(n));
+			appendInteger(n);
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(int64_t n)
 		{
-			this->operator<<(::std::to_string(n));
+			appendInteger(n);
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(uint64_t n)
 		{
-			this->operator<<(::std::to_string(n));
+			appendInteger(n);
+			return *this;
+		}
+
+		LogBuffer& LogBuffer::operator<<(const void *ptr)
+		{
+			appendPointer(reinterpret_cast<uintptr_t>(ptr));
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(float n)
 		{
-			this->operator<<(::std::to_string(n));
+			appendFloat(n);
 			return *this;
 		}
 
 		LogBuffer& LogBuffer::operator<<(double n)
 		{
-			this->operator<<(::std::to_string(n));
+			appendFloat(n);
 			return *this;
 		}
 
@@ -122,7 +169,7 @@ namespace nets
 			return *this;
 		}
 
-		LogBuffer& LogBuffer::operator<<(const char* str)
+		LogBuffer& LogBuffer::operator<<(const char *str)
 		{
 			if (str != nullptr)
 			{
@@ -131,15 +178,21 @@ namespace nets
 			return *this;
 		}
 
-		LogBuffer& LogBuffer::operator<<(const ::std::string& str)
+		LogBuffer& LogBuffer::operator<<(const ::std::string &str)
 		{
 			append(str.c_str(), str.length());
 			return *this;
 		}
 
-		LogBuffer& LogBuffer::operator<<(const LogBuffer& other)
+		LogBuffer& LogBuffer::operator<<(const LogBuffer &other)
 		{
-			append(other.buffer_, usedLen_);
+			append(other.buffer_, other.usedLen_);
+			return *this;
+		}
+
+		LogBuffer& LogBuffer::operator<<(const Timestamp& timestamp)
+		{
+			usedLen_ += timestamp.formatTime(buffer_ + usedLen_);
 			return *this;
 		}
 	} // namespace base

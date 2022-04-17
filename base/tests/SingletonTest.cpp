@@ -3,48 +3,45 @@
 //
 
 #include <gtest/gtest.h>
-#include <iostream>
 #include <string>
 #include <thread>
 #include "base/Singleton.h"
 
 using namespace nets::base;
 
-class Clazz
+DECLARE_SINGLETON(Clazz)
 {
+	DEFINE_SINGLETON(Clazz)
 	public:
-		Clazz() : name_()
+		explicit Clazz(const ::std::string& name) : name_(name)
 		{
-			::std::cout << "default construct" << ::std::endl;
 		}
 
-		Clazz(const ::std::string &s) : name_(s)
+		::std::string getName() const
 		{
-			::std::cout << "const reference copy construct" << ::std::endl;
+			return name_;
 		}
-
-		Clazz(const ::std::string &&s) : name_(s)
-		{
-			::std::cout << "rvalue reference construct " << ::std::endl;
-		}
-
-		~Clazz()
-		{
-			::std::cout << "Clazz Destruct " << name_ << ::std::endl;
-		}
-
 	private:
-		::std::string name_;
-};
+		::std::string name_ {};
 
-TEST(SingletonAddr, EQ)
+};
+INIT_SINGLETON(Clazz)
+
+
+// 请单独执行每一个TestCase
+// 因为 Clazz::getInstance() 被调用一次被初始化后，其他TestCase再调用也是相同的，所以单独执行每个TestCase才能验证每个Case的实际结果
+
+TEST(SingletonAddr, BasicUse)
 {
-	Clazz *cptr1 = Singleton<Clazz>::getInstance();
-	Clazz *cptr2 = Singleton<Clazz>::getInstance("cptr2");
-	Clazz *cptr3 = Singleton<Clazz>::getInstance("cptr3");
-	::std::cout << "SingletonAddr: " << cptr1 << ::std::endl;
+	Clazz* cptr1 = Clazz::getInstance();
+	Clazz* cptr2 = Clazz::getInstance();
+	Clazz* cptr3 = Clazz::getInstance("a");
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
+	::std::cout << "SingletonAddr: " << cptr1 << ' ' << cptr2 << ' ' << cptr3 << ::std::endl;
+	ASSERT_EQ(cptr1->getName(), "");
+	ASSERT_EQ(cptr2->getName(), "");
+	ASSERT_EQ(cptr3->getName(), "");
 }
 
 TEST(SingletonAddr, MultiThread)
@@ -53,20 +50,22 @@ TEST(SingletonAddr, MultiThread)
 	Clazz* cptr2 = nullptr;
 	Clazz* cptr3 = nullptr;
     ::std::thread t1([&] {
-		cptr1 = Singleton<Clazz>::getInstance("cp1");
+		cptr1 = Clazz::getInstance("cp1");
     });
-
     ::std::thread t2([&] {
-		cptr2 = Singleton<Clazz>::getInstance("cp2");
+		cptr2 = Clazz::getInstance("cp2");
     });
 	::std::thread t3([&] {
-		cptr3 = Singleton<Clazz>::getInstance("cp3");
+		cptr3 = Clazz::getInstance("cp3");
 	});
 	t1.join();
 	t2.join();
 	t3.join();
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
+	ASSERT_EQ(cptr1->getName(), "cp1");
+	ASSERT_EQ(cptr2->getName(), "cp1");
+	ASSERT_EQ(cptr3->getName(), "cp1");
 }
 
 int main(int argc, char **argv)

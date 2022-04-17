@@ -5,57 +5,107 @@
 #ifndef NETS_BASE_SINGLETON_H
 #define NETS_BASE_SINGLETON_H
 
+#include <mutex>
 #include "base/Noncopyable.h"
 
-namespace nets
-{
-    namespace base
-    {
-        template<class T>
-        class Singleton : Noncopyable
-        {
-            public:
-                template<typename ...Args>
-                static T* getInstance(Args&& ...args);
+/***
+ *
+ *	考虑到模板有跨DLL调用的问题，就不使用模板的方式写单例了
+ *	如果某个类需要使用单例，直接用下面三个宏搞定
+ *
+ */
 
-            private:
-                static void destroy()
-				{
-					// 单例类型必须是完整类型
-					typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
-					T_must_be_complete_type jugg;
-					(void) jugg;
-					if (value_ != nullptr)
-					{
-						delete value_;
-						value_ = nullptr;
-					}
-				}
+#define DECLARE_SINGLETON_CLASS(CLASS_NAME) \
+	class CLASS_NAME : nets::base::Noncopyable
 
-            private:
-                static T* value_;
-                static ::std::once_flag onceFlag_;
-        };
 
-        template <class T>
-        T* Singleton<T>::value_ { nullptr };
+#define DEFINE_SINGLETON(CLASS_NAME) \
+	protected:	\
+		CLASS_NAME() = default;	\
+		~CLASS_NAME() = default;	\
+			\
+	public:	\
+        template <typename ...Args>	\
+		static inline CLASS_NAME*  getInstance(Args&& ...args)	\
+		{                                           \
+			::std::call_once(OnceFlag, [](Args&& ...args)	\
+            {	\
+                Instance = new CLASS_NAME(::std::forward<Args>(args)...);	\
+                atexit(destroy);	\
+            }, ::std::forward<Args>(args)...);	\
+            return Instance;	\
+		}	\
+			\
+	private:	\
+		static void destroy()	\
+		{	\
+			typedef char T_must_be_complete_type[sizeof(CLASS_NAME) == 0 ? -1 : 1];	\
+			T_must_be_complete_type jugg;	\
+			(void) jugg;    \
+			if (Instance != nullptr)    \
+			{    \
+				delete Instance;	\
+				Instance = nullptr;	\
+			}    \
+		}	\
+				\
+	private:	\
+		static CLASS_NAME* Instance;	\
+		static ::std::once_flag OnceFlag;
 
-        template <class T>
-        ::std::once_flag Singleton<T>::onceFlag_ {};
+#define INIT_SINGLETON(CLASS_NAME) \
+	CLASS_NAME* CLASS_NAME::Instance	{ nullptr }; \
+	::std::once_flag CLASS_NAME::OnceFlag {};
 
-        template<class T>
-        template<typename ...Args>
-        T* Singleton<T>::getInstance(Args&& ...args)
-        {
-            ::std::call_once(onceFlag_, [](Args&& ...args)
-            {
-                value_ = new T(::std::forward<Args>(args)...);
-				// 自动释放内存
-                atexit(destroy);
-            }, ::std::forward<Args>(args)...);
-            return value_;
-        }
-    } // namespace base
-} // namespace nets
+//namespace nets
+//{
+//    namespace base
+//    {
+//        template<class T>
+//        class Singleton : Noncopyable
+//        {
+//            public:
+//                template<typename ...Args>
+//                static T* getInstance(Args&& ...args);
+//
+//            private:
+//                static void destroy()
+//				{
+//					// 单例类型必须是完整类型
+//					typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
+//					T_must_be_complete_type jugg;
+//					(void) jugg;
+//					if (value_ != nullptr)
+//					{
+//						delete value_;
+//						value_ = nullptr;
+//					}
+//				}
+//
+//            private:
+//                static T* value_;
+//                static ::std::once_flag onceFlag_;
+//        };
+//
+//        template <class T>
+//        T* Singleton<T>::value_ { nullptr };
+//
+//        template <class T>
+//        ::std::once_flag Singleton<T>::onceFlag_ {};
+//
+//        template<class T>
+//        template<typename ...Args>
+//        T* Singleton<T>::getInstance(Args&& ...args)
+//        {
+//            ::std::call_once(onceFlag_, [](Args&& ...args)
+//            {
+//                value_ = new T(::std::forward<Args>(args)...);
+//				// 自动释放内存
+//                atexit(destroy);
+//            }, ::std::forward<Args>(args)...);
+//            return value_;
+//        }
+//    } // namespace base
+//} // namespace nets
 
 #endif // NETS_BASE_SINGLETON_H

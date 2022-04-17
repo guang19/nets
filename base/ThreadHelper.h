@@ -12,9 +12,7 @@ namespace nets
 {
 	namespace base
 	{
-		__thread pid_t cacheTid_ = 0;
-		__thread char tidString_[32] = { 0 };
-		__thread uint32_t tidStringLength_ = 0;
+		extern __thread pid_t cacheTid_;
 
 		pid_t getTid();
 		pid_t currentTid();

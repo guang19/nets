@@ -6,7 +6,12 @@
 #define NETS_LOGBUFFER_H
 
 #include <string>
+#include "base/log/Timestamp.h"
 #include "base/Noncopyable.h"
+
+#ifndef LOG_BUFFER_SIZE
+	#define LOG_BUFFER_SIZE (1024 << 2)
+#endif
 
 namespace nets
 {
@@ -15,55 +20,62 @@ namespace nets
 		class LogBuffer : Noncopyable
 		{
 			public:
-				explicit LogBuffer(uint32_t capacity);
-				~LogBuffer();
+				LogBuffer() = default;
+				~LogBuffer() = default;
 
-				const char* getBuffer() const
+				inline const char* getBuffer() const
 				{
 					return buffer_;
 				}
 
-				::std::string toString() const
+				inline char* getCurrentBuffer()
 				{
-					return ::std::string(buffer_, usedLen_);
+					return buffer_ + usedLen_;
 				}
 
-				void reset()
-				{
-					usedLen_ = 0;
-				}
-
-				void clear();
-
-				uint32_t available() const
+				inline uint32_t available() const
 				{
 					return capacity_ - usedLen_;
 				}
 
-				uint32_t length() const
+				inline uint32_t length() const
 				{
 					return usedLen_;
 				}
 
+				inline void addLen(uint32_t len)
+				{
+					usedLen_ += len;
+				}
+
 				void append(const char *data, uint32_t len);
+				void appendPointer(uintptr_t ptr);
+
+				template <typename Number>
+				void appendInteger(Number n);
+
+				template <typename Float>
+				void appendFloat(Float n);
 
 				LogBuffer& operator<<(int16_t n);
 				LogBuffer& operator<<(uint16_t n);
-				LogBuffer& operator<<(int32_t);
-				LogBuffer& operator<<(uint32_t);
-				LogBuffer& operator<<(int64_t);
-				LogBuffer& operator<<(uint64_t);
+				LogBuffer& operator<<(int32_t n);
+				LogBuffer& operator<<(uint32_t n);
+				LogBuffer& operator<<(int64_t n);
+				LogBuffer& operator<<(uint64_t n);
+				LogBuffer& operator<<(const void* ptr);
 				LogBuffer& operator<<(float n);
-				LogBuffer& operator<<(double);
+				LogBuffer& operator<<(double n);
 				LogBuffer& operator<<(char c);
 				LogBuffer& operator<<(const char* str);
 				LogBuffer& operator<<(const ::std::string& str);
 				LogBuffer& operator<<(const LogBuffer& stream);
+				LogBuffer& operator<<(const Timestamp& timestamp);
 
 			private:
-				uint32_t capacity_ { 0 };
+				char buffer_[LOG_BUFFER_SIZE] { 0 };
+				uint32_t capacity_ { LOG_BUFFER_SIZE };
 				uint32_t usedLen_ { 0 };
-				char *buffer_ { nullptr };
 		};
 	} // namespace base
 } // namespace nets

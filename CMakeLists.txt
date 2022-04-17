@@ -5,18 +5,31 @@ PROJECT(nets LANGUAGES C CXX)
 # 开启ctest
 ENABLE_TESTING()
 
+MESSAGE(STATUS "======CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}======")
+
+# Definition
+# 日志缓存大小：默认4k。
+#ADD_DEFINITIONS(-DLOG_BUFFER_SIZE=4096)
+# 日志等级：默认DEBUG。可选：TRACE,DEBUG,INFO,WARN,ERROR,FATAL
+ADD_DEFINITIONS(-DLOG_LEVEL=TRACE)
+# 日志输出目标：默认标准输出。可选：STDOUT,FILE
+ADD_DEFINITIONS(-DLOG_APPENDER=STDOUT)
+#日志文件路径
+ADD_DEFINITIONS(-DLOG_PATH="~/nets/log")
+#日志文件回滚大小：单位:MB
+ADD_DEFINITIONS(-DLOG_ROLLING_SIZE=24)
+
+# C CXX Compiler
 SET(CMAKE_C_COMPILER "/usr/bin/gcc")
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
+# CXX Compiler Flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g \
 -Wall \
--Werror \
 -Wextra \
+-Werror \
 -Wno-unused-parameter \
 ")
-
-MESSAGE(STATUS "======CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}======")
-
 IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -DNDEBUG")
 ELSE()

@@ -113,18 +113,38 @@ namespace nets
 			localtime_r(&seconds, &tmS);
 			if (showMicroseconds)
 			{
-				char timeStr[27] = {0};
-				snprintf(timeStr, sizeof(timeStr), "%04d-%02d-%02d %02d:%02d:%02d.%06d",
+				char timeStr[24] = { 0 };
+				snprintf(timeStr, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
 						 tmS.tm_year + 1900, tmS.tm_mon, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec,
 						 getMicroseconds());
 				return timeStr;
 			}
 			else
 			{
-				char timeStr[20] = {0};
-				snprintf(timeStr, sizeof(timeStr), "%04d-%02d-%02d %02d:%02d:%02d",
+				char timeStr[20] = { 0 };
+				snprintf(timeStr, 20, "%04d-%02d-%02d %02d:%02d:%02d",
 						 tmS.tm_year + 1900, tmS.tm_mon, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec);
 				return timeStr;
+			}
+		}
+
+		uint32_t Timestamp::formatTime(char* buffer ,bool showMicroseconds) const
+		{
+			::std::time_t seconds = getSeconds();
+			struct tm tmS {};
+			localtime_r(&seconds, &tmS);
+			if (showMicroseconds)
+			{
+				snprintf(buffer, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d",
+						 tmS.tm_year + 1900, tmS.tm_mon, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec,
+						 getMicroseconds());
+				return 23;
+			}
+			else
+			{
+				snprintf(buffer, 20, "%04d-%02d-%02d %02d:%02d:%02d",
+						 tmS.tm_year + 1900, tmS.tm_mon, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec);
+				return 19;
 			}
 		}
 

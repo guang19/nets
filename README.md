@@ -9,3 +9,6 @@ nets是一个基于Linux平台的多线程C++网络库
 - 静态变量：大驼峰；
 - 宏定义：全大写，单词之间加下划线；
 - gtest：test_suite_name和test_name大驼峰。
+
+## 宏参数
+- LOG_BUFFER_SIZE：日志缓冲区大小，单位：kb。默认4kb；

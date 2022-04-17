@@ -3,7 +3,8 @@
 //
 
 #include "base/log/Logging.h"
-#include "base/log/LogBuffer.h"
+
+#include <stdarg.h>
 
 namespace nets
 {
@@ -11,7 +12,6 @@ namespace nets
 	{
 		namespace
 		{
-			constexpr uint32_t LogBufferFixedCapacity = 4096;
 			const char* const LogLevelName[LogLevel::NUM_OF_LOG_LEVELS] =
 			{
 				"TRACE",
@@ -23,23 +23,49 @@ namespace nets
 			};
 		}
 
-		void Logger::trace(const LogLineComponent& logLineComponent)
+		Logger::Logger(LogLevel logLevel, const char* sourcefile, uint32_t line) : logBuffer_(),
+		logLineComponent_(Timestamp::now(), logLevel, sourcefile, line)
 		{
-			LogBuffer logBuffer(LogBufferFixedCapacity);
-			logBuffer << logLineComponent.time_.formatTime() << ' ';
-			currentTid();
-			logBuffer << '[';
-			logBuffer.append(tidString_, tidStringLength_);
-			logBuffer << ']';
-			logBuffer << ' ';
-			logBuffer << '[';
-			logBuffer << LogLevelName[logLineComponent.logLevel_];
-			logBuffer << ']' << ' ';
-			logBuffer << logLineComponent.sourcefile_;
-			logBuffer << "::" << logLineComponent.function_ << ':';
-			logBuffer << logLineComponent.line_ << ' ' << '-' << ' ';
-			fwrite(logBuffer.getBuffer(),1, logBuffer.length(), ::stdout);
-			fflush(::stdout);
+			recordLineComponent(logLineComponent_);
+		}
+
+		Logger::~Logger()
+		{
+			LogMgr->getLogAppender()->append(logBuffer_);
+		}
+
+		void Logger::log(const char* fmt, ...)
+		{
+			va_list args;
+			va_start(args, fmt);
+			recordFormat(fmt, args);
+			va_end(args);
+		}
+
+		void Logger::recordLineComponent(const LogLineComponent& logLineComponent)
+		{
+			logBuffer_ << logLineComponent.time_;
+			logBuffer_ << " [" << static_cast<int64_t>(currentTid()) << "] ";
+			logBuffer_ << LogLevelName[logLineComponent.logLevel_] << ' ';
+			logBuffer_ << logLineComponent.sourcefile_ << ':' << logLineComponent.line_ << " - ";
+		}
+
+		void Logger::recordFormat(const char* fmt, va_list args)
+		{
+			va_list tmp;
+			va_copy(tmp, args);
+			uint32_t len = vsnprintf(nullptr, 0, fmt, tmp) + 1;
+			va_end(tmp);
+			if (len > 0 && logBuffer_.available() > len)
+			{
+				vsnprintf(logBuffer_.getCurrentBuffer(), len, fmt, args);
+				logBuffer_.addLen(len - 1);
+				logBuffer_ << '\n';
+			}
+			else
+			{
+				logBuffer_ << "[Log content length more than LOG_BUFFER_SIZE]\n";
+			}
 		}
 	} // namespace base
 } // namespace nets

@@ -8,7 +8,6 @@
 #include <chrono>
 #include <string>
 #include "base/Copyable.h"
-#include "base/log/LogBuffer.h"
 
 namespace nets
 {
@@ -43,6 +42,7 @@ namespace nets
 				Timestamp plusHours(int32_t hours);
 				Timestamp plusDays(int32_t days);
 				::std::string formatTime(bool showMicroseconds = true) const;
+				uint32_t formatTime(char* buffer ,bool showMicroseconds = true) const;
 
 				static Timestamp fromUnixTime(::std::time_t seconds);
 				static Timestamp fromUnixTime(::std::time_t seconds, uint32_t microseconds);
