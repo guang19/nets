@@ -27,15 +27,15 @@ TEST(LoggingTest, BasicUse)
 
 TEST(LoggingTest, StreamAPI)
 {
-	LOGS_TRACE << "这是一条trace信息";
-	LOGS_DEBUG << "这是一条debug信息";
-	LOGS_INFO << "这是一条info信息";
-	LOGS_WARN <<"这是一条warn信息";
-	LOGS_ERROR << "这是一条error信息";
-	LOGS_FATAL << "这是一条fatal信息";
+	LOGS_TRACE << "这是一条trace信息\n";
+	LOGS_DEBUG << "这是一条debug信息\n";
+	LOGS_INFO << "这是一条info信息\n";
+	LOGS_WARN <<"这是一条warn信息\n";
+	LOGS_ERROR << "这是一条error信息\n";
+	LOGS_FATAL << "这是一条fatal信息\n";
 	::std::thread t1([&]()
 					 {
-						 LOGS_DEBUG << "这是一条debug信息";
+						 LOGS_DEBUG << "这是一条debug信息\n";
 					 });
 	t1.join();
 }
@@ -66,9 +66,9 @@ TEST(LoggingTest, StackOverflow)
 			  "废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话");
 }
 
+
 TEST(LoggingTest, Appender)
 {
-
 }
 
 int main(int argc, char** argv)

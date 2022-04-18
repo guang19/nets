@@ -45,7 +45,7 @@ namespace nets
 		void Logger::recordLineComponent(const LogLineComponent& logLineComponent)
 		{
 			logBuffer_ << logLineComponent.time_;
-			logBuffer_ << " [" << static_cast<int64_t>(currentTid()) << "] ";
+			logBuffer_ << " [" << static_cast<int32_t>(currentTid()) << "] ";
 			logBuffer_ << LogLevelName[logLineComponent.logLevel_] << ' ';
 			logBuffer_ << logLineComponent.sourcefile_ << ':' << logLineComponent.line_ << " - ";
 		}
