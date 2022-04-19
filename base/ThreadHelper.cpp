@@ -5,7 +5,6 @@
 
 #include "base/ThreadHelper.h"
 
-#include <stdio.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 

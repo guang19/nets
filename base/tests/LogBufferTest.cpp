@@ -5,15 +5,13 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <cmath>
-#include "base/log/LogBuffer.h"
-#include "base/log/Timestamp.h"
+#include "base/log/LogBufferStream.h"
 
 using namespace nets::base;
 
 TEST(LogBufferTest, T)
 {
-	LogBuffer logBuffer;
-	Timestamp::now().formatTime(logBuffer.getCurrentBuffer());
+	LogBufferStream logBuffer;
 	::std::cout << logBuffer.getBuffer() << '\n';
 	::std::cout << logBuffer.length() << '\n';
 	::std::cout << logBuffer.available();
@@ -21,20 +19,20 @@ TEST(LogBufferTest, T)
 
 TEST(LogBufferTest, Baseic)
 {
-	LogBuffer logBuffer;
+	LogBufferStream logBuffer;
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), (uint32_t)LOG_BUFFER_SIZE);
+	ASSERT_EQ(logBuffer.available(), LogBufferSize);
 }
 
 TEST(LogBufferTest, Append)
 {
-	LogBuffer logBuffer;
+	LogBufferStream logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), (uint32_t)LOG_BUFFER_SIZE);
+	ASSERT_EQ(logBuffer.available(), LogBufferSize);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
-	ASSERT_EQ(logBuffer.available(),  (uint32_t)LOG_BUFFER_SIZE - 3);
+	ASSERT_EQ(logBuffer.available(),  LogBufferSize - 3);
 	ASSERT_STREQ(logBuffer.getBuffer(), "abc");
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	::std::cout << "=============================================\n";
@@ -48,13 +46,13 @@ TEST(LogBufferTest, Append)
 
 TEST(LogBufferTest, AppendBuffer)
 {
-	LogBuffer logBuffer;
+	LogBufferStream logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), (uint32_t)LOG_BUFFER_SIZE);
+	ASSERT_EQ(logBuffer.available(), LogBufferSize);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
-	ASSERT_EQ(logBuffer.available(),  (uint32_t)LOG_BUFFER_SIZE - 3);
-	LogBuffer logBuffer2;
+	ASSERT_EQ(logBuffer.available(), LogBufferSize - 3);
+	LogBufferStream logBuffer2;
 	logBuffer2 << "abc";
 	logBuffer << logBuffer2 << '\n';
 	::std::cout << logBuffer.getBuffer();

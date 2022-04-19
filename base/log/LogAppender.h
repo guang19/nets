@@ -5,7 +5,7 @@
 #ifndef NETS_LOGAPPENDER_H
 #define NETS_LOGAPPENDER_H
 
-#include "base/log/LogBuffer.h"
+#include "base/log/LogBufferStream.h"
 #include "base/Singleton.h"
 
 namespace nets
@@ -24,7 +24,7 @@ namespace nets
 				virtual ~ILogAppender() = default;
 
 			public:
-				virtual void append(const LogBuffer& logBuffer) = 0;
+				virtual void append(const LogBufferStream& logBuffer) = 0;
 		};
 
 		DECLARE_SINGLETON_CLASS(StdoutLogAppender), public ILogAppender
@@ -32,7 +32,7 @@ namespace nets
 			DEFINE_SINGLETON(StdoutLogAppender)
 
 			public:
-				void append(const LogBuffer &logBuffer) override;
+				void append(const LogBufferStream &logBuffer) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(FileLogAppender), public ILogAppender
@@ -40,7 +40,7 @@ namespace nets
 			DEFINE_SINGLETON(FileLogAppender)
 
 			public:
-				void append(const LogBuffer &logBuffer) override;
+				void append(const LogBufferStream &logBuffer) override;
 		};
 	} // namespace base
 } // namespace nets

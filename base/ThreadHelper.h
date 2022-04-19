@@ -5,7 +5,7 @@
 #ifndef NETS_THREADHELPER_H
 #define NETS_THREADHELPER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <sys/types.h>
 
 namespace nets

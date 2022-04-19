@@ -12,13 +12,13 @@ namespace nets
 
 		INIT_SINGLETON(FileLogAppender)
 
-		void StdoutLogAppender::append(const nets::base::LogBuffer &logBuffer)
+		void StdoutLogAppender::append(const nets::base::LogBufferStream &logBuffer)
 		{
 			fwrite(logBuffer.getBuffer(),1, logBuffer.length(), ::stdout);
 			fflush(::stdout);
 		}
 
-		void FileLogAppender::append(const nets::base::LogBuffer &logBuffer)
+		void FileLogAppender::append(const nets::base::LogBufferStream &logBuffer)
 		{
 
 		}
