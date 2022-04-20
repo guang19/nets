@@ -15,46 +15,46 @@
  *
  */
 
-#define DECLARE_SINGLETON_CLASS(CLASS_NAME) \
+#define DECLARE_SINGLETON_CLASS(CLASS_NAME)			\
 	class CLASS_NAME : nets::base::Noncopyable
 
 
-#define DEFINE_SINGLETON(CLASS_NAME) \
-	protected:	\
-		CLASS_NAME() = default;	\
-		~CLASS_NAME() = default;	\
-			\
-	public:	\
-        template <typename ...Args>	\
+#define DEFINE_SINGLETON(CLASS_NAME) 							\
+	protected:													\
+		CLASS_NAME() = default;									\
+		~CLASS_NAME() = default;								\
+																\
+	public:														\
+        template <typename ...Args>								\
 		static inline CLASS_NAME*  getInstance(Args&& ...args)	\
-		{                                           \
-			::std::call_once(OnceFlag, [](Args&& ...args)	\
-            {	\
+		{                                           			\
+			::std::call_once(OnceFlag, [](Args&& ...args)		\
+            {													\
                 Instance = new CLASS_NAME(::std::forward<Args>(args)...);	\
-                atexit(destroy);	\
-            }, ::std::forward<Args>(args)...);	\
-            return Instance;	\
-		}	\
-			\
-	private:	\
-		static void destroy()	\
-		{	\
+                atexit(destroy);						\
+            }, ::std::forward<Args>(args)...);			\
+            return Instance;							\
+		}												\
+														\
+	private:											\
+		static void destroy()							\
+		{												\
 			typedef char T_must_be_complete_type[sizeof(CLASS_NAME) == 0 ? -1 : 1];	\
-			T_must_be_complete_type jugg;	\
-			(void) jugg;    \
-			if (Instance != nullptr)    \
-			{    \
-				delete Instance;	\
-				Instance = nullptr;	\
-			}    \
-		}	\
-				\
-	private:	\
-		static CLASS_NAME* Instance;	\
+			T_must_be_complete_type jugg;				\
+			(void) jugg;    							\
+			if (Instance != nullptr)    				\
+			{    										\
+				delete Instance;						\
+				Instance = nullptr;						\
+			}    										\
+		}												\
+														\
+	private:											\
+		static CLASS_NAME* Instance;					\
 		static ::std::once_flag OnceFlag;
 
-#define INIT_SINGLETON(CLASS_NAME) \
-	CLASS_NAME* CLASS_NAME::Instance	{ nullptr }; \
+#define INIT_SINGLETON(CLASS_NAME) 						\
+	CLASS_NAME* CLASS_NAME::Instance { nullptr };		\
 	::std::once_flag CLASS_NAME::OnceFlag {};
 
 //namespace nets

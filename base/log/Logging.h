@@ -8,6 +8,7 @@
 #include <ctime>
 #include <cstring>
 #include <string>
+#include "base/Copyable.h"
 #include "base/Noncopyable.h"
 #include "base/log/LogBufferStream.h"
 
@@ -43,7 +44,7 @@ namespace nets
 			NUM_OF_LOG_LEVELS = 6
 		};
 
-		class LogMessageTime
+		class LogMessageTime : public Copyable
 		{
 			public:
 				LogMessageTime();
@@ -79,38 +80,66 @@ namespace nets
 		typedef struct LogMessage_
 		{
 			public:
-				explicit LogMessage_(const LogMessageTime& time, LogLevel logLevel,
-								  const char* file, uint32_t line) noexcept;
-
-				inline LogBufferStream& getLogBufferStream()
-				{
-					return logBufferStream_;
-				}
+				LogMessage_(LogLevel logLevel, const char* file, uint32_t line) noexcept;
+				LogMessage_(LogLevel logLevel, const char* file, uint32_t line, const char* message) noexcept;
 
 			public:
-				void formatMessageInfo();
-				void formatMessageArgs(const char* fmt, va_list args);
+				const LogMessageTime& getLogMessageTime() const
+				{
+					return logMessageTime_;
+				}
+
+				LogLevel getLogLevel() const
+				{
+					return logLevel_;
+				}
+
+				const char* getFilename() const
+				{
+					return filename_;
+				}
+
+				void setFilenameFromPath(const char* file);
+
+				uint32_t getLine() const
+				{
+					return line_;
+				}
+
+				const char* getMessage() const
+				{
+					return message_;
+				}
+
+				void setMessage(const char* message)
+				{
+					message_ = message;
+				}
 
 			private:
 				LogMessageTime logMessageTime_ {};
 				LogLevel logLevel_ { LOG_LEVEL };
 				const char* filename_ { nullptr };
 				uint32_t line_ { 0 };
-				LogBufferStream logBufferStream_ {};
+				const char* message_ { nullptr };
 		} LogMessage;
 
-		class Logger
+		class LogFormatter
+		{
+				virtual uint32_t formatMessage(char* buffer, const LogMessage& logMessage) = 0;
+		};
+
+		class DefaultLogFormatter : LogFormatter
+		{
+				uint32_t formatMessage(char *buffer, const LogMessage &logMessage) override;
+		};
+
+		class LogMessageStream : public LogBufferStream
 		{
 			public:
-				Logger(LogLevel logLevel, const char* file, uint32_t line) noexcept;
-				Logger(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...) noexcept;
-				~Logger();
-
-			public:
-				inline LogBufferStream& getMessageStream()
-				{
-					return logMessage_.getLogBufferStream();
-				}
+				LogMessageStream(LogLevel logLevel, const char* file, uint32_t line) noexcept;
+				LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...) noexcept;
+				~LogMessageStream();
 
 			private:
 				LogMessage logMessage_;
@@ -118,80 +147,78 @@ namespace nets
 	} // namespace base
 } // namespace nets
 
-#define LOG_TRACE(fmt, ...)																	\
-	do                         																\
-	{                          																\
-        if (LogLevel::TRACE >= LOG_LEVEL)													\
-		{																					\
-			nets::base::Logger(LogLevel::TRACE, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}																					\
-	}                          																\
+#define LOG_TRACE(fmt, ...)																		\
+	do                         																	\
+	{                          																	\
+        if (LogLevel::TRACE >= LOG_LEVEL)														\
+		{																						\
+			nets::base::LogMessage(LogLevel::TRACE, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
+		}																						\
+	}                          																	\
 	while (0)
 
-#define LOG_DEBUG(fmt, ...) 																\
-	do                         																\
-	{                          																\
-		if (LogLevel::DEBUG >= LOG_LEVEL) 													\
-		{																					\
-			nets::base::Logger(LogLevel::DEBUG, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}																					\
-	}                          																\
+#define LOG_DEBUG(fmt, ...) 																	\
+	do                         																	\
+	{                          																	\
+		if (LogLevel::DEBUG >= LOG_LEVEL) 														\
+		{																						\
+			nets::base::LogMessage(LogLevel::DEBUG, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
+		}																						\
+	}                          																	\
 	while (0)
 
-#define LOG_INFO(fmt, ...) 																\
-	do                        															\
-	{                          															\
-		if (LogLevel::INFO >= LOG_LEVEL) 												\
-		{																				\
-			nets::base::Logger(LogLevel::INFO, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}																				\
-	}                          															\
+#define LOG_INFO(fmt, ...) 																		\
+	do                        																	\
+	{                          																	\
+		if (LogLevel::INFO >= LOG_LEVEL) 														\
+		{																						\
+			nets::base::LogMessage(LogLevel::INFO, __FILE__, __LINE__, fmt, ##__VA_ARGS__);		\
+		}																						\
+	}                          																	\
 	while (0)
 
-#define LOG_WARN(fmt, ...) 															\
-	do                         														\
-	{                          														\
-		nets::base::Logger(LogLevel::WARN, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-	}                          														\
+#define LOG_WARN(fmt, ...) 																		\
+	do                         																	\
+	{                          																	\
+		nets::base::LogMessage(LogLevel::WARN, __FILE__, __LINE__, fmt, ##__VA_ARGS__);			\
+	}                          																	\
 	while (0)
 
-#define LOG_ERROR(fmt, ...) 															\
-	do                         															\
-	{                          															\
-		nets::base::Logger(LogLevel::ERROR, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-	}                          															\
+#define LOG_ERROR(fmt, ...) 																	\
+	do                         																	\
+	{                          																	\
+		nets::base::LogMessage(LogLevel::ERROR, __FILE__, __LINE__, fmt, ##__VA_ARGS__);		\
+	}                          																	\
 	while (0)
 
-#define LOG_FATAL(fmt, ...) 															\
-	do                         															\
-	{                         															\
-		nets::base::Logger(LogLevel::FATAL, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-	}                      																\
+#define LOG_FATAL(fmt, ...) 																	\
+	do                         																	\
+	{                         																	\
+		nets::base::LogMessage(LogLevel::FATAL, __FILE__, __LINE__, fmt, ##__VA_ARGS__);		\
+	}                      																		\
 	while (0)
-
 
 // stream api
+#define LOGS_TRACE 																				\
+		if (LogLevel::TRACE >= LOG_LEVEL) 														\
+			nets::base::LogMessage(LogLevel::TRACE, __FILE__, __LINE__).getStream()
 
-#define LOGS_TRACE 																		\
-		if (LogLevel::TRACE >= LOG_LEVEL) 												\
-			nets::base::Logger(LogLevel::TRACE, __FILE__, __LINE__).getMessageStream()
+#define LOGS_DEBUG 																				\
+		if (LogLevel::DEBUG >= LOG_LEVEL) 														\
+			nets::base::LogMessage(LogLevel::DEBUG, __FILE__, __LINE__).getStream()
 
-#define LOGS_DEBUG 																		\
-		if (LogLevel::DEBUG >= LOG_LEVEL) 												\
-			nets::base::Logger(LogLevel::DEBUG, __FILE__, __LINE__).getMessageStream()
+#define LOGS_INFO 																				\
+		if (LogLevel::INFO >= LOG_LEVEL) 														\
+			nets::base::LogMessage(LogLevel::INFO, __FILE__, __LINE__).getStream()
 
-#define LOGS_INFO 																		\
-		if (LogLevel::INFO >= LOG_LEVEL) 												\
-			nets::base::Logger(LogLevel::INFO, __FILE__, __LINE__).getMessageStream()
+#define LOGS_WARN 																				\
+		if (LogLevel::WARN >= LOG_LEVEL) 														\
+			nets::base::LogMessage(LogLevel::WARN, __FILE__, __LINE__).getStream()
 
-#define LOGS_WARN 																		\
-		if (LogLevel::WARN >= LOG_LEVEL) 												\
-			nets::base::Logger(LogLevel::WARN, __FILE__, __LINE__).getMessageStream()
+#define LOGS_ERROR 																				\
+			nets::base::LogMessage(LogLevel::ERROR, __FILE__, __LINE__).getStream()
 
-#define LOGS_ERROR 																		\
-			nets::base::Logger(LogLevel::ERROR, __FILE__, __LINE__).getMessageStream()
-
-#define LOGS_FATAL 																		\
-			nets::base::Logger(LogLevel::FATAL, __FILE__, __LINE__).getMessageStream()
+#define LOGS_FATAL 																				\
+			nets::base::LogMessage(LogLevel::FATAL, __FILE__, __LINE__).getStream()
 
 #endif //NETS_LOGGING_H
