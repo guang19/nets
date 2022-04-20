@@ -11,3 +11,11 @@ nets是一个基于Linux平台的多线程C++网络库
 - gtest：test_suite_name和test_name大驼峰。
 
 ## 宏参数
+- LOG_LEVEL：日志等级，默认DEBUG。可选：TRACE,DEBUG,INFO,WARN,ERROR,FATAL；
+- LOG_WRITER：日志输出目标，默认STDOUT。可选：STDOUT,SINGLE_FILE，DAILY_FILE，ROLLING_FILE；
+  - STDOUT：标准输出；
+  - SINGLE_FILE：输出单文件，不回滚，不计大小与时间；
+  - DAILY_FILE：每日生成一个文件，不计大小；
+  - ROLLING_FILE：按照文件大小回滚。
+- LOG_FILE：日志文件，默认为：“~/nets/nets.log”；
+- LOG_ROLLING_SIZE：日志文件回滚大小，单位:MB，默认24M。（仅当LOG_WRITER为ROLLING_FILE时有效）

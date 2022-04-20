@@ -72,7 +72,7 @@ namespace nets
 				LogBufferStream& operator<<(const ::std::string& str);
 				LogBufferStream& operator<<(const LogBufferStream& stream);
 
-			private:
+			protected:
 				char buffer_[LogBufferSize] { 0 };
 				uint32_t capacity_ { LogBufferSize };
 				uint32_t usedLen_ { 0 };

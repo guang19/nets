@@ -3,9 +3,11 @@
 //
 
 #include "base/log/Logging.h"
+
 #include <cstdarg>
 #include <sys/time.h>
-#include "base/ThreadHelper.h"
+#include "base/log/LogWriter.h"
+#include "base/log/LogFormatter.h"
 
 namespace nets
 {
@@ -16,85 +18,68 @@ namespace nets
 			constexpr uint32_t MicrosecondsPerSecond = 1000000U;
 		}
 
-		LogMessageTime::LogMessageTime() : timeS_(), secondsEpoch_(0), microseconds_(0)
+		LogMessageTime::LogMessageTime() : timestampEpoch_(0)
 		{
 		}
 
-		LogMessageTime::LogMessageTime(uint64_t timestamp)
+		LogMessageTime::LogMessageTime(uint64_t timestamp) : timestampEpoch_(timestamp)
 		{
-			secondsEpoch_ = static_cast<::std::time_t>(timestamp / MicrosecondsPerSecond);
-			microseconds_ = timestamp % MicrosecondsPerSecond;
-			localtime_r(&secondsEpoch_, &timeS_);
 		}
 
-		LogMessageTime::LogMessageTime(::std::time_t secondsEpoch, uint32_t microseconds)
+		LogMessageTime::LogMessageTime(::std::time_t secondsEpoch, ::std::time_t microseconds)
+			: LogMessageTime((secondsEpoch * MicrosecondsPerSecond) + microseconds)
 		{
-			localtime_r(&secondsEpoch, &timeS_);
-
 		}
 
 		LogMessageTime::LogMessageTime(const LogMessageTime& rhs)
 		{
-			timeS_ = rhs.timeS_;
-			secondsEpoch_ = rhs.secondsEpoch_;
-			microseconds_ = rhs.microseconds_;
+			timestampEpoch_ = rhs.timestampEpoch_;
 		}
 
-		LogMessageTime::LogMessageTime(LogMessageTime&& rhs) noexcept
+		LogMessageTime::LogMessageTime(LogMessageTime&& rhs)
 		{
-			timeS_ = rhs.timeS_;
-			secondsEpoch_ = rhs.secondsEpoch_;
-			microseconds_ = rhs.microseconds_;
-			rhs.timeS_ = {};
-			rhs.secondsEpoch_ = 0;
-			rhs.microseconds_ = 0;
+			timestampEpoch_ = rhs.timestampEpoch_;
+			rhs.timestampEpoch_ = 0;
 		}
 
 		LogMessageTime& LogMessageTime::operator=(const LogMessageTime& rhs)
 		{
 			if (this != &rhs)
 			{
-				timeS_ = rhs.timeS_;
-				secondsEpoch_ = rhs.secondsEpoch_;
-				microseconds_ = rhs.microseconds_;
+				timestampEpoch_ = rhs.timestampEpoch_;
 			}
 			return *this;
 		}
 
-		LogMessageTime& LogMessageTime::operator=(LogMessageTime&& rhs) noexcept
+		LogMessageTime& LogMessageTime::operator=(LogMessageTime&& rhs)
 		{
 			if (this != &rhs)
 			{
-				timeS_ = rhs.timeS_;
-				secondsEpoch_ = rhs.secondsEpoch_;
-				microseconds_ = rhs.microseconds_;
-				rhs.timeS_ = {};
-				rhs.secondsEpoch_ = 0;
-				rhs.microseconds_ = 0;
+				timestampEpoch_ = rhs.timestampEpoch_;
+				rhs.timestampEpoch_ = 0;
 			}
 			return *this;
 		}
 
-		LogMessageTime LogMessageTime::now() noexcept
+		LogMessageTime LogMessageTime::now()
 		{
 			struct timeval tmV {};
 			gettimeofday(&tmV, nullptr);
-			return { tmV.tv_sec, static_cast<uint32_t>(tmV.tv_usec) };
+			return { tmV.tv_sec, tmV.tv_usec };
 		}
 
-		uint64_t LogMessageTime::getTimestamp() const
+		::std::time_t LogMessageTime::getSeconds() const
 		{
-			return (secondsEpoch_ * MicrosecondsPerSecond) + microseconds_;
+			return static_cast<::std::time_t>(timestampEpoch_ / MicrosecondsPerSecond);
 		}
 
-		LogMessage_::LogMessage_(LogLevel logLevel, const char* file, uint32_t line) noexcept :
-			logLevel_(logLevel), line_(line), message_(nullptr)
+		uint32_t LogMessageTime::getMicroseconds() const
 		{
-			setFilenameFromPath(file);
+			return timestampEpoch_ % MicrosecondsPerSecond;
 		}
 
-		LogMessage_::LogMessage_(LogLevel logLevel, const char* file, uint32_t line, const char* message) noexcept :
-			logLevel_(logLevel), line_(line), message_(message)
+		LogMessage_::LogMessage_(LogLevel logLevel, const char* file, uint32_t line) :
+			logMessageTime_(LogMessageTime::now()), logLevel_(logLevel), line_(line), message_()
 		{
 			setFilenameFromPath(file);
 		}
@@ -112,25 +97,12 @@ namespace nets
 			}
 		}
 
-		namespace
-		{
-			const char* const LogLevelName[LogLevel::NUM_OF_LOG_LEVELS] =
-				{
-					"TRACE",
-					"DEBUG",
-					"INFO",
-					"WARN",
-					"ERROR",
-					"FATAL"
-				};
-		}
-
-		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line) noexcept :
+		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line) :
 			logMessage_(logLevel, file, line)
 		{
 		}
 
-		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...) noexcept :
+		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...) :
 			logMessage_(logLevel, file, line)
 		{
 			va_list args;
@@ -139,30 +111,25 @@ namespace nets
 			va_copy(tmp, args);
 			uint32_t len = vsnprintf(nullptr, 0, fmt, tmp) + 1;
 			va_end(tmp);
+			LogBufferStream& msg = logMessage_.getMessage();
 			if (len > 0 && available() > len)
 			{
-				vsnprintf(getCurrentBuffer(), len, fmt, args);
-				addLen(len - 1);
-				this->operator<<('\n');
+				::std::vsnprintf(msg.getCurrentBuffer(), len, fmt, args);
+				msg.addLen(len - 1);
+				msg << '\n';
 			}
 			else
 			{
-				this->operator<<("[Log content length more than LogBufferSize]\n");
+				msg << "[Log content length more than LogBufferSize]\n";
 			}
 			va_end(args);
 		}
 
 		LogMessageStream::~LogMessageStream()
 		{
-			//			logBufferStream_ << logMessageTime_;
-//			logBufferStream_ << " [" << static_cast<int64_t>(currentTid()) << "] ";
-//			logBufferStream_ << LogLevelName[logLevel_] << ' ';
-//			logBufferStream_ << filename_ << ':' << line_ << " - ";
-		}
-
-		uint32_t DefaultLogFormatter::formatMessage(char *buffer, const LogMessage &logMessage)
-		{
-			return 0;
+			DefaultLogFormatter formatter;
+			formatter.formatLogMessage(*this, logMessage_);
+			LOG_WRITER_FACTORY->getLogWriter()->write(*this);
 		}
 	} // namespace base
 } // namespace nets

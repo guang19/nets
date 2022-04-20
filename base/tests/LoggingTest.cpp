@@ -65,27 +65,14 @@ TEST(LoggingTest, StackOverflow)
 			  "废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话");
 }
 
-#include <sys/time.h>
-TEST(LoggingTest, Appender)
+TEST(LoggingTest, T)
 {
-	struct timeval tmv;
-	gettimeofday(&tmv, nullptr);
-	::std::time_t time = ::std::time(&time);
-	::std::cout << "time: " << time << '\n';
-	::std::cout << "gettimeofday: " << tmv.tv_sec << '\n';
-
-	::std::tm *tmS1 = ::std::localtime(&time);
-	::std::cout << "tmS1: " << tmS1->tm_min << ' ' << tmS1->tm_sec << '\n';
-	::std::cout << "transform: " << ::std::mktime(tmS1) << '\n';
-
-
-	::std::tm *tmS2 = ::std::localtime(&tmv.tv_sec);
-	::std::cout << "tmS2: " << tmS2->tm_min << ' ' << tmS2->tm_sec << '\n';
-
-	time_t ttt = tmv.tv_sec * 1000000 + tmv.tv_usec;
-	::std::tm *tmS3 = ::std::localtime(&ttt);
-	::std::cout << "tmS3: " << tmS3->tm_min << ' ' << tmS3->tm_sec << '\n';
+	long ln = 123456;
+	char ar[20] = {0};
+	snprintf(ar, 4, "%03ld", ln);
+	printf("%s", ar);
 }
+
 
 int main(int argc, char** argv)
 {
