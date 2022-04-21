@@ -5,8 +5,10 @@
 #ifndef NETS_LOGWRITER_H
 #define NETS_LOGWRITER_H
 
+#include <list>
+#include <thread>
 #include "base/Singleton.h"
-#include "base/log/LogBufferStream.h"
+#include "base/log/LogBuffer.h"
 
 #ifndef LOG_WRITER
 	#define LOG_WRITER STDOUT
@@ -42,7 +44,7 @@ namespace nets
 				virtual ~ILogWriter() = default;
 
 			public:
-				virtual void write(const LogBufferStream& logBuffer) = 0;
+				virtual void write(const LogBuffer& logBuffer) = 0;
 		};
 
 		DECLARE_SINGLETON_CLASS(StdoutLogWriter), public ILogWriter
@@ -50,15 +52,19 @@ namespace nets
 			DEFINE_SINGLETON(StdoutLogWriter)
 
 			public:
-				void write(const LogBufferStream &logBuffer) override;
+				void write(const LogBuffer& logBuffer) override;
 		};
 
 		class FileLogWriter : public ILogWriter
 		{
 			public:
-				void write(const LogBufferStream &logBuffer) override
+				void write(const LogBuffer& logBuffer) override
 				{
 				}
+
+			private:
+				::std::list<LogBuffer> bufferList_;
+				::std::thread ioThread_ {};
 		};
 
 		DECLARE_SINGLETON_CLASS(SingleFileLogWriter), public FileLogWriter
@@ -66,7 +72,7 @@ namespace nets
 			DEFINE_SINGLETON(SingleFileLogWriter)
 
 			public:
-				void write(const LogBufferStream &logBuffer) override;
+				void write(const LogBuffer& logBuffer) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(DailyFileLogWriter), public FileLogWriter
@@ -74,7 +80,7 @@ namespace nets
 			DEFINE_SINGLETON(DailyFileLogWriter)
 
 			public:
-				void write(const LogBufferStream &logBuffer) override;
+				void write(const LogBuffer& logBuffer) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(RollingFileLogWriter), public FileLogWriter
@@ -82,7 +88,7 @@ namespace nets
 			DEFINE_SINGLETON(RollingFileLogWriter)
 
 			public:
-				void write(const LogBufferStream &logBuffer) override;
+				void write(const LogBuffer& logBuffer) override;
 		};
 
 

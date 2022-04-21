@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/4/3.
 //
 
-#ifndef NETS_LOGBUFFERSTREAM_H
-#define NETS_LOGBUFFERSTREAM_H
+#ifndef NETS_LOGBUFFER_H
+#define NETS_LOGBUFFER_H
 
 #include <string>
 #include <cstdint>
@@ -18,11 +18,11 @@ namespace nets
 			constexpr uint32_t LogBufferSize = (1024 << 6);
 		}
 
-		class LogBufferStream : Noncopyable
+		class LogBuffer
 		{
 			public:
-				LogBufferStream() = default;
-				~LogBufferStream() = default;
+				LogBuffer() = default;
+				~LogBuffer() = default;
 
 				inline const char* getBuffer() const
 				{
@@ -58,19 +58,19 @@ namespace nets
 				template <typename Float>
 				void appendFloat(Float n);
 
-				LogBufferStream& operator<<(int16_t n);
-				LogBufferStream& operator<<(uint16_t n);
-				LogBufferStream& operator<<(int32_t n);
-				LogBufferStream& operator<<(uint32_t n);
-				LogBufferStream& operator<<(int64_t n);
-				LogBufferStream& operator<<(uint64_t n);
-				LogBufferStream& operator<<(const void* ptr);
-				LogBufferStream& operator<<(float n);
-				LogBufferStream& operator<<(double n);
-				LogBufferStream& operator<<(char c);
-				LogBufferStream& operator<<(const char* str);
-				LogBufferStream& operator<<(const ::std::string& str);
-				LogBufferStream& operator<<(const LogBufferStream& stream);
+				LogBuffer& operator<<(int16_t n);
+				LogBuffer& operator<<(uint16_t n);
+				LogBuffer& operator<<(int32_t n);
+				LogBuffer& operator<<(uint32_t n);
+				LogBuffer& operator<<(int64_t n);
+				LogBuffer& operator<<(uint64_t n);
+				LogBuffer& operator<<(const void* ptr);
+				LogBuffer& operator<<(float n);
+				LogBuffer& operator<<(double n);
+				LogBuffer& operator<<(char c);
+				LogBuffer& operator<<(const char* str);
+				LogBuffer& operator<<(const ::std::string& str);
+				LogBuffer& operator<<(const LogBuffer& stream);
 
 			protected:
 				char buffer_[LogBufferSize] { 0 };
@@ -80,4 +80,4 @@ namespace nets
 	} // namespace base
 } // namespace nets
 
-#endif //NETS_LOGBUFFERSTREAM_H
+#endif //NETS_LOGBUFFER_H

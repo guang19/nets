@@ -10,7 +10,7 @@
 #include <string>
 #include "base/Copyable.h"
 #include "base/Noncopyable.h"
-#include "base/log/LogBufferStream.h"
+#include "base/log/LogBuffer.h"
 
 #ifndef LOG_LEVEL
 	#define LOG_LEVEL DEBUG
@@ -84,7 +84,7 @@ namespace nets
 					return line_;
 				}
 
-				inline LogBufferStream& getMessage()
+				inline LogBuffer& getMessage()
 				{
 					return message_;
 				}
@@ -97,10 +97,10 @@ namespace nets
 				LogLevel logLevel_ { LOG_LEVEL };
 				const char* filename_ { nullptr };
 				uint32_t line_ { 0 };
-				LogBufferStream message_ {};
+				LogBuffer message_ {};
 		} LogMessage;
 
-		class LogMessageStream : public LogBufferStream
+		class LogMessageStream : public LogBuffer
 		{
 			public:
 				LogMessageStream(LogLevel logLevel, const char* file, uint32_t line);
@@ -108,7 +108,7 @@ namespace nets
 				~LogMessageStream();
 
 			public:
-				inline LogBufferStream& getStream()
+				inline LogBuffer& getStream()
 				{
 					return logMessage_.getMessage();
 				}

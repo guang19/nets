@@ -5,13 +5,13 @@
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <cmath>
-#include "base/log/LogBufferStream.h"
+#include "base/log/LogBuffer.h"
 
 using namespace nets::base;
 
 TEST(LogBufferTest, T)
 {
-	LogBufferStream logBuffer;
+	LogBuffer logBuffer;
 	::std::cout << logBuffer.getBuffer() << '\n';
 	::std::cout << logBuffer.length() << '\n';
 	::std::cout << logBuffer.available();
@@ -19,7 +19,7 @@ TEST(LogBufferTest, T)
 
 TEST(LogBufferTest, Baseic)
 {
-	LogBufferStream logBuffer;
+	LogBuffer logBuffer;
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	ASSERT_EQ(logBuffer.length(), 0U);
 	ASSERT_EQ(logBuffer.available(), LogBufferSize);
@@ -27,7 +27,7 @@ TEST(LogBufferTest, Baseic)
 
 TEST(LogBufferTest, Append)
 {
-	LogBufferStream logBuffer;
+	LogBuffer logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
 	ASSERT_EQ(logBuffer.available(), LogBufferSize);
 	logBuffer << "abc";
@@ -46,13 +46,13 @@ TEST(LogBufferTest, Append)
 
 TEST(LogBufferTest, AppendBuffer)
 {
-	LogBufferStream logBuffer;
+	LogBuffer logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
 	ASSERT_EQ(logBuffer.available(), LogBufferSize);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
 	ASSERT_EQ(logBuffer.available(), LogBufferSize - 3);
-	LogBufferStream logBuffer2;
+	LogBuffer logBuffer2;
 	logBuffer2 << "abc";
 	logBuffer << logBuffer2 << '\n';
 	::std::cout << logBuffer.getBuffer();

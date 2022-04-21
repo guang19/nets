@@ -6,7 +6,7 @@
 #define NETS_LOGFORMATTER_H
 
 #include "base/log/Logging.h"
-#include "base/log/LogBufferStream.h"
+#include "base/log/LogBuffer.h"
 
 namespace nets
 {
@@ -15,13 +15,13 @@ namespace nets
 		class LogFormatter
 		{
 			public:
-				virtual void formatLogMessage(LogBufferStream& logBufferStream, LogMessage& logMessage) = 0;
+				virtual void formatLogMessage(LogBuffer& logBufferStream, LogMessage& logMessage) = 0;
 		};
 
 		class DefaultLogFormatter : public LogFormatter
 		{
 			public:
-				void formatLogMessage(LogBufferStream& logBufferStream, LogMessage& logMessage) override;
+				void formatLogMessage(LogBuffer& logBufferStream, LogMessage& logMessage) override;
 		};
 
 	} // namespace base

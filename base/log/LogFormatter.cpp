@@ -23,7 +23,7 @@ namespace nets
 				};
 		}
 
-		void DefaultLogFormatter::formatLogMessage(LogBufferStream& logBufferStream, LogMessage& logMessage)
+		void DefaultLogFormatter::formatLogMessage(LogBuffer& logBufferStream, LogMessage& logMessage)
 		{
 			struct tm tmS {};
 			const LogMessageTime& logMessageTime = logMessage.getLogMessageTime();

@@ -14,21 +14,21 @@ namespace nets
 		INIT_SINGLETON(RollingFileLogWriter)
 		INIT_SINGLETON(LogWriterFactory)
 
-		void StdoutLogWriter::write(const LogBufferStream &logBuffer)
+		void StdoutLogWriter::write(const LogBuffer& logBuffer)
 		{
 			fwrite(logBuffer.getBuffer(),1, logBuffer.length(), ::stdout);
 			fflush(::stdout);
 		}
 
-		void SingleFileLogWriter::write(const LogBufferStream &logBuffer)
+		void SingleFileLogWriter::write(const LogBuffer& logBuffer)
 		{
 		}
 
-		void DailyFileLogWriter::write(const LogBufferStream &logBuffer)
+		void DailyFileLogWriter::write(const LogBuffer& logBuffer)
 		{
 		}
 
-		void RollingFileLogWriter::write(const LogBufferStream &logBuffer)
+		void RollingFileLogWriter::write(const LogBuffer& logBuffer)
 		{
 		}
 
@@ -44,8 +44,9 @@ namespace nets
 					return DailyFileLogWriter::getInstance();
 				case LogWriter::ROLLING_FILE:
 					return RollingFileLogWriter::getInstance();
+				default:
+					return nullptr;
 			}
-			return nullptr;
 		}
 	} // namespace base
 } // namespace nets

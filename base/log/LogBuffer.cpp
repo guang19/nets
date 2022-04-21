@@ -2,7 +2,7 @@
 // Created by YangGuang on 2022/4/3.
 //
 
-#include "base/log/LogBufferStream.h"
+#include "base/log/LogBuffer.h"
 
 #include <algorithm>
 #include <limits>
@@ -13,7 +13,7 @@ namespace nets
 {
 	namespace base
 	{
-		void LogBufferStream::append(const char *data, uint32_t len)
+		void LogBuffer::append(const char *data, uint32_t len)
 		{
 			if (available() > len)
 			{
@@ -70,7 +70,7 @@ namespace nets
 		}
 
 		template<typename Number>
-		void LogBufferStream::appendInteger(Number n)
+		void LogBuffer::appendInteger(Number n)
 		{
 			if (available() >= MaxNumSize)
 			{
@@ -78,7 +78,7 @@ namespace nets
 			}
 		}
 
-		void LogBufferStream::appendPointer(uintptr_t ptr)
+		void LogBuffer::appendPointer(uintptr_t ptr)
 		{
 			if (available() >= MaxNumSize)
 			{
@@ -87,7 +87,7 @@ namespace nets
 		}
 
 		template<typename Float>
-		void LogBufferStream::appendFloat(Float n)
+		void LogBuffer::appendFloat(Float n)
 		{
 			if (available() >= MaxNumSize)
 			{
@@ -109,67 +109,67 @@ namespace nets
 			}
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(int16_t n)
+		LogBuffer& LogBuffer::operator<<(int16_t n)
 		{
 			appendInteger(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(uint16_t n)
+		LogBuffer& LogBuffer::operator<<(uint16_t n)
 		{
 			appendInteger(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(int32_t n)
+		LogBuffer& LogBuffer::operator<<(int32_t n)
 		{
 			appendInteger(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(uint32_t n)
+		LogBuffer& LogBuffer::operator<<(uint32_t n)
 		{
 			appendInteger(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(int64_t n)
+		LogBuffer& LogBuffer::operator<<(int64_t n)
 		{
 			appendInteger(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(uint64_t n)
+		LogBuffer& LogBuffer::operator<<(uint64_t n)
 		{
 			appendInteger(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(const void *ptr)
+		LogBuffer& LogBuffer::operator<<(const void *ptr)
 		{
 			appendPointer(reinterpret_cast<uintptr_t>(ptr));
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(float n)
+		LogBuffer& LogBuffer::operator<<(float n)
 		{
 			appendFloat(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(double n)
+		LogBuffer& LogBuffer::operator<<(double n)
 		{
 			appendFloat(n);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(char c)
+		LogBuffer& LogBuffer::operator<<(char c)
 		{
 			append(&c, 1);
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(const char *str)
+		LogBuffer& LogBuffer::operator<<(const char *str)
 		{
 			if (str != nullptr)
 			{
@@ -178,13 +178,13 @@ namespace nets
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(const ::std::string& str)
+		LogBuffer& LogBuffer::operator<<(const ::std::string& str)
 		{
 			append(str.c_str(), str.length());
 			return *this;
 		}
 
-		LogBufferStream& LogBufferStream::operator<<(const LogBufferStream &other)
+		LogBuffer& LogBuffer::operator<<(const LogBuffer &other)
 		{
 			append(other.buffer_, other.usedLen_);
 			return *this;
