@@ -64,7 +64,7 @@ namespace nets
 		LogMessageTime LogMessageTime::now()
 		{
 			struct timeval tmV {};
-			gettimeofday(&tmV, nullptr);
+			::gettimeofday(&tmV, nullptr);
 			return { tmV.tv_sec, tmV.tv_usec };
 		}
 
@@ -127,9 +127,8 @@ namespace nets
 
 		LogMessageStream::~LogMessageStream()
 		{
-			DefaultLogFormatter formatter;
-			formatter.formatLogMessage(*this, logMessage_);
-			LOG_WRITER_FACTORY->getLogWriter()->write(*this);
+			LOG_FORMATTER->formatLogMessage(*this, logMessage_);
+			LOG_WRITER->write(getBuffer(), length());
 		}
 	} // namespace base
 } // namespace nets

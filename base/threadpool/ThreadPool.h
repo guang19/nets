@@ -29,7 +29,7 @@ namespace nets
 				using condition_variable_type = ::std::condition_variable;
 				using lock_guard_type = ::std::lock_guard<::std::mutex>;
 				using unique_lock_type = ::std::unique_lock<::std::mutex>;
-				using ThreadPoolRawPtr = ThreadPool *;
+				using ThreadPoolRawPtr = ThreadPool*;
 				using BoundedBlockingQueuePtr = ::std::unique_ptr<BoundedBlockingQueue<task_type>>;
 
 			public:

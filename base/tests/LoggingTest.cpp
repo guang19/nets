@@ -3,11 +3,11 @@
 //
 
 #include <gtest/gtest.h>
+
 #include <thread>
 #include "base/log/Logging.h"
 
 using namespace nets::base;
-
 
 TEST(LoggingTest, BasicUse)
 {
@@ -64,15 +64,6 @@ TEST(LoggingTest, StackOverflow)
 			  "废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话"
 			  "废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话废话");
 }
-
-TEST(LoggingTest, T)
-{
-	long ln = 123456;
-	char ar[20] = {0};
-	snprintf(ar, 4, "%03ld", ln);
-	printf("%s", ar);
-}
-
 
 int main(int argc, char** argv)
 {

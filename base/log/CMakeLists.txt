@@ -1,4 +1,4 @@
-SET(LogHeaders Logging.h LogBuffer.h LogFormatter.hL LogWriter.h)
+SET(LogHeaders Logging.h LogBuffer.h LogFormatter.h LogWriter.h)
 INSTALL(FILES ${LogHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base/log)
 
 SET(LogSrcs Logging.cpp LogBuffer.cpp LogFormatter.cpp LogWriter.cpp)

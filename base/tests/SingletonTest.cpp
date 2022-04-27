@@ -3,13 +3,14 @@
 //
 
 #include <gtest/gtest.h>
+
 #include <string>
 #include <thread>
 #include "base/Singleton.h"
 
 using namespace nets::base;
 
-DECLARE_SINGLETON(Clazz)
+DECLARE_SINGLETON_CLASS(Clazz)
 {
 	DEFINE_SINGLETON(Clazz)
 	public:

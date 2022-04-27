@@ -3,6 +3,7 @@
 //
 
 #include <gtest/gtest.h>
+
 #include <algorithm>
 #include <cmath>
 #include "base/log/LogBuffer.h"
@@ -22,17 +23,17 @@ TEST(LogBufferTest, Baseic)
 	LogBuffer logBuffer;
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), LogBufferSize);
+	ASSERT_EQ(logBuffer.available(), 65536U);
 }
 
 TEST(LogBufferTest, Append)
 {
 	LogBuffer logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), LogBufferSize);
+	ASSERT_EQ(logBuffer.available(), 65536U);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
-	ASSERT_EQ(logBuffer.available(),  LogBufferSize - 3);
+	ASSERT_EQ(logBuffer.available(),  65536U - 3);
 	ASSERT_STREQ(logBuffer.getBuffer(), "abc");
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	::std::cout << "=============================================\n";
@@ -48,10 +49,10 @@ TEST(LogBufferTest, AppendBuffer)
 {
 	LogBuffer logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), LogBufferSize);
+	ASSERT_EQ(logBuffer.available(), 65536U);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
-	ASSERT_EQ(logBuffer.available(), LogBufferSize - 3);
+	ASSERT_EQ(logBuffer.available(), 65536U - 3);
 	LogBuffer logBuffer2;
 	logBuffer2 << "abc";
 	logBuffer << logBuffer2 << '\n';

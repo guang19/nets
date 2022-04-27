@@ -5,19 +5,45 @@
 #include "base/log/LogBuffer.h"
 
 #include <algorithm>
-#include <limits>
 #include <cmath>
 #include <cstring>
+#include <limits>
 
 namespace nets
 {
 	namespace base
 	{
+
+		namespace
+		{
+			// log length limit: 8K
+			constexpr uint32_t LogLenLimit = (1024 << 3);
+		}
+
+		LogBuffer::LogBuffer() : LogBuffer(LogLenLimit)
+		{
+		}
+
+		LogBuffer::LogBuffer(uint32_t logBufferSize) : buffer_(new char[logBufferSize]),
+			capacity_(logBufferSize), usedLen_(0)
+		{
+			::std::memset(buffer_, 0, logBufferSize);
+		}
+
+		LogBuffer::~LogBuffer()
+		{
+			if (buffer_ != nullptr)
+			{
+				delete[] buffer_;
+				buffer_ = nullptr;
+			}
+		}
+
 		void LogBuffer::append(const char *data, uint32_t len)
 		{
 			if (available() > len)
 			{
-				memcpy(buffer_ + usedLen_, data, len);
+				::std::memcpy(buffer_ + usedLen_, data, len);
 				usedLen_ += len;
 			}
 		}
@@ -94,12 +120,12 @@ namespace nets
 				char *cur = buffer_ + usedLen_;
 				if (::std::isnan(n))
 				{
-					memcpy(cur, "nan", 3);
+					::std::memcpy(cur, "nan", 3);
 					usedLen_ += 3;
 				}
 				else if (::std::isinf(n))
 				{
-					memcpy(cur, "inf", 3);
+					::std::memcpy(cur, "inf", 3);
 					usedLen_ += 3;
 				}
 				else

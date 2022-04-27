@@ -5,24 +5,20 @@
 #ifndef NETS_LOGBUFFER_H
 #define NETS_LOGBUFFER_H
 
-#include <string>
 #include <cstdint>
+#include <string>
 #include "base/Noncopyable.h"
 
 namespace nets
 {
 	namespace base
 	{
-		namespace
-		{
-			constexpr uint32_t LogBufferSize = (1024 << 6);
-		}
-
 		class LogBuffer
 		{
 			public:
-				LogBuffer() = default;
-				~LogBuffer() = default;
+				LogBuffer();
+				explicit LogBuffer(uint32_t logBufferSize);
+				~LogBuffer();
 
 				inline const char* getBuffer() const
 				{
@@ -72,9 +68,9 @@ namespace nets
 				LogBuffer& operator<<(const ::std::string& str);
 				LogBuffer& operator<<(const LogBuffer& stream);
 
-			protected:
-				char buffer_[LogBufferSize] { 0 };
-				uint32_t capacity_ { LogBufferSize };
+			private:
+				char* buffer_ { nullptr };
+				uint32_t capacity_ { 0 };
 				uint32_t usedLen_ { 0 };
 		};
 	} // namespace base
