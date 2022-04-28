@@ -15,13 +15,14 @@
  *	i did not use templates to write singletons.
  *  If a class needs to use a singleton, use the following three macros directly.
  *
- *	If you need to do some work before the singleton is initialized, you need to define a function
- *	named <beforeInit>. function is automatically called when the singleton is initialized.
- *  eg: RetType beforeInit(void);
- *
- *	If you need to do some work before the singleton is initialized, you need to define a function
+ *	If you need to do some work after the singleton is initialized, you need to define a function
  *	named <afterInit>, function is automatically called after the singleton is initialized.
- *	eg: RetType afterInit(void);
+ *
+ * return type and parameter are void
+ * /////////////////////////
+ *	void afterInit(void);
+ * /////////////////////////
+ *
  */
 
 #define DECLARE_SINGLETON_CLASS(CLASS_NAME)	\
@@ -29,33 +30,19 @@
 
 
 #define DEFINE_SINGLETON(CLASS_NAME) \
-		DECLARE_HAS_MEMBER_FUNCTION(beforeInit);	\
-		DECLARE_HAS_MEMBER_FUNCTION(afterInit);	\
-		\
 	protected:	\
 		CLASS_NAME() = default;	\
 		~CLASS_NAME() = default;	\
 		\
-		template<typename C = CLASS_NAME>	\
-		void callBeforeInit(...)	\
+        template<typename C>	\
+		static void callAfterInit(...)	\
 		{	\
-		}	\
-			\
-		template <typename C = CLASS_NAME, void (C::*)() = &C::beforeInit>	\
-		void callBeforeInit(const void*)	\
-		{	\
-			beforeInit();	\
 		}	\
 		\
-        template<typename C = CLASS_NAME>	\
-		void callAfterInit(...)	\
+		template <typename C, void (C::*)(void) = &C::afterInit>	\
+		static void callAfterInit(C* c)	\
 		{	\
-		}	\
-			\
-		template <typename C = CLASS_NAME, void (C::*)() = &C::afterInit>	\
-		void callAfterInit(const void*)	\
-		{	\
-			afterInit();	\
+			c->afterInit();	\
 		}	\
 		\
 	public:	\
@@ -64,15 +51,8 @@
 		{	\
 			::std::call_once(OnceFlag, [](Args&& ...args)	\
             {	\
-				if (HAS_MEMBER_FUNCTION(CLASS_NAME, beforeInit))	\
-				{	\
-            		callBeforeInit(nullptr);	\
-				}	\
                 Instance = new CLASS_NAME(::std::forward<Args>(args)...);	\
-                if (HAS_MEMBER_FUNCTION(CLASS_NAME, afterInit))	\
-                {	\
-					callAfterInit(nullptr);	\
-                }	\
+				callAfterInit<CLASS_NAME>(Instance);	\
                 atexit(destroy);	\
             }, ::std::forward<Args>(args)...);	\
             return Instance;	\

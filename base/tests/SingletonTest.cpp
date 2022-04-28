@@ -23,6 +23,7 @@ DECLARE_SINGLETON_CLASS(Clazz)
 		{
 			return name_;
 		}
+
 	private:
 		::std::string name_ {};
 
@@ -69,6 +70,25 @@ TEST(SingletonAddr, MultiThread)
 	ASSERT_EQ(cptr2->getName(), "cp1");
 	ASSERT_EQ(cptr3->getName(), "cp1");
 }
+
+DECLARE_SINGLETON_CLASS(Clazz2)
+{
+	DEFINE_SINGLETON(Clazz2);
+
+	public:
+		inline void afterInit()
+		{
+			::std::cout << "afterInit without parameter\n";
+		}
+
+};
+INIT_SINGLETON(Clazz2);
+
+TEST(SingletonAddr, AfterInit)
+{
+	Clazz2::getInstance();
+}
+
 
 int main(int argc, char **argv)
 {

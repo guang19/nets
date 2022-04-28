@@ -24,7 +24,7 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(DefaultLogFormatter), public ILogFormatter
 		{
-			DEFINE_SINGLETON(DefaultLogFormatter)
+			DEFINE_SINGLETON(DefaultLogFormatter);
 
 			public:
 				void formatLogMessage(LogBuffer& logBufferStream, LogMessage& logMessage) override;
@@ -32,7 +32,7 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(LogFormatterFactory)
 		{
-			DEFINE_SINGLETON(LogFormatterFactory)
+			DEFINE_SINGLETON(LogFormatterFactory);
 
 			public:
 				ILogFormatter* getLogFormatter() const;

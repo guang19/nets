@@ -63,9 +63,9 @@ namespace nets
 				void getFileInfo(uint64_t* fileSize, ::std::time_t* createTime, ::std::time_t* modifyTime);
 
 			private:
-				FILE* fp_ { NULL };
-				::std::string dir_ {};
-				::std::string filename_ {};
+				FILE* fp_ { nullptr };
+				const char* dir_ {};
+				const char* filename_ {};
 				uint64_t bytes_ { 0 };
 				::std::time_t createTime_ { 0 };
 				char* buffer_ { nullptr };
@@ -82,7 +82,7 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(StdoutLogWriter), public ILogWriter
 		{
-			DEFINE_SINGLETON(StdoutLogWriter)
+			DEFINE_SINGLETON(StdoutLogWriter);
 
 			public:
 				void write(const char* data, uint32_t len) override;
@@ -129,7 +129,13 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(AsyncSingleFileLogWriter), public AsyncFileLogWriter
 		{
-			DEFINE_SINGLETON(AsyncSingleFileLogWriter)
+			DEFINE_SINGLETON(AsyncSingleFileLogWriter);
+
+			private:
+				inline void afterInit()
+				{
+					start();
+				}
 
 			protected:
 				void persist(const char* data, uint32_t len) override;
@@ -137,7 +143,13 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(AsyncDailyFileLogWriter), public AsyncFileLogWriter
 		{
-			DEFINE_SINGLETON(AsyncDailyFileLogWriter)
+			DEFINE_SINGLETON(AsyncDailyFileLogWriter);
+
+			private:
+				inline void afterInit()
+				{
+					start();
+				}
 
 			protected:
 				void persist(const char* data, uint32_t len) override;
@@ -145,7 +157,13 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(AsyncRollingFileLogWriter), public AsyncFileLogWriter
 		{
-			DEFINE_SINGLETON(AsyncRollingFileLogWriter)
+			DEFINE_SINGLETON(AsyncRollingFileLogWriter);
+
+			private:
+				inline void afterInit()
+				{
+					start();
+				}
 
 			protected:
 				void persist(const char* data, uint32_t len) override;
@@ -153,7 +171,7 @@ namespace nets
 
 		DECLARE_SINGLETON_CLASS(LogWriterFactory)
 		{
-			DEFINE_SINGLETON(LogWriterFactory)
+			DEFINE_SINGLETON(LogWriterFactory);
 
 			public:
 				ILogWriter* getLogWriter() const;

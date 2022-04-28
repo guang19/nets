@@ -9,9 +9,11 @@
 
 #define UNUSED(x) ((void) (x))
 
-#define DECLARE_HAS_MEMBER_FUNCTION(FUNC)	\
-	template<class T, typename ...Args>	\
-	struct HasMemberFun_##FUNC	\
+/***********************************
+  *
+#define DECLARE_HAS_MEMBER_FUNCTION(FUNC) \
+    template<class T, typename ...Args>	\
+	struct HasMemberFunc_##FUNC	\
 	{	\
 		private:	\
 			template<class C>	\
@@ -25,7 +27,28 @@
 			constexpr static bool value = decltype(check<T>(nullptr))::value;	\
 	}
 
+// 判断某个类是否有某个函数
 #define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...)	\
-		HasMemberFun_##FUNC<CLASS, ##__VA_ARGS__>::value
+		HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>::value
+ *
+ ***********************************/
+
+#define DECLARE_HAS_MEMBER_FUNCTION(FUNC) \
+	template<class C, typename ...Args>      \
+	static bool HasMemberFunc_##FUNC(decltype(::std::declval<C>().FUNC(::std::declval<Args>()...))* = nullptr) \
+	{	\
+    	return true;	\
+	}	\
+		\
+    template<class C, typename ...Args>	\
+	static bool HasMemberFunc_##FUNC(...)	\
+	{	\
+    	return false;	\
+	}
+
+// 判断某个类是否有某个函数
+#define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...) \
+	HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>(nullptr)
+
 
 #endif //NETS_COMMONMACRO_H

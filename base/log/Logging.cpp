@@ -81,20 +81,7 @@ namespace nets
 		LogMessage_::LogMessage_(LogLevel logLevel, const char* file, uint32_t line) :
 			logMessageTime_(LogMessageTime::now()), logLevel_(logLevel), line_(line), message_()
 		{
-			setFilenameFromPath(file);
-		}
-
-		void LogMessage_::setFilenameFromPath(const char* file)
-		{
-			const char* basename = strrchr(file, '/');
-			if (basename != nullptr)
-			{
-				filename_ = basename + 1;
-			}
-			else
-			{
-				filename_ = file;
-			}
+			filename_ = basename(file);
 		}
 
 		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line) :
@@ -118,7 +105,7 @@ namespace nets
 				msg.addLen(len - 1);
 				msg << '\n';
 			}
-			else
+			else if(len > 0)
 			{
 				msg << "[Log content length more than LogBufferSize]\n";
 			}

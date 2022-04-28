@@ -91,9 +91,6 @@ namespace nets
 				}
 
 			private:
-				void setFilenameFromPath(const char* file);
-
-			private:
 				LogMessageTime logMessageTime_ {};
 				LogLevel logLevel_ { LOG_LEVEL };
 				const char* filename_ { nullptr };

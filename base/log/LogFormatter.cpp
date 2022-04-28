@@ -10,8 +10,8 @@ namespace nets
 {
 	namespace base
 	{
-		INIT_SINGLETON(DefaultLogFormatter)
-		INIT_SINGLETON(LogFormatterFactory)
+		INIT_SINGLETON(DefaultLogFormatter);
+		INIT_SINGLETON(LogFormatterFactory);
 
 		namespace
 		{

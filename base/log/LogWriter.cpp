@@ -12,11 +12,11 @@ namespace nets
 {
 	namespace base
 	{
-		INIT_SINGLETON(StdoutLogWriter)
-		INIT_SINGLETON(AsyncSingleFileLogWriter)
-		INIT_SINGLETON(AsyncDailyFileLogWriter)
-		INIT_SINGLETON(AsyncRollingFileLogWriter)
-		INIT_SINGLETON(LogWriterFactory)
+		INIT_SINGLETON(StdoutLogWriter);
+		INIT_SINGLETON(AsyncSingleFileLogWriter);
+		INIT_SINGLETON(AsyncDailyFileLogWriter);
+		INIT_SINGLETON(AsyncRollingFileLogWriter);
+		INIT_SINGLETON(LogWriterFactory);
 
 		void StdoutLogWriter::write(const char* data, uint32_t len)
 		{
@@ -29,25 +29,16 @@ namespace nets
 			constexpr uint32_t FileBufferSize = 1024 << 3;
 			constexpr uint32_t FilenameLen = 256;
 		}
-
-		LogFile::LogFile(const char* file) : dir_(file), filename_()
+#include <libgen.h>
+		LogFile::LogFile(const char file[]) : dir_(dirname(const_cast<char*>(file))),
+			filename_(basename(const_cast<char*>(file)))
 		{
-			if (dir_.length() > FilenameLen)
+			uint32_t filenameLen = strlen(file);
+			if (filenameLen > FilenameLen)
 			{
 
 				::std::fprintf(::stderr, "Log file name length more than %d\n", FilenameLen);
 				exit(1);
-			}
-			::std::string::size_type idx = dir_.find_last_of('/');
-			if (idx != ::std::string::npos)
-			{
-				dir_.erase(dir_.begin() + idx + 1, dir_.end());
-				filename_.append(file + idx  + 1);
-			}
-			else
-			{
-				dir_.clear();
-				filename_.append(file);
 			}
 			fp_ = ::std::fopen(file, "a");
 			getFileInfo(&bytes_, &createTime_, nullptr);
@@ -58,10 +49,10 @@ namespace nets
 
 		LogFile::~LogFile()
 		{
-			if (fp_ != NULL)
+			if (fp_ != nullptr)
 			{
 				::std::fclose(fp_);
-				fp_ = NULL;
+				fp_ = nullptr;
 			}
 			if (buffer_ != nullptr)
 			{
@@ -99,35 +90,35 @@ namespace nets
 
 		void LogFile::renameByTime()
 		{
-			if (fp_ != NULL)
+			if (fp_ != nullptr)
 			{
 				::std::fclose(fp_);
-				fp_ = NULL;
+				fp_ = nullptr;
 			}
 			struct tm tmS {};
 			::localtime_r(&createTime_, &tmS);
 			char newFilename[23] = { 0 };
 			::std::strftime(newFilename, 20, "%Y-%m-%d_%H:%M:%S", &tmS);
 			::std::memcpy(newFilename + 19, ".log", 4);
-			const char* filenameCStr = filename_.c_str();
-			if (dir_.empty())
-			{
-				::std::rename(filenameCStr, newFilename);
-				fp_ = ::std::fopen(filenameCStr, "a");
-			}
-			else
-			{
-				const char* dirCStr = dir_.c_str();
-				uint32_t dirLen = dir_.length();
-				char file1[FilenameLen] = { 0 };
-				char file2[FilenameLen] = { 0 };
-				::std::memcpy(file1, dirCStr, dirLen);
-				::std::memcpy(file1 + dirLen, filenameCStr, filename_.length());
-				::std::memcpy(file2, dirCStr, dirLen);
-				::std::memcpy(file2 + dirLen, newFilename, 23);
-				::std::rename(file1, file2);
-				fp_ = ::std::fopen(file1, "a");
-			}
+//			const char* filenameCStr = filename_.c_str();
+//			if (dir_.empty())
+//			{
+//				::std::rename(filenameCStr, newFilename);
+//				fp_ = ::std::fopen(filenameCStr, "a");
+//			}
+//			else
+//			{
+//				const char* dirCStr = dir_.c_str();
+//				uint32_t dirLen = dir_.length();
+//				char file1[FilenameLen] = { 0 };
+//				char file2[FilenameLen] = { 0 };
+//				::std::memcpy(file1, dirCStr, dirLen);
+//				::std::memcpy(file1 + dirLen, filenameCStr, filename_.length());
+//				::std::memcpy(file2, dirCStr, dirLen);
+//				::std::memcpy(file2 + dirLen, newFilename, 23);
+//				::std::rename(file1, file2);
+//				fp_ = ::std::fopen(file1, "a");
+//			}
 			getFileInfo(&bytes_, &createTime_, nullptr);
 		}
 
@@ -298,23 +289,11 @@ namespace nets
 				case LogWriterType::STDOUT:
 					return StdoutLogWriter::getInstance();
 				case LogWriterType::SINGLE_FILE:
-				{
-					AsyncSingleFileLogWriter* logWriter = AsyncSingleFileLogWriter::getInstance();
-					logWriter->start();
-					return logWriter;
-				}
+					return AsyncSingleFileLogWriter::getInstance();
 				case LogWriterType::DAILY_FILE:
-				{
-					AsyncDailyFileLogWriter* logWriter = AsyncDailyFileLogWriter::getInstance();
-					logWriter->start();
-					return logWriter;
-				}
+					return AsyncDailyFileLogWriter::getInstance();
 				case LogWriterType::ROLLING_FILE:
-				{
-					AsyncRollingFileLogWriter* logWriter = AsyncRollingFileLogWriter::getInstance();
-					logWriter->start();
-					return logWriter;
-				}
+					return AsyncRollingFileLogWriter::getInstance();
 				default:
 					return StdoutLogWriter::getInstance();
 			}

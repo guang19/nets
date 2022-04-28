@@ -8,7 +8,7 @@
 
 class TBase
 {
-	protected:
+	public:
 		void BaseFun()
 		{
 
@@ -17,28 +17,27 @@ class TBase
 
 class T : public TBase
 {
-		DECLARE_HAS_MEMBER_FUNCTION(BaseFun);
-		DECLARE_HAS_MEMBER_FUNCTION(TestFun);
+
 	public:
 		void TestFun()
 		{
 		}
 
-		T()
+		void TestFunWithParameter(int)
 		{
-			std::cout << HAS_MEMBER_FUNCTION(T, BaseFun) << '\n';
-			std::cout << HAS_MEMBER_FUNCTION(T, TestFun) << '\n';
 		}
 };
 
-
+DECLARE_HAS_MEMBER_FUNCTION(BaseFun);
+DECLARE_HAS_MEMBER_FUNCTION(TestFun);
+DECLARE_HAS_MEMBER_FUNCTION(TestFunWithParameter);
 
 TEST(CommonMacroTest, HasMemberFunction)
 {
-	T t;
+	ASSERT_TRUE(HAS_MEMBER_FUNCTION(T, BaseFun));
+	ASSERT_TRUE(HAS_MEMBER_FUNCTION(T, TestFun));
+	ASSERT_TRUE((HAS_MEMBER_FUNCTION(T, TestFunWithParameter, int)));
 }
-
-
 
 int main(int argc, char** argv)
 {
