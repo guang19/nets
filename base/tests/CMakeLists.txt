@@ -1,6 +1,9 @@
 INCLUDE_DIRECTORIES(${GOOGLE_TEST_INC_DIR})
 LINK_DIRECTORIES(${GOOGLE_TEST_LIB_DIR})
 
+ADD_EXECUTABLE(CommonMacroTest CommonMacroTest.cpp)
+TARGET_LINK_LIBRARIES(CommonMacroTest nets_base libgtest.a)
+
 ADD_EXECUTABLE(SingletonTest SingletonTest.cpp)
 TARGET_LINK_LIBRARIES(SingletonTest nets_base libgtest.a)
 

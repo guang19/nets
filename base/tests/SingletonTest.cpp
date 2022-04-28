@@ -12,7 +12,8 @@ using namespace nets::base;
 
 DECLARE_SINGLETON_CLASS(Clazz)
 {
-	DEFINE_SINGLETON(Clazz)
+	DEFINE_SINGLETON(Clazz);
+
 	public:
 		explicit Clazz(const ::std::string& name) : name_(name)
 		{
@@ -26,7 +27,7 @@ DECLARE_SINGLETON_CLASS(Clazz)
 		::std::string name_ {};
 
 };
-INIT_SINGLETON(Clazz)
+INIT_SINGLETON(Clazz);
 
 
 // 请单独执行每一个TestCase

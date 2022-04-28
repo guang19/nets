@@ -1,4 +1,4 @@
-SET(BaseHeaders Copyable.h Noncopyable.h Singleton.h ThreadHelper.h)
+SET(BaseHeaders CommonMacro.h Copyable.h Noncopyable.h Singleton.h ThreadHelper.h)
 INSTALL(FILES ${BaseHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base)
 
 SET(BaseSrcs ThreadHelper.cpp)
