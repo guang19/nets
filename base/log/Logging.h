@@ -123,7 +123,7 @@ namespace nets
 #define LOG_TRACE(fmt, ...)																			\
 	do                         																		\
 	{                          																		\
-        if (LogLevel::TRACE >= LOG_LEVEL)															\
+		if (LogLevel::TRACE >= LOG_LEVEL)															\
 		{																							\
 			nets::base::LogMessageStream(LogLevel::TRACE, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
 		}																							\

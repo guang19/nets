@@ -109,7 +109,7 @@ namespace nets
 			va_start(args, fmt);
 			va_list tmp;
 			va_copy(tmp, args);
-			uint32_t len = vsnprintf(nullptr, 0, fmt, tmp) + 1;
+			uint32_t len = ::std::vsnprintf(nullptr, 0, fmt, tmp) + 1;
 			va_end(tmp);
 			LogBuffer& msg = logMessage_.getMessage();
 			if (len > 0 && available() > len)

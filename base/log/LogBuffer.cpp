@@ -91,7 +91,6 @@ namespace nets
 				while (n > 0);
 				::std::reverse(buffer + 2, tmp);
 			}
-
 			return tmp - buffer;
 		}
 

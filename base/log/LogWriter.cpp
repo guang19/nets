@@ -27,10 +27,17 @@ namespace nets
 		namespace
 		{
 			constexpr uint32_t FileBufferSize = 1024 << 3;
+			constexpr uint32_t FilenameLen = 256;
 		}
 
-		LogFile::LogFile(const char* file) : dir_(file), filename_(), bytes_(0)
+		LogFile::LogFile(const char* file) : dir_(file), filename_()
 		{
+			if (dir_.length() > FilenameLen)
+			{
+
+				::std::fprintf(::stderr, "Log file name length more than %d\n", FilenameLen);
+				exit(1);
+			}
 			::std::string::size_type idx = dir_.find_last_of('/');
 			if (idx != ::std::string::npos)
 			{
@@ -43,7 +50,7 @@ namespace nets
 				filename_.append(file);
 			}
 			fp_ = ::std::fopen(file, "a");
-			getFileInfo(nullptr, &createTime_, nullptr);
+			getFileInfo(&bytes_, &createTime_, nullptr);
 			buffer_ = new char[FileBufferSize];
 			::std::memset(buffer_, 0, FileBufferSize);
 			::setbuffer(fp_, buffer_, FileBufferSize);
@@ -65,18 +72,18 @@ namespace nets
 
 		void LogFile::append(const char* data, uint32_t len)
 		{
-			uint32_t writtenBytes = 0;
+			uint64_t writtenBytes = 0;
 			while (writtenBytes < len)
 			{
-				uint32_t remain = len - writtenBytes;
+				uint64_t remain = len - writtenBytes;
 				// thread unsafe
-				uint32_t n = ::fwrite_unlocked(data + writtenBytes, remain, 1, fp_);
+				uint64_t n = ::fwrite_unlocked(data + writtenBytes, remain, 1, fp_);
 				if (n != remain)
 				{
 					int32_t err = ferror(fp_);
 					if (err)
 					{
-						::std::fprintf(::stderr, "LogFile append error:%s", strerror(err));
+						::std::fprintf(::stderr, "LogFile append error:%s\n", strerror(err));
 						break;
 					}
 				}
@@ -90,7 +97,7 @@ namespace nets
 			::std::fflush(fp_);
 		}
 
-		void LogFile::renameByNowTime()
+		void LogFile::renameByTime()
 		{
 			if (fp_ != NULL)
 			{
@@ -99,30 +106,34 @@ namespace nets
 			}
 			struct tm tmS {};
 			::localtime_r(&createTime_, &tmS);
-			char newFilename[25] = { 0 };
+			char newFilename[23] = { 0 };
 			::std::strftime(newFilename, 20, "%Y-%m-%d_%H:%M:%S", &tmS);
-			::std::memcpy(newFilename + strlen(newFilename), ".log", 4);
+			::std::memcpy(newFilename + 19, ".log", 4);
+			const char* filenameCStr = filename_.c_str();
 			if (dir_.empty())
 			{
-				const char* fileCStr = filename_.c_str();
-				::std::rename(fileCStr, newFilename);
-				fp_ = ::std::fopen(fileCStr, "a");
+				::std::rename(filenameCStr, newFilename);
+				fp_ = ::std::fopen(filenameCStr, "a");
 			}
 			else
 			{
-				::std::string dir1(dir_);
-				::std::string dir2(dir_);
-				const char* fileCStr = dir1.append(filename_).c_str();
-				::std::rename(fileCStr, dir2.append(newFilename).c_str());
-				fp_ = ::std::fopen(fileCStr, "a");
+				const char* dirCStr = dir_.c_str();
+				uint32_t dirLen = dir_.length();
+				char file1[FilenameLen] = { 0 };
+				char file2[FilenameLen] = { 0 };
+				::std::memcpy(file1, dirCStr, dirLen);
+				::std::memcpy(file1 + dirLen, filenameCStr, filename_.length());
+				::std::memcpy(file2, dirCStr, dirLen);
+				::std::memcpy(file2 + dirLen, newFilename, 23);
+				::std::rename(file1, file2);
+				fp_ = ::std::fopen(file1, "a");
 			}
-			getFileInfo(nullptr, &createTime_, nullptr);
-			bytes_ = 0;
+			getFileInfo(&bytes_, &createTime_, nullptr);
 		}
 
 		void LogFile::getFileInfo(uint64_t* fileSize, ::std::time_t* createTime, ::std::time_t* modifyTime)
 		{
-			FileInfo fileInfo {};
+			struct stat fileInfo {};
 			if (!::fstat(fileno(fp_), &fileInfo))
 			{
 				return;
@@ -261,16 +272,21 @@ namespace nets
 			::std::time(&nowTime);
 			if (nowTime - logFile_->createTime() >= DaySeconds)
 			{
-				logFile_->renameByNowTime();
+				logFile_->renameByTime();
 			}
 			logFile_->append(data, len);
 		}
 
+		namespace
+		{
+			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+		}
+
 		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len)
 		{
-			if (logFile_->size() >= LOG_FILE_ROLLING_SIZE)
+			if (logFile_->size() >= LogFileRollingSize)
 			{
-				logFile_->renameByNowTime();
+				logFile_->renameByTime();
 			}
 			logFile_->append(data, len);
 		}

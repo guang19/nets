@@ -40,8 +40,6 @@ namespace nets
 
 		class LogFile : Noncopyable
 		{
-				using FileInfo = struct stat;
-
 			public:
 				explicit LogFile(const char* file);
 				~LogFile();
@@ -50,7 +48,7 @@ namespace nets
 				void append(const char* data, uint32_t len);
 				void flush();
 
-				void renameByNowTime();
+				void renameByTime();
 
 				inline uint32_t size() const
 				{
@@ -68,7 +66,7 @@ namespace nets
 				FILE* fp_ { NULL };
 				::std::string dir_ {};
 				::std::string filename_ {};
-				uint32_t bytes_ { 0 };
+				uint64_t bytes_ { 0 };
 				::std::time_t createTime_ { 0 };
 				char* buffer_ { nullptr };
 		};
