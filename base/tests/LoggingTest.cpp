@@ -88,33 +88,9 @@ class Lg
 		int* n { nullptr };
 };
 
-#include <libgen.h>
-#include <string.h>
-
-void mkdirR(char* dir)
-{
-	char
-}
-
 TEST(LoggingTest, SingleFile)
 {
-//	LOG_TRACE("这是一条trace信息");
-	const char file[] = "/tmp/nets/nets.log";
-	FILE* fp = ::std::fopen(file, "a");
-	const char* dir = dirname(const_cast<char*>(file));
-	::std::cout << "目录为：" << dir << '\n';
-	const char* basename_ = basename(const_cast<char*>(file));
-	::std::cout << "basename:" << basename_ << '\n';
-	::std::cout << file;
-	if (fp == nullptr)
-	{
-		::std::cout << "创建或打开失败\n";
-
-	}
-	else
-	{
-		::std::cout << "创建或打开成功\n";
-	}
+	LOG_TRACE("这是一条trace信息");
 }
 
 int main(int argc, char** argv)

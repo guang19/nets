@@ -6,6 +6,9 @@
 
 #include <cstring>
 #include <ctime>
+#include <libgen.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <utility>
 
 namespace nets
@@ -29,19 +32,33 @@ namespace nets
 			constexpr uint32_t FileBufferSize = 1024 << 3;
 			constexpr uint32_t FilenameLen = 256;
 		}
-#include <libgen.h>
-		LogFile::LogFile(const char file[]) : dir_(dirname(const_cast<char*>(file))),
-			filename_(basename(const_cast<char*>(file)))
+
+		LogFile::LogFile(const char* file)
 		{
 			uint32_t filenameLen = strlen(file);
 			if (filenameLen > FilenameLen)
 			{
 
-				::std::fprintf(::stderr, "Log file name length more than %d\n", FilenameLen);
+				::std::fprintf(::stderr, "Error:log file name length more than %d\n", FilenameLen);
 				exit(1);
 			}
-			fp_ = ::std::fopen(file, "a");
-			getFileInfo(&bytes_, &createTime_, nullptr);
+			char tmpFile[FilenameLen] = { 0 };
+			::std::memset(tmpFile, 0, FilenameLen);
+			::std::memcpy(tmpFile, file, filenameLen);
+			dir_ = ::dirname(tmpFile);
+			filename_ = ::basename(tmpFile);
+			// log file has parent directory
+			if (::std::strcmp(dir_, ".") != 0)
+			{
+				// create parent directory of log file
+				mkdirR(dir_);
+			}
+			if ((fp_ = ::std::fopen(file, "a")) == nullptr)
+			{
+				::std::fprintf(::stderr, "Error:log file name length more than %d\n", FilenameLen);
+				exit(1);
+			}
+			getFileInfo(&bytes_, &createTime_);
 			buffer_ = new char[FileBufferSize];
 			::std::memset(buffer_, 0, FileBufferSize);
 			::setbuffer(fp_, buffer_, FileBufferSize);
@@ -74,7 +91,7 @@ namespace nets
 					int32_t err = ferror(fp_);
 					if (err)
 					{
-						::std::fprintf(::stderr, "LogFile append error:%s\n", strerror(err));
+						::std::fprintf(::stderr, "Error:log file append error ""\"""%s""\"""\n", ::strerror(err));
 						break;
 					}
 				}
@@ -100,29 +117,60 @@ namespace nets
 			char newFilename[23] = { 0 };
 			::std::strftime(newFilename, 20, "%Y-%m-%d_%H:%M:%S", &tmS);
 			::std::memcpy(newFilename + 19, ".log", 4);
-//			const char* filenameCStr = filename_.c_str();
-//			if (dir_.empty())
-//			{
-//				::std::rename(filenameCStr, newFilename);
-//				fp_ = ::std::fopen(filenameCStr, "a");
-//			}
-//			else
-//			{
-//				const char* dirCStr = dir_.c_str();
-//				uint32_t dirLen = dir_.length();
-//				char file1[FilenameLen] = { 0 };
-//				char file2[FilenameLen] = { 0 };
-//				::std::memcpy(file1, dirCStr, dirLen);
-//				::std::memcpy(file1 + dirLen, filenameCStr, filename_.length());
-//				::std::memcpy(file2, dirCStr, dirLen);
-//				::std::memcpy(file2 + dirLen, newFilename, 23);
-//				::std::rename(file1, file2);
-//				fp_ = ::std::fopen(file1, "a");
-//			}
-			getFileInfo(&bytes_, &createTime_, nullptr);
+			if (::std::strcmp(dir_, ".") != 0)
+			{
+				char tmpFile1[FilenameLen] = { 0 };
+				char tmpFile2[FilenameLen] = { 0 };
+				::std::strcat(tmpFile1, dir_);
+				::std::strcat(tmpFile1, "/");
+				::std::strcat(tmpFile1, filename_);
+				::std::strcat(tmpFile2, dir_);
+				::std::strcat(tmpFile2, "/");
+				::std::strcat(tmpFile2, newFilename);
+				::std::rename(tmpFile1, tmpFile2);
+				fp_ = ::std::fopen(tmpFile1, "a");
+			}
+			else
+			{
+				::std::rename(filename_, newFilename);
+				fp_ = ::std::fopen(filename_, "a");
+			}
+			getFileInfo(&bytes_, &createTime_);
 		}
 
-		void LogFile::getFileInfo(uint64_t* fileSize, ::std::time_t* createTime, ::std::time_t* modifyTime)
+		void LogFile::mkdirR(const char *multiLevelDir)
+		{
+			if (access(multiLevelDir, F_OK) == 0)
+			{
+				return;
+			}
+			uint32_t len = strlen(multiLevelDir);
+			char dir1[256] = { 0 };
+			char* dirptr1 = dir1;
+			char dir2[256] = { 0 };
+			::std::memset(dir1, 0, 256);
+			::std::memset(dir2, 0, 256);
+			::std::memcpy(dir1, multiLevelDir, len);
+			char* spStr;
+			while ((spStr = strsep(&dirptr1, "/")) != nullptr)
+			{
+				if (strlen(spStr) > 0)
+				{
+					::std::strcat(dir2, "/");
+					::std::strcat(dir2, spStr);
+					if (access(dir2, F_OK) != 0)
+					{
+						if (::mkdir(dir2, 0644) != 0)
+						{
+							::std::fprintf(::stderr, "Error: create parent directory of log file\n");
+							exit(1);
+						}
+					}
+				}
+			}
+		}
+
+		void LogFile::getFileInfo(uint64_t* fileSize, ::std::time_t* createTime)
 		{
 			struct stat fileInfo {};
 			if (!::fstat(fileno(fp_), &fileInfo))
@@ -136,10 +184,6 @@ namespace nets
 			if (createTime != nullptr)
 			{
 				*createTime = fileInfo.st_ctime;
-			}
-			if (modifyTime != nullptr)
-			{
-				*modifyTime = fileInfo.st_mtime;
 			}
 		}
 

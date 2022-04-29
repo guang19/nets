@@ -9,7 +9,6 @@
 #include <condition_variable>
 #include <thread>
 #include <vector>
-#include <sys/stat.h>
 #include "base/log/LogBuffer.h"
 #include "base/Noncopyable.h"
 #include "base/Singleton.h"
@@ -60,7 +59,9 @@ namespace nets
 					return createTime_;
 				}
 
-				void getFileInfo(uint64_t* fileSize, ::std::time_t* createTime, ::std::time_t* modifyTime);
+			private:
+				void mkdirR(const char* multiLevelDir);
+				void getFileInfo(uint64_t* fileSize, ::std::time_t* createTime);
 
 			private:
 				FILE* fp_ { nullptr };
