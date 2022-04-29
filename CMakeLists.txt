@@ -13,11 +13,20 @@ SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 # 开启ctest
 ENABLE_TESTING()
 
-# Definition
-# 日志等级，默认DEBUG。可选：TRACE,DEBUG,INFO,WARN,ERROR,FATAL；
-ADD_DEFINITIONS(-DLOG_LEVEL=TRACE)
-# 日志输出目标，默认STDOUT。可选：STDOUT,SINGLE_FILE，DAILY_FILE，ROLLING_FILE；
-ADD_DEFINITIONS(-DLOG_WRITER_TYPE=SINGLE_FILE)
+# 日志等级，默认DEBUG。可选：
+# - 0：TRACE；
+# - 1：DEBUG；
+# - 2：INFO；
+# - 3：WARN；
+# - 4：ERROR；
+# - 5：FATAL。
+ADD_DEFINITIONS(-DLOG_LEVEL=1)
+# 日志输出目标，默认为0（STDOUT）。可选：
+# 0：STDOUT：标准输出；
+# 1：SINGLE_FILE：输出单文件，不回滚，不计大小与时间；
+# 2：DAILY_FILE：每日生成一个文件，不计大小；
+# 3：ROLLING_FILE：按照文件大小回滚
+ADD_DEFINITIONS(-DLOG_WRITER_TYPE=2)
 # 日志文件，默认为：“/tmp/nets/nets.log”，请使用绝对路径；
 ADD_DEFINITIONS(-DLOG_FILE="/tmp/nets/nets.log")
 # 日志文件回滚大小，单位:MB，默认24M。（仅当LOG_WRITER为ROLLING_FILE时有效）

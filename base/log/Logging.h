@@ -13,7 +13,7 @@
 #include "base/Noncopyable.h"
 
 #ifndef LOG_LEVEL
-	#define LOG_LEVEL DEBUG
+	#define LOG_LEVEL 1
 #endif
 
 namespace nets
@@ -92,7 +92,7 @@ namespace nets
 
 			private:
 				LogMessageTime logMessageTime_ {};
-				LogLevel logLevel_ { LOG_LEVEL };
+				LogLevel logLevel_ {};
 				const char* filename_ { nullptr };
 				uint32_t line_ { 0 };
 				LogBuffer message_ {};

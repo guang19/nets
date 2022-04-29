@@ -65,10 +65,11 @@ namespace nets
 
 			private:
 				FILE* fp_ { nullptr };
-				const char* dir_ {};
-				const char* filename_ {};
+				char* dir_ {};
+				char* filename_ {};
 				uint64_t bytes_ { 0 };
 				::std::time_t createTime_ { 0 };
+				::std::time_t lastRollTime_ { 0 };
 				char* buffer_ { nullptr };
 		};
 
@@ -94,7 +95,6 @@ namespace nets
 				using AtomicBoolType 		= ::std::atomic<bool>;
 				using MutexType             = ::std::mutex;
 				using ConditionVarType 		= ::std::condition_variable;
-				using LockGuardType         = ::std::lock_guard<MutexType>;
 				using UniqueLockType	    = ::std::unique_lock<MutexType>;
 				using BufferPtr				= ::std::unique_ptr<LogBuffer>;
 				using BufferVectorType		= ::std::vector<BufferPtr>;
@@ -111,7 +111,7 @@ namespace nets
 
 				////////////////////////////////////////////////////////////////////////////
 			protected:
-				virtual void persist(const char* data, uint32_t len) = 0;
+				virtual void persist(const char* data, uint32_t len){};
 				FilePtr logFile_ { nullptr };
 				////////////////////////////////////////////////////////////////////////////
 

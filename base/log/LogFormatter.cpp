@@ -25,6 +25,9 @@ namespace nets
 					"FATAL"
 				};
 
+			/**
+			 * log time cache
+			 */
 			__thread struct tm CacheTMS {};
 			__thread ::std::time_t CacheSeconds { 0 };
 		}

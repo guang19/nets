@@ -33,10 +33,10 @@ namespace nets
 			constexpr uint32_t FilenameLen = 256;
 		}
 
-		LogFile::LogFile(const char* file)
+		LogFile::LogFile(const char* file) : lastRollTime_(0)
 		{
-			uint32_t filenameLen = strlen(file);
-			if (filenameLen > FilenameLen)
+			uint32_t filePathLen = strlen(file);
+			if (filePathLen > FilenameLen)
 			{
 
 				::std::fprintf(::stderr, "Error:log file name length more than %d\n", FilenameLen);
@@ -44,18 +44,24 @@ namespace nets
 			}
 			char tmpFile[FilenameLen] = { 0 };
 			::std::memset(tmpFile, 0, FilenameLen);
-			::std::memcpy(tmpFile, file, filenameLen);
-			dir_ = ::dirname(tmpFile);
-			filename_ = ::basename(tmpFile);
+			::std::memcpy(tmpFile, file, filePathLen);
+			const char* filename = ::basename(tmpFile);
+			uint32_t filenameLen = ::std::strlen(filename);
+			const char* dir = ::dirname(tmpFile);
+			uint32_t dirLen = ::std::strlen(dir);
+			dir_ = new char[dirLen];
+			filename_ = new char[filenameLen];
+			::std::memcpy(dir_, dir, dirLen);
+			::std::memcpy(filename_, filename, filenameLen);
 			// log file has parent directory
-			if (::std::strcmp(dir_, ".") != 0)
+			if (::std::strcmp(dir, ".") != 0)
 			{
 				// create parent directory of log file
-				mkdirR(dir_);
+				mkdirR(dir);
 			}
 			if ((fp_ = ::std::fopen(file, "a")) == nullptr)
 			{
-				::std::fprintf(::stderr, "Error:log file name length more than %d\n", FilenameLen);
+				::std::fprintf(::stderr, "Error:failed to open log file");
 				exit(1);
 			}
 			getFileInfo(&bytes_, &createTime_);
@@ -84,12 +90,12 @@ namespace nets
 			while (writtenBytes < len)
 			{
 				uint64_t remain = len - writtenBytes;
-				// thread unsafe
-				uint64_t n = ::fwrite_unlocked(data + writtenBytes, remain, 1, fp_);
+				// not thread-safe
+				uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
 				if (n != remain)
 				{
 					int32_t err = ferror(fp_);
-					if (err)
+					if (err != 0)
 					{
 						::std::fprintf(::stderr, "Error:log file append error ""\"""%s""\"""\n", ::strerror(err));
 						break;
@@ -114,7 +120,7 @@ namespace nets
 			}
 			struct tm tmS {};
 			::localtime_r(&createTime_, &tmS);
-			char newFilename[23] = { 0 };
+			char newFilename[24] = { 0 };
 			::std::strftime(newFilename, 20, "%Y-%m-%d_%H:%M:%S", &tmS);
 			::std::memcpy(newFilename + 19, ".log", 4);
 			if (::std::strcmp(dir_, ".") != 0)
@@ -160,9 +166,9 @@ namespace nets
 					::std::strcat(dir2, spStr);
 					if (access(dir2, F_OK) != 0)
 					{
-						if (::mkdir(dir2, 0644) != 0)
+						if (::mkdir(dir2, 0775) != 0)
 						{
-							::std::fprintf(::stderr, "Error: create parent directory of log file\n");
+							::std::fprintf(::stderr, "Error: failed to create parent directory of log file\n");
 							exit(1);
 						}
 					}
@@ -173,7 +179,7 @@ namespace nets
 		void LogFile::getFileInfo(uint64_t* fileSize, ::std::time_t* createTime)
 		{
 			struct stat fileInfo {};
-			if (!::fstat(fileno(fp_), &fileInfo))
+			if (::fstat(::fileno(fp_), &fileInfo) != 0)
 			{
 				return;
 			}
@@ -191,24 +197,20 @@ namespace nets
 		{
 			// Log buffer cache 2M
 			constexpr uint32_t LogBufferSize = 2 * 1024 * 1024;
-			// Log buffer flush interval,unit：seconds
-			constexpr uint32_t LogBufferFlushInterval= 1;
+			// Log buffer flush interval,unit：milliseconds
+			constexpr uint32_t LogBufferFlushInterval= 1000;
 		}
 
 		AsyncFileLogWriter::AsyncFileLogWriter() : logFile_(new LogFile(LOG_FILE)),
 			running_(false), cacheBuffer_(new LogBuffer(LogBufferSize)),
-			backupCacheBuffer_(new LogBuffer(LogBufferSize)), buffers_(),
-			asyncThread_(&AsyncFileLogWriter::asyncWrite, this), mtx_(), cv_()
+			backupCacheBuffer_(new LogBuffer(LogBufferSize)), buffers_(), mtx_(), cv_()
 		{
 			buffers_.reserve(LOG_FILE_ROLLING_SIZE >> 1);
 		}
 
 		AsyncFileLogWriter::~AsyncFileLogWriter()
 		{
-			if (running_)
-			{
-				stop();
-			}
+			stop();
 		}
 
 		void AsyncFileLogWriter::start()
@@ -218,16 +220,20 @@ namespace nets
 				return;
 			}
 			running_ = true;
-			if (asyncThread_.joinable())
-			{
-				asyncThread_.detach();
-			}
+			asyncThread_ = ::std::thread(&AsyncFileLogWriter::asyncWrite, this);
 		}
 
 		void AsyncFileLogWriter::stop()
 		{
-			running_ = false;
-			cv_.notify_one();
+			if (running_)
+			{
+				running_ = false;
+				cv_.notify_one();
+				if (asyncThread_.joinable())
+				{
+					asyncThread_.join();
+				}
+			}
 		}
 
 		void AsyncFileLogWriter::write(const char* data, uint32_t len)
@@ -298,7 +304,8 @@ namespace nets
 
 		namespace
 		{
-			::std::time_t DaySeconds = 60 * 60 * 24;
+//			::std::time_t DaySeconds = 60 * 60 * 24;
+			::std::time_t DaySeconds = 30;
 		}
 
 		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len)

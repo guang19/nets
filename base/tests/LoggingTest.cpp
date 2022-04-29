@@ -39,58 +39,36 @@ TEST(LoggingTest, StreamAPI)
 	t1.join();
 }
 
-class Lg
-{
-	public:
-		Lg() : thread_()
-		{
-			n = new int(5);
-		}
-
-		~Lg()
-		{
-			if (running_)
-			{
-				stop();
-			}
-		}
-
-		void stop()
-		{
-			running_ = false;
-			delete n;
-			n = nullptr;
-		}
-
-		void start()
-		{
-			running_ = true;
-			thread_ = ::std::thread(&Lg::async, this);
-			if (thread_.joinable())
-			{
-				thread_.detach();
-			}
-		}
-
-		void async()
-		{
-			while (running_)
-			{
-				::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
-				*n = *n + 1;
-				printf("==%d==\n", *n);
-			}
-		}
-
-	private:
-		::std::thread thread_;
-		::std::atomic<bool> running_ { false };
-		int* n { nullptr };
-};
-
+// 将LOG_WRITER_TYPE选项改为1（SINGLE_FILE）
 TEST(LoggingTest, SingleFile)
 {
 	LOG_TRACE("这是一条trace信息");
+	LOG_DEBUG("这是一条debug信息");
+	LOG_INFO("这是一条info信息");
+	LOG_WARN("这是一条warn信息");
+	LOG_ERROR("这是一条error信息");
+	LOG_FATAL("这是一条fatal信息");
+	LOGS_DEBUG << "这是一条debug信息 stream\n";
+	LOGS_INFO << "这是一条info信息 stream\n";
+	LOGS_WARN << "这是一条warn信息 stream\n";
+	LOGS_ERROR << "这是一条error信息 stream\n";
+	LOGS_FATAL << "这是一条fatal信息 stream\n";
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+}
+
+#include <libgen.h>
+#include <string.h>
+// 将LOG_WRITER_TYPE选项改为2（DAILY_FILE）
+TEST(LoggingTest, DailyFile)
+{
+	char tmpFile[256] = { 0 };
+	::std::memset(tmpFile, 0, 256);
+	::std::memcpy(tmpFile, "/tmp/nets/nets.log", 18);
+	const char* filename = basename(tmpFile);
+	uint32_t filenameLen = ::std::strlen(filename);
+	const char* dir = ::dirname(tmpFile);
+	uint32_t dirLen = ::std::strlen(dir);
+	::std::cout << dirLen << '\t' << dir << '\t' << filenameLen << '\t' << filename;
 }
 
 int main(int argc, char** argv)
