@@ -10,7 +10,6 @@ SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 开启ctest
 ENABLE_TESTING()
 
 # 日志等级，默认DEBUG。可选：
@@ -26,7 +25,7 @@ ADD_DEFINITIONS(-DLOG_LEVEL=1)
 # 1：SINGLE_FILE：输出单文件，不回滚，不计大小与时间；
 # 2：DAILY_FILE：每日生成一个文件，不计大小；
 # 3：ROLLING_FILE：按照文件大小回滚
-ADD_DEFINITIONS(-DLOG_WRITER_TYPE=2)
+ADD_DEFINITIONS(-DLOG_WRITER_TYPE=0)
 # 日志文件，默认为：“/tmp/nets/nets.log”，请使用绝对路径；
 ADD_DEFINITIONS(-DLOG_FILE="/tmp/nets/nets.log")
 # 日志文件回滚大小，单位:MB，默认24M。（仅当LOG_WRITER为ROLLING_FILE时有效）
@@ -48,7 +47,6 @@ ELSE()
     SET(GOOGLE_TEST_LIB_DIR ${PROJECT_SOURCE_DIR}/third_party/googletest/lib)
 ENDIF()
 
-# CXX Compiler Flags
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g \
 -Wall \
 -Wextra \

@@ -13,7 +13,7 @@
 #include "base/Noncopyable.h"
 
 #ifndef LOG_LEVEL
-	#define LOG_LEVEL 1
+#define LOG_LEVEL 1
 #endif
 
 namespace nets
@@ -35,7 +35,7 @@ namespace nets
 		{
 			public:
 				LogMessageTime();
-				explicit LogMessageTime(uint64_t timestamp);
+				explicit LogMessageTime(::std::time_t timestamp);
 				LogMessageTime(::std::time_t secondsEpoch, ::std::time_t microseconds);
 
 				LogMessageTime(const LogMessageTime& rhs);
@@ -46,7 +46,7 @@ namespace nets
 
 				static LogMessageTime now();
 
-				inline uint64_t getTimestamp() const
+				inline ::std::time_t getTimestamp() const
 				{
 					return timestampEpoch_;
 				}
@@ -55,7 +55,7 @@ namespace nets
 				uint32_t getMicroseconds() const;
 
 			private:
-				uint64_t timestampEpoch_ { 0 };
+				::std::time_t timestampEpoch_ { 0 };
 		};
 
 		typedef struct LogMessage_ : Noncopyable

@@ -14,15 +14,15 @@
 #include "base/Singleton.h"
 
 #ifndef LOG_WRITER_TYPE
-	#define LOG_WRITER_TYPE STDOUT
+#define LOG_WRITER_TYPE STDOUT
 #endif
 
 #ifndef LOG_FILE
-	#define LOG_FILE "/tmp/nets/nets.log"
+#define LOG_FILE "/tmp/nets/nets.log"
 #endif
 
 #ifndef LOG_FILE_ROLLING_SIZE
-	#define LOG_FILE_ROLLING_SIZE 24
+#define LOG_FILE_ROLLING_SIZE 24
 #endif
 
 namespace nets
@@ -37,6 +37,9 @@ namespace nets
 			ROLLING_FILE
 		};
 
+		/**
+		 *  not thread-safe
+		 */
 		class LogFile : Noncopyable
 		{
 			public:
@@ -47,28 +50,27 @@ namespace nets
 				void append(const char* data, uint32_t len);
 				void flush();
 
-				void renameByTime();
+				void renameByNowTime(::std::time_t now);
+
+				void mkdirR(const char* multiLevelDir);
 
 				inline uint32_t size() const
 				{
 					return bytes_;
 				}
 
-				inline ::std::time_t createTime() const
+				inline ::std::time_t getLastRollTime() const
 				{
-					return createTime_;
+					return lastRollTime_;
 				}
-
 			private:
-				void mkdirR(const char* multiLevelDir);
 				void getFileInfo(uint64_t* fileSize, ::std::time_t* createTime);
 
 			private:
 				FILE* fp_ { nullptr };
-				char* dir_ {};
-				char* filename_ {};
+				char* dir_ { nullptr };
+				char* filename_ { nullptr };
 				uint64_t bytes_ { 0 };
-				::std::time_t createTime_ { 0 };
 				::std::time_t lastRollTime_ { 0 };
 				char* buffer_ { nullptr };
 		};
@@ -111,7 +113,7 @@ namespace nets
 
 				////////////////////////////////////////////////////////////////////////////
 			protected:
-				virtual void persist(const char* data, uint32_t len){};
+				virtual void persist(const char* data, uint32_t len, ::std::time_t persistTime){};
 				FilePtr logFile_ { nullptr };
 				////////////////////////////////////////////////////////////////////////////
 
@@ -139,7 +141,7 @@ namespace nets
 				}
 
 			protected:
-				void persist(const char* data, uint32_t len) override;
+				void persist(const char* data, uint32_t len, ::std::time_t persistTime) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(AsyncDailyFileLogWriter), public AsyncFileLogWriter
@@ -153,7 +155,7 @@ namespace nets
 				}
 
 			protected:
-				void persist(const char* data, uint32_t len) override;
+				void persist(const char* data, uint32_t len, ::std::time_t persistTime) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(AsyncRollingFileLogWriter), public AsyncFileLogWriter
@@ -167,7 +169,7 @@ namespace nets
 				}
 
 			protected:
-				void persist(const char* data, uint32_t len) override;
+				void persist(const char* data, uint32_t len, ::std::time_t persistTime) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(LogWriterFactory)

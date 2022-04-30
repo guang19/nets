@@ -22,7 +22,7 @@ namespace nets
 		{
 		}
 
-		LogMessageTime::LogMessageTime(uint64_t timestamp) : timestampEpoch_(timestamp)
+		LogMessageTime::LogMessageTime(::std::time_t timestamp) : timestampEpoch_(timestamp)
 		{
 		}
 

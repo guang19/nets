@@ -53,7 +53,7 @@ namespace nets
 					queue_.pop_back();
 				}
 
-                // 唤醒put线程和take线程
+				// notify blocking thread
                 void notifyBlockingThread()
 				{
 					lock_guard_type lock(mtx_);
@@ -64,11 +64,6 @@ namespace nets
                 void put(const_reference_type el);
                 void take(reference_type el);
 
-				/********************************************************************************
-				 *
-				 * @Predicate : 当Predicate满足时，put或take操作不会阻塞线程并且put和take操作一定失败
-				 *
-				 ********************************************************************************/
 				template<typename Predicate>
 				bool put(const_reference_type el,  Predicate p);
                 template<typename Predicate>
@@ -86,7 +81,6 @@ namespace nets
                 bool tryPop(reference_type el);
 
             private:
-                // 内部使用，能够确保使用前已加锁
 				bool isFull() const
                 {
                     return queue_.size() >= maxQueueSize_;
@@ -134,7 +128,6 @@ namespace nets
 			{
 				return !isFull() || p();
 			});
-			// 因为wait的条件是 (!full() || p())，所以并不确定是否full，还需再判断一次
 			if (isFull() || p())
 			{
 				return false;

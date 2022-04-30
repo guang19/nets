@@ -17,10 +17,10 @@ namespace nets
 		namespace
 		{
 			// log length limit: 8K
-			constexpr uint32_t LogLenLimit = (1024 << 3);
+			constexpr uint32_t DefaultLogBufferSize = (1024 << 3);
 		}
 
-		LogBuffer::LogBuffer() : LogBuffer(LogLenLimit)
+		LogBuffer::LogBuffer() : LogBuffer(DefaultLogBufferSize)
 		{
 		}
 

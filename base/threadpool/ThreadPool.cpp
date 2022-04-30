@@ -71,7 +71,6 @@ namespace nets
 		{
 			if (corePoolSize <= 0 || corePoolSize > maximumPoolSize)
 			{
-				// 无效的核心线程数和最大线程数
 				throw ::std::invalid_argument("corePoolSize must be greater than 0 and maximumPoolSize must be greater than corePoolSize");
 			}
 		}
@@ -85,7 +84,6 @@ namespace nets
 		{
 			if (running_)
 			{
-				// 正在运行或者已经初始化了
 				return;
 			}
 			running_ = true;
@@ -97,9 +95,8 @@ namespace nets
 			{
 				running_ = false;
 				unique_lock_type lock(mtx_);
-				// 唤醒阻塞在任务队列的线程
+				// notify blocking thread
 				taskQueue_->notifyBlockingThread();
-				// 还有线程在运行就等待
 				poolCv_.wait(lock, [&]()
 				{
 					return pool_.empty();
@@ -120,7 +117,7 @@ namespace nets
 			}
             while (running_)
             {
-				// 核心线程可以阻塞等待
+				// core thread blocked wait
 				if (threadWrapperRawPtr->isCoreThread_)
 				{
 					taskQueue_->take(threadWrapperRawPtr->task_, [&]
@@ -130,7 +127,7 @@ namespace nets
 				}
 				else
 				{
-					// 非核心线程则等待超时
+					// non-core thread wait timeout
 					if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, [&]
 					{
 						return !isRunning();

@@ -30,9 +30,6 @@
 
 
 #define DEFINE_SINGLETON(CLASS_NAME) \
-	protected:	\
-		CLASS_NAME() = default;	\
-		~CLASS_NAME() = default;	\
 		\
         template<typename C>	\
 		static void callAfterInit(...)	\
@@ -93,7 +90,7 @@
 //            private:
 //                static void destroy()
 //				{
-//					// 单例类型必须是完整类型
+//					// singleton class must be complete type
 //					typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
 //					T_must_be_complete_type jugg;
 //					UNUSED(jugg);

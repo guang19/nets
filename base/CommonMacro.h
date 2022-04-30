@@ -27,7 +27,7 @@
 			constexpr static bool value = decltype(check<T>(nullptr))::value;	\
 	}
 
-// 判断某个类是否有某个函数
+// check if the class has the function
 #define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...)	\
 		HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>::value
  *
@@ -46,7 +46,7 @@
     	return false;	\
 	}
 
-// 判断某个类是否有某个函数
+// check if the class has the function
 #define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...) \
 	HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>(nullptr)
 

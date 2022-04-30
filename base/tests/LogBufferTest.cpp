@@ -10,30 +10,19 @@
 
 using namespace nets::base;
 
-TEST(LogBufferTest, T)
-{
-	LogBuffer logBuffer;
-	::std::cout << logBuffer.getBuffer() << '\n';
-	::std::cout << logBuffer.length() << '\n';
-	::std::cout << logBuffer.available();
-}
-
 TEST(LogBufferTest, Baseic)
 {
 	LogBuffer logBuffer;
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), 65536U);
 }
 
 TEST(LogBufferTest, Append)
 {
 	LogBuffer logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), 65536U);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
-	ASSERT_EQ(logBuffer.available(),  65536U - 3);
 	ASSERT_STREQ(logBuffer.getBuffer(), "abc");
 	::std::cout << logBuffer.getBuffer() << ::std::endl;
 	::std::cout << "=============================================\n";
@@ -49,10 +38,8 @@ TEST(LogBufferTest, AppendBuffer)
 {
 	LogBuffer logBuffer;
 	ASSERT_EQ(logBuffer.length(), 0U);
-	ASSERT_EQ(logBuffer.available(), 65536U);
 	logBuffer << "abc";
 	ASSERT_EQ(logBuffer.length(), 3U);
-	ASSERT_EQ(logBuffer.available(), 65536U - 3);
 	LogBuffer logBuffer2;
 	logBuffer2 << "abc";
 	logBuffer << logBuffer2 << '\n';

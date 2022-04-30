@@ -34,15 +34,18 @@ namespace nets
 
 			public:
 				/**************************************************************************
-				 *  当线程池已满，且任务队列已满时，新的任务无法被立刻执行，可以指定以下拒绝策略进行补偿
+				 * When the thread pool is full and the task queue cannot continue accept
+				 * new tasks, the following rejection policy can be selected to deal with
+				 * new tasks
 				 **************************************************************************/
 				enum RejectionPolicy
 				{
-					// 丢弃新的任务，不做任何操作
+					// abandon new tasks and do nothing
 					DiscardPolicy = 0,
-					// 遗弃任务队列末尾的任务，再尝试把新任务添加到任务队列末尾
+					// abandon the task at the end of the task queue
+					// and try to add a new task to the end
 					DiscardOlderPolicy,
-					// 使用调用者的线程直接执行任务
+					// the caller's thread runs the task directly
 					CallerRunsPolicy,
 				};
 
@@ -128,18 +131,20 @@ namespace nets
 			private:
 				::std::string name_ {};
 				atomic_bool_type running_ { false };
-				// 核心线程数，这部分线程属于常驻线程，一旦被创造就会随着线程池的周期结束而销毁
+				// the numbers of core threads, once created,
+				// will be destroyed as the life cycle of the thread pool ends
 				size_type corePoolSize_ { 0 };
 				// 线程池最大容纳的线程数
+				// the maximum numbers of threads that the thread pool can hold
 				size_type maximumPoolSize_ { 0 };
-				// 线程池中除了常驻线程外，其余{ 空闲线程 }能够存活的时间
+				// time that idle threads can survive
 				milliseconds_type keepAliveTime_ { 0 };
-				// 任务队列
+				// task queue
 				BoundedBlockingQueuePtr taskQueue_ { nullptr };
 				::std::list<ThreadWrapperPtr> pool_ {};
 				mutex_type mtx_ {};
 				condition_variable_type poolCv_ {};
-				//拒绝策略
+				// rejection policy
 				RejectionPolicy rejectionPolicy_;
 		};
 
@@ -158,26 +163,26 @@ namespace nets
 					::std::bind(::std::forward<Fn>(fun), ::std::forward<Args>(args)...);
 			task_type task = ::std::bind(originFunc);
 			size_type threadSize = pool_.size();
-			// 如果核心线程池未满，就创建新核心线程执行任务
+			// if still able to create core thread
 			if (threadSize < corePoolSize_)
 			{
 				return addThreadTask(task, true, threadSize);
 			}
 			else
 			{
-				// 尝试直接添加到任务队列
+				// try push task to task queue
 				if (taskQueue_->tryPush(task))
 				{
 					return true;
 				}
-				// 线程池还未满，创建非核心线程执行任务
+				// the thread pool is not full, create non-core thread to perform task
 				if (threadSize < maximumPoolSize_)
 				{
 					return addThreadTask(task, false, threadSize);
 				}
 				else
 				{
-					// 拒绝策略
+					// handle task with rejection policy
 					return rejectedExecution(task);
 				}
 			}

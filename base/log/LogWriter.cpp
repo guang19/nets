@@ -10,6 +10,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <utility>
+#include "base/CommonMacro.h"
 
 namespace nets
 {
@@ -29,29 +30,32 @@ namespace nets
 
 		namespace
 		{
-			constexpr uint32_t FileBufferSize = 1024 << 3;
-			constexpr uint32_t FilenameLen = 256;
+			constexpr uint32_t FileIOBufferSize = 1024 << 3;
+			constexpr uint32_t MaxFilePathLen = 256;
 		}
 
-		LogFile::LogFile(const char* file) : lastRollTime_(0)
+		LogFile::LogFile(const char* file)
 		{
 			uint32_t filePathLen = strlen(file);
-			if (filePathLen > FilenameLen)
+			if (filePathLen > MaxFilePathLen)
 			{
 
-				::std::fprintf(::stderr, "Error:log file name length more than %d\n", FilenameLen);
+				::std::fprintf(::stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
 				exit(1);
 			}
-			char tmpFile[FilenameLen] = { 0 };
-			::std::memset(tmpFile, 0, FilenameLen);
+			char tmpFile[MaxFilePathLen] = { 0 };
+			::std::memset(tmpFile, 0, MaxFilePathLen);
 			::std::memcpy(tmpFile, file, filePathLen);
+			// <dirname> will modify input str, so called <basename> before <dirname>
 			const char* filename = ::basename(tmpFile);
 			uint32_t filenameLen = ::std::strlen(filename);
 			const char* dir = ::dirname(tmpFile);
 			uint32_t dirLen = ::std::strlen(dir);
-			dir_ = new char[dirLen];
-			filename_ = new char[filenameLen];
+			dir_ = new char[dirLen + 1];
+			filename_ = new char[filenameLen + 1];
+			::std::memset(dir_, 0, dirLen + 1);
 			::std::memcpy(dir_, dir, dirLen);
+			::std::memset(filename_, 0, filenameLen + 1);
 			::std::memcpy(filename_, filename, filenameLen);
 			// log file has parent directory
 			if (::std::strcmp(dir, ".") != 0)
@@ -64,10 +68,10 @@ namespace nets
 				::std::fprintf(::stderr, "Error:failed to open log file");
 				exit(1);
 			}
-			getFileInfo(&bytes_, &createTime_);
-			buffer_ = new char[FileBufferSize];
-			::std::memset(buffer_, 0, FileBufferSize);
-			::setbuffer(fp_, buffer_, FileBufferSize);
+			getFileInfo(&bytes_, &lastRollTime_);
+			buffer_ = new char[FileIOBufferSize];
+			::std::memset(buffer_, 0, FileIOBufferSize);
+			::setbuffer(fp_, buffer_, FileIOBufferSize);
 		}
 
 		LogFile::~LogFile()
@@ -76,6 +80,16 @@ namespace nets
 			{
 				::std::fclose(fp_);
 				fp_ = nullptr;
+			}
+			if (dir_ != nullptr)
+			{
+				delete[] dir_;
+				dir_ = nullptr;
+			}
+			if (filename_ != nullptr)
+			{
+				delete[] filename_;
+				filename_ = nullptr;
 			}
 			if (buffer_ != nullptr)
 			{
@@ -111,7 +125,7 @@ namespace nets
 			::std::fflush(fp_);
 		}
 
-		void LogFile::renameByTime()
+		void LogFile::renameByNowTime(::std::time_t now)
 		{
 			if (fp_ != nullptr)
 			{
@@ -119,14 +133,15 @@ namespace nets
 				fp_ = nullptr;
 			}
 			struct tm tmS {};
-			::localtime_r(&createTime_, &tmS);
+			::localtime_r(&now, &tmS);
 			char newFilename[24] = { 0 };
-			::std::strftime(newFilename, 20, "%Y-%m-%d_%H:%M:%S", &tmS);
+			::std::memset(newFilename, 0, 24);
+			::std::strftime(newFilename, 20, "%Y-%m-%d_%H-%M-%S", &tmS);
 			::std::memcpy(newFilename + 19, ".log", 4);
 			if (::std::strcmp(dir_, ".") != 0)
 			{
-				char tmpFile1[FilenameLen] = { 0 };
-				char tmpFile2[FilenameLen] = { 0 };
+				char tmpFile1[MaxFilePathLen] = { 0 };
+				char tmpFile2[MaxFilePathLen] = { 0 };
 				::std::strcat(tmpFile1, dir_);
 				::std::strcat(tmpFile1, "/");
 				::std::strcat(tmpFile1, filename_);
@@ -141,7 +156,8 @@ namespace nets
 				::std::rename(filename_, newFilename);
 				fp_ = ::std::fopen(filename_, "a");
 			}
-			getFileInfo(&bytes_, &createTime_);
+			getFileInfo(&bytes_, nullptr);
+			lastRollTime_ = now;
 		}
 
 		void LogFile::mkdirR(const char *multiLevelDir)
@@ -151,14 +167,14 @@ namespace nets
 				return;
 			}
 			uint32_t len = strlen(multiLevelDir);
-			char dir1[256] = { 0 };
-			char* dirptr1 = dir1;
-			char dir2[256] = { 0 };
-			::std::memset(dir1, 0, 256);
-			::std::memset(dir2, 0, 256);
+			char dir1[MaxFilePathLen] = { 0 };
+			char* dirptr = dir1;
+			char dir2[MaxFilePathLen] = { 0 };
+			::std::memset(dir1, 0, MaxFilePathLen);
+			::std::memset(dir2, 0, MaxFilePathLen);
 			::std::memcpy(dir1, multiLevelDir, len);
 			char* spStr;
-			while ((spStr = strsep(&dirptr1, "/")) != nullptr)
+			while ((spStr = strsep(&dirptr, "/")) != nullptr)
 			{
 				if (strlen(spStr) > 0)
 				{
@@ -176,7 +192,7 @@ namespace nets
 			}
 		}
 
-		void LogFile::getFileInfo(uint64_t* fileSize, ::std::time_t* createTime)
+		void LogFile::getFileInfo(uint64_t *fileSize, ::std::time_t *createTime)
 		{
 			struct stat fileInfo {};
 			if (::fstat(::fileno(fp_), &fileInfo) != 0)
@@ -196,14 +212,15 @@ namespace nets
 		namespace
 		{
 			// Log buffer cache 2M
-			constexpr uint32_t LogBufferSize = 2 * 1024 * 1024;
+			constexpr uint32_t MaxLogBufferSize = 2 * 1024 * 1024;
 			// Log buffer flush interval,unit：milliseconds
 			constexpr uint32_t LogBufferFlushInterval= 1000;
 		}
 
 		AsyncFileLogWriter::AsyncFileLogWriter() : logFile_(new LogFile(LOG_FILE)),
-			running_(false), cacheBuffer_(new LogBuffer(LogBufferSize)),
-			backupCacheBuffer_(new LogBuffer(LogBufferSize)), buffers_(), mtx_(), cv_()
+			running_(false), cacheBuffer_(new LogBuffer(MaxLogBufferSize)),
+			backupCacheBuffer_(new LogBuffer(MaxLogBufferSize)), buffers_(), asyncThread_(),
+			mtx_(), cv_()
 		{
 			buffers_.reserve(LOG_FILE_ROLLING_SIZE >> 1);
 		}
@@ -252,7 +269,7 @@ namespace nets
 				}
 				else
 				{
-					cacheBuffer_.reset(new LogBuffer(LogBufferSize));
+					cacheBuffer_.reset(new LogBuffer(MaxLogBufferSize));
 				}
 				cacheBuffer_->append(data, len);
 				cv_.notify_one();
@@ -263,8 +280,9 @@ namespace nets
 		{
 			BufferVectorType tmpBuffers;
 			tmpBuffers.reserve(LOG_FILE_ROLLING_SIZE >> 1);
-			BufferPtr tmpBuffer1(new LogBuffer(LogBufferSize));
-			BufferPtr tmpBuffer2(new LogBuffer(LogBufferSize));
+			BufferPtr tmpBuffer1(new LogBuffer(MaxLogBufferSize));
+			BufferPtr tmpBuffer2(new LogBuffer(MaxLogBufferSize));
+			::std::time_t currentTime = 0;
 			while (running_)
 			{
 				{
@@ -282,53 +300,60 @@ namespace nets
 						backupCacheBuffer_ = ::std::move(tmpBuffer2);
 					}
 				}
+				currentTime = ::std::time(nullptr);
 				for (const BufferPtr& buf : tmpBuffers)
 				{
-					persist(buf->getBuffer(), buf->length());
+					persist(buf->getBuffer(), buf->length(), currentTime);
 				}
 				logFile_->flush();
 				tmpBuffers.clear();
-				tmpBuffer1.reset(new LogBuffer(LogBufferSize));
+				tmpBuffer1.reset(new LogBuffer(MaxLogBufferSize));
 				if (tmpBuffer2 == nullptr)
 				{
-					tmpBuffer2.reset(new LogBuffer(LogBufferSize));
+					tmpBuffer2.reset(new LogBuffer(MaxLogBufferSize));
 				}
 			}
 			logFile_->flush();
 		}
 
-		void AsyncSingleFileLogWriter::persist(const char* data, uint32_t len)
+		void AsyncSingleFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
 		{
+			UNUSED(persistTime);
 			logFile_->append(data, len);
 		}
 
 		namespace
 		{
-//			::std::time_t DaySeconds = 60 * 60 * 24;
-			::std::time_t DaySeconds = 30;
+			// if you need test DAILY_FILE LogWriter, you need to adjust this
+			// constant for short intervals, not for the whole day
+			constexpr ::std::time_t SecondsPerDay = 60 * 60 * 24;
+			// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
+//			constexpr ::std::time_t SecondsPerDay = 60;
 		}
 
-		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len)
+		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
 		{
-			::std::time_t nowTime = 0;
-			::std::time(&nowTime);
-			if (nowTime - logFile_->createTime() >= DaySeconds)
+			if (persistTime - logFile_->getLastRollTime() >= SecondsPerDay)
 			{
-				logFile_->renameByTime();
+				logFile_->renameByNowTime(persistTime);
 			}
 			logFile_->append(data, len);
 		}
 
 		namespace
 		{
+			// if you need test ROLLING_FILE LogWriter, you need to adjust this
+			// constant  as small as possible
 			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+			// Set LogFileRollingSize to 500 Bytes, then you will see soon if the log file is roll back
+//			 constexpr uint64_t LogFileRollingSize = 500;
 		}
 
-		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len)
+		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
 		{
-			if (logFile_->size() >= LogFileRollingSize)
+			if (logFile_->size() + len > LogFileRollingSize)
 			{
-				logFile_->renameByTime();
+				logFile_->renameByNowTime(persistTime);
 			}
 			logFile_->append(data, len);
 		}

@@ -31,8 +31,9 @@ DECLARE_SINGLETON_CLASS(Clazz)
 INIT_SINGLETON(Clazz);
 
 
-// 请单独执行每一个TestCase
-// 因为 Clazz::getInstance() 被调用一次被初始化后，其他TestCase再调用也是相同的，所以单独执行每个TestCase才能验证每个Case的实际结果
+// execute each test-case individually
+// because singleton instance has been initialized since getInstance called first time,
+// other test-case re-calls are the same singleton instance
 
 TEST(SingletonAddr, BasicUse)
 {
