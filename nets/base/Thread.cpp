@@ -51,13 +51,13 @@ namespace nets
 						}
 						catch (const ::std::exception& exception)
 						{
-							fprintf(::stderr, "Error:exception caught in thread %s, reason %s",
+							fprintf(::stderr, "Error:exception caught in thread %s, reason %s\n",
 									threadName_.c_str(), exception.what());
 							abort();
 						}
 						catch (...)
 						{
-							fprintf(::stderr, "Error:unknown exception caught in thread %s", threadName_.c_str());
+							fprintf(::stderr, "Error:unknown exception caught in thread %s\n", threadName_.c_str());
 							abort();
 						}
 					}

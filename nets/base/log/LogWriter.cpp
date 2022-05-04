@@ -65,7 +65,7 @@ namespace nets
 			}
 			if ((fp_ = ::std::fopen(file, "a")) == nullptr)
 			{
-				::std::fprintf(::stderr, "Error:failed to open log file");
+				::std::fprintf(::stderr, "Error:failed to open log file\n");
 				abort();
 			}
 			getFileInfo(&bytes_, &lastRollTime_);

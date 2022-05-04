@@ -123,8 +123,10 @@ namespace nets
 
 #define LOG_WARN(fmt, ...)	\
 	do	\
-	{	\
-		nets::base::LogMessageStream(LogLevel::WARN, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
+	{	if (LogLevel::WARN >= LOG_LEVEL)	\
+		{	\
+			nets::base::LogMessageStream(LogLevel::WARN, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
+		}	\
 	}	\
 	while (0)
 
