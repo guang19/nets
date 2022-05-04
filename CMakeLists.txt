@@ -6,7 +6,6 @@ PROJECT(nets LANGUAGES C CXX)
 SET(CMAKE_C_COMPILER "/usr/bin/gcc")
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
-
 SET(CMAKE_CXX_STANDARD 11)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -43,16 +42,15 @@ ELSE()
     OPTION(BUILD_NETS_TESTS "Build nets tests" ON)
     OPTION(BUILD_NETS_EXAMPLES "Build nets examples" ON)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
-    SET(GOOGLE_TEST_INC_DIR ${PROJECT_SOURCE_DIR}/third_party/googletest/include)
-    SET(GOOGLE_TEST_LIB_DIR ${PROJECT_SOURCE_DIR}/third_party/googletest/lib)
+    SET(GOOGLE_TEST_INC_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/include)
+    SET(GOOGLE_TEST_LIB_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/lib)
 ENDIF()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g \
 -Wall \
 -Wextra \
 -Werror \
--Wno-unused-parameter \
-")
+-Wno-unused-parameter")
 
 MESSAGE(STATUS "======CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}======")
 
@@ -60,4 +58,4 @@ MESSAGE(STATUS "======CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}======")
 #set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
-ADD_SUBDIRECTORY(base)
+ADD_SUBDIRECTORY(nets/base)
