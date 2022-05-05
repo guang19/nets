@@ -2,9 +2,9 @@
 // Created by guang19 on 2021/12/30.
 //
 
-#include "nets/base/concurrency/ThreadPool.h"
+#include <utility>
 
-#include <iostream>
+#include "nets/base/concurrency/ThreadPool.h"
 
 namespace nets
 {
@@ -12,23 +12,23 @@ namespace nets
     {
 		namespace
 		{
-			constexpr const char* DefaultThreadPoolName { "NetsThreadPool" };
-			constexpr ThreadPool::milliseconds_type DefaultKeepAliveTime { 30000 };
-			constexpr ThreadPool::size_type DefaultMaxQueueSize { INT32_MAX };
+			constexpr const char* DefaultThreadPoolName = "NetsThreadPool";
+			constexpr ::std::time_t DefaultKeepAliveTime = 30000;
+			constexpr ThreadPool::SizeType DefaultMaxQueueSize = INT32_MAX;
+			constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy =
+				ThreadPool::RejectionPolicy::DiscardOlderPolicy;
 		}
 
-        ThreadPool::ThreadWrapper::ThreadWrapper(size_type id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr)
+        ThreadPool::ThreadWrapper::ThreadWrapper(SizeType id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr)
 			: ThreadWrapper(id, false, nullptr, threadPoolRawPtr)
-        {}
+        {
+		}
 
-        ThreadPool::ThreadWrapper::ThreadWrapper(size_type id, bool isCoreThread, const task_type& task, ThreadPoolRawPtr threadPoolRawPtr)
-            : id_(id), isCoreThread_(isCoreThread), task_(task), thread_(&ThreadWrapper::startThread, this),
+        ThreadPool::ThreadWrapper::ThreadWrapper(SizeType id, bool isCoreThread, TaskType task, ThreadPoolRawPtr threadPoolRawPtr)
+            : id_(id), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(::std::bind(&ThreadWrapper::startThread, this)),
 			threadPoolRawPtr_(threadPoolRawPtr)
         {
-            if (thread_.joinable())
-            {
-                thread_.detach();
-            }
+			thread_.start();
         }
 
         void ThreadPool::ThreadWrapper::startThread()
@@ -36,42 +36,46 @@ namespace nets
 			threadPoolRawPtr_->runThread(this);
         }
 
-        ThreadPool::ThreadPool(size_type corePoolSize, size_type maximumPoolSize)
-			: ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, DefaultKeepAliveTime,
-						 DefaultMaxQueueSize)
-        {}
+        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize) :
+			ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, DefaultKeepAliveTime,
+						 DefaultMaxQueueSize, DefaultRejectionPolicy)
+        {
+		}
 
-        ThreadPool::ThreadPool(size_type corePoolSize, size_type maximumPoolSize, const milliseconds_type& keepAliveTime)
-            : ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, keepAliveTime,
-						 DefaultMaxQueueSize)
-        {}
+        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::std::time_t keepAliveTime) :
+			ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, keepAliveTime,
+						 DefaultMaxQueueSize, DefaultRejectionPolicy)
+        {
+		}
 
-        ThreadPool::ThreadPool(size_type corePoolSize, size_type maximumPoolSize, const milliseconds_type& keepAliveTime,
-							   size_type maxQueueSize)
-							   : ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, keepAliveTime,
-											maxQueueSize)
-        {}
+        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::std::time_t keepAliveTime,
+			SizeType maxQueueSize) : ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize,
+			keepAliveTime, maxQueueSize, DefaultRejectionPolicy)
+		{
+		}
 
-        ThreadPool::ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize)
-			: ThreadPool(name, corePoolSize, maximumPoolSize, DefaultKeepAliveTime,
-						 DefaultMaxQueueSize)
-        {}
+        ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
+			enum RejectionPolicy rejectionPolicy) : ThreadPool(name, corePoolSize, maximumPoolSize,
+			DefaultKeepAliveTime, DefaultMaxQueueSize, rejectionPolicy)
+        {
+		}
 
-        ThreadPool::ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize,
-							   const milliseconds_type& keepAliveTime)
-							   : ThreadPool(name, corePoolSize, maximumPoolSize, keepAliveTime, DefaultMaxQueueSize)
-        {}
+        ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
+			::std::time_t keepAliveTime, enum RejectionPolicy rejectionPolicy) : ThreadPool(name, corePoolSize,
+			maximumPoolSize, keepAliveTime, DefaultMaxQueueSize, rejectionPolicy)
+        {
+		}
 
-        ThreadPool::ThreadPool(const ::std::string& name, size_type corePoolSize, size_type maximumPoolSize,
-                               const milliseconds_type& keepAliveTime, size_type maxQueueSize)
-							   : name_(name), running_(false), corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize),
-							   keepAliveTime_(keepAliveTime), taskQueue_(new BoundedBlockingQueue<task_type>(maxQueueSize)),
-							   rejectionPolicy_(RejectionPolicy::DiscardPolicy)
+		ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
+							   ::std::time_t keepAliveTime, SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy)
+			: name_(name), running_(false), corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize),
+			  keepAliveTime_(keepAliveTime), taskQueue_(new BoundedBlockingQueue<TaskType>(maxQueueSize)),
+			  rejectionPolicy_(rejectionPolicy)
 
 		{
 			if (corePoolSize <= 0 || corePoolSize > maximumPoolSize)
 			{
-				throw ::std::invalid_argument("corePoolSize must be greater than 0 and maximumPoolSize must be greater than corePoolSize");
+				LOG_FATAL("corePoolSize must be greater than 0 and maximumPoolSize must be greater than corePoolSize");
 			}
 		}
 
@@ -84,24 +88,30 @@ namespace nets
 		{
 			if (running_)
 			{
+				LOG_WARN("thread pool has been initialized");
 				return;
 			}
 			running_ = true;
+			threadPool_.reserve(corePoolSize_);
+			LOG_DEBUG("thread pool init success");
 		}
 
 		void ThreadPool::shutdown()
 		{
-			if (running_)
+			if (!running_)
 			{
-				running_ = false;
-				unique_lock_type lock(mtx_);
-				// notify blocking thread
-				taskQueue_->notifyBlockingThread();
-				poolCv_.wait(lock, [&]()
-				{
-					return pool_.empty();
-				});
-            }
+				LOG_DEBUG("thread pool has not been init");
+				return;
+			}
+			running_ = false;
+			LockGuardType lock(mutex_);
+			// notify blocking thread
+			taskQueue_->notifyBlockingThread();
+			while (!threadPool_.empty())
+			{
+				poolCV_.wait(mutex_);
+			}
+			LOG_DEBUG("thread pool has been shutdown");
 		}
 
         void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)
@@ -110,33 +120,31 @@ namespace nets
 			{
 				return;
 			}
-			if (threadWrapperRawPtr->task_)
+			if (threadWrapperRawPtr->task_ != nullptr)
 			{
 				threadWrapperRawPtr->task_();
 				threadWrapperRawPtr->task_ = nullptr;
 			}
+			::std::function<bool ()> notRunning = [&]() -> bool
+				{
+					return !isRunning();
+				};
             while (running_)
             {
 				// core thread blocked wait
 				if (threadWrapperRawPtr->isCoreThread_)
 				{
-					taskQueue_->take(threadWrapperRawPtr->task_, [&]
-					{
-						return !isRunning();
-					});
+					taskQueue_->take(threadWrapperRawPtr->task_, notRunning);
 				}
 				else
 				{
 					// non-core thread wait timeout
-					if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, [&]
-					{
-						return !isRunning();
-					}))
+					if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, notRunning))
 					{
 						break;
 					}
 				}
-                if (threadWrapperRawPtr->task_)
+                if (threadWrapperRawPtr->task_ != nullptr)
                 {
 					threadWrapperRawPtr->task_();
 					threadWrapperRawPtr->task_ = nullptr;
@@ -147,29 +155,26 @@ namespace nets
 
 		void ThreadPool::releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr)
 		{
-			lock_guard_type lock(mtx_);
-			for (auto it = pool_.begin(), end = pool_.end(); it != end; ++it)
+			LockGuardType lock(mutex_);
+			for (auto it = threadPool_.begin(), end = threadPool_.end(); it != end; ++it)
 			{
 				if (it->get() == threadWrapperRawPtr)
 				{
-					pool_.erase(it);
-					poolCv_.notify_all();
+					threadPool_.erase(it);
+					poolCV_.notifyAll();
 					break;
 				}
 			}
 		}
 
-		bool ThreadPool::addThreadTask(const task_type& task, bool isCore, size_type currentThreadSize)
+		bool ThreadPool::addThreadTask(const TaskType& task, bool isCore, SizeType currentThreadSize)
 		{
-			if (running_)
-			{
-				pool_.emplace_back(new ThreadWrapper(currentThreadSize + 1, isCore, task, this));
-				return true;
-			}
-			return false;
+			threadPool_.emplace_back(new ThreadWrapper(currentThreadSize, isCore, task,
+				this));
+			return true;
 		}
 
-		bool ThreadPool::rejectedExecution(const ThreadPool::task_type &task)
+		bool ThreadPool::rejectedExecution(const TaskType& task)
 		{
 			switch (rejectionPolicy_)
 			{
@@ -177,7 +182,7 @@ namespace nets
 					return false;
 				case RejectionPolicy::DiscardOlderPolicy:
 				{
-					taskQueue_->pop_back();
+					taskQueue_->popBack();
 					return taskQueue_->tryPush(task);
 				}
 				case RejectionPolicy::CallerRunsPolicy:
@@ -186,7 +191,6 @@ namespace nets
 					return true;
 				}
 			}
-			return false;
 		}
 	} // namespace base
 } // namespace nets

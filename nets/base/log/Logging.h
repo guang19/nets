@@ -7,7 +7,6 @@
 
 
 #include <cstring>
-#include <string>
 #include "nets/base/Copyable.h"
 #include "nets/base/log/LogBuffer.h"
 #include "nets/base/Noncopyable.h"
@@ -35,7 +34,7 @@ namespace nets
 		typedef struct LogMessage_ : Noncopyable
 		{
 			public:
-				LogMessage_(LogLevel logLevel, const char* file, uint32_t line);
+				explicit LogMessage_(LogLevel logLevel, const char* file, uint32_t line);
 				~LogMessage_() = default;
 
 			public:
@@ -75,8 +74,8 @@ namespace nets
 		class LogMessageStream : public LogBuffer
 		{
 			public:
-				LogMessageStream(LogLevel logLevel, const char* file, uint32_t line);
-				LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...);
+				explicit LogMessageStream(LogLevel logLevel, const char* file, uint32_t line);
+				explicit LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...);
 				~LogMessageStream();
 
 			public:

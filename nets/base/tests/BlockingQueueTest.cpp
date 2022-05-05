@@ -6,8 +6,10 @@
 
 #include <atomic>
 #include <deque>
-#include <thread>
-#include "nets/base/threadpool/BoundedBlockingQueue.h"
+#include "nets/base/Thread.h"
+#include "nets/base/ThreadHelper.h"
+#include "nets/base/Timestamp.h"
+#include "nets/base/concurrency/BoundedBlockingQueue.h"
 
 using namespace nets::base;
 
@@ -23,12 +25,15 @@ class BlockingQueueTest : public testing::Test
 		// Tears down the test fixture.
 		void TearDown() override
 		{
-			delete blockingQueue;
-			blockingQueue = nullptr;
+			if (blockingQueue != nullptr)
+			{
+				delete blockingQueue;
+				blockingQueue = nullptr;
+			}
 		}
 
 	protected:
-		BoundedBlockingQueue<int32_t>* blockingQueue;
+		BoundedBlockingQueue<int32_t>* blockingQueue { nullptr };
 };
 
 TEST_F(BlockingQueueTest, PutTake)
@@ -51,39 +56,40 @@ TEST_F(BlockingQueueTest, PutTakeMultiThread)
 {
     for (int i = 0 ; i < 5; ++i)
     {
-        ::std::thread([&]
+        Thread t1([&]
                     {
                         blockingQueue->put(i);
-                    }).detach();
-		::std::thread([&]
+                    });
+		t1.start();
+		t1.detach();
+		Thread t2([&]
 					{
 						int32_t n;
 						blockingQueue->take(n);
-					}).detach();
-    }
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
+					});
+		t2.start();
+		t2.detach();
+	}
+	sleepS(1);
 	ASSERT_EQ(blockingQueue->size(), 0u);
 }
 
 TEST_F(BlockingQueueTest, PutTakeConditionVar)
 {
 	::std::atomic<bool> running(true);
-	ASSERT_EQ(blockingQueue->put(1, [&]() -> bool {
-		return !running;
-	}), true);
+	::std::function<bool ()> func = ::std::bind([&]() -> bool
+		{
+			return !running;
+		});
+	ASSERT_EQ(blockingQueue->put(1, func), true);
 	int32_t takeVal = 0;
-	ASSERT_EQ(blockingQueue->take(takeVal, [&]() -> bool {
-		return !running;
-	}), true);
+	ASSERT_EQ(blockingQueue->take(takeVal, func), true);
 	ASSERT_EQ(takeVal, 1);
-	ASSERT_EQ(blockingQueue->put(2, [&]() -> bool {
-		return !running;
-	}), true);
+	ASSERT_EQ(blockingQueue->put(2, func), true);
 	running = false;
-	ASSERT_EQ(blockingQueue->take(takeVal, [&]() -> bool {
-		return !running;
-	}), false);
+	ASSERT_EQ(blockingQueue->take(takeVal, func), false);
 	ASSERT_EQ(takeVal, 1);
+	ASSERT_TRUE((blockingQueue->size() == 1));
 }
 
 TEST_F(BlockingQueueTest, PutTimeout)
@@ -93,33 +99,25 @@ TEST_F(BlockingQueueTest, PutTimeout)
 	blockingQueue->put(3);
 	blockingQueue->put(4);
 	blockingQueue->put(5);
-	ASSERT_EQ(blockingQueue->size(), 5u);
+	ASSERT_EQ(blockingQueue->size(), 5U);
 	int32_t takeVal = 0;
-	int64_t start =
-			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
-					.count();
-	ASSERT_EQ(blockingQueue->put(takeVal, ::std::chrono::milliseconds(3000)), false);
-	int64_t end =
-			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
-					.count();
+	int64_t start = Timestamp::now().getSecondsSinceEpoch();
+	ASSERT_EQ(blockingQueue->put(takeVal, 3000L), false);
+	int64_t end = Timestamp::now().getSecondsSinceEpoch();
 	ASSERT_GT(end, start);
-	ASSERT_GE(end - start, 3000);
+	ASSERT_GE((end - start), 3);
 	ASSERT_EQ(takeVal, 0);
 }
 
 TEST_F(BlockingQueueTest, TakeTimeout)
 {
 	int32_t takeVal = 0;
-	int64_t start =
-			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
-			        .count();
+	int64_t start = Timestamp::now().getSecondsSinceEpoch();
 	ASSERT_EQ(blockingQueue->isEmpty(), true);
-	ASSERT_EQ(blockingQueue->take(takeVal, ::std::chrono::milliseconds(3000)), false);
-	int64_t end =
-			::std::chrono::duration_cast<::std::chrono::milliseconds>(::std::chrono::steady_clock::now().time_since_epoch())
-					.count();
+	ASSERT_EQ(blockingQueue->take(takeVal, 3000L), false);
+	int64_t end = Timestamp::now().getSecondsSinceEpoch();
 	ASSERT_GT(end, start);
-	ASSERT_GE(end - start, 3000);
+	ASSERT_GE((end - start), 3);
 	ASSERT_EQ(takeVal, 0);
 }
 

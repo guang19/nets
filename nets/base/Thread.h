@@ -22,7 +22,8 @@ namespace nets
 				using ThreadFunc = ::std::function<void ()>;
 
 			public:
-				Thread(ThreadFunc threadFunc, const ::std::string& threadName = "");
+				Thread();
+				explicit Thread(ThreadFunc threadFunc, const ::std::string& threadName = "");
 				~Thread();
 
 			public:

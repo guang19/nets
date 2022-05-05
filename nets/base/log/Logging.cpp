@@ -53,6 +53,10 @@ namespace nets
 		{
 			LOG_FORMATTER->formatLogMessage(*this, logMessage_);
 			LOG_WRITER->write(getBuffer(), length());
+			if (logMessage_.getLogLevel() == LogLevel::FATAL)
+			{
+				abort();
+			}
 		}
 	} // namespace base
 } // namespace nets

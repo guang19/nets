@@ -57,7 +57,7 @@ namespace nets
 		{
 			struct timeval tmV {};
 			::gettimeofday(&tmV, nullptr);
-			return { tmV.tv_sec, tmV.tv_usec };
+			return Timestamp(tmV.tv_sec, tmV.tv_usec);
 		}
 
 		::std::time_t Timestamp::getSecondsSinceEpoch() const

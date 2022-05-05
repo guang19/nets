@@ -22,7 +22,7 @@ namespace nets
 				void notifyOne();
 				void notifyAll();
 				void wait(Mutex& mutex);
-				bool waitTimeout(Mutex& mutex, ::std::time_t seconds);
+				bool waitTimeout(Mutex& mutex, ::std::time_t milliseconds);
 
 			private:
 				pthread_cond_t condition_;

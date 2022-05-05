@@ -94,10 +94,10 @@ namespace nets
 
 		class AsyncFileLogWriter : public ILogWriter
 		{
-				using AtomicBoolType 		= ::std::atomic<bool>;
-				using MutexType             = ::std::mutex;
-				using ConditionVarType 		= ::std::condition_variable;
-				using UniqueLockType	    = ::std::unique_lock<MutexType>;
+				using AtomicBoolType		= ::std::atomic<bool>;
+				using MutexType				= ::std::mutex;
+				using ConditionVarType		= ::std::condition_variable;
+				using UniqueLockType		= ::std::unique_lock<MutexType>;
 				using BufferPtr				= ::std::unique_ptr<LogBuffer>;
 				using BufferVectorType		= ::std::vector<BufferPtr>;
 				using FilePtr				= ::std::unique_ptr<LogFile>;

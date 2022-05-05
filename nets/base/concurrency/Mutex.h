@@ -101,7 +101,7 @@ namespace nets
 					}
 				}
 
-				void lock()
+				inline void lock()
 				{
 					if (!state_)
 					{
@@ -110,7 +110,7 @@ namespace nets
 					}
 				}
 
-				void tryLock()
+				inline void tryLock()
 				{
 					if (!state_)
 					{
@@ -118,7 +118,7 @@ namespace nets
 					}
 				}
 
-				void unlock()
+				inline void unlock()
 				{
 					if (state_)
 					{
@@ -127,7 +127,7 @@ namespace nets
 					}
 				}
 
-				bool isLockedByCurrentThread()
+				inline bool isLockedByCurrentThread()
 				{
 					return state_;
 				}

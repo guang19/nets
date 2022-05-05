@@ -25,7 +25,7 @@ namespace nets
 			public:
 				Timestamp();
 				explicit Timestamp(::std::time_t timestamp);
-				Timestamp(::std::time_t secondsSinceEpoch, ::std::time_t microseconds);
+				explicit Timestamp(::std::time_t secondsSinceEpoch, ::std::time_t microseconds);
 
 				Timestamp(const Timestamp& rhs);
 				Timestamp(Timestamp&& rhs) noexcept;

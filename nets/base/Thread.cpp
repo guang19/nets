@@ -10,10 +10,13 @@ namespace nets
 {
 	namespace base
 	{
-		Thread::Thread(ThreadFunc threadFunc, const std::string& threadName) : runnable_(false), joinable_(false),
-			threadId_(0), tid_(0), threadName_(threadName), threadFunc_(::std::move(threadFunc)), latch_(1)
+		Thread::Thread() : Thread(nullptr)
 		{
-			setDefaultThreadName();
+		}
+
+		Thread::Thread(ThreadFunc  threadFunc, const std::string& threadName) : runnable_(false), joinable_(false),
+			threadId_(0), tid_(0), threadName_(threadName), threadFunc_(std::move(threadFunc)), latch_(1)
+		{
 		}
 
 		Thread::~Thread()
@@ -79,6 +82,7 @@ namespace nets
 
 		void Thread::start()
 		{
+			setDefaultThreadName();
 			ThreadRouter* router = new ThreadRouter(threadName_, &tid_, threadFunc_, latch_);
 			runnable_ = true;
 			joinable_ = true;

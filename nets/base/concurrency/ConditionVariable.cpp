@@ -38,13 +38,20 @@ namespace nets
 			pthread_cond_wait(&condition_, mutex.getMutexPtr());
 		}
 
-		bool ConditionVariable::waitTimeout(Mutex &mutex, ::std::time_t seconds)
+		bool ConditionVariable::waitTimeout(Mutex &mutex, ::std::time_t milliseconds)
 		{
 			struct timespec tmSpec {};
 			::clock_gettime(CLOCK_REALTIME, &tmSpec);
-			::std::time_t nanoseconds = (seconds * NanosecondsPerSecond);
+			::std::time_t nanoseconds = static_cast<::std::time_t>(milliseconds * MicrosecondsPerSecond);
 			tmSpec.tv_sec += static_cast<::std::time_t>((tmSpec.tv_nsec + nanoseconds) / NanosecondsPerSecond);
 			tmSpec.tv_nsec += static_cast<::std::int64_t>((tmSpec.tv_nsec + nanoseconds) % NanosecondsPerSecond);
+			// tv_nsec can not exceed <NanosecondsPerSecond>,
+			// otherwise pthread_cond_timedwait will have an unknown result
+			while (tmSpec.tv_nsec >= NanosecondsPerSecond)
+			{
+				tmSpec.tv_sec += 1;
+				tmSpec.tv_nsec -= NanosecondsPerSecond;
+			}
 			// during waiting time, other threads may acquire ownership of the parameter(@mutex)
 			// so modify the ownership of the mutex in advance
 			Mutex::OwnerGuard ownerGuard(mutex);
