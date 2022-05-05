@@ -10,7 +10,7 @@ namespace nets
 {
 	namespace base
 	{
-		ConditionVariable::ConditionVariable() : mutex_()
+		ConditionVariable::ConditionVariable()
 		{
 			pthread_cond_init(&condition_, nullptr);
 		}
@@ -32,16 +32,14 @@ namespace nets
 
 		void ConditionVariable::wait(Mutex& mutex)
 		{
-			LockGuard<Mutex> lock(mutex_);
 			// during waiting time, other threads may acquire ownership of the parameter(@mutex)
 			// so modify the ownership of the mutex in advance
 			Mutex::OwnerGuard ownerGuard(mutex);
 			pthread_cond_wait(&condition_, mutex.getMutexPtr());
 		}
 
-		bool ConditionVariable::wait(Mutex &mutex, ::std::time_t seconds)
+		bool ConditionVariable::waitTimeout(Mutex &mutex, ::std::time_t seconds)
 		{
-			LockGuard<Mutex> lock(mutex_);
 			struct timespec tmSpec {};
 			::clock_gettime(CLOCK_REALTIME, &tmSpec);
 			::std::time_t nanoseconds = (seconds * NanosecondsPerSecond);

@@ -12,7 +12,7 @@
 #include <thread>
 #include <list>
 #include "nets/base/Noncopyable.h"
-#include "nets/base/threadpool/BoundedBlockingQueue.h"
+#include "nets/base/concurrency/BoundedBlockingQueue.h"
 
 namespace nets
 {

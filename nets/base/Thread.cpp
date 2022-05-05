@@ -9,7 +9,7 @@
 namespace nets
 {
 	namespace base
-{
+	{
 		Thread::Thread(ThreadFunc threadFunc, const std::string& threadName) : runnable_(false), joinable_(false),
 			threadId_(0), tid_(0), threadName_(threadName), threadFunc_(::std::move(threadFunc)), latch_(1)
 		{

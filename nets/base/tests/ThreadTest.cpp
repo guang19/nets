@@ -25,6 +25,7 @@ TEST(ThreadTest, ThreadHelper)
 
 void* task1()
 {
+	sleep(2);
 	printf("Enter: task1\n");
 	char name[16] = { 0 };
 	::prctl(PR_GET_NAME, name);
