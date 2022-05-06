@@ -55,7 +55,7 @@ namespace nets
 			LOG_WRITER->write(getBuffer(), length());
 			if (logMessage_.getLogLevel() == LogLevel::FATAL)
 			{
-				abort();
+				exit(1);
 			}
 		}
 	} // namespace base

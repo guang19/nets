@@ -100,7 +100,6 @@ namespace nets
 		{
 			if (!running_)
 			{
-				LOG_DEBUG("thread pool has not been init");
 				return;
 			}
 			running_ = false;
@@ -181,15 +180,13 @@ namespace nets
 				case RejectionPolicy::DiscardPolicy:
 					return false;
 				case RejectionPolicy::DiscardOlderPolicy:
-				{
 					taskQueue_->popBack();
 					return taskQueue_->tryPush(task);
-				}
 				case RejectionPolicy::CallerRunsPolicy:
-				{
 					task();
 					return true;
-				}
+				default:
+					return false;
 			}
 		}
 	} // namespace base

@@ -41,7 +41,7 @@ namespace nets
 			{
 
 				::std::fprintf(::stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
-				abort();
+				exit(1);
 			}
 			char tmpFile[MaxFilePathLen] = { 0 };
 			::std::memset(tmpFile, 0, MaxFilePathLen);
@@ -66,7 +66,7 @@ namespace nets
 			if ((fp_ = ::std::fopen(file, "a")) == nullptr)
 			{
 				::std::fprintf(::stderr, "Error:failed to open log file\n");
-				abort();
+				exit(1);
 			}
 			getFileInfo(&bytes_, &lastRollTime_);
 			buffer_ = new char[FileIOBufferSize];
@@ -185,7 +185,7 @@ namespace nets
 						if (::mkdir(dir2, 0775) != 0)
 						{
 							::std::fprintf(::stderr, "Error: failed to create parent directory of log file\n");
-							abort();
+							exit(1);
 						}
 					}
 				}

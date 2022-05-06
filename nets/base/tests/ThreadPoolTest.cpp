@@ -31,9 +31,10 @@ class ThreadPoolTest : public testing::Test
 		ThreadPool* threadPool;
 };
 
-TEST_F(ThreadPoolTest, ConstructException)
+TEST_F(ThreadPoolTest, ConstructParameter)
 {
-//	ASSERT_THROW(ThreadPool(1,0), ::std::invalid_argument);
+	ThreadPool(1,0);
+	ThreadPool(0,0);
 }
 
 TEST_F(ThreadPoolTest, ExecuteTask)
