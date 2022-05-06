@@ -5,8 +5,8 @@
 #ifndef NETS_TIMESTAMP_H
 #define NETS_TIMESTAMP_H
 
-#include <ctime>
 #include <cstdint>
+#include <ctime>
 #include "nets/base/Copyable.h"
 
 namespace nets
@@ -41,8 +41,15 @@ namespace nets
 					return timestampSinceEpoch_;
 				}
 
-				::std::time_t getSecondsSinceEpoch() const;
-				uint32_t getMicroseconds() const;
+				inline ::std::time_t getSecondsSinceEpoch() const
+				{
+					return static_cast<::std::time_t>(timestampSinceEpoch_ / MicrosecondsPerSecond);
+				}
+
+				inline uint32_t getMicroseconds() const
+				{
+					return static_cast<uint32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
+				}
 
 			private:
 				::std::time_t timestampSinceEpoch_ { 0 };

@@ -5,7 +5,7 @@
 #ifndef NETS_CONDITIONVARIABLE_H
 #define NETS_CONDITIONVARIABLE_H
 
-#include <chrono>
+#include <ctime>
 #include "nets/base/concurrency/Mutex.h"
 
 namespace nets

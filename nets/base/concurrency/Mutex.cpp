@@ -46,12 +46,12 @@ namespace nets
 			return (owner_ == currentTid());
 		}
 
-		Mutex::OwnerGuard::OwnerGuard(Mutex &mutex) : mutex_(mutex)
+		Mutex::OwnerGuard_::OwnerGuard_(Mutex &mutex) : mutex_(mutex)
 		{
 			mutex_.owner_ = 0;
 		}
 
-		Mutex::OwnerGuard::~OwnerGuard()
+		Mutex::OwnerGuard_::~OwnerGuard_()
 		{
 			mutex_.owner_ = currentTid();
 		}
@@ -78,6 +78,7 @@ namespace nets
 			}
 			count_ += 1;
 		}
+
 		bool RecursiveMutex::tryLock()
 		{
 			if (pthread_mutex_trylock(&mutex_) == 0)

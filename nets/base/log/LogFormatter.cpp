@@ -4,6 +4,7 @@
 
 #include "nets/base/log/LogFormatter.h"
 
+#include <cstring>
 #include "nets/base/ThreadHelper.h"
 
 namespace nets
@@ -41,7 +42,7 @@ namespace nets
 			{
 				if (localtime_r(&seconds, &tmS) == nullptr)
 				{
-					memset(&tmS, 0, sizeof(tmS));
+					::std::memset(&tmS, 0, sizeof(tmS));
 				}
 				CacheSeconds  = seconds;
 				CacheTMS = tmS;

@@ -6,8 +6,8 @@
 
 #include <functional>
 #include <sys/prctl.h>
-#include "nets/base/Thread.h"
 #include "nets/base/ThreadHelper.h"
+#include "nets/base/Thread.h"
 
 using namespace nets::base;
 
@@ -36,13 +36,13 @@ void* task1()
 
 void* task2(int arg)
 {
-	::std::cout << "task(int)\n";
+	::printf("task(int)\n");
 	return nullptr;
 }
 
 void* task3(void* arg)
 {
-	::std::cout << "task(void*)\n";
+	::printf("task(void*)\n");
 	return nullptr;
 }
 

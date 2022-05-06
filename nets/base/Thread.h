@@ -8,9 +8,9 @@
 #include <atomic>
 #include <functional>
 #include <pthread.h>
-#include "nets/base/ThreadHelper.h"
-#include "nets/base/Noncopyable.h"
 #include "nets/base/concurrency/CountDownLatch.h"
+#include "nets/base/Noncopyable.h"
+#include "nets/base/ThreadHelper.h"
 
 namespace nets
 {

@@ -7,7 +7,6 @@
 #include <atomic>
 #include <deque>
 #include "nets/base/Thread.h"
-#include "nets/base/ThreadHelper.h"
 #include "nets/base/Timestamp.h"
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 

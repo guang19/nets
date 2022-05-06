@@ -6,12 +6,14 @@
 #define NETS_LOGWRITER_H
 
 #include <atomic>
-#include <condition_variable>
-#include <thread>
+#include <memory>
 #include <vector>
+#include "nets/base/concurrency/ConditionVariable.h"
+#include "nets/base/concurrency/Mutex.h"
 #include "nets/base/log/LogBuffer.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Singleton.h"
+#include "nets/base/Thread.h"
 
 #ifndef LOG_WRITER_TYPE
 #define LOG_WRITER_TYPE STDOUT
@@ -63,6 +65,7 @@ namespace nets
 				{
 					return lastRollTime_;
 				}
+
 			private:
 				void getFileInfo(uint64_t* fileSize, ::std::time_t* createTime);
 
@@ -95,9 +98,9 @@ namespace nets
 		class AsyncFileLogWriter : public ILogWriter
 		{
 				using AtomicBoolType		= ::std::atomic<bool>;
-				using MutexType				= ::std::mutex;
-				using ConditionVarType		= ::std::condition_variable;
-				using UniqueLockType		= ::std::unique_lock<MutexType>;
+				using MutexType				= Mutex;
+				using ConditionVarType		= ConditionVariable;
+				using LockGuardType			= LockGuard<MutexType>;
 				using BufferPtr				= ::std::unique_ptr<LogBuffer>;
 				using BufferVectorType		= ::std::vector<BufferPtr>;
 				using FilePtr				= ::std::unique_ptr<LogFile>;
@@ -125,8 +128,8 @@ namespace nets
 				BufferPtr cacheBuffer_ { nullptr };
 				BufferPtr backupCacheBuffer_ { nullptr };
 				BufferVectorType buffers_ {};
-				::std::thread asyncThread_ {};
-				MutexType mtx_ {};
+				Thread asyncThread_ {};
+				MutexType mutex_ {};
 				ConditionVarType cv_ {};
 		};
 

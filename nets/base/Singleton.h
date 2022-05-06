@@ -5,7 +5,8 @@
 #ifndef NETS_BASE_SINGLETON_H
 #define NETS_BASE_SINGLETON_H
 
-#include <mutex>
+#include <functional>
+#include <pthread.h>
 #include "nets/base/CommonMacro.h"
 #include "nets/base/Noncopyable.h"
 
@@ -28,9 +29,8 @@
 #define DECLARE_SINGLETON_CLASS(CLASS_NAME)	\
 	class CLASS_NAME : nets::base::Noncopyable
 
-
-#define DEFINE_SINGLETON(CLASS_NAME) \
-                                     \
+#define DEFINE_SINGLETON(CLASS_NAME)	\
+		\
 	protected:	\
 		CLASS_NAME() = default;	\
 		~CLASS_NAME() = default;	\
@@ -46,20 +46,11 @@
 			c->afterInit();	\
 		}	\
 		\
-	public:	\
-        template <typename ...Args>	\
-		static inline CLASS_NAME*  getInstance(Args&& ...args)	\
+        static void init()	\
 		{	\
-			::std::call_once(OnceFlag, [](Args&& ...args)	\
-            {	\
-                Instance = new CLASS_NAME(::std::forward<Args>(args)...);	\
-				callAfterInit<CLASS_NAME>(Instance);	\
-                atexit(destroy);	\
-            }, ::std::forward<Args>(args)...);	\
-            return Instance;	\
+			Init##CLASS_NAME##InstanceFunc();	\
 		}	\
 		\
-	private:	\
 		static void destroy()	\
 		{	\
 			typedef char T_must_be_complete_type[sizeof(CLASS_NAME) == 0 ? -1 : 1];	\
@@ -72,63 +63,28 @@
 			}	\
 		}	\
 		\
+	public:	\
+        template <typename ...Args>	\
+		static inline CLASS_NAME*  getInstance(Args&& ...args)	\
+		{	\
+			Init##CLASS_NAME##InstanceFunc = ::std::bind([&]()	\
+				{	\
+		   			Instance = new CLASS_NAME(::std::forward<Args>(args)...);	\
+					callAfterInit<CLASS_NAME>(Instance);	\
+                	::atexit(&CLASS_NAME::destroy);	\
+				});	\
+			::pthread_once(&OnceFlag, &CLASS_NAME::init);	\
+            return Instance;	\
+		}	\
+		\
 	private:	\
 		static CLASS_NAME* Instance;	\
-		static ::std::once_flag OnceFlag
+		static ::pthread_once_t OnceFlag;  \
+		static ::std::function<void ()> Init##CLASS_NAME##InstanceFunc
 
 #define INIT_SINGLETON(CLASS_NAME)	\
 	CLASS_NAME* CLASS_NAME::Instance { nullptr };	\
-	::std::once_flag CLASS_NAME::OnceFlag {}
-
-//namespace nets
-//{
-//    namespace base
-//    {
-//        template<class T>
-//        class Singleton : Noncopyable
-//        {
-//            public:
-//                template<typename ...Args>
-//                static T* getInstance(Args&& ...args);
-//
-//            private:
-//                static void destroy()
-//				{
-//					// singleton class must be complete type
-//					typedef char T_must_be_complete_type[sizeof(T) == 0 ? -1 : 1];
-//					T_must_be_complete_type jugg;
-//					UNUSED(jugg);
-//					if (value_ != nullptr)
-//					{
-//						delete value_;
-//						value_ = nullptr;
-//					}
-//				}
-//
-//            private:
-//                static T* value_;
-//                static ::std::once_flag onceFlag_;
-//        };
-//
-//        template <class T>
-//        T* Singleton<T>::value_ { nullptr };
-//
-//        template <class T>
-//        ::std::once_flag Singleton<T>::onceFlag_ {};
-//
-//        template<class T>
-//        template<typename ...Args>
-//        T* Singleton<T>::getInstance(Args&& ...args)
-//        {
-//            ::std::call_once(onceFlag_, [](Args&& ...args)
-//            {
-//                value_ = new T(::std::forward<Args>(args)...);
-//				// auto free
-//                atexit(destroy);
-//            }, ::std::forward<Args>(args)...);
-//            return value_;
-//        }
-//    } // namespace base
-//} // namespace nets
+	::pthread_once_t CLASS_NAME::OnceFlag { PTHREAD_ONCE_INIT };	\
+	::std::function<void ()> CLASS_NAME::Init##CLASS_NAME##InstanceFunc {}
 
 #endif // NETS_BASE_SINGLETON_H

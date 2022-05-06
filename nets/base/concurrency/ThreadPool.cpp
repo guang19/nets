@@ -19,13 +19,14 @@ namespace nets
 				ThreadPool::RejectionPolicy::DiscardOlderPolicy;
 		}
 
-        ThreadPool::ThreadWrapper::ThreadWrapper(SizeType id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr)
-			: ThreadWrapper(id, false, nullptr, threadPoolRawPtr)
+        ThreadPool::ThreadWrapper::ThreadWrapper(const ::std::string& name, bool isCoreThread,
+			ThreadPoolRawPtr threadPoolRawPtr) : ThreadWrapper(name, false, nullptr, threadPoolRawPtr)
         {
 		}
 
-        ThreadPool::ThreadWrapper::ThreadWrapper(SizeType id, bool isCoreThread, TaskType task, ThreadPoolRawPtr threadPoolRawPtr)
-            : id_(id), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(::std::bind(&ThreadWrapper::startThread, this)),
+        ThreadPool::ThreadWrapper::ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task,
+			ThreadPoolRawPtr threadPoolRawPtr) : isCoreThread_(isCoreThread), task_(std::move(task)),
+			thread_(::std::bind(&ThreadWrapper::startThread, this), name),
 			threadPoolRawPtr_(threadPoolRawPtr)
         {
 			thread_.start();
@@ -115,53 +116,60 @@ namespace nets
 
         void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)
         {
-			if (threadWrapperRawPtr == nullptr)
+			if (threadWrapperRawPtr->task_ != nullptr)
 			{
-				return;
-			}
-			try
-			{
-				if (threadWrapperRawPtr->task_ != nullptr)
+				try
 				{
 					threadWrapperRawPtr->task_();
-					threadWrapperRawPtr->task_ = nullptr;
 				}
-				::std::function<bool ()> notRunning = [&]() -> bool
+				catch (const ::std::exception& exception)
 				{
-					return !isRunning();
-				};
-				while (running_)
+					LOG_ERROR("exception caught during thread [%s] execution in thread pool [%s], reason %s\n",
+						threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str(), exception.what());
+				}
+				catch(...)
 				{
-					// core thread blocked wait
-					if (threadWrapperRawPtr->isCoreThread_)
+					LOG_ERROR("unknown exception caught during thread [%s] execution in thread pool [%s]\n",
+						threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str());
+				}
+				threadWrapperRawPtr->task_ = nullptr;
+			}
+			::std::function<bool ()> notRunning = [&]() -> bool{
+				return !isRunning();
+			};
+			while (running_)
+			{
+				// core thread blocked wait
+				if (threadWrapperRawPtr->isCoreThread_)
+				{
+					taskQueue_->take(threadWrapperRawPtr->task_, notRunning);
+				}
+				else
+				{
+					// non-core thread wait timeout
+					if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, notRunning))
 					{
-						taskQueue_->take(threadWrapperRawPtr->task_, notRunning);
+						break;
 					}
-					else
-					{
-						// non-core thread wait timeout
-						if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, notRunning))
-						{
-							break;
-						}
-					}
-					if (threadWrapperRawPtr->task_ != nullptr)
+				}
+				if (threadWrapperRawPtr->task_ != nullptr)
+				{
+					try
 					{
 						threadWrapperRawPtr->task_();
-						threadWrapperRawPtr->task_ = nullptr;
 					}
+					catch (const ::std::exception& exception)
+					{
+						LOG_ERROR("exception caught during thread [%s] execution in thread pool [%s], reason %s\n",
+							threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str(), exception.what());
+					}
+					catch(...)
+					{
+						LOG_ERROR("unknown exception caught during thread [%s] execution in thread pool [%s]\n",
+							threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str());
+					}
+					threadWrapperRawPtr->task_ = nullptr;
 				}
-			}
-			catch (const ::std::exception& exception)
-			{
-				fprintf(::stderr, "Error:exception caught in thread pool %s,reason %s\n",
-						name_.c_str(), exception.what());
-				exit(1);
-			}
-			catch(...)
-			{
-				fprintf(::stderr, "Error:unknown exception caught in thread pool %s\n", name_.c_str());
-				exit(1);
 			}
 			releaseThread(threadWrapperRawPtr);
 		}
@@ -180,9 +188,12 @@ namespace nets
 			}
 		}
 
-		bool ThreadPool::addThreadTask(const TaskType& task, bool isCore, SizeType currentThreadSize)
+		bool ThreadPool::addThreadTask(const TaskType& task, bool isCore, SizeType threadSize)
 		{
-			threadPool_.emplace_back(new ThreadWrapper(currentThreadSize, isCore, task,
+			threadSize += 1;
+			char name[24] = { 0 };
+			snprintf(name, 24, "NesThreadPool-%lu", threadSize);
+			threadPool_.emplace_back(new ThreadWrapper(name, isCore, task,
 				this));
 			return true;
 		}

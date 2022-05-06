@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <functional>
-#include <iostream>
 #include "nets/base/concurrency/ThreadPool.h"
 
 using namespace nets::base;
@@ -17,7 +16,7 @@ class ThreadPoolTest : public testing::Test
 		void SetUp() override
 		{
 			// set parameters to be smaller, you can observe the result of execute more intuitively
-			threadPool = new ThreadPool(2, 5, 30000, 2);
+			threadPool = new ThreadPool(16, 24, 30000, 5);
 			threadPool->init();
 		}
 
@@ -42,25 +41,25 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 {
 	ASSERT_TRUE(threadPool->execute([]() -> bool
 	{
-		::std::cout << "hello thread pool" << ::std::endl;
+		::printf("hello thread pool");
 		return true;
 	}));
 	ASSERT_TRUE(threadPool->execute([](int num) -> bool
 	{
-		::std::cout << "your enter number is:" << num << ::std::endl;
+		::printf("your enter number is: %d\n", num);
 		return true;
 	}, 5));
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 {
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		threadPool->execute([&]()
 		{
 			if (i == 5)
 			{
-				throw;
+				throw ::std::invalid_argument("haha");
 			}
 			for (int j = 0; j < 10000; ++j)
 			{

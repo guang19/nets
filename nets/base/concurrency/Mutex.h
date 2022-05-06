@@ -31,15 +31,15 @@ namespace nets
 				}
 
 			public:
-				class OwnerGuard
+				typedef struct OwnerGuard_
 				{
 					public:
-						explicit OwnerGuard(Mutex& mutex);
-						~OwnerGuard();
+						explicit OwnerGuard_(Mutex& mutex);
+						~OwnerGuard_();
 
 					private:
 						Mutex& mutex_;
-				};
+				} OwnerGuard;
 
 			private:
 				::pthread_mutex_t mutex_ {};

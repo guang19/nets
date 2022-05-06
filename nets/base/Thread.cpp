@@ -55,7 +55,7 @@ namespace nets
 						catch (const ::std::exception& exception)
 						{
 							fprintf(::stderr, "Error:exception caught in thread %s,reason %s\n",
-									threadName_.c_str(), exception.what());
+								threadName_.c_str(), exception.what());
 							exit(1);
 						}
 						catch (...)
@@ -102,7 +102,7 @@ namespace nets
 
 		void Thread::join()
 		{
-			if (joinable_)
+			if (joinable_ && runnable_)
 			{
 				joinable_ = false;
 				pthread_join(threadId_, nullptr);
@@ -111,7 +111,7 @@ namespace nets
 
 		void Thread::detach()
 		{
-			if (joinable_)
+			if (joinable_ && runnable_)
 			{
 				joinable_ = false;
 				pthread_detach(threadId_);
@@ -125,8 +125,8 @@ namespace nets
 			NumOfCreatedThreads += 1;
 			if (threadName_.empty())
 			{
-				char name[17] = { 0 };
-				snprintf(name, 17, "NesThread-%u", NumOfCreatedThreads.load());
+				char name[24] = { 0 };
+				snprintf(name, 24, "NesThread-%u", NumOfCreatedThreads.load());
 				threadName_ = name;
 			}
 		}

@@ -5,19 +5,13 @@
 #include "nets/base/log/Logging.h"
 
 #include <cstdarg>
-#include "nets/base/log/LogWriter.h"
 #include "nets/base/log/LogFormatter.h"
+#include "nets/base/log/LogWriter.h"
 
 namespace nets
 {
 	namespace base
 	{
-		LogMessage_::LogMessage_(LogLevel logLevel, const char* file, uint32_t line) :
-			logTime_(Timestamp::now()), logLevel_(logLevel), line_(line), message_()
-		{
-			filename_ = basename(file);
-		}
-
 		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line) :
 			logMessage_(logLevel, file, line)
 		{
@@ -55,6 +49,8 @@ namespace nets
 			LOG_WRITER->write(getBuffer(), length());
 			if (logMessage_.getLogLevel() == LogLevel::FATAL)
 			{
+				// if exit directly, log buffer in memory probably will lost
+				sleepMillis(1500);
 				exit(1);
 			}
 		}

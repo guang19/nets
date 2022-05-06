@@ -37,10 +37,15 @@ namespace nets
 
 		__thread const char* threadName_ = "unnamed";
 
+		namespace
+		{
+			constexpr const char* const MainThreadName = "Main";
+		}
+
 		void afterFork()
 		{
 			cacheTid_ = 0;
-			threadName_ = "Main";
+			threadName_ = MainThreadName;
 		}
 
 		struct ThreadInitializer
@@ -48,7 +53,7 @@ namespace nets
 			ThreadInitializer()
 			{
 				currentTid();
-				threadName_ = "Main";
+				threadName_ = MainThreadName;
 				pthread_atfork(nullptr, nullptr, &afterFork);
 			}
 		};

@@ -49,20 +49,18 @@ namespace nets
 				};
 
 			private:
-				class ThreadWrapper : Noncopyable
+				struct ThreadWrapper : Noncopyable
 				{
 					public:
-						explicit ThreadWrapper(SizeType id, bool isCoreThread, ThreadPoolRawPtr threadPoolRawPtr);
-						explicit ThreadWrapper(SizeType id, bool isCoreThread, TaskType task,
+						explicit ThreadWrapper(const ::std::string& name, bool isCoreThread,
+							ThreadPoolRawPtr threadPoolRawPtr);
+						explicit ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task,
 							ThreadPoolRawPtr threadPoolRawPtr);
 
 						~ThreadWrapper() = default;
 
-					private:
 						void startThread();
 
-					public:
-						SizeType id_ { 0 };
 						bool isCoreThread_ { false };
 						TaskType task_ { nullptr };
 						Thread thread_ {};
@@ -111,12 +109,12 @@ namespace nets
 				}
 
 				template<typename Fn, typename... Args>
-				bool execute(Fn fun, Args... args);
+				bool execute(Fn func, Args... args);
 
 			private:
 				void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 				void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-				bool addThreadTask(const TaskType &task, bool isCore, SizeType currentThreadSize);
+				bool addThreadTask(const TaskType &task, bool isCore, SizeType threadSize);
 				bool rejectExecution(const TaskType& task);
 
 			private:
@@ -140,7 +138,7 @@ namespace nets
 		};
 
 		template<typename Fn, typename... Args>
-		bool ThreadPool::execute(Fn fun, Args... args)
+		bool ThreadPool::execute(Fn func, Args... args)
 		{
 			if (!running_)
 			{
@@ -149,12 +147,11 @@ namespace nets
 			}
 			LockGuardType lock(mutex_);
 			::std::function<decltype(::std::declval<Fn>()(::std::declval<Args>()...)) ()> originFunc =
-				::std::bind(::std::forward<Fn>(fun), ::std::forward<Args>(args)...);
+				::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 			TaskType task = [originFunc]()
 				{
 					originFunc();
-				};
-//			TaskType task = ::std::bind(originFunc);
+		        };
 			SizeType threadSize = threadPool_.size();
 			// if still able to create core thread
 			if (threadSize < corePoolSize_)

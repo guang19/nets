@@ -59,15 +59,5 @@ namespace nets
 			::gettimeofday(&tmV, nullptr);
 			return Timestamp(tmV.tv_sec, tmV.tv_usec);
 		}
-
-		::std::time_t Timestamp::getSecondsSinceEpoch() const
-		{
-			return static_cast<::std::time_t>(timestampSinceEpoch_ / MicrosecondsPerSecond);
-		}
-
-		uint32_t Timestamp::getMicroseconds() const
-		{
-			return static_cast<uint32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
-		}
 	} // namespace base
 } // namespace nets

@@ -5,7 +5,7 @@
 #ifndef NETS_LOGFORMATTER_H
 #define NETS_LOGFORMATTER_H
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/LogMessage.h"
 #include "nets/base/Singleton.h"
 
 namespace nets

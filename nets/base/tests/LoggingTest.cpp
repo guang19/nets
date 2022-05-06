@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include <thread>
 #include "nets/base/log/Logging.h"
+#include "nets/base/Thread.h"
 
 using namespace nets::base;
 
@@ -16,12 +16,12 @@ TEST(LoggingTest, BasicUse)
 	LOG_INFO("这是一条info信息");
 	LOG_WARN("这是一条warn信息");
 	LOG_ERROR("这是一条error信息");
+	Thread t1([&]()
+			  {
+				  LOG_DEBUG("这是一条debug信息");
+			  });
+	t1.start();
 	LOG_FATAL("这是一条fatal信息");
-	::std::thread t1([&]()
-					 {
-						 LOG_DEBUG("这是一条debug信息");
-					 });
-	t1.join();
 }
 
 TEST(LoggingTest, StreamAPI)
@@ -31,12 +31,12 @@ TEST(LoggingTest, StreamAPI)
 	LOGS_INFO << "这是一条info信息\n";
 	LOGS_WARN << "这是一条warn信息\n";
 	LOGS_ERROR << "这是一条error信息\n";
-	LOGS_FATAL << "这是一条fatal信息\n";
-	::std::thread t1([&]()
-					 {
-						 LOGS_DEBUG << "这是一条debug信息\n";
-					 });
-	t1.join();
+	Thread t1([&]()
+			  {
+				  LOGS_DEBUG << "这是一条debug信息\n";
+			  });
+	t1.start();
+	LOGS_FATAL << "这是一条流式fatal信息\n";
 }
 
 // change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
@@ -53,8 +53,8 @@ TEST(LoggingTest, SingleFile)
 	LOGS_INFO << "这是一条info信息 stream\n";
 	LOGS_WARN << "这是一条warn信息 stream\n";
 	LOGS_ERROR << "这是一条error信息 stream\n";
-	LOGS_FATAL << "这是一条fatal信息 stream\n";
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+	LOGS_FATAL << "这是一条流式fatal信息 stream\n";
+	::sleepS(2);
 }
 
 // before execute:
@@ -74,7 +74,7 @@ TEST(LoggingTest, DailyFile)
 	LOGS_WARN << "这是一条warn信息 stream\n";
 	LOGS_ERROR << "这是一条error信息 stream\n";
 	LOGS_FATAL << "这是一条fatal信息 stream\n";
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+	::sleepS(2);
 }
 
 
@@ -86,7 +86,7 @@ TEST(LoggingTest, RollingFile)
 	LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息"
 				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息"
 				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息";
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+	::sleepS(2);
 }
 
 int main(int argc, char** argv)

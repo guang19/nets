@@ -6,11 +6,7 @@
 #define NETS_LOGGING_H
 
 
-#include <cstring>
-#include "nets/base/Copyable.h"
-#include "nets/base/log/LogBuffer.h"
-#include "nets/base/Noncopyable.h"
-#include "nets/base/Timestamp.h"
+#include "nets/base/log/LogMessage.h"
 
 #ifndef LOG_LEVEL
 #define LOG_LEVEL 1
@@ -20,57 +16,6 @@ namespace nets
 {
 	namespace base
 	{
-		enum LogLevel
-		{
-			TRACE = 0,
-			DEBUG,
-			INFO,
-			WARN,
-			ERROR,
-			FATAL,
-			NUM_OF_LOG_LEVELS = 6
-		};
-
-		typedef struct LogMessage_ : Noncopyable
-		{
-			public:
-				explicit LogMessage_(LogLevel logLevel, const char* file, uint32_t line);
-				~LogMessage_() = default;
-
-			public:
-				inline const Timestamp& getLogTime() const
-				{
-					return logTime_;
-				}
-
-				inline LogLevel getLogLevel() const
-				{
-					return logLevel_;
-				}
-
-				inline const char* getFilename() const
-				{
-					return filename_;
-				}
-
-				inline uint32_t getLine() const
-				{
-					return line_;
-				}
-
-				inline LogBuffer& getMessage()
-				{
-					return message_;
-				}
-
-			private:
-				Timestamp logTime_ {};
-				LogLevel logLevel_ {};
-				const char* filename_ { nullptr };
-				uint32_t line_ { 0 };
-				LogBuffer message_ {};
-		} LogMessage;
-
 		class LogMessageStream : public LogBuffer
 		{
 			public:

@@ -5,8 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <functional>
-#include <thread>
-#include <sys/prctl.h>
 #include <vector>
 #include "nets/base/Thread.h"
 #include "nets/base/concurrency/CountDownLatch.h"

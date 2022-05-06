@@ -219,8 +219,8 @@ namespace nets
 
 		AsyncFileLogWriter::AsyncFileLogWriter() : logFile_(new LogFile(LOG_FILE)),
 			running_(false), cacheBuffer_(new LogBuffer(MaxLogBufferSize)),
-			backupCacheBuffer_(new LogBuffer(MaxLogBufferSize)), buffers_(), asyncThread_(),
-			mtx_(), cv_()
+			backupCacheBuffer_(new LogBuffer(MaxLogBufferSize)), buffers_(),
+			asyncThread_(::std::bind(&AsyncFileLogWriter::asyncWrite, this)), mutex_(), cv_()
 		{
 			buffers_.reserve(LOG_FILE_ROLLING_SIZE >> 1);
 		}
@@ -237,7 +237,7 @@ namespace nets
 				return;
 			}
 			running_ = true;
-			asyncThread_ = ::std::thread(&AsyncFileLogWriter::asyncWrite, this);
+			asyncThread_.start();
 		}
 
 		void AsyncFileLogWriter::stop()
@@ -245,7 +245,7 @@ namespace nets
 			if (running_)
 			{
 				running_ = false;
-				cv_.notify_one();
+				cv_.notifyOne();
 				if (asyncThread_.joinable())
 				{
 					asyncThread_.join();
@@ -255,7 +255,7 @@ namespace nets
 
 		void AsyncFileLogWriter::write(const char* data, uint32_t len)
 		{
-			UniqueLockType lock(mtx_);
+			LockGuardType lock(mutex_);
 			if (cacheBuffer_->available() > len)
 			{
 				cacheBuffer_->append(data, len);
@@ -272,7 +272,7 @@ namespace nets
 					cacheBuffer_.reset(new LogBuffer(MaxLogBufferSize));
 				}
 				cacheBuffer_->append(data, len);
-				cv_.notify_one();
+				cv_.notifyOne();
 			}
 		}
 
@@ -288,12 +288,11 @@ namespace nets
 				while (running_)
 				{
 					{
-						UniqueLockType lock(mtx_);
-						cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
-									 [this]() -> bool
-									 {
-										 return !buffers_.empty();
-									 });
+						LockGuardType lock(mutex_);
+						if (buffers_.empty())
+						{
+							cv_.waitTimeout(mutex_, LogBufferFlushInterval);
+						}
 						buffers_.push_back(::std::move(cacheBuffer_));
 						tmpBuffers.swap(buffers_);
 						cacheBuffer_ = ::std::move(tmpBuffer1);
@@ -319,11 +318,14 @@ namespace nets
 			}
 			catch (const ::std::exception& exception)
 			{
+				fprintf(::stderr, "Error:exception caught while write log to file asynchronously,"
+					"reason %s\n", exception.what());
 				exit(1);
 			}
 			catch (...)
 			{
-
+				fprintf(::stderr, "Error:unknown exception caught in log writer asynchronously thread\n");
+				exit(1);
 			}
 		}
 
@@ -339,7 +341,7 @@ namespace nets
 			// constant for short intervals, not for the whole day
 			constexpr ::std::time_t SecondsPerDay = 60 * 60 * 24;
 			// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-			// constexpr ::std::time_t SecondsPerDay = 60;
+//			 constexpr ::std::time_t SecondsPerDay = 30;
 		}
 
 		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
@@ -355,9 +357,9 @@ namespace nets
 		{
 			// if you need test ROLLING_FILE LogWriter, you need to adjust this
 			// constant  as small as possible
-			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
-			// Set LogFileRollingSize to 500 Bytes, then you will see soon if the log file is roll back
-			// constexpr uint64_t LogFileRollingSize = 500;
+//			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+			// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
+			 constexpr uint64_t LogFileRollingSize = 200;
 		}
 
 		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
