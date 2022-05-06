@@ -117,7 +117,7 @@ namespace nets
 				void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 				void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 				bool addThreadTask(const TaskType &task, bool isCore, SizeType currentThreadSize);
-				bool rejectedExecution(const TaskType& task);
+				bool rejectExecution(const TaskType& task);
 
 			private:
 				::std::string name_ {};
@@ -148,34 +148,35 @@ namespace nets
 				return false;
 			}
 			LockGuardType lock(mutex_);
-//			::std::function<void ()> originFunc =
-//					::std::bind(::std::forward<Fn>(fun), ::std::forward<Args>(args)...);
-			::std::function<typename ::std::result_of<Fn(Args...)>::type ()> originFunc =
-					::std::bind(::std::forward<Fn>(fun), ::std::forward<Args>(args)...);
+			::std::function<decltype(::std::declval<Fn>()(::std::declval<Args>()...)) ()> originFunc =
+				::std::bind(::std::forward<Fn>(fun), ::std::forward<Args>(args)...);
+			TaskType task = [originFunc]()
+				{
+					originFunc();
+				};
 //			TaskType task = ::std::bind(originFunc);
-			TaskType task = originFunc;
 			SizeType threadSize = threadPool_.size();
 			// if still able to create core thread
-			if (threadSize <= corePoolSize_)
+			if (threadSize < corePoolSize_)
 			{
 				return addThreadTask(task, true, threadSize);
 			}
 			else
 			{
-				// try push task to task queue
+				//if task queue is not full, try push task to task queue
 				if (taskQueue_->tryPush(task))
 				{
 					return true;
 				}
 				// the thread pool is not full, create non-core thread to perform task
-				if (threadSize < maximumPoolSize_)
+				else if (threadSize < maximumPoolSize_)
 				{
 					return addThreadTask(task, false, threadSize);
 				}
 				// handle task with rejection policy
 				else
 				{
-					return rejectedExecution(task);
+					return rejectExecution(task);
 				}
 			}
 		}

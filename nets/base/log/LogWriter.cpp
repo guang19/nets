@@ -283,37 +283,48 @@ namespace nets
 			BufferPtr tmpBuffer1(new LogBuffer(MaxLogBufferSize));
 			BufferPtr tmpBuffer2(new LogBuffer(MaxLogBufferSize));
 			::std::time_t currentTime = 0;
-			while (running_)
+			try
 			{
+				while (running_)
 				{
-					UniqueLockType lock(mtx_);
-					cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
-						[this]() -> bool
-						{
-							return !buffers_.empty();
-						});
-					buffers_.push_back(::std::move(cacheBuffer_));
-					tmpBuffers.swap(buffers_);
-					cacheBuffer_ = ::std::move(tmpBuffer1);
-					if (backupCacheBuffer_ == nullptr)
 					{
-						backupCacheBuffer_ = ::std::move(tmpBuffer2);
+						UniqueLockType lock(mtx_);
+						cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
+									 [this]() -> bool
+									 {
+										 return !buffers_.empty();
+									 });
+						buffers_.push_back(::std::move(cacheBuffer_));
+						tmpBuffers.swap(buffers_);
+						cacheBuffer_ = ::std::move(tmpBuffer1);
+						if (backupCacheBuffer_ == nullptr)
+						{
+							backupCacheBuffer_ = ::std::move(tmpBuffer2);
+						}
+					}
+					currentTime = ::std::time(nullptr);
+					for (const BufferPtr& buf : tmpBuffers)
+					{
+						persist(buf->getBuffer(), buf->length(), currentTime);
+					}
+					logFile_->flush();
+					tmpBuffers.clear();
+					tmpBuffer1.reset(new LogBuffer(MaxLogBufferSize));
+					if (tmpBuffer2 == nullptr)
+					{
+						tmpBuffer2.reset(new LogBuffer(MaxLogBufferSize));
 					}
 				}
-				currentTime = ::std::time(nullptr);
-				for (const BufferPtr& buf : tmpBuffers)
-				{
-					persist(buf->getBuffer(), buf->length(), currentTime);
-				}
 				logFile_->flush();
-				tmpBuffers.clear();
-				tmpBuffer1.reset(new LogBuffer(MaxLogBufferSize));
-				if (tmpBuffer2 == nullptr)
-				{
-					tmpBuffer2.reset(new LogBuffer(MaxLogBufferSize));
-				}
 			}
-			logFile_->flush();
+			catch (const ::std::exception& exception)
+			{
+				exit(1);
+			}
+			catch (...)
+			{
+
+			}
 		}
 
 		void AsyncSingleFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
@@ -346,7 +357,7 @@ namespace nets
 			// constant  as small as possible
 			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
 			// Set LogFileRollingSize to 500 Bytes, then you will see soon if the log file is roll back
-//			 constexpr uint64_t LogFileRollingSize = 500;
+			// constexpr uint64_t LogFileRollingSize = 500;
 		}
 
 		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)

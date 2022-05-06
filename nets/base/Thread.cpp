@@ -29,7 +29,7 @@ namespace nets
 
 		namespace
 		{
-			struct ThreadRouter
+			class ThreadRouter
 			{
 				public:
 					ThreadRouter(const ::std::string& threadName, pid_t* tid, Thread::ThreadFunc threadFunc, CountDownLatch& latch) :
@@ -54,17 +54,18 @@ namespace nets
 						}
 						catch (const ::std::exception& exception)
 						{
-							fprintf(::stderr, "Error:exception caught in thread %s, reason %s\n",
+							fprintf(::stderr, "Error:exception caught in thread %s,reason %s\n",
 									threadName_.c_str(), exception.what());
-							abort();
+							exit(1);
 						}
 						catch (...)
 						{
 							fprintf(::stderr, "Error:unknown exception caught in thread %s\n", threadName_.c_str());
-							abort();
+							exit(1);
 						}
 					}
 
+				private:
 					::std::string threadName_ {};
 					::pid_t* tid_ { nullptr };
 					Thread::ThreadFunc threadFunc_;

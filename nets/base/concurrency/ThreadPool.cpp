@@ -119,38 +119,52 @@ namespace nets
 			{
 				return;
 			}
-			if (threadWrapperRawPtr->task_ != nullptr)
+			try
 			{
-				threadWrapperRawPtr->task_();
-				threadWrapperRawPtr->task_ = nullptr;
-			}
-			::std::function<bool ()> notRunning = [&]() -> bool
+				if (threadWrapperRawPtr->task_ != nullptr)
+				{
+					threadWrapperRawPtr->task_();
+					threadWrapperRawPtr->task_ = nullptr;
+				}
+				::std::function<bool ()> notRunning = [&]() -> bool
 				{
 					return !isRunning();
 				};
-            while (running_)
-            {
-				// core thread blocked wait
-				if (threadWrapperRawPtr->isCoreThread_)
+				while (running_)
 				{
-					taskQueue_->take(threadWrapperRawPtr->task_, notRunning);
-				}
-				else
-				{
-					// non-core thread wait timeout
-					if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, notRunning))
+					// core thread blocked wait
+					if (threadWrapperRawPtr->isCoreThread_)
 					{
-						break;
+						taskQueue_->take(threadWrapperRawPtr->task_, notRunning);
+					}
+					else
+					{
+						// non-core thread wait timeout
+						if (!taskQueue_->take(threadWrapperRawPtr->task_, keepAliveTime_, notRunning))
+						{
+							break;
+						}
+					}
+					if (threadWrapperRawPtr->task_ != nullptr)
+					{
+						threadWrapperRawPtr->task_();
+						threadWrapperRawPtr->task_ = nullptr;
 					}
 				}
-                if (threadWrapperRawPtr->task_ != nullptr)
-                {
-					threadWrapperRawPtr->task_();
-					threadWrapperRawPtr->task_ = nullptr;
-                }
-            }
+			}
+			catch (const ::std::exception& exception)
+			{
+				fprintf(::stderr, "Error:exception caught in thread pool %s,reason %s\n",
+						name_.c_str(), exception.what());
+				exit(1);
+			}
+			catch(...)
+			{
+				fprintf(::stderr, "Error:unknown exception caught in thread pool %s\n", name_.c_str());
+				exit(1);
+			}
 			releaseThread(threadWrapperRawPtr);
-        }
+		}
 
 		void ThreadPool::releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr)
 		{
@@ -173,7 +187,7 @@ namespace nets
 			return true;
 		}
 
-		bool ThreadPool::rejectedExecution(const TaskType& task)
+		bool ThreadPool::rejectExecution(const TaskType& task)
 		{
 			switch (rejectionPolicy_)
 			{

@@ -16,7 +16,8 @@ class ThreadPoolTest : public testing::Test
 		// Sets up the test fixture.
 		void SetUp() override
 		{
-			threadPool = new ThreadPool(2, 2);
+			// set parameters to be smaller, you can observe the result of execute more intuitively
+			threadPool = new ThreadPool(2, 5, 30000, 2);
 			threadPool->init();
 		}
 
@@ -39,16 +40,35 @@ TEST_F(ThreadPoolTest, ConstructParameter)
 
 TEST_F(ThreadPoolTest, ExecuteTask)
 {
-
-	ASSERT_TRUE(threadPool->execute([]()
+	ASSERT_TRUE(threadPool->execute([]() -> bool
 	{
-		::std::cout << "hello threadpool" << ::std::endl;
+		::std::cout << "hello thread pool" << ::std::endl;
+		return true;
 	}));
-	ASSERT_TRUE(threadPool->execute([](int num)
+	ASSERT_TRUE(threadPool->execute([](int num) -> bool
 	{
 		::std::cout << "your enter number is:" << num << ::std::endl;
+		return true;
 	}, 5));
+}
 
+TEST_F(ThreadPoolTest, ExecuteTaskLimit)
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		threadPool->execute([&]()
+		{
+			if (i == 5)
+			{
+				throw;
+			}
+			for (int j = 0; j < 10000; ++j)
+			{
+				::printf("your enter number is: %d, threadId:%d\n", j , currentTid());
+			}
+		});
+	}
+	sleepS(3);
 }
 
 int main(int argc, char** argv)
