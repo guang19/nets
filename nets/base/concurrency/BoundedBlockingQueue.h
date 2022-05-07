@@ -19,16 +19,16 @@ namespace nets
         template<typename T, typename Container = ::std::deque<T>>
         class BoundedBlockingQueue : Noncopyable
         {
-            public:
-				using ContainerType				= Container;
-				using ValueType					= T;
-				using LReferenceType			= ValueType&;
-				using RReferenceType			= ValueType&&;
-				using ConstReferenceType		= const ValueType&;
-				using SizeType					= typename Container::size_type;
-				using MutexType					= Mutex;
-				using ConditionVariableType		= ConditionVariable;
-				using LockGuardType				= LockGuard<MutexType>;
+			public:
+				using SizeType				= typename Container::size_type;
+				using ValueType				= T;
+				using MutexType				= Mutex;
+				using LockGuardType			= LockGuard<MutexType>;
+				using ContainerType			= Container;
+				using LReferenceType		= ValueType&;
+				using RReferenceType		= ValueType&&;
+				using ConstReferenceType	= const ValueType&;
+				using ConditionVariableType	= ConditionVariable;
 
             public:
                 explicit BoundedBlockingQueue(SizeType maxQueueSize) : maxQueueSize_(maxQueueSize)

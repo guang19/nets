@@ -23,12 +23,12 @@ namespace nets
 		{
 			public:
 				using SizeType					= ::std::size_t;
-				using AtomicBoolType			= ::std::atomic<bool>;
 				using TaskType					= ::std::function<void()>;
 				using MutexType					= Mutex;
-				using ConditionVariableType		= ConditionVariable;
 				using LockGuardType				= LockGuard<MutexType>;
+				using AtomicBoolType			= ::std::atomic<bool>;
 				using ThreadPoolRawPtr			= ThreadPool*;
+				using ConditionVariableType		= ConditionVariable;
 				using BoundedBlockingQueuePtr	= ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
 
 			public:
