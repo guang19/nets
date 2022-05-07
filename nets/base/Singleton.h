@@ -65,7 +65,7 @@
 		\
 	public:	\
         template <typename ...Args>	\
-		static inline CLASS_NAME*  getInstance(Args&& ...args)	\
+		static inline CLASS_NAME* getInstance(Args&& ...args)	\
 		{	\
 			Init##CLASS_NAME##InstanceFunc = ::std::bind([&]()	\
 				{	\

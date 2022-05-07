@@ -357,9 +357,9 @@ namespace nets
 		{
 			// if you need test ROLLING_FILE LogWriter, you need to adjust this
 			// constant  as small as possible
-//			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+			constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
 			// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-			 constexpr uint64_t LogFileRollingSize = 200;
+//			constexpr uint64_t LogFileRollingSize = 200;
 		}
 
 		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
