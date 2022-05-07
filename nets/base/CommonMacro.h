@@ -34,21 +34,21 @@
  ***********************************/
 
 #define DECLARE_HAS_MEMBER_FUNCTION(FUNC) \
-	template<class C, typename ...Args>      \
-	static bool HasMemberFunc_##FUNC(decltype(::std::declval<C>().FUNC(::std::declval<Args>()...))* = nullptr) \
-	{	\
-    	return true;	\
-	}	\
-		\
-    template<class C, typename ...Args>	\
-	static bool HasMemberFunc_##FUNC(...)	\
-	{	\
-    	return false;	\
-	}
+    template<class C, typename ...Args>      \
+    static bool HasMemberFunc_##FUNC(decltype(::std::declval<C>().FUNC(::std::declval<Args>()...))* = nullptr) \
+    {    \
+        return true;    \
+    }    \
+        \
+    template<class C, typename ...Args>    \
+    static bool HasMemberFunc_##FUNC(...)    \
+    {    \
+        return false;    \
+    }
 
 // check if the class has the function
 #define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...) \
-	HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>(nullptr)
+    HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>(nullptr)
 
 
 #endif //NETS_COMMONMACRO_H

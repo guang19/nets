@@ -13,7 +13,7 @@ namespace nets
         {
             protected:
 				Copyable() = default;
-                ~Copyable() = default;
+				~Copyable() = default;
         };
     } // namespace base
 } // namespace nets

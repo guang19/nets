@@ -22,14 +22,14 @@ namespace nets
 		class ThreadPool : Noncopyable
 		{
 			public:
-				using SizeType						= ::std::size_t;
-				using AtomicBoolType				= ::std::atomic<bool>;
-				using TaskType						= ::std::function<void()>;
-				using MutexType						= Mutex;
-				using ConditionVariableType			= ConditionVariable;
-				using LockGuardType					= LockGuard<MutexType>;
-				using ThreadPoolRawPtr				= ThreadPool*;
-				using BoundedBlockingQueuePtr		= ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
+				using SizeType					= ::std::size_t;
+				using AtomicBoolType			= ::std::atomic<bool>;
+				using TaskType					= ::std::function<void()>;
+				using MutexType					= Mutex;
+				using ConditionVariableType		= ConditionVariable;
+				using LockGuardType				= LockGuard<MutexType>;
+				using ThreadPoolRawPtr			= ThreadPool*;
+				using BoundedBlockingQueuePtr	= ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
 
 			public:
 				/**************************************************************************
