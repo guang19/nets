@@ -14,40 +14,40 @@
 
 namespace nets
 {
-    namespace base
-    {
-        template<typename T, typename Container = ::std::deque<T>>
-        class BoundedBlockingQueue : Noncopyable
-        {
+	namespace base
+	{
+		template<typename T, typename Container = ::std::deque<T>>
+		class BoundedBlockingQueue : Noncopyable
+		{
 			public:
-				using SizeType				= typename Container::size_type;
-				using ValueType				= T;
-				using MutexType				= Mutex;
-				using LockGuardType			= LockGuard<MutexType>;
-				using ContainerType			= Container;
-				using LReferenceType		= ValueType&;
-				using RReferenceType		= ValueType&&;
-				using ConstReferenceType	= const ValueType&;
-				using ConditionVariableType	= ConditionVariable;
+				using SizeType = typename Container::size_type;
+				using ValueType = T;
+				using MutexType = Mutex;
+				using LockGuardType = LockGuard<MutexType>;
+				using ContainerType = Container;
+				using LReferenceType = ValueType &;
+				using RReferenceType = ValueType &&;
+				using ConstReferenceType = const ValueType &;
+				using ConditionVariableType = ConditionVariable;
 
-            public:
-                explicit BoundedBlockingQueue(SizeType maxQueueSize) : maxQueueSize_(maxQueueSize)
+			public:
+				explicit BoundedBlockingQueue(SizeType maxQueueSize) : maxQueueSize_(maxQueueSize)
 				{
 				}
 
 				~BoundedBlockingQueue() = default;
 
-                bool isEmpty()
-                {
+				bool isEmpty()
+				{
 					LockGuardType lock(mutex_);
-                    return queue_.empty();
-                }
+					return queue_.empty();
+				}
 
 				SizeType size()
-                {
+				{
 					LockGuardType lock(mutex_);
-                    return queue_.size();
-                }
+					return queue_.size();
+				}
 
 				void popBack()
 				{
@@ -56,64 +56,74 @@ namespace nets
 				}
 
 				// notify blocking thread
-                void notifyBlockingThread()
+				void notifyBlockingThread()
 				{
 					LockGuardType lock(mutex_);
 					notFullCV_.notifyAll();
 					notEmptyCV_.notifyAll();
 				}
 
-                void put(ConstReferenceType el);
-                void put(RReferenceType el);
-                void take(LReferenceType el);
+				void put(ConstReferenceType el);
+
+				void put(RReferenceType el);
+
+				void take(LReferenceType el);
 
 				template<typename Predicate>
 				bool put(ConstReferenceType el, Predicate p);
+
 				template<typename Predicate>
 				bool put(RReferenceType el, Predicate p);
-                template<typename Predicate>
+
+				template<typename Predicate>
 				bool take(LReferenceType el, Predicate p);
 
-                bool put(ConstReferenceType el, ::std::time_t milliseconds);
-                bool put(RReferenceType el, ::std::time_t milliseconds);
-                bool take(LReferenceType el, ::std::time_t milliseconds);
+				bool put(ConstReferenceType el, ::std::time_t milliseconds);
 
-                template<typename Predicate>
+				bool put(RReferenceType el, ::std::time_t milliseconds);
+
+				bool take(LReferenceType el, ::std::time_t milliseconds);
+
+				template<typename Predicate>
 				bool put(ConstReferenceType el, ::std::time_t milliseconds, Predicate p);
+
 				template<typename Predicate>
 				bool put(RReferenceType el, ::std::time_t milliseconds, Predicate p);
-                template<typename Predicate>
+
+				template<typename Predicate>
 				bool take(LReferenceType el, ::std::time_t milliseconds, Predicate p);
 
-                bool tryPush(ConstReferenceType el);
-                bool tryPush(RReferenceType el);
-                bool tryPop(LReferenceType el);
+				bool tryPush(ConstReferenceType el);
 
-            private:
+				bool tryPush(RReferenceType el);
+
+				bool tryPop(LReferenceType el);
+
+			private:
 				bool isFull() const
-                {
-                    return queue_.size() >= maxQueueSize_;
-                }
+				{
+					return queue_.size() >= maxQueueSize_;
+				}
 
-            private:
-                SizeType maxQueueSize_ { 0 };
-                ContainerType queue_ {};
-                MutexType mutex_ {};
-                ConditionVariableType notFullCV_ {};
-				ConditionVariableType notEmptyCV_ {};
-        };
+			private:
+				SizeType maxQueueSize_{0};
+				ContainerType queue_{};
+				MutexType mutex_{};
+				ConditionVariableType notFullCV_{};
+				ConditionVariableType notEmptyCV_{};
+		};
 
 		template<typename T, typename Container>
-        void BoundedBlockingQueue<T, Container>::put(ConstReferenceType el)
-        {
+		void BoundedBlockingQueue<T, Container>::put(ConstReferenceType el)
+		{
 			LockGuardType lock(mutex_);
 			while (isFull())
 			{
 				notFullCV_.wait(mutex_);
 			}
-            queue_.push_back(el);
+			queue_.push_back(el);
 			notEmptyCV_.notifyOne();
-        }
+		}
 
 		template<typename T, typename Container>
 		void BoundedBlockingQueue<T, Container>::put(RReferenceType el)
@@ -128,17 +138,17 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-        void BoundedBlockingQueue<T, Container>::take(LReferenceType el)
-        {
+		void BoundedBlockingQueue<T, Container>::take(LReferenceType el)
+		{
 			LockGuardType lock(mutex_);
 			while (queue_.empty())
 			{
 				notEmptyCV_.wait(mutex_);
 			}
-            el = queue_.front();
-            queue_.pop_front();
+			el = queue_.front();
+			queue_.pop_front();
 			notFullCV_.notifyOne();
-        }
+		}
 
 		template<typename T, typename Container>
 		template<typename Predicate>
@@ -196,8 +206,8 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-        bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, ::std::time_t milliseconds)
-        {
+		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, ::std::time_t milliseconds)
+		{
 			LockGuardType lock(mutex_);
 			if (isFull())
 			{
@@ -209,7 +219,7 @@ namespace nets
 			queue_.push_back(el);
 			notEmptyCV_.notifyOne();
 			return true;
-        }
+		}
 
 		template<typename T, typename Container>
 		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, ::std::time_t milliseconds)
@@ -228,8 +238,8 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-        bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, ::std::time_t milliseconds)
-        {
+		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, ::std::time_t milliseconds)
+		{
 			LockGuardType lock(mutex_);
 			if (queue_.empty())
 			{
@@ -242,7 +252,7 @@ namespace nets
 			queue_.pop_front();
 			notFullCV_.notifyOne();
 			return true;
-        }
+		}
 
 		template<typename T, typename Container>
 		template<typename Predicate>
@@ -251,7 +261,7 @@ namespace nets
 			LockGuardType lock(mutex_);
 			if (isFull() && !p())
 			{
-				if(!notFullCV_.waitTimeout(mutex_, milliseconds))
+				if (!notFullCV_.waitTimeout(mutex_, milliseconds))
 				{
 					return false;
 				}
@@ -272,7 +282,7 @@ namespace nets
 			LockGuardType lock(mutex_);
 			if (isFull() && !p())
 			{
-				if(!notFullCV_.waitTimeout(mutex_, milliseconds))
+				if (!notFullCV_.waitTimeout(mutex_, milliseconds))
 				{
 					return false;
 				}
@@ -309,7 +319,7 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-        bool BoundedBlockingQueue<T, Container>::tryPush(ConstReferenceType el)
+		bool BoundedBlockingQueue<T, Container>::tryPush(ConstReferenceType el)
 		{
 			LockGuardType lock(mutex_, TRY);
 			if (lock.isLockedByCurrentThread() && !isFull())
@@ -335,7 +345,7 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-        bool BoundedBlockingQueue<T, Container>::tryPop(LReferenceType el)
+		bool BoundedBlockingQueue<T, Container>::tryPop(LReferenceType el)
 		{
 			LockGuardType lock(mutex_, TRY);
 			if (lock.isLockedByCurrentThread() && !isFull())

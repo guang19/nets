@@ -25,6 +25,7 @@ namespace nets
 			pthread_mutex_lock(&mutex_);
 			owner_ = currentTid();
 		}
+
 		bool Mutex::tryLock()
 		{
 			if (pthread_mutex_trylock(&mutex_) == 0)
@@ -58,7 +59,7 @@ namespace nets
 
 		RecursiveMutex::RecursiveMutex() : owner_(0), count_(0)
 		{
-			pthread_mutexattr_t mutexattr {};
+			pthread_mutexattr_t mutexattr{};
 			pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
 			pthread_mutex_init(&mutex_, &mutexattr);
 			pthread_mutexattr_destroy(&mutexattr);

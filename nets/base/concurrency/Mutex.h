@@ -17,17 +17,21 @@ namespace nets
 		{
 			public:
 				Mutex();
+
 				~Mutex();
 
 			public:
 				void lock();
+
 				bool tryLock();
+
 				void unlock();
+
 				bool isLockedByCurrentThread() const;
 
 				inline ::pthread_mutex_t* getMutexPtr()
 				{
-					return &mutex_;
+					return& mutex_;
 				}
 
 			public:
@@ -42,20 +46,24 @@ namespace nets
 				} OwnerGuard;
 
 			private:
-				::pthread_mutex_t mutex_ {};
-				::pid_t owner_ { 0 };
+				::pthread_mutex_t mutex_{};
+				::pid_t owner_{0};
 		};
 
 		class RecursiveMutex : Noncopyable
 		{
 			public:
 				RecursiveMutex();
+
 				~RecursiveMutex();
 
 			public:
 				void lock();
+
 				bool tryLock();
+
 				void unlock();
+
 				bool isLockedByCurrentThread() const;
 
 				inline ::pthread_mutex_t* getMutexPtr()
@@ -64,9 +72,9 @@ namespace nets
 				}
 
 			private:
-				::pthread_mutex_t mutex_ {};
-				::pid_t owner_ { 0 };
-				uint16_t count_ { 0 };
+				::pthread_mutex_t mutex_{};
+				::pid_t owner_{0};
+				uint16_t count_{0};
 		};
 
 		enum LockType
@@ -76,15 +84,15 @@ namespace nets
 			DEFER
 		};
 
-		template <class MutexType>
+		template<class MutexType>
 		class LockGuard : Noncopyable
 		{
 			public:
-				explicit LockGuard(MutexType& mutex) : LockGuard(mutex, LockType::NOW)
+				explicit LockGuard(MutexType &mutex) : LockGuard(mutex, LockType::NOW)
 				{
 				}
 
-				LockGuard(MutexType& mutex, LockType lockType) : mutex_(mutex), state_(false)
+				LockGuard(MutexType &mutex, LockType lockType) : mutex_(mutex), state_(false)
 				{
 					switch (lockType)
 					{
@@ -138,8 +146,8 @@ namespace nets
 				}
 
 			private:
-				MutexType& mutex_;
-				bool state_ { false };
+				MutexType &mutex_;
+				bool state_{false};
 		};
 	} // namespace base
 } // namespace nets

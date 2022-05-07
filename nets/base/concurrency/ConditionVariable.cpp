@@ -30,7 +30,7 @@ namespace nets
 			pthread_cond_broadcast(&condition_);
 		}
 
-		void ConditionVariable::wait(Mutex& mutex)
+		void ConditionVariable::wait(Mutex &mutex)
 		{
 			// during waiting time, other threads may acquire ownership of the parameter(@mutex)
 			// so modify the ownership of the mutex in advance
@@ -40,7 +40,7 @@ namespace nets
 
 		bool ConditionVariable::waitTimeout(Mutex &mutex, ::std::time_t milliseconds)
 		{
-			struct timespec tmSpec {};
+			struct timespec tmSpec{};
 			::clock_gettime(CLOCK_REALTIME, &tmSpec);
 			::std::time_t nanoseconds = static_cast<::std::time_t>(milliseconds * MicrosecondsPerSecond);
 			tmSpec.tv_sec += static_cast<::std::time_t>((tmSpec.tv_nsec + nanoseconds) / NanosecondsPerSecond);

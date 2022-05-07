@@ -22,14 +22,14 @@ namespace nets
 		class ThreadPool : Noncopyable
 		{
 			public:
-				using SizeType					= ::std::size_t;
-				using TaskType					= ::std::function<void()>;
-				using MutexType					= Mutex;
-				using LockGuardType				= LockGuard<MutexType>;
-				using AtomicBoolType			= ::std::atomic<bool>;
-				using ThreadPoolRawPtr			= ThreadPool*;
-				using ConditionVariableType		= ConditionVariable;
-				using BoundedBlockingQueuePtr	= ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
+				using SizeType = ::std::size_t;
+				using TaskType = ::std::function<void()>;
+				using MutexType = Mutex;
+				using LockGuardType = LockGuard<MutexType>;
+				using AtomicBoolType = ::std::atomic<bool>;
+				using ThreadPoolRawPtr = ThreadPool*;
+				using ConditionVariableType = ConditionVariable;
+				using BoundedBlockingQueuePtr = ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
 
 			public:
 				/**************************************************************************
@@ -53,18 +53,19 @@ namespace nets
 				{
 					public:
 						explicit ThreadWrapper(const ::std::string& name, bool isCoreThread,
-							ThreadPoolRawPtr threadPoolRawPtr);
+											   ThreadPoolRawPtr threadPoolRawPtr);
+
 						explicit ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task,
-							ThreadPoolRawPtr threadPoolRawPtr);
+											   ThreadPoolRawPtr threadPoolRawPtr);
 
 						~ThreadWrapper() = default;
 
 						void startThread();
 
-						bool isCoreThread_ { false };
-						TaskType task_ { nullptr };
-						Thread thread_ {};
-						ThreadPoolRawPtr threadPoolRawPtr_ { nullptr };
+						bool isCoreThread_{false};
+						TaskType task_{nullptr};
+						Thread thread_{};
+						ThreadPoolRawPtr threadPoolRawPtr_{nullptr};
 				};
 
 				using ThreadWrapperRawPtr = ThreadWrapper*;
@@ -76,20 +77,22 @@ namespace nets
 				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::std::time_t keepAliveTime);
 
 				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::std::time_t keepAliveTime,
-					SizeType maxQueueSize);
+									SizeType maxQueueSize);
 
 				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-					enum RejectionPolicy rejectionPolicy);
+									enum RejectionPolicy rejectionPolicy);
 
 				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-					::std::time_t keepAliveTime, enum RejectionPolicy rejectionPolicy);
+									::std::time_t keepAliveTime, enum RejectionPolicy rejectionPolicy);
 
 				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-					::std::time_t keepAliveTime, SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy);
+									::std::time_t keepAliveTime, SizeType maxQueueSize,
+									enum RejectionPolicy rejectionPolicy);
 
 				~ThreadPool();
 
 				void init();
+
 				void shutdown();
 
 				inline bool isRunning() const
@@ -97,7 +100,7 @@ namespace nets
 					return running_;
 				}
 
-				inline const ::std::string &getThreadPoolName() const
+				inline const ::std::string& getThreadPoolName() const
 				{
 					return name_;
 				}
@@ -113,26 +116,29 @@ namespace nets
 
 			private:
 				void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
+
 				void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-				bool addThreadTask(const TaskType &task, bool isCore, SizeType threadSize);
+
+				bool addThreadTask(const TaskType& task, bool isCore, SizeType threadSize);
+
 				bool rejectExecution(const TaskType& task);
 
 			private:
-				::std::string name_ {};
-				AtomicBoolType running_ { false };
+				::std::string name_{};
+				AtomicBoolType running_{false};
 				// the numbers of core threads, once created,
 				// will be destroyed as the life cycle of the thread pool ends
-				SizeType corePoolSize_ { 0 };
+				SizeType corePoolSize_{0};
 				// 线程池最大容纳的线程数
 				// the maximum numbers of threads that the thread pool can hold
-				SizeType maximumPoolSize_ { 0 };
+				SizeType maximumPoolSize_{0};
 				// time that idle threads can survive, unit: ms
-				::std::time_t keepAliveTime_ { 0 };
+				::std::time_t keepAliveTime_{0};
 				// task queue
-				BoundedBlockingQueuePtr taskQueue_ { nullptr };
-				::std::vector<ThreadWrapperPtr> threadPool_ {};
-				MutexType mutex_ {};
-				ConditionVariableType poolCV_ {};
+				BoundedBlockingQueuePtr taskQueue_{nullptr};
+				::std::vector<ThreadWrapperPtr> threadPool_{};
+				MutexType mutex_{};
+				ConditionVariableType poolCV_{};
 				// rejection policy
 				RejectionPolicy rejectionPolicy_;
 		};
@@ -146,12 +152,12 @@ namespace nets
 				return false;
 			}
 			LockGuardType lock(mutex_);
-			::std::function<decltype(::std::declval<Fn>()(::std::declval<Args>()...)) ()> originFunc =
+			::std::function<decltype(::std::declval<Fn>()(::std::declval<Args>()...))()> originFunc =
 				::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 			TaskType task = [originFunc]()
-				{
-					originFunc();
-		        };
+			{
+				originFunc();
+			};
 			SizeType threadSize = threadPool_.size();
 			// if still able to create core thread
 			if (threadSize < corePoolSize_)
@@ -165,12 +171,12 @@ namespace nets
 				{
 					return true;
 				}
-				// the thread pool is not full, create non-core thread to perform task
+					// the thread pool is not full, create non-core thread to perform task
 				else if (threadSize < maximumPoolSize_)
 				{
 					return addThreadTask(task, false, threadSize);
 				}
-				// handle task with rejection policy
+					// handle task with rejection policy
 				else
 				{
 					return rejectExecution(task);
