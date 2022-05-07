@@ -25,3 +25,6 @@ nets是一个非阻塞，事件驱动的多线程网络库，遵守Reactor 网�
   - 3：ROLLING_FILE：按照文件大小回滚。
 - LOG_FILE：日志文件，默认为：“/tmp/nets/nets.log”，请使用绝对路径；
 - LOG_FILE_ROLLING_SIZE：日志文件回滚大小，单位:MB，默认24M。（仅当LOG_WRITER为ROLLING_FILE时有效）
+
+## TODO
+- [ ] 优化日志Log IO，虽然现在采用的日志IO也是后台异步写的方式，但即使没有日志写入，异步线程也是每隔1秒flush一次，而每次flush都需要与前台交换Buffer，总体来说内存消耗上来说是比较大的，所以后续会改为任务队列的模型。
