@@ -23,27 +23,32 @@ namespace nets
 		class Timestamp : public Copyable
 		{
 			public:
+				using TimeTp = ::time_t;
+				
+			public:
 				Timestamp();
-				explicit Timestamp(::std::time_t timestamp);
-				explicit Timestamp(::std::time_t secondsSinceEpoch, ::std::time_t microseconds);
+				explicit Timestamp(TimeTp timestamp);
+				explicit Timestamp(TimeTp secondsSinceEpoch, uint32_t microseconds);
 
-				Timestamp(const Timestamp& rhs);
-				Timestamp(Timestamp&& rhs) noexcept;
+				Timestamp(const Timestamp& other);
+				Timestamp(Timestamp&& other) noexcept;
 
-				Timestamp& operator=(const Timestamp& rhs);
-				Timestamp& operator=(Timestamp&& rhs) noexcept;
+				Timestamp& operator=(const Timestamp& other);
+				Timestamp& operator=(Timestamp&& other) noexcept;
+
+				void swap(Timestamp&& other);
 
 			public:
 				static Timestamp now();
 
-				inline ::std::time_t getTimestamp() const
+				inline TimeTp getTimestamp() const
 				{
 					return timestampSinceEpoch_;
 				}
 
-				inline ::std::time_t getSecondsSinceEpoch() const
+				inline TimeTp getSecondsSinceEpoch() const
 				{
-					return static_cast<::std::time_t>(timestampSinceEpoch_ / MicrosecondsPerSecond);
+					return static_cast<TimeTp>(timestampSinceEpoch_ / MicrosecondsPerSecond);
 				}
 
 				inline uint32_t getMicroseconds() const
@@ -52,7 +57,7 @@ namespace nets
 				}
 
 			private:
-				::std::time_t timestampSinceEpoch_ { 0 };
+				TimeTp timestampSinceEpoch_ { 0 };
 		};
 	} // namespace base
 } // namespace nets

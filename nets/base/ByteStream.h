@@ -5,24 +5,18 @@
 #ifndef NETS_BYTESTREAM_H
 #define NETS_BYTESTREAM_H
 
-#include <cstdint>
-#include <cstring>
 #include <string>
 #include "nets/base/ByteBuffer.h"
 #include "nets/base/Noncopyable.h"
-
 
 namespace nets
 {
 	namespace base
 	{
-		class ByteStream : public ByteBuffer, Noncopyable
+		class ByteStream : public ByteBuffer
 		{
 			public:
-				explicit ByteStream(SizeTp capacity) : ByteBuffer(capacity)
-				{
-				}
-
+				explicit ByteStream(SizeTp capacity);
 				~ByteStream() override = default;
 
 			public:

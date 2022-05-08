@@ -22,7 +22,7 @@ namespace nets
 		class ThreadPool : Noncopyable
 		{
 			public:
-				using SizeType = ::std::size_t;
+				using SizeType = size_t;
 				using TaskType = ::std::function<void()>;
 				using MutexType = Mutex;
 				using LockGuardType = LockGuard<MutexType>;
@@ -74,19 +74,19 @@ namespace nets
 			public:
 				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize);
 
-				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::std::time_t keepAliveTime);
+				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::time_t keepAliveTime);
 
-				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::std::time_t keepAliveTime,
+				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::time_t keepAliveTime,
 									SizeType maxQueueSize);
 
 				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
 									enum RejectionPolicy rejectionPolicy);
 
 				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-									::std::time_t keepAliveTime, enum RejectionPolicy rejectionPolicy);
+									::time_t keepAliveTime, enum RejectionPolicy rejectionPolicy);
 
 				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-									::std::time_t keepAliveTime, SizeType maxQueueSize,
+									::time_t keepAliveTime, SizeType maxQueueSize,
 									enum RejectionPolicy rejectionPolicy);
 
 				~ThreadPool();
@@ -133,7 +133,7 @@ namespace nets
 				// the maximum numbers of threads that the thread pool can hold
 				SizeType maximumPoolSize_{0};
 				// time that idle threads can survive, unit: ms
-				::std::time_t keepAliveTime_{0};
+				::time_t keepAliveTime_{0};
 				// task queue
 				BoundedBlockingQueuePtr taskQueue_{nullptr};
 				::std::vector<ThreadWrapperPtr> threadPool_{};

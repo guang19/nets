@@ -24,8 +24,8 @@ namespace nets
 
 		void StdoutLogWriter::write(const char* data, uint32_t len)
 		{
-			::std::fwrite(data,1, len, ::stdout);
-			::std::fflush(::stdout);
+			::fwrite(data,1, len, ::stdout);
+			::fflush(::stdout);
 		}
 
 		namespace
@@ -36,41 +36,41 @@ namespace nets
 
 		LogFile::LogFile(const char* file)
 		{
-			uint32_t filePathLen = ::std::strlen(file);
+			uint32_t filePathLen = ::strlen(file);
 			if (filePathLen > MaxFilePathLen)
 			{
 
-				::std::fprintf(::stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
-				exit(1);
+				::fprintf(::stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
+				::exit(1);
 			}
 			char tmpFile[MaxFilePathLen] = { 0 };
-			::std::memset(tmpFile, 0, MaxFilePathLen);
-			::std::memcpy(tmpFile, file, filePathLen);
+			::memset(tmpFile, 0, MaxFilePathLen);
+			::memcpy(tmpFile, file, filePathLen);
 			// <dirname> will modify input str, so called <basename> before <dirname>
 			const char* filename = ::basename(tmpFile);
-			uint32_t filenameLen = ::std::strlen(filename);
+			uint32_t filenameLen = ::strlen(filename);
 			const char* dir = ::dirname(tmpFile);
-			uint32_t dirLen = ::std::strlen(dir);
+			uint32_t dirLen = ::strlen(dir);
 			dir_ = new char[dirLen + 1];
 			filename_ = new char[filenameLen + 1];
-			::std::memset(dir_, 0, dirLen + 1);
-			::std::memcpy(dir_, dir, dirLen);
-			::std::memset(filename_, 0, filenameLen + 1);
-			::std::memcpy(filename_, filename, filenameLen);
+			::memset(dir_, 0, dirLen + 1);
+			::memcpy(dir_, dir, dirLen);
+			::memset(filename_, 0, filenameLen + 1);
+			::memcpy(filename_, filename, filenameLen);
 			// log file has parent directory
-			if (::std::strcmp(dir, ".") != 0)
+			if (::strcmp(dir, ".") != 0)
 			{
 				// create parent directory of log file
 				mkdirR(dir);
 			}
-			if ((fp_ = ::std::fopen(file, "a")) == nullptr)
+			if ((fp_ = ::fopen(file, "a")) == nullptr)
 			{
-				::std::fprintf(::stderr, "Error:failed to open log file\n");
-				exit(1);
+				::fprintf(::stderr, "Error:failed to open log file\n");
+				::exit(1);
 			}
 			getFileInfo(&bytes_, &lastRollTime_);
 			buffer_ = new char[FileIOBufferSize];
-			::std::memset(buffer_, 0, FileIOBufferSize);
+			::memset(buffer_, 0, FileIOBufferSize);
 			::setbuffer(fp_, buffer_, FileIOBufferSize);
 		}
 
@@ -78,7 +78,7 @@ namespace nets
 		{
 			if (fp_ != nullptr)
 			{
-				::std::fclose(fp_);
+				::fclose(fp_);
 				fp_ = nullptr;
 			}
 			if (dir_ != nullptr)
@@ -111,7 +111,7 @@ namespace nets
 					int32_t err = ferror(fp_);
 					if (err != 0)
 					{
-						::std::fprintf(::stderr, "Error:log file append error ""\"""%s""\"""\n", ::strerror(err));
+						::fprintf(::stderr, "Error:log file append error ""\"""%s""\"""\n", ::strerror(err));
 						break;
 					}
 				}
@@ -122,39 +122,39 @@ namespace nets
 
 		void LogFile::flush()
 		{
-			::std::fflush(fp_);
+			::fflush(fp_);
 		}
 
-		void LogFile::renameByNowTime(::std::time_t now)
+		void LogFile::renameByNowTime(::time_t now)
 		{
 			if (fp_ != nullptr)
 			{
-				::std::fclose(fp_);
+				::fclose(fp_);
 				fp_ = nullptr;
 			}
 			struct tm tmS {};
 			::localtime_r(&now, &tmS);
 			char newFilename[24] = { 0 };
-			::std::memset(newFilename, 0, 24);
-			::std::strftime(newFilename, 20, "%Y-%m-%d_%H-%M-%S", &tmS);
-			::std::memcpy(newFilename + 19, ".log", 4);
-			if (::std::strcmp(dir_, ".") != 0)
+			::memset(newFilename, 0, 24);
+			::strftime(newFilename, 20, "%Y-%m-%d_%H-%M-%S", &tmS);
+			::memcpy(newFilename + 19, ".log", 4);
+			if (::strcmp(dir_, ".") != 0)
 			{
 				char tmpFile1[MaxFilePathLen] = { 0 };
 				char tmpFile2[MaxFilePathLen] = { 0 };
-				::std::strcat(tmpFile1, dir_);
-				::std::strcat(tmpFile1, "/");
-				::std::strcat(tmpFile1, filename_);
-				::std::strcat(tmpFile2, dir_);
-				::std::strcat(tmpFile2, "/");
-				::std::strcat(tmpFile2, newFilename);
-				::std::rename(tmpFile1, tmpFile2);
-				fp_ = ::std::fopen(tmpFile1, "a");
+				::strcat(tmpFile1, dir_);
+				::strcat(tmpFile1, "/");
+				::strcat(tmpFile1, filename_);
+				::strcat(tmpFile2, dir_);
+				::strcat(tmpFile2, "/");
+				::strcat(tmpFile2, newFilename);
+				::rename(tmpFile1, tmpFile2);
+				fp_ = ::fopen(tmpFile1, "a");
 			}
 			else
 			{
-				::std::rename(filename_, newFilename);
-				fp_ = ::std::fopen(filename_, "a");
+				::rename(filename_, newFilename);
+				fp_ = ::fopen(filename_, "a");
 			}
 			getFileInfo(&bytes_, nullptr);
 			lastRollTime_ = now;
@@ -166,33 +166,33 @@ namespace nets
 			{
 				return;
 			}
-			uint32_t len = ::std::strlen(multiLevelDir);
+			uint32_t len = ::strlen(multiLevelDir);
 			char dir1[MaxFilePathLen] = { 0 };
 			char* dirptr = dir1;
 			char dir2[MaxFilePathLen] = { 0 };
-			::std::memset(dir1, 0, MaxFilePathLen);
-			::std::memset(dir2, 0, MaxFilePathLen);
-			::std::memcpy(dir1, multiLevelDir, len);
+			::memset(dir1, 0, MaxFilePathLen);
+			::memset(dir2, 0, MaxFilePathLen);
+			::memcpy(dir1, multiLevelDir, len);
 			char* spStr;
 			while ((spStr = strsep(&dirptr, "/")) != nullptr)
 			{
-				if (::std::strlen(spStr) > 0)
+				if (::strlen(spStr) > 0)
 				{
-					::std::strcat(dir2, "/");
-					::std::strcat(dir2, spStr);
+					::strcat(dir2, "/");
+					::strcat(dir2, spStr);
 					if (access(dir2, F_OK) != 0)
 					{
 						if (::mkdir(dir2, 0775) != 0)
 						{
-							::std::fprintf(::stderr, "Error: failed to create parent directory of log file\n");
-							exit(1);
+							::fprintf(::stderr, "Error: failed to create parent directory of log file\n");
+							::exit(1);
 						}
 					}
 				}
 			}
 		}
 
-		void LogFile::getFileInfo(uint64_t* fileSize, ::std::time_t* createTime)
+		void LogFile::getFileInfo(uint64_t* fileSize, ::time_t* createTime)
 		{
 			struct stat fileInfo {};
 			if (::fstat(::fileno(fp_), &fileInfo) != 0)
@@ -282,7 +282,7 @@ namespace nets
 			tmpBuffers.reserve(LOG_FILE_ROLLING_SIZE >> 1);
 			BufferPtr tmpBuffer1(new LogBuffer(MaxLogBufferSize));
 			BufferPtr tmpBuffer2(new LogBuffer(MaxLogBufferSize));
-			::std::time_t currentTime = 0;
+			::time_t currentTime = 0;
 			try
 			{
 				while (running_)
@@ -301,7 +301,7 @@ namespace nets
 							backupCacheBuffer_ = ::std::move(tmpBuffer2);
 						}
 					}
-					currentTime = ::std::time(nullptr);
+					currentTime = ::time(nullptr);
 					for (const BufferPtr& buf : tmpBuffers)
 					{
 						persist(buf->buffer(), buf->writerIndex(), currentTime);
@@ -318,18 +318,18 @@ namespace nets
 			}
 			catch (const ::std::exception& exception)
 			{
-				fprintf(::stderr, "Error:exception caught while write log to file asynchronously,"
+				::fprintf(::stderr, "Error:exception caught while write log to file asynchronously,"
 					"reason %s\n", exception.what());
-				exit(1);
+				::exit(1);
 			}
 			catch (...)
 			{
-				fprintf(::stderr, "Error:unknown exception caught in log writer asynchronously thread\n");
-				exit(1);
+				::fprintf(::stderr, "Error:unknown exception caught in log writer asynchronously thread\n");
+				::exit(1);
 			}
 		}
 
-		void AsyncSingleFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
+		void AsyncSingleFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
 		{
 			UNUSED(persistTime);
 			logFile_->append(data, len);
@@ -339,12 +339,12 @@ namespace nets
 		{
 			// if you need test DAILY_FILE LogWriter, you need to adjust this
 			// constant for short intervals, not for the whole day
-			constexpr ::std::time_t SecondsPerDay = 60 * 60 * 24;
+			constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
 			// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-//			 constexpr ::std::time_t SecondsPerDay = 30;
+//			 constexpr ::time_t SecondsPerDay = 30;
 		}
 
-		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
+		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
 		{
 			if (persistTime - logFile_->getLastRollTime() >= SecondsPerDay)
 			{
@@ -362,7 +362,7 @@ namespace nets
 //			constexpr uint64_t LogFileRollingSize = 200;
 		}
 
-		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::std::time_t persistTime)
+		void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
 		{
 			if (logFile_->size() + len > LogFileRollingSize)
 			{

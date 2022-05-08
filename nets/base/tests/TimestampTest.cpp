@@ -11,10 +11,11 @@ using namespace nets::base;
 
 TEST(TimestampTest, BasicUse)
 {
-	struct timeval tmV {};
 	Timestamp now(Timestamp::now());
-	ASSERT_TRUE((now.getSecondsSinceEpoch() - tmV.tv_sec <= 100));
-	ASSERT_TRUE((now.getMicroseconds() - tmV.tv_usec <= 100));
+	::time_t tmp = now.getSecondsSinceEpoch();
+	Timestamp now2 = ::std::move(now);
+	ASSERT_EQ(now2.getSecondsSinceEpoch(), tmp);
+	ASSERT_EQ(now.getSecondsSinceEpoch(), 0);
 }
 
 int main(int argc, char** argv)

@@ -30,19 +30,19 @@ namespace nets
 			 * log time cache
 			 */
 			__thread struct tm CacheTMS {};
-			__thread ::std::time_t CacheSeconds { 0 };
+			__thread ::time_t CacheSeconds { 0 };
 		}
 
 		void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
 		{
 			struct tm tmS {};
 			const Timestamp& logTime = logMessage.getLogTime();
-			::std::time_t seconds = logTime.getSecondsSinceEpoch();
+			::time_t seconds = logTime.getSecondsSinceEpoch();
 			if (seconds != CacheSeconds)
 			{
 				if (localtime_r(&seconds, &tmS) == nullptr)
 				{
-					::std::memset(&tmS, 0, sizeof(tmS));
+					::memset(&tmS, 0, sizeof(tmS));
 				}
 				CacheSeconds  = seconds;
 				CacheTMS = tmS;
@@ -52,10 +52,8 @@ namespace nets
 				tmS = CacheTMS;
 			}
 			char timeBuf[24] = { 0 };
-			::std::snprintf(timeBuf, 24,
-					 "%04d-%02d-%02d %02d:%02d:%02d.%03d",
-					 tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec,
-							logTime.getMicroseconds());
+			::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900,
+				tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.getMicroseconds());
 			logBuffer << timeBuf;
 			logBuffer << " [" << currentTid() << "] ";
 			logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';

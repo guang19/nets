@@ -12,6 +12,10 @@ namespace nets
 {
 	namespace base
 	{
+		ByteStream::ByteStream(ByteBuffer::SizeTp capacity) : ByteBuffer(capacity)
+		{
+		}
+
 		namespace
 		{
 			constexpr char Digits[] = {"0123456789"};
@@ -90,17 +94,17 @@ namespace nets
 				char* cur = buffer_ + writerIndex_;
 				if (::std::isnan(f))
 				{
-					::std::memcpy(cur, "nan", 3);
+					::memcpy(cur, "nan", 3);
 					writerIndex_ += 3;
 				}
 				else if (::std::isinf(f))
 				{
-					::std::memcpy(cur, "inf", 3);
+					::memcpy(cur, "inf", 3);
 					writerIndex_ += 3;
 				}
 				else
 				{
-					writerIndex_ += snprintf(cur, MaxNumSize, "%.18g", f);
+					writerIndex_ += ::snprintf(cur, MaxNumSize, "%.18g", f);
 				}
 			}
 		}
@@ -109,7 +113,7 @@ namespace nets
 		{
 			if (writeableBytes() > len)
 			{
-				::std::memcpy(buffer_ + writerIndex_, data, len);
+				::memcpy(buffer_ + writerIndex_, data, len);
 				writerIndex_ += len;
 			}
 		}
@@ -196,7 +200,7 @@ namespace nets
 
 		ByteStream& ByteStream::operator<<(const char* str)
 		{
-			appendStr(str, ::std::strlen(str));
+			appendStr(str, ::strlen(str));
 			return *this;
 		}
 

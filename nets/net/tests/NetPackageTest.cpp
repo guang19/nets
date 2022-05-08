@@ -26,13 +26,15 @@ bool isLittleEndian()
 	return false;
 }
 
-TEST(ByteBufferTest, Endian)
+TEST(NetPackageTest, Endian)
 {
 	ASSERT_FALSE(isBigEndian());
 	ASSERT_TRUE(isLittleEndian());
-	uint32_t x = 0x1234;
-	htobe32(x);
-	printf("%u", x);
+	uint32_t x = 1234;
+	uint32_t y = htobe32(x);
+	ASSERT_TRUE(x != y);
+	uint32_t z = be32toh(y);
+	ASSERT_EQ(x, z);
 }
 
 

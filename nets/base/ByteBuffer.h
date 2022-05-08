@@ -6,13 +6,14 @@
 #define NETS_BYTEBUFFER_H
 
 #include <cstdint>
+#include <cstring>
 #include "nets/base/Copyable.h"
 
 namespace nets
 {
 	namespace base
 	{
-		class ByteBuffer
+		class ByteBuffer : public Copyable
 		{
 			public:
 				using SizeTp = uint32_t;
@@ -20,6 +21,14 @@ namespace nets
 			public:
 				explicit ByteBuffer(SizeTp capacity);
 				virtual ~ByteBuffer();
+
+				ByteBuffer(const ByteBuffer& other);
+				ByteBuffer(ByteBuffer&& other) noexcept;
+				ByteBuffer& operator=(const ByteBuffer& other);
+				ByteBuffer& operator=(ByteBuffer&& other) noexcept;
+
+			public:
+				void swap(ByteBuffer&& other);
 
 			public:
 				inline SizeTp readerIndex() const

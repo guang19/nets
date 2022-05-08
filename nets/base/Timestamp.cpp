@@ -5,6 +5,7 @@
 #include "nets/base/Timestamp.h"
 
 #include <sys/time.h>
+#include <utility>
 
 namespace nets
 {
@@ -14,43 +15,48 @@ namespace nets
 		{
 		}
 
-		Timestamp::Timestamp(::std::time_t timestamp) : timestampSinceEpoch_(timestamp)
+		Timestamp::Timestamp(TimeTp timestamp) : timestampSinceEpoch_(timestamp)
 		{
 		}
 
-		Timestamp::Timestamp(::std::time_t secondsSinceEpoch, ::std::time_t microseconds)
+		Timestamp::Timestamp(TimeTp secondsSinceEpoch, uint32_t microseconds)
 			: Timestamp((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
 		{
 		}
 
-		Timestamp::Timestamp(const Timestamp& rhs)
+		Timestamp::Timestamp(const Timestamp& other)
 		{
-			timestampSinceEpoch_ = rhs.timestampSinceEpoch_;
+			timestampSinceEpoch_ = other.timestampSinceEpoch_;
 		}
 
-		Timestamp::Timestamp(Timestamp&& rhs) noexcept
+		Timestamp::Timestamp(Timestamp&& other) noexcept
 		{
-			timestampSinceEpoch_ = rhs.timestampSinceEpoch_;
-			rhs.timestampSinceEpoch_ = 0;
+			timestampSinceEpoch_ = other.timestampSinceEpoch_;
+			other.timestampSinceEpoch_ = 0;
 		}
 
-		Timestamp& Timestamp::operator=(const Timestamp& rhs)
+		Timestamp& Timestamp::operator=(const Timestamp& other)
 		{
-			if (this != &rhs)
+			if (this != &other)
 			{
-				timestampSinceEpoch_ = rhs.timestampSinceEpoch_;
+				timestampSinceEpoch_ = other.timestampSinceEpoch_;
 			}
 			return *this;
 		}
 
-		Timestamp& Timestamp::operator=(Timestamp&& rhs) noexcept
+		Timestamp& Timestamp::operator=(Timestamp&& other) noexcept
 		{
-			if (this != &rhs)
+			if (this != &other)
 			{
-				timestampSinceEpoch_ = rhs.timestampSinceEpoch_;
-				rhs.timestampSinceEpoch_ = 0;
+				timestampSinceEpoch_ = other.timestampSinceEpoch_;
+				other.timestampSinceEpoch_ = 0;
 			}
 			return *this;
+		}
+
+		void Timestamp::swap(Timestamp &&other)
+		{
+			::std::swap(timestampSinceEpoch_, other.timestampSinceEpoch_);
 		}
 
 		Timestamp Timestamp::now()

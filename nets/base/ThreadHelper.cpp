@@ -70,22 +70,22 @@ namespace nets
 			return threadName_;
 		}
 
-		void sleepS(::std::time_t seconds)
+		void sleepS(TimeTp seconds)
 		{
 			::sleep(seconds);
 		}
 
-		void sleepMillis(::std::time_t mseconds)
+		void sleepMillis(TimeTp mseconds)
 		{
 			::usleep(mseconds * 1000);
 		}
 
-		void sleepMicros(::std::time_t useconds)
+		void sleepMicros(TimeTp useconds)
 		{
 			::usleep(useconds);
 		}
 
-		void sleepNanos(::std::time_t nseconds)
+		void sleepNanos(TimeTp nseconds)
 		{
 			struct timespec timSpec {};
 			timSpec.tv_sec = (nseconds / NanosecondsPerSecond);

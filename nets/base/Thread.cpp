@@ -54,14 +54,14 @@ namespace nets
 						}
 						catch (const ::std::exception& exception)
 						{
-							fprintf(::stderr, "Error:exception caught in thread %s,reason %s\n",
+							::fprintf(::stderr, "Error:exception caught in thread %s,reason %s\n",
 								threadName_.c_str(), exception.what());
-							exit(1);
+							::exit(1);
 						}
 						catch (...)
 						{
-							fprintf(::stderr, "Error:unknown exception caught in thread %s\n", threadName_.c_str());
-							exit(1);
+							::fprintf(::stderr, "Error:unknown exception caught in thread %s\n", threadName_.c_str());
+							::exit(1);
 						}
 					}
 
@@ -126,7 +126,7 @@ namespace nets
 			if (threadName_.empty())
 			{
 				char name[24] = { 0 };
-				snprintf(name, 24, "NesThread-%u", NumOfCreatedThreads.load());
+				::snprintf(name, 24, "NesThread-%u", NumOfCreatedThreads.load());
 				threadName_ = name;
 			}
 		}

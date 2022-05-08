@@ -14,6 +14,9 @@ TARGET_LINK_LIBRARIES(TimestampTest nets_base libgtest.a)
 ADD_EXECUTABLE(ThreadTest ThreadTest.cpp)
 TARGET_LINK_LIBRARIES(ThreadTest nets_base libgtest.a)
 
+ADD_EXECUTABLE(ByteStreamTest ByteStreamTest.cpp)
+TARGET_LINK_LIBRARIES(ByteStreamTest nets_base libgtest.a)
+
 ###### Concurrency Test
 ADD_EXECUTABLE(ConcurrencyTest ConcurrencyTest.cpp)
 TARGET_LINK_LIBRARIES(ConcurrencyTest nets_base libgtest.a)
@@ -27,6 +30,3 @@ TARGET_LINK_LIBRARIES(ThreadPoolTest nets_base libgtest.a)
 ###### Log Test
 ADD_EXECUTABLE(LogTest LoggingTest.cpp)
 TARGET_LINK_LIBRARIES(LogTest nets_base libgtest.a)
-
-ADD_EXECUTABLE(LogBufferTest LogBufferTest.cpp)
-TARGET_LINK_LIBRARIES(LogBufferTest nets_base libgtest.a)

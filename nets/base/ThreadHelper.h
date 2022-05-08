@@ -19,10 +19,12 @@ namespace nets
 		void setCurrentThreadName(const char* threadName);
 		const char* getCurrentThreadName();
 
-		void sleepS(::std::time_t seconds);
-		void sleepMillis(::std::time_t mseconds);
-		void sleepMicros(::std::time_t useconds);
-		void sleepNanos(::std::time_t useconds);
+		using TimeTp = ::time_t;
+
+		void sleepS(TimeTp seconds);
+		void sleepMillis(TimeTp mseconds);
+		void sleepMicros(TimeTp useconds);
+		void sleepNanos(TimeTp useconds);
 
 	} // namespace base
 } // namespace nets

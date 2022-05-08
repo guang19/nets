@@ -38,13 +38,13 @@ namespace nets
 			pthread_cond_wait(&condition_, mutex.getMutexPtr());
 		}
 
-		bool ConditionVariable::waitTimeout(Mutex &mutex, ::std::time_t milliseconds)
+		bool ConditionVariable::waitTimeout(Mutex &mutex, ::time_t milliseconds)
 		{
 			struct timespec tmSpec{};
 			::clock_gettime(CLOCK_REALTIME, &tmSpec);
-			::std::time_t nanoseconds = static_cast<::std::time_t>(milliseconds * MicrosecondsPerSecond);
-			tmSpec.tv_sec += static_cast<::std::time_t>((tmSpec.tv_nsec + nanoseconds) / NanosecondsPerSecond);
-			tmSpec.tv_nsec += static_cast<::std::int64_t>((tmSpec.tv_nsec + nanoseconds) % NanosecondsPerSecond);
+			::time_t nanoseconds = static_cast<::time_t>(milliseconds * MicrosecondsPerSecond);
+			tmSpec.tv_sec += static_cast<::time_t>((tmSpec.tv_nsec + nanoseconds) / NanosecondsPerSecond);
+			tmSpec.tv_nsec += static_cast<int64_t>((tmSpec.tv_nsec + nanoseconds) % NanosecondsPerSecond);
 			// tv_nsec can not exceed <NanosecondsPerSecond>,
 			// otherwise pthread_cond_timedwait will have an unknown result
 			while (tmSpec.tv_nsec >= NanosecondsPerSecond)

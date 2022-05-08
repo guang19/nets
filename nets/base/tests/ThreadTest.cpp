@@ -26,11 +26,11 @@ TEST(ThreadTest, ThreadHelper)
 void* task1()
 {
 	sleep(2);
-	printf("Enter: task1\n");
+	::printf("Enter: task1\n");
 	char name[16] = { 0 };
 	::prctl(PR_GET_NAME, name);
-	printf("prctl current name:%s\n", name);
-	printf("ThreadHelper:%s\n", getCurrentThreadName());
+	::printf("prctl current name:%s\n", name);
+	::printf("ThreadHelper:%s\n", getCurrentThreadName());
 	return nullptr;
 }
 
@@ -54,9 +54,9 @@ TEST(ThreadTest, ThreadStart)
 	ASSERT_TRUE((t1.getTid() == 0));
 	t1.start();
 	ASSERT_TRUE(t1.joinable());
-	printf("%s\n", t1.getThreadName().c_str());
-	printf("%lu\n", t1.getThreadId());;
-	printf("%lu\n", t1.getTid());
+	::printf("%s\n", t1.getThreadName().c_str());
+	::printf("%lu\n", t1.getThreadId());;
+	::printf("%lu\n", t1.getTid());
 }
 
 TEST(ThreadTest, ThreadJoin)
@@ -68,9 +68,9 @@ TEST(ThreadTest, ThreadJoin)
 	t1.start();
 	t1.join();
 	ASSERT_FALSE(t1.joinable());
-	printf("%s\n", t1.getThreadName().c_str());
-	printf("%lu\n", t1.getThreadId());;
-	printf("%lu\n", t1.getTid());
+	::printf("%s\n", t1.getThreadName().c_str());
+	::printf("%lu\n", t1.getThreadId());;
+	::printf("%lu\n", t1.getTid());
 }
 
 TEST(ThreadTest, ThreadDetach)
@@ -82,9 +82,9 @@ TEST(ThreadTest, ThreadDetach)
 	t1.start();
 	t1.detach();
 	ASSERT_FALSE(t1.joinable());
-	printf("%s\n", t1.getThreadName().c_str());
-	printf("%lu\n", t1.getThreadId());;
-	printf("%lu\n", t1.getTid());
+	::printf("%s\n", t1.getThreadName().c_str());
+	::printf("%lu\n", t1.getThreadId());;
+	::printf("%lu\n", t1.getTid());
 }
 
 

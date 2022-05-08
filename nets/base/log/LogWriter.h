@@ -52,7 +52,7 @@ namespace nets
 				void append(const char* data, uint32_t len);
 				void flush();
 
-				void renameByNowTime(::std::time_t now);
+				void renameByNowTime(::time_t now);
 
 				void mkdirR(const char* multiLevelDir);
 
@@ -61,20 +61,20 @@ namespace nets
 					return bytes_;
 				}
 
-				inline ::std::time_t getLastRollTime() const
+				inline ::time_t getLastRollTime() const
 				{
 					return lastRollTime_;
 				}
 
 			private:
-				void getFileInfo(uint64_t* fileSize, ::std::time_t* createTime);
+				void getFileInfo(uint64_t* fileSize, ::time_t* createTime);
 
 			private:
 				FILE* fp_ { nullptr };
 				char* dir_ { nullptr };
 				char* filename_ { nullptr };
 				uint64_t bytes_ { 0 };
-				::std::time_t lastRollTime_ { 0 };
+				::time_t lastRollTime_ { 0 };
 				char* buffer_ { nullptr };
 		};
 
@@ -97,13 +97,13 @@ namespace nets
 
 		class AsyncFileLogWriter : public ILogWriter
 		{
-				using AtomicBoolType		= ::std::atomic<bool>;
-				using MutexType				= Mutex;
-				using ConditionVarType		= ConditionVariable;
-				using LockGuardType			= LockGuard<MutexType>;
-				using BufferPtr				= ::std::unique_ptr<LogBuffer>;
-				using BufferVectorType		= ::std::vector<BufferPtr>;
-				using FilePtr				= ::std::unique_ptr<LogFile>;
+				using FilePtr = ::std::unique_ptr<LogFile>;
+				using BufferPtr = ::std::unique_ptr<LogBuffer>;
+				using MutexType = Mutex;
+				using LockGuardType = LockGuard<MutexType>;
+				using AtomicBoolType = ::std::atomic<bool>;
+				using ConditionVarType = ConditionVariable;
+				using BufferVectorType = ::std::vector<BufferPtr>;
 
 			public:
 				AsyncFileLogWriter();
@@ -116,7 +116,7 @@ namespace nets
 
 				////////////////////////////////////////////////////////////////////////////
 			protected:
-				virtual void persist(const char* data, uint32_t len, ::std::time_t persistTime){};
+				virtual void persist(const char* data, uint32_t len, ::time_t persistTime){};
 				FilePtr logFile_ { nullptr };
 				////////////////////////////////////////////////////////////////////////////
 
@@ -144,7 +144,7 @@ namespace nets
 				}
 
 			protected:
-				void persist(const char* data, uint32_t len, ::std::time_t persistTime) override;
+				void persist(const char* data, uint32_t len, ::time_t persistTime) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(AsyncDailyFileLogWriter), public AsyncFileLogWriter
@@ -158,7 +158,7 @@ namespace nets
 				}
 
 			protected:
-				void persist(const char* data, uint32_t len, ::std::time_t persistTime) override;
+				void persist(const char* data, uint32_t len, ::time_t persistTime) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(AsyncRollingFileLogWriter), public AsyncFileLogWriter
@@ -172,7 +172,7 @@ namespace nets
 				}
 
 			protected:
-				void persist(const char* data, uint32_t len, ::std::time_t persistTime) override;
+				void persist(const char* data, uint32_t len, ::time_t persistTime) override;
 		};
 
 		DECLARE_SINGLETON_CLASS(LogWriterFactory)

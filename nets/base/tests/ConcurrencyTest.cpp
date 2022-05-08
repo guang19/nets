@@ -122,7 +122,7 @@ TEST(ConcurrencyTest, CountDownLatchTest)
 	t4.start();
 	t5.start();
 	latch.wait();
-	printf("CountDownLatch count down = 0\n");
+	::printf("CountDownLatch count down = 0\n");
 }
 
 TEST(ConcurrencyTest, ConditionVariableTest)
@@ -143,7 +143,7 @@ TEST(ConcurrencyTest, ConditionVariableTest)
 					notFull.wait(mutex);
 				}
 				vec.emplace_back(1);
-				printf("%u-produce:%lu\n", currentTid(), vec.size());
+				::printf("%u-produce:%lu\n", currentTid(), vec.size());
 				notEmpty.notifyAll();
 			}
 		});
@@ -158,7 +158,7 @@ TEST(ConcurrencyTest, ConditionVariableTest)
 					notEmpty.wait(mutex);
 				}
 				vec.pop_back();
-				printf("%u-consume:%lu\n", currentTid(), vec.size());
+				::printf("%u-consume:%lu\n", currentTid(), vec.size());
 				notFull.notifyAll();
 			}
 		});
@@ -174,7 +174,7 @@ TEST(ConcurrencyTest, ConditionVariableTest)
 	t2.join();
 	t3.join();
 	t4.join();
-	printf("------%lu", vec.size());
+	::printf("------%lu", vec.size());
 }
 
 
