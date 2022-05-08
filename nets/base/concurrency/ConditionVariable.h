@@ -15,6 +15,8 @@ namespace nets
 		class ConditionVariable : Noncopyable
 		{
 			public:
+				using TimeType = ::time_t;
+			public:
 				ConditionVariable();
 				~ConditionVariable();
 
@@ -22,7 +24,7 @@ namespace nets
 				void notifyOne();
 				void notifyAll();
 				void wait(Mutex& mutex);
-				bool waitTimeout(Mutex& mutex, ::time_t milliseconds);
+				bool waitTimeout(Mutex& mutex, TimeType milliseconds);
 
 			private:
 				pthread_cond_t condition_;

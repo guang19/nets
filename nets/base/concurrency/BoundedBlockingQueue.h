@@ -20,6 +20,7 @@ namespace nets
 		class BoundedBlockingQueue : Noncopyable
 		{
 			public:
+				using TimeType = ::time_t;
 				using SizeType = typename Container::size_type;
 				using ValueType = T;
 				using MutexType = Mutex;
@@ -78,20 +79,20 @@ namespace nets
 				template<typename Predicate>
 				bool take(LReferenceType el, Predicate p);
 
-				bool put(ConstReferenceType el, ::time_t milliseconds);
+				bool put(ConstReferenceType el, TimeType milliseconds);
 
-				bool put(RReferenceType el, ::time_t milliseconds);
+				bool put(RReferenceType el, TimeType milliseconds);
 
-				bool take(LReferenceType el, ::time_t milliseconds);
-
-				template<typename Predicate>
-				bool put(ConstReferenceType el, ::time_t milliseconds, Predicate p);
+				bool take(LReferenceType el, TimeType milliseconds);
 
 				template<typename Predicate>
-				bool put(RReferenceType el, ::time_t milliseconds, Predicate p);
+				bool put(ConstReferenceType el, TimeType milliseconds, Predicate p);
 
 				template<typename Predicate>
-				bool take(LReferenceType el, ::time_t milliseconds, Predicate p);
+				bool put(RReferenceType el, TimeType milliseconds, Predicate p);
+
+				template<typename Predicate>
+				bool take(LReferenceType el, TimeType milliseconds, Predicate p);
 
 				bool tryPush(ConstReferenceType el);
 
@@ -206,7 +207,7 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, ::time_t milliseconds)
+		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, TimeType milliseconds)
 		{
 			LockGuardType lock(mutex_);
 			if (isFull())
@@ -222,7 +223,7 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, ::time_t milliseconds)
+		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, TimeType milliseconds)
 		{
 			LockGuardType lock(mutex_);
 			if (isFull())
@@ -238,7 +239,7 @@ namespace nets
 		}
 
 		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, ::time_t milliseconds)
+		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, TimeType milliseconds)
 		{
 			LockGuardType lock(mutex_);
 			if (queue_.empty())
@@ -256,7 +257,7 @@ namespace nets
 
 		template<typename T, typename Container>
 		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, ::time_t milliseconds, Predicate p)
+		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, TimeType milliseconds, Predicate p)
 		{
 			LockGuardType lock(mutex_);
 			if (isFull() && !p())
@@ -277,7 +278,7 @@ namespace nets
 
 		template<typename T, typename Container>
 		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, ::time_t milliseconds, Predicate p)
+		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, TimeType milliseconds, Predicate p)
 		{
 			LockGuardType lock(mutex_);
 			if (isFull() && !p())
@@ -298,7 +299,7 @@ namespace nets
 
 		template<typename T, typename Container>
 		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, ::time_t milliseconds, Predicate p)
+		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, TimeType milliseconds, Predicate p)
 		{
 			LockGuardType lock(mutex_);
 			if (queue_.empty() && !p())

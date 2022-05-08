@@ -15,11 +15,11 @@ namespace nets
 		{
 		}
 
-		Timestamp::Timestamp(TimeTp timestamp) : timestampSinceEpoch_(timestamp)
+		Timestamp::Timestamp(TimeType timestamp) : timestampSinceEpoch_(timestamp)
 		{
 		}
 
-		Timestamp::Timestamp(TimeTp secondsSinceEpoch, uint32_t microseconds)
+		Timestamp::Timestamp(TimeType secondsSinceEpoch, uint32_t microseconds)
 			: Timestamp((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
 		{
 		}

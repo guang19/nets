@@ -23,12 +23,12 @@ namespace nets
 		class Timestamp : public Copyable
 		{
 			public:
-				using TimeTp = ::time_t;
+				using TimeType = ::time_t;
 				
 			public:
 				Timestamp();
-				explicit Timestamp(TimeTp timestamp);
-				explicit Timestamp(TimeTp secondsSinceEpoch, uint32_t microseconds);
+				explicit Timestamp(TimeType timestamp);
+				explicit Timestamp(TimeType secondsSinceEpoch, uint32_t microseconds);
 
 				Timestamp(const Timestamp& other);
 				Timestamp(Timestamp&& other) noexcept;
@@ -41,14 +41,14 @@ namespace nets
 			public:
 				static Timestamp now();
 
-				inline TimeTp getTimestamp() const
+				inline TimeType getTimestamp() const
 				{
 					return timestampSinceEpoch_;
 				}
 
-				inline TimeTp getSecondsSinceEpoch() const
+				inline TimeType getSecondsSinceEpoch() const
 				{
-					return static_cast<TimeTp>(timestampSinceEpoch_ / MicrosecondsPerSecond);
+					return static_cast<TimeType>(timestampSinceEpoch_ / MicrosecondsPerSecond);
 				}
 
 				inline uint32_t getMicroseconds() const
@@ -57,7 +57,7 @@ namespace nets
 				}
 
 			private:
-				TimeTp timestampSinceEpoch_ { 0 };
+				TimeType timestampSinceEpoch_ { 0 };
 		};
 	} // namespace base
 } // namespace nets

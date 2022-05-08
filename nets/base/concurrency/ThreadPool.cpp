@@ -13,7 +13,7 @@ namespace nets
 		namespace
 		{
 			constexpr const char* DefaultThreadPoolName = "NetsThreadPool";
-			constexpr ::time_t DefaultKeepAliveTime = 30000;
+			constexpr TimeType DefaultKeepAliveTime = 30000;
 			constexpr ThreadPool::SizeType DefaultMaxQueueSize = INT32_MAX;
 			constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy =
 				ThreadPool::RejectionPolicy::DiscardOlderPolicy;
@@ -43,13 +43,13 @@ namespace nets
         {
 		}
 
-        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::time_t keepAliveTime) :
+        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, TimeType keepAliveTime) :
 			ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, keepAliveTime,
 						 DefaultMaxQueueSize, DefaultRejectionPolicy)
         {
 		}
 
-        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, ::time_t keepAliveTime,
+        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, TimeType keepAliveTime,
 			SizeType maxQueueSize) : ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize,
 			keepAliveTime, maxQueueSize, DefaultRejectionPolicy)
 		{
@@ -62,13 +62,13 @@ namespace nets
 		}
 
         ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-			::time_t keepAliveTime, enum RejectionPolicy rejectionPolicy) : ThreadPool(name, corePoolSize,
+			TimeType keepAliveTime, enum RejectionPolicy rejectionPolicy) : ThreadPool(name, corePoolSize,
 			maximumPoolSize, keepAliveTime, DefaultMaxQueueSize, rejectionPolicy)
         {
 		}
 
 		ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-							   ::time_t keepAliveTime, SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy)
+							   TimeType keepAliveTime, SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy)
 			: name_(name), running_(false), corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize),
 			  keepAliveTime_(keepAliveTime), taskQueue_(new BoundedBlockingQueue<TaskType>(maxQueueSize)),
 			  rejectionPolicy_(rejectionPolicy)

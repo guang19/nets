@@ -30,14 +30,14 @@ namespace nets
 			 * log time cache
 			 */
 			__thread struct tm CacheTMS {};
-			__thread ::time_t CacheSeconds { 0 };
+			__thread TimeType CacheSeconds { 0 };
 		}
 
 		void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
 		{
 			struct tm tmS {};
 			const Timestamp& logTime = logMessage.getLogTime();
-			::time_t seconds = logTime.getSecondsSinceEpoch();
+			TimeType seconds = logTime.getSecondsSinceEpoch();
 			if (seconds != CacheSeconds)
 			{
 				if (localtime_r(&seconds, &tmS) == nullptr)

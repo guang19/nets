@@ -25,7 +25,6 @@ namespace nets
 			}
 		}
 
-
 		ByteBuffer::ByteBuffer(const ByteBuffer& other)
 		{
 			readerIndex_ = other.readerIndex_;
