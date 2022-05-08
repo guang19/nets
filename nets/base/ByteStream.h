@@ -19,6 +19,11 @@ namespace nets
 				explicit ByteStream(SizeTp capacity);
 				~ByteStream() override = default;
 
+				ByteStream(const ByteStream& stream);
+				ByteStream(ByteStream&& stream) noexcept;
+				ByteStream& operator=(const ByteStream& stream);
+				ByteStream& operator=(ByteStream&& stream) noexcept;
+
 			public:
 				template <typename Number>
 				void appendInteger(Number n);

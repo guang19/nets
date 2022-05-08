@@ -42,6 +42,9 @@ namespace nets
 			capacity_ = other.capacity_;
 			buffer_ = other.buffer_;
 			other.buffer_ = nullptr;
+			other.readerIndex_ = 0;
+			other.writerIndex_ = 0;
+			other.capacity_ = 0;
 		}
 
 		ByteBuffer& ByteBuffer::operator=(const ByteBuffer& other)
@@ -75,6 +78,9 @@ namespace nets
 				}
 				buffer_ = other.buffer_;
 				other.buffer_ = nullptr;
+				other.readerIndex_ = 0;
+				other.writerIndex_ = 0;
+				other.capacity_ = 0;
 			}
 			return *this;
 		}

@@ -215,5 +215,25 @@ namespace nets
 			appendStr(stream.buffer_, stream.writerIndex_);
 			return *this;
 		}
+
+		ByteStream::ByteStream(const ByteStream& stream) : ByteBuffer(stream)
+		{
+		}
+
+		ByteStream::ByteStream(ByteStream&& stream) noexcept : ByteBuffer(::std::move(stream))
+		{
+		}
+
+		ByteStream &ByteStream::operator=(const ByteStream& stream)
+		{
+			ByteBuffer::operator=(stream);
+			return *this;
+		}
+
+		ByteStream &ByteStream::operator=(ByteStream&& stream) noexcept
+		{
+			ByteBuffer::operator=(stream);
+			return *this;
+		}
 	} // namespace base
 } // namespace nets

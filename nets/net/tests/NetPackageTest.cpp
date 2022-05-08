@@ -37,7 +37,6 @@ TEST(NetPackageTest, Endian)
 	ASSERT_EQ(x, z);
 }
 
-
 int main(int argc, char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

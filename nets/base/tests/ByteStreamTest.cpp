@@ -10,6 +10,30 @@
 
 using namespace nets::base;
 
+TEST(ByteStreamTest, ByteBufferTest)
+{
+	ByteStream stream1(1024);
+	stream1 << "abcdefg";
+	ByteStream stream2(stream1);
+	ASSERT_EQ(stream1.readerIndex(), stream2.readerIndex());
+	ASSERT_EQ(stream1.writerIndex(), stream2.writerIndex());
+	ASSERT_EQ(stream1.capacity(), stream2.capacity());
+	ByteStream stream3(::std::move(stream2));
+	ASSERT_EQ(stream1.readerIndex(), stream3.readerIndex());
+	ASSERT_EQ(stream1.writerIndex(), stream3.writerIndex());
+	ASSERT_EQ(stream1.capacity(), stream3.capacity());
+	ASSERT_EQ(stream2.readerIndex(), 0U);
+	ASSERT_EQ(stream2.writerIndex(), 0U);
+	ASSERT_EQ(stream2.capacity(), 0U);
+	ByteStream stream4 = ::std::move(stream3);
+	ASSERT_EQ(stream1.readerIndex(), stream4.readerIndex());
+	ASSERT_EQ(stream1.writerIndex(), stream4.writerIndex());
+	ASSERT_EQ(stream1.capacity(), stream4.capacity());
+	ASSERT_EQ(stream3.readerIndex(), 0U);
+	ASSERT_EQ(stream3.writerIndex(), 0U);
+	ASSERT_EQ(stream3.capacity(), 0U);
+}
+
 TEST(ByteStreamTest, Append)
 {
 	ByteStream stream { 1024 };
