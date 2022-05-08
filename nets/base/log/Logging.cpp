@@ -4,7 +4,6 @@
 
 #include "nets/base/log/Logging.h"
 
-#include <cstdarg>
 #include "nets/base/log/LogFormatter.h"
 #include "nets/base/log/LogWriter.h"
 
@@ -17,36 +16,11 @@ namespace nets
 		{
 		}
 
-		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...) :
-			logMessage_(logLevel, file, line)
-		{
-			va_list args;
-			va_start(args, fmt);
-			va_list tmp;
-			va_copy(tmp, args);
-			uint32_t len = ::std::vsnprintf(nullptr, 0, fmt, tmp);
-			va_end(tmp);
-			LogBuffer& msg = logMessage_.getMessage();
-			if (len > 0)
-			{
-				if (available() > len)
-				{
-					::std::vsnprintf(msg.getCurrentBuffer(), len + 1, fmt, args);
-					msg.addLen(len);
-					msg << '\n';
-				}
-				else
-				{
-					msg << "[Log content length more than LogBufferSize]\n";
-				}
-			}
-			va_end(args);
-		}
-
 		LogMessageStream::~LogMessageStream()
 		{
+			logMessage_.getStream() << '\n';
 			LOG_FORMATTER->formatLogMessage(*this, logMessage_);
-			LOG_WRITER->write(getBuffer(), length());
+			LOG_WRITER->write(buffer(), writerIndex());
 			if (logMessage_.getLogLevel() == LogLevel::FATAL)
 			{
 				// if exit directly, log buffer in memory probably will lost

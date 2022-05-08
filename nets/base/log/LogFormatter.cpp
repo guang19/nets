@@ -33,7 +33,7 @@ namespace nets
 			__thread ::std::time_t CacheSeconds { 0 };
 		}
 
-		void DefaultLogFormatter::formatLogMessage(LogBuffer& logBufferStream, LogMessage& logMessage)
+		void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
 		{
 			struct tm tmS {};
 			const Timestamp& logTime = logMessage.getLogTime();
@@ -51,15 +51,16 @@ namespace nets
 			{
 				tmS = CacheTMS;
 			}
-			::std::snprintf(logBufferStream.getCurrentBuffer(), 24,
+			char timeBuf[24] = { 0 };
+			::std::snprintf(timeBuf, 24,
 					 "%04d-%02d-%02d %02d:%02d:%02d.%03d",
 					 tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec,
 							logTime.getMicroseconds());
-			logBufferStream.addLen(23);
-			logBufferStream << " [" << currentTid() << "] ";
-			logBufferStream << LogLevelName[logMessage.getLogLevel()] << ' ';
-			logBufferStream << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
-			logBufferStream << logMessage.getMessage();
+			logBuffer << timeBuf;
+			logBuffer << " [" << currentTid() << "] ";
+			logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';
+			logBuffer << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
+			logBuffer << logMessage.getStream();
 		}
 
 		ILogFormatter* LogFormatterFactory::getLogFormatter() const

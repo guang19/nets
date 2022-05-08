@@ -11,7 +11,7 @@ namespace nets
 	namespace base
 	{
 		LogMessage_::LogMessage_(LogLevel logLevel, const char* file, uint32_t line) :
-			logTime_(Timestamp::now()), logLevel_(logLevel), line_(line), message_()
+			logTime_(Timestamp::now()), logLevel_(logLevel), line_(line), stream_()
 		{
 			filename_ = basename(file);
 		}

@@ -11,49 +11,28 @@ using namespace nets::base;
 
 TEST(LoggingTest, BasicUse)
 {
-	LOG_TRACE("这是一条trace信息");
-	LOG_DEBUG("这是一条debug信息");
-	LOG_INFO("这是一条info信息");
-	LOG_WARN("这是一条warn信息");
-	LOG_ERROR("这是一条error信息");
+	LOGS_TRACE << "这是一条trace信息";
+	LOGS_DEBUG << "这是一条debug信息";
+	LOGS_INFO << "这是一条info信息";
+	LOGS_WARN << "这是一条warn信息";
+	LOGS_ERROR << "这是一条error信息";
 	Thread t1([&]()
 			  {
-				  LOG_DEBUG("这是一条debug信息");
+				  LOGS_DEBUG << "这是一条debug信息";
 			  });
 	t1.start();
-	LOG_FATAL("这是一条fatal信息");
-}
-
-TEST(LoggingTest, StreamAPI)
-{
-	LOGS_TRACE << "这是一条trace信息\n";
-	LOGS_DEBUG << "这是一条debug信息\n";
-	LOGS_INFO << "这是一条info信息\n";
-	LOGS_WARN << "这是一条warn信息\n";
-	LOGS_ERROR << "这是一条error信息\n";
-	Thread t1([&]()
-			  {
-				  LOGS_DEBUG << "这是一条debug信息\n";
-			  });
-	t1.start();
-	LOGS_FATAL << "这是一条流式fatal信息\n";
+	LOGS_FATAL << "这是一条流式fatal信息";
 }
 
 // change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
 TEST(LoggingTest, SingleFile)
 {
-	LOG_TRACE("这是一条trace信息");
-	LOG_DEBUG("这是一条debug信息");
-	LOG_INFO("这是一条info信息");
-	LOG_WARN("这是一条warn信息");
-	LOG_ERROR("这是一条error信息");
-	LOG_FATAL("这是一条fatal信息");
-	LOGS_TRACE << "这是一条trance信息 stream\n";
-	LOGS_DEBUG << "这是一条debug信息 stream\n";
-	LOGS_INFO << "这是一条info信息 stream\n";
-	LOGS_WARN << "这是一条warn信息 stream\n";
-	LOGS_ERROR << "这是一条error信息 stream\n";
-	LOGS_FATAL << "这是一条流式fatal信息 stream\n";
+	LOGS_TRACE << "这是一条trance信息 stream";
+	LOGS_DEBUG << "这是一条debug信息 stream";
+	LOGS_INFO << "这是一条info信息 stream";
+	LOGS_WARN << "这是一条warn信息 stream";
+	LOGS_ERROR << "这是一条error信息 stream";
+	LOGS_FATAL << "这是一条流式fatal信息 stream";
 	::sleepS(2);
 }
 
@@ -62,18 +41,12 @@ TEST(LoggingTest, SingleFile)
 // and change the constant "SecondsPerDay(in LogWriter.cpp)" for short intervals
 TEST(LoggingTest, DailyFile)
 {
-	LOG_TRACE("这是一条trace信息");
-	LOG_DEBUG("这是一条debug信息");
-	LOG_INFO("这是一条info信息");
-	LOG_WARN("这是一条warn信息");
-	LOG_ERROR("这是一条error信息");
-	LOG_FATAL("这是一条fatal信息");
-	LOGS_TRACE << "这是一条trance信息 stream\n";
-	LOGS_DEBUG << "这是一条debug信息 stream\n";
-	LOGS_INFO << "这是一条info信息 stream\n";
-	LOGS_WARN << "这是一条warn信息 stream\n";
-	LOGS_ERROR << "这是一条error信息 stream\n";
-	LOGS_FATAL << "这是一条fatal信息 stream\n";
+	LOGS_TRACE << "这是一条trance信息 stream";
+	LOGS_DEBUG << "这是一条debug信息 stream";
+	LOGS_INFO << "这是一条info信息 stream";
+	LOGS_WARN << "这是一条warn信息 stream";
+	LOGS_ERROR << "这是一条error信息 stream";
+	LOGS_FATAL << "这是一条fatal信息 stream";
 	::sleepS(2);
 }
 

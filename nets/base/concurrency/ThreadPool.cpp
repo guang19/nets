@@ -76,7 +76,7 @@ namespace nets
 		{
 			if (corePoolSize <= 0 || corePoolSize > maximumPoolSize)
 			{
-				LOG_FATAL("corePoolSize must be greater than 0 and maximumPoolSize must be greater than corePoolSize");
+				LOGS_FATAL << "corePoolSize must be greater than 0 and maximumPoolSize must be greater than corePoolSize";
 			}
 		}
 
@@ -89,12 +89,12 @@ namespace nets
 		{
 			if (running_)
 			{
-				LOG_WARN("thread pool has been initialized");
+				LOGS_WARN << "thread pool has been initialized";
 				return;
 			}
 			running_ = true;
 			threadPool_.reserve(corePoolSize_);
-			LOG_DEBUG("thread pool init success");
+			LOGS_DEBUG << "thread pool init success";
 		}
 
 		void ThreadPool::shutdown()
@@ -111,7 +111,7 @@ namespace nets
 			{
 				poolCV_.wait(mutex_);
 			}
-			LOG_DEBUG("thread pool has been shutdown");
+			LOGS_DEBUG << "thread pool has been shutdown";
 		}
 
         void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)
@@ -124,13 +124,13 @@ namespace nets
 				}
 				catch (const ::std::exception& exception)
 				{
-					LOG_ERROR("exception caught during thread [%s] execution in thread pool [%s], reason %s\n",
-						threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str(), exception.what());
+					LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.getThreadName()
+						<< "] execution in thread pool [" << name_ << "], reason " << exception.what();
 				}
 				catch(...)
 				{
-					LOG_ERROR("unknown exception caught during thread [%s] execution in thread pool [%s]\n",
-						threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str());
+					LOGS_ERROR << "unknown exception caught during thread [" <<
+						threadWrapperRawPtr->thread_.getThreadName() << "] execution in thread pool [" << name_ << ']';
 				}
 				threadWrapperRawPtr->task_ = nullptr;
 			}
@@ -160,13 +160,13 @@ namespace nets
 					}
 					catch (const ::std::exception& exception)
 					{
-						LOG_ERROR("exception caught during thread [%s] execution in thread pool [%s], reason %s\n",
-							threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str(), exception.what());
+						LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.getThreadName()
+							<< "] execution in thread pool [" << name_ << "], reason " << exception.what();
 					}
 					catch(...)
 					{
-						LOG_ERROR("unknown exception caught during thread [%s] execution in thread pool [%s]\n",
-							threadWrapperRawPtr->thread_.getThreadName().c_str(), name_.c_str());
+						LOGS_ERROR << "unknown exception caught during thread [" <<
+						threadWrapperRawPtr->thread_.getThreadName() << "] execution in thread pool [" << name_ << ']';
 					}
 					threadWrapperRawPtr->task_ = nullptr;
 				}

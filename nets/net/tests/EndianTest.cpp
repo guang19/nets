@@ -30,7 +30,11 @@ TEST(ByteBufferTest, Endian)
 {
 	ASSERT_FALSE(isBigEndian());
 	ASSERT_TRUE(isLittleEndian());
+	uint32_t x = 0x1234;
+	htobe32(x);
+	printf("%u", x);
 }
+
 
 int main(int argc, char** argv)
 {

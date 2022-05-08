@@ -20,13 +20,12 @@ namespace nets
 		{
 			public:
 				explicit LogMessageStream(LogLevel logLevel, const char* file, uint32_t line);
-				explicit LogMessageStream(LogLevel logLevel, const char* file, uint32_t line, const char* fmt, ...);
 				~LogMessageStream();
 
 			public:
 				inline LogBuffer& stream()
 				{
-					return logMessage_.getMessage();
+					return logMessage_.getStream();
 				}
 
 			private:
@@ -34,59 +33,6 @@ namespace nets
 		};
 	} // namespace base
 } // namespace nets
-
-#define LOG_TRACE(fmt, ...)	\
-	do	\
-	{	\
-		if (LogLevel::TRACE >= LOG_LEVEL)	\
-		{	\
-			nets::base::LogMessageStream(LogLevel::TRACE, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}	\
-	}	\
-	while (0)
-
-#define LOG_DEBUG(fmt, ...)	\
-	do	\
-	{	\
-		if (LogLevel::DEBUG >= LOG_LEVEL)	\
-		{	\
-			nets::base::LogMessageStream(LogLevel::DEBUG, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}	\
-	}	\
-	while (0)
-
-#define LOG_INFO(fmt, ...)	\
-	do	\
-	{	\
-		if (LogLevel::INFO >= LOG_LEVEL)	\
-		{	\
-			nets::base::LogMessageStream(LogLevel::INFO, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}	\
-	}	\
-	while (0)
-
-#define LOG_WARN(fmt, ...)	\
-	do	\
-	{	if (LogLevel::WARN >= LOG_LEVEL)	\
-		{	\
-			nets::base::LogMessageStream(LogLevel::WARN, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-		}	\
-	}	\
-	while (0)
-
-#define LOG_ERROR(fmt, ...)	\
-	do	\
-	{	\
-		nets::base::LogMessageStream(LogLevel::ERROR, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-	}	\
-	while (0)
-
-#define LOG_FATAL(fmt, ...)	\
-	do	\
-	{	\
-		nets::base::LogMessageStream(LogLevel::FATAL, __FILE__, __LINE__, fmt, ##__VA_ARGS__);	\
-	}	\
-	while (0)
 
 // stream api
 #define LOGS_TRACE	\

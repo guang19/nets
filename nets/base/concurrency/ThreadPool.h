@@ -148,7 +148,7 @@ namespace nets
 		{
 			if (!running_)
 			{
-				LOG_ERROR("thread pool has not been initialized");
+				LOGS_ERROR << "thread pool has not been initialized";
 				return false;
 			}
 			LockGuardType lock(mutex_);

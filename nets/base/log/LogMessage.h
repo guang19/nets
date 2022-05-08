@@ -51,9 +51,9 @@ namespace nets
 					return line_;
 				}
 
-				inline LogBuffer& getMessage()
+				inline LogBuffer& getStream()
 				{
-					return message_;
+					return stream_;
 				}
 
 			private:
@@ -61,7 +61,7 @@ namespace nets
 				LogLevel logLevel_ {};
 				const char* filename_ { nullptr };
 				uint32_t line_ { 0 };
-				LogBuffer message_ {};
+				LogBuffer stream_ {};
 		} LogMessage;
 	} // namespace base
 } // namespace nets

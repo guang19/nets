@@ -36,7 +36,7 @@ namespace nets
 
 		LogFile::LogFile(const char* file)
 		{
-			uint32_t filePathLen = strlen(file);
+			uint32_t filePathLen = ::std::strlen(file);
 			if (filePathLen > MaxFilePathLen)
 			{
 
@@ -166,7 +166,7 @@ namespace nets
 			{
 				return;
 			}
-			uint32_t len = strlen(multiLevelDir);
+			uint32_t len = ::std::strlen(multiLevelDir);
 			char dir1[MaxFilePathLen] = { 0 };
 			char* dirptr = dir1;
 			char dir2[MaxFilePathLen] = { 0 };
@@ -176,7 +176,7 @@ namespace nets
 			char* spStr;
 			while ((spStr = strsep(&dirptr, "/")) != nullptr)
 			{
-				if (strlen(spStr) > 0)
+				if (::std::strlen(spStr) > 0)
 				{
 					::std::strcat(dir2, "/");
 					::std::strcat(dir2, spStr);
@@ -256,9 +256,9 @@ namespace nets
 		void AsyncFileLogWriter::write(const char* data, uint32_t len)
 		{
 			LockGuardType lock(mutex_);
-			if (cacheBuffer_->available() > len)
+			if (cacheBuffer_->writeableBytes() > len)
 			{
-				cacheBuffer_->append(data, len);
+				cacheBuffer_->appendStr(data, len);
 			}
 			else
 			{
@@ -271,7 +271,7 @@ namespace nets
 				{
 					cacheBuffer_.reset(new LogBuffer(MaxLogBufferSize));
 				}
-				cacheBuffer_->append(data, len);
+				cacheBuffer_->appendStr(data, len);
 				cv_.notifyOne();
 			}
 		}
@@ -304,7 +304,7 @@ namespace nets
 					currentTime = ::std::time(nullptr);
 					for (const BufferPtr& buf : tmpBuffers)
 					{
-						persist(buf->getBuffer(), buf->length(), currentTime);
+						persist(buf->buffer(), buf->writerIndex(), currentTime);
 					}
 					logFile_->flush();
 					tmpBuffers.clear();
