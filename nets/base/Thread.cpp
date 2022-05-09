@@ -46,7 +46,7 @@ namespace nets
 						{
 							setCurrentThreadName(threadName_.c_str());
 						}
-						::prctl(PR_SET_NAME, getCurrentThreadName());
+						::prctl(PR_SET_NAME, currentThreadName());
 						latch_.countDown();
 						try
 						{

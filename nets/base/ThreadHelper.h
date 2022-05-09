@@ -17,7 +17,7 @@ namespace nets
 		bool isMainThread();
 
 		void setCurrentThreadName(const char* threadName);
-		const char* getCurrentThreadName();
+		const char* currentThreadName();
 
 		using TimeType = ::time_t;
 

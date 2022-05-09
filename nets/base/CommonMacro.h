@@ -5,9 +5,12 @@
 #ifndef NETS_COMMONMACRO_H
 #define NETS_COMMONMACRO_H
 
+#include <cstring>
 #include <utility>
 
 #define UNUSED(x) ((void) (x))
+
+#define MEMZERO(p, len) ::memset((p), 0, (len))
 
 /***********************************
   *

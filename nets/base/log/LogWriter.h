@@ -61,7 +61,7 @@ namespace nets
 					return bytes_;
 				}
 
-				inline ::time_t getLastRollTime() const
+				inline ::time_t lastRollTime() const
 				{
 					return lastRollTime_;
 				}

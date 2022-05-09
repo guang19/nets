@@ -31,17 +31,17 @@ namespace nets
 				void join();
 				void detach();
 
-				inline ::pthread_t getThreadId() const
+				inline ::pthread_t threadId() const
 				{
 					return threadId_;
 				}
 
-				inline ::pthread_t getTid() const
+				inline ::pthread_t tid() const
 				{
 					return tid_;
 				}
 
-				inline const ::std::string& getThreadName() const
+				inline const ::std::string& threadName() const
 				{
 					return threadName_;
 				}

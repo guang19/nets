@@ -44,7 +44,7 @@ namespace nets
 				::exit(1);
 			}
 			char tmpFile[MaxFilePathLen] = { 0 };
-			::memset(tmpFile, 0, MaxFilePathLen);
+			MEMZERO(tmpFile, MaxFilePathLen);
 			::memcpy(tmpFile, file, filePathLen);
 			// <dirname> will modify input str, so called <basename> before <dirname>
 			const char* filename = ::basename(tmpFile);
@@ -53,9 +53,9 @@ namespace nets
 			uint32_t dirLen = ::strlen(dir);
 			dir_ = new char[dirLen + 1];
 			filename_ = new char[filenameLen + 1];
-			::memset(dir_, 0, dirLen + 1);
+			MEMZERO(dir_, dirLen + 1);
 			::memcpy(dir_, dir, dirLen);
-			::memset(filename_, 0, filenameLen + 1);
+			MEMZERO(filename_, filenameLen + 1);
 			::memcpy(filename_, filename, filenameLen);
 			// log file has parent directory
 			if (::strcmp(dir, ".") != 0)
@@ -70,7 +70,7 @@ namespace nets
 			}
 			getFileInfo(&bytes_, &lastRollTime_);
 			buffer_ = new char[FileIOBufferSize];
-			::memset(buffer_, 0, FileIOBufferSize);
+			MEMZERO(buffer_, FileIOBufferSize);
 			::setbuffer(fp_, buffer_, FileIOBufferSize);
 		}
 
@@ -135,7 +135,7 @@ namespace nets
 			struct tm tmS {};
 			::localtime_r(&now, &tmS);
 			char newFilename[24] = { 0 };
-			::memset(newFilename, 0, 24);
+			MEMZERO(newFilename, 24);
 			::strftime(newFilename, 20, "%Y-%m-%d_%H-%M-%S", &tmS);
 			::memcpy(newFilename + 19, ".log", 4);
 			if (::strcmp(dir_, ".") != 0)
@@ -170,8 +170,8 @@ namespace nets
 			char dir1[MaxFilePathLen] = { 0 };
 			char* dirptr = dir1;
 			char dir2[MaxFilePathLen] = { 0 };
-			::memset(dir1, 0, MaxFilePathLen);
-			::memset(dir2, 0, MaxFilePathLen);
+			MEMZERO(dir1, MaxFilePathLen);
+			MEMZERO(dir2, MaxFilePathLen);
 			::memcpy(dir1, multiLevelDir, len);
 			char* spStr;
 			while ((spStr = strsep(&dirptr, "/")) != nullptr)
@@ -346,7 +346,7 @@ namespace nets
 
 		void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
 		{
-			if (persistTime - logFile_->getLastRollTime() >= SecondsPerDay)
+			if (persistTime - logFile_->lastRollTime() >= SecondsPerDay)
 			{
 				logFile_->renameByNowTime(persistTime);
 			}

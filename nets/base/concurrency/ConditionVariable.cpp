@@ -35,7 +35,7 @@ namespace nets
 			// during waiting time, other threads may acquire ownership of the parameter(@mutex)
 			// so modify the ownership of the mutex in advance
 			Mutex::OwnerGuard ownerGuard(mutex);
-			pthread_cond_wait(&condition_, mutex.getMutexPtr());
+			pthread_cond_wait(&condition_, mutex.mutexPtr());
 		}
 
 		bool ConditionVariable::waitTimeout(Mutex &mutex, TimeType milliseconds)
@@ -55,7 +55,7 @@ namespace nets
 			// during waiting time, other threads may acquire ownership of the parameter(@mutex)
 			// so modify the ownership of the mutex in advance
 			Mutex::OwnerGuard ownerGuard(mutex);
-			return (0 == pthread_cond_timedwait(&condition_, mutex.getMutexPtr(), &tmSpec));
+			return (0 == pthread_cond_timedwait(&condition_, mutex.mutexPtr(), &tmSpec));
 		}
 	} // namespace base
 } // namespace nets

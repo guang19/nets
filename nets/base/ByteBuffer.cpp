@@ -5,6 +5,7 @@
 #include "nets/base/ByteBuffer.h"
 
 #include <algorithm>
+#include "nets/base/CommonMacro.h"
 
 namespace nets
 {
@@ -13,7 +14,7 @@ namespace nets
 		ByteBuffer::ByteBuffer(SizeTp capacity) : buffer_(new char[capacity]), readerIndex_(0), writerIndex_(0),
 			capacity_(capacity)
 		{
-			::memset(buffer_, 0, capacity);
+			MEMZERO(buffer_, capacity_);
 		}
 
 		ByteBuffer::~ByteBuffer()
@@ -31,7 +32,7 @@ namespace nets
 			writerIndex_ = other.writerIndex_;
 			capacity_ = other.capacity_;
 			buffer_ = new char[capacity_];
-			::memset(buffer_, 0, capacity_);
+			MEMZERO(buffer_, capacity_);
 			::memcpy(buffer_, other.buffer_, capacity_);
 		}
 
@@ -59,7 +60,7 @@ namespace nets
 					delete[] buffer_;
 				}
 				buffer_ = new char[capacity_];
-				::memset(buffer_, 0, capacity_);
+				MEMZERO(buffer_, capacity_);
 				::memcpy(buffer_, other.buffer_, capacity_);
 			}
 			return *this;

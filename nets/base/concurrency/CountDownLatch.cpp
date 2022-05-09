@@ -31,7 +31,7 @@ namespace nets
 			}
 		}
 
-		uint32_t CountDownLatch::getCount()
+		uint32_t CountDownLatch::count()
 		{
 			LockGuard<Mutex> lock(mutex_);
 			return count_;

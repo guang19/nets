@@ -29,7 +29,7 @@ namespace nets
 
 				bool isLockedByCurrentThread() const;
 
-				inline ::pthread_mutex_t* getMutexPtr()
+				inline ::pthread_mutex_t* mutexPtr()
 				{
 					return& mutex_;
 				}
@@ -66,7 +66,7 @@ namespace nets
 
 				bool isLockedByCurrentThread() const;
 
-				inline ::pthread_mutex_t* getMutexPtr()
+				inline ::pthread_mutex_t* mutexPtr()
 				{
 					return &mutex_;
 				}

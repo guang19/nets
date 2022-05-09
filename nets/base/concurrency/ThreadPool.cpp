@@ -124,13 +124,13 @@ namespace nets
 				}
 				catch (const ::std::exception& exception)
 				{
-					LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.getThreadName()
+					LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.threadName()
 						<< "] execution in thread pool [" << name_ << "], reason " << exception.what();
 				}
 				catch(...)
 				{
 					LOGS_ERROR << "unknown exception caught during thread [" <<
-						threadWrapperRawPtr->thread_.getThreadName() << "] execution in thread pool [" << name_ << ']';
+						threadWrapperRawPtr->thread_.threadName() << "] execution in thread pool [" << name_ << ']';
 				}
 				threadWrapperRawPtr->task_ = nullptr;
 			}
@@ -160,13 +160,13 @@ namespace nets
 					}
 					catch (const ::std::exception& exception)
 					{
-						LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.getThreadName()
+						LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.threadName()
 							<< "] execution in thread pool [" << name_ << "], reason " << exception.what();
 					}
 					catch(...)
 					{
 						LOGS_ERROR << "unknown exception caught during thread [" <<
-						threadWrapperRawPtr->thread_.getThreadName() << "] execution in thread pool [" << name_ << ']';
+						threadWrapperRawPtr->thread_.threadName() << "] execution in thread pool [" << name_ << ']';
 					}
 					threadWrapperRawPtr->task_ = nullptr;
 				}

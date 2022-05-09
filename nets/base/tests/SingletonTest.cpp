@@ -19,7 +19,7 @@ DECLARE_SINGLETON_CLASS(Clazz)
 		{
 		}
 
-		::std::string getName() const
+		::std::string name() const
 		{
 			return name_;
 		}
@@ -43,9 +43,9 @@ TEST(SingletonAddr, BasicUse)
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
 	::printf("SingletonAddr: %p %p %p\n", cptr1, cptr2, cptr3);
-	ASSERT_EQ(cptr1->getName(), "");
-	ASSERT_EQ(cptr2->getName(), "");
-	ASSERT_EQ(cptr3->getName(), "");
+	ASSERT_EQ(cptr1->name(), "");
+	ASSERT_EQ(cptr2->name(), "");
+	ASSERT_EQ(cptr3->name(), "");
 }
 
 TEST(SingletonAddr, MultiThread)
@@ -67,9 +67,9 @@ TEST(SingletonAddr, MultiThread)
 	t3.join();
 	ASSERT_EQ(cptr1, cptr2);
 	ASSERT_EQ(cptr2, cptr3);
-	ASSERT_EQ(cptr1->getName(), "cp1");
-	ASSERT_EQ(cptr2->getName(), "cp1");
-	ASSERT_EQ(cptr3->getName(), "cp1");
+	ASSERT_EQ(cptr1->name(), "cp1");
+	ASSERT_EQ(cptr2->name(), "cp1");
+	ASSERT_EQ(cptr3->name(), "cp1");
 }
 
 DECLARE_SINGLETON_CLASS(Clazz2)

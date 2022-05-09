@@ -22,7 +22,7 @@ namespace nets
 			public:
 				void wait();
 				void countDown();
-				uint32_t getCount();
+				uint32_t count();
 
 			private:
 				Mutex mutex_ {};

@@ -100,12 +100,12 @@ namespace nets
 					return running_;
 				}
 
-				inline const ::std::string& getThreadPoolName() const
+				inline const ::std::string& threadPoolName() const
 				{
 					return name_;
 				}
 
-				inline SizeType getPoolSize()
+				inline SizeType poolSize()
 				{
 					LockGuardType lock(mutex_);
 					return threadPool_.size();

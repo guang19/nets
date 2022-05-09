@@ -65,7 +65,7 @@ namespace nets
 			threadName_ = threadName;
 		}
 
-		const char* getCurrentThreadName()
+		const char* currentThreadName()
 		{
 			return threadName_;
 		}

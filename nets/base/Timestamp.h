@@ -41,17 +41,17 @@ namespace nets
 			public:
 				static Timestamp now();
 
-				inline TimeType getTimestamp() const
+				inline TimeType timestamp() const
 				{
 					return timestampSinceEpoch_;
 				}
 
-				inline TimeType getSecondsSinceEpoch() const
+				inline TimeType secondsSinceEpoch() const
 				{
 					return static_cast<TimeType>(timestampSinceEpoch_ / MicrosecondsPerSecond);
 				}
 
-				inline uint32_t getMicroseconds() const
+				inline uint32_t microseconds() const
 				{
 					return static_cast<uint32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
 				}

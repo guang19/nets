@@ -4,7 +4,7 @@
 
 #include "nets/base/log/LogFormatter.h"
 
-#include <cstring>
+#include "nets/base/CommonMacro.h"
 #include "nets/base/ThreadHelper.h"
 
 namespace nets
@@ -37,12 +37,12 @@ namespace nets
 		{
 			struct tm tmS {};
 			const Timestamp& logTime = logMessage.getLogTime();
-			TimeType seconds = logTime.getSecondsSinceEpoch();
+			TimeType seconds = logTime.secondsSinceEpoch();
 			if (seconds != CacheSeconds)
 			{
 				if (localtime_r(&seconds, &tmS) == nullptr)
 				{
-					::memset(&tmS, 0, sizeof(tmS));
+					MEMZERO(&tmS, sizeof(tmS));
 				}
 				CacheSeconds  = seconds;
 				CacheTMS = tmS;
@@ -53,7 +53,7 @@ namespace nets
 			}
 			char timeBuf[24] = { 0 };
 			::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900,
-				tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.getMicroseconds());
+				tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
 			logBuffer << timeBuf;
 			logBuffer << " [" << currentTid() << "] ";
 			logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';
