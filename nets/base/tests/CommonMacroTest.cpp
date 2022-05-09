@@ -8,24 +8,17 @@
 
 class TBase
 {
-	public:
-		void BaseFun()
-		{
-
-		}
+public:
+	void BaseFun() {}
 };
 
 class T : public TBase
 {
 
-	public:
-		void TestFun()
-		{
-		}
+public:
+	void TestFun() {}
 
-		void TestFunWithParameter(int)
-		{
-		}
+	void TestFunWithParameter(int) {}
 };
 
 DECLARE_HAS_MEMBER_FUNCTION(BaseFun);

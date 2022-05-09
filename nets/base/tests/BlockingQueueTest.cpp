@@ -6,33 +6,34 @@
 
 #include <atomic>
 #include <deque>
+
+#include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/Thread.h"
 #include "nets/base/Timestamp.h"
-#include "nets/base/concurrency/BoundedBlockingQueue.h"
 
 using namespace nets::base;
 
 class BlockingQueueTest : public testing::Test
 {
-	public:
-		// Sets up the test fixture.
-		void SetUp() override
-		{
-			blockingQueue = new BoundedBlockingQueue<int32_t>(5);
-		}
+public:
+	// Sets up the test fixture.
+	void SetUp() override
+	{
+		blockingQueue = new BoundedBlockingQueue<int32_t>(5);
+	}
 
-		// Tears down the test fixture.
-		void TearDown() override
+	// Tears down the test fixture.
+	void TearDown() override
+	{
+		if (blockingQueue != nullptr)
 		{
-			if (blockingQueue != nullptr)
-			{
-				delete blockingQueue;
-				blockingQueue = nullptr;
-			}
+			delete blockingQueue;
+			blockingQueue = nullptr;
 		}
+	}
 
-	protected:
-		BoundedBlockingQueue<int32_t>* blockingQueue { nullptr };
+protected:
+	BoundedBlockingQueue<int32_t>* blockingQueue {nullptr};
 };
 
 TEST_F(BlockingQueueTest, PutTake)
@@ -53,19 +54,21 @@ TEST_F(BlockingQueueTest, PutTake)
 
 TEST_F(BlockingQueueTest, PutTakeMultiThread)
 {
-    for (int i = 0 ; i < 5; ++i)
-    {
-        Thread t1([&]
-                    {
-                        blockingQueue->put(i);
-                    });
+	for (int i = 0; i < 5; ++i)
+	{
+		Thread t1(
+			[&]
+			{
+				blockingQueue->put(i);
+			});
 		t1.start();
 		t1.detach();
-		Thread t2([&]
-					{
-						int32_t n;
-						blockingQueue->take(n);
-					});
+		Thread t2(
+			[&]
+			{
+				int32_t n;
+				blockingQueue->take(n);
+			});
 		t2.start();
 		t2.detach();
 	}
@@ -76,10 +79,10 @@ TEST_F(BlockingQueueTest, PutTakeMultiThread)
 TEST_F(BlockingQueueTest, PutTakeConditionVar)
 {
 	::std::atomic<bool> running(true);
-	::std::function<bool ()> func = ::std::bind([&]() -> bool
-		{
-			return !running;
-		});
+	::std::function<bool()> func = [&]() -> bool
+	{
+		return !running;
+	};
 	ASSERT_EQ(blockingQueue->put(1, func), true);
 	int32_t takeVal = 0;
 	ASSERT_EQ(blockingQueue->take(takeVal, func), true);
@@ -87,7 +90,7 @@ TEST_F(BlockingQueueTest, PutTakeConditionVar)
 	ASSERT_EQ(blockingQueue->put(2, func), true);
 	running = false;
 	ASSERT_EQ(blockingQueue->take(takeVal, func), false);
-	ASSERT_EQ(takeVal, 2);
+	ASSERT_EQ(takeVal, 1);
 	ASSERT_TRUE((blockingQueue->size() == 1));
 }
 

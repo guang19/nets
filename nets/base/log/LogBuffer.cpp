@@ -4,23 +4,15 @@
 
 #include "nets/base/log/LogBuffer.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	namespace
 	{
+		// log length limit: 4K
+		constexpr uint32_t DefaultLogBufferLength = (1024 << 2);
+	} // namespace
 
-		namespace
-		{
-			// log length limit: 4K
-			constexpr uint32_t DefaultLogBufferLength = (1024 << 2);
-		}
+	LogBuffer::LogBuffer() : ByteStream(DefaultLogBufferLength) {}
 
-		LogBuffer::LogBuffer() : ByteStream(DefaultLogBufferLength)
-		{
-		}
-
-		LogBuffer::LogBuffer(uint32_t logBufferLength) : ByteStream(logBufferLength)
-		{
-		}
-	} // namespace base
-} // namespace nets
+	LogBuffer::LogBuffer(uint32_t logBufferLength) : ByteStream(logBufferLength) {}
+} // namespace nets::base

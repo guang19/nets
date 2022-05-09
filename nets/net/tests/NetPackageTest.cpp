@@ -9,7 +9,7 @@
 bool isBigEndian()
 {
 	uint16_t var = 1;
-	if (*((uint8_t*)&var) != 1)
+	if (*((uint8_t*) &var) != 1)
 	{
 		return true;
 	}
@@ -19,7 +19,7 @@ bool isBigEndian()
 bool isLittleEndian()
 {
 	uint16_t var = 1;
-	if (*((uint8_t*)&var) == 1)
+	if (*((uint8_t*) &var) == 1)
 	{
 		return true;
 	}

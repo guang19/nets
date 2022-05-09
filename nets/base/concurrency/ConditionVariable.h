@@ -6,30 +6,29 @@
 #define NETS_CONDITIONVARIABLE_H
 
 #include <ctime>
+
 #include "nets/base/concurrency/Mutex.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	class ConditionVariable : Noncopyable
 	{
-		class ConditionVariable : Noncopyable
-		{
-			public:
-				using TimeType = ::time_t;
-			public:
-				ConditionVariable();
-				~ConditionVariable();
+	public:
+		using TimeType = ::time_t;
 
-			public:
-				void notifyOne();
-				void notifyAll();
-				void wait(Mutex& mutex);
-				bool waitTimeout(Mutex& mutex, TimeType milliseconds);
+	public:
+		ConditionVariable();
+		~ConditionVariable();
 
-			private:
-				pthread_cond_t condition_;
-		};
-	} // namespace base
-} // namespace nets
+	public:
+		void notifyOne();
+		void notifyAll();
+		void wait(Mutex& mutex);
+		bool waitTimeout(Mutex& mutex, TimeType milliseconds);
 
-#endif //NETS_CONDITIONVARIABLE_H
+	private:
+		pthread_cond_t condition_ {};
+	};
+} // namespace nets::base
+
+#endif // NETS_CONDITIONVARIABLE_H

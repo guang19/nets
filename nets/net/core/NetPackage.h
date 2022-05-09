@@ -7,18 +7,15 @@
 
 #include "nets/base/ByteBuffer.h"
 
-namespace nets
+namespace nets::net
 {
-	namespace net
+	class NetPackage : public base::ByteBuffer
 	{
-		class NetPackage : public base::ByteBuffer
-		{
-			public:
-				NetPackage();
-				explicit NetPackage(SizeTp capacity);
-				~NetPackage() override = default;
-		};
-	} // namespace net
-} // namespace nets
+	public:
+		NetPackage();
+		explicit NetPackage(SizeTp capacity);
+		~NetPackage() override = default;
+	};
+} // namespace nets::net
 
-#endif //NETS_NETPACKAGE_H
+#endif // NETS_NETPACKAGE_H

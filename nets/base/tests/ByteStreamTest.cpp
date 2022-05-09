@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+
 #include "nets/base/ByteStream.h"
 
 using namespace nets::base;
@@ -36,7 +37,7 @@ TEST(ByteStreamTest, ByteBufferTest)
 
 TEST(ByteStreamTest, Append)
 {
-	ByteStream stream { 1024 };
+	ByteStream stream {1024};
 	ASSERT_EQ(stream.writerIndex(), 0U);
 	stream << "abc";
 	ASSERT_EQ(stream.writerIndex(), 3U);
@@ -48,11 +49,11 @@ TEST(ByteStreamTest, Append)
 
 TEST(ByteStreamTest, AppendBuffer)
 {
-	ByteStream stream { 1024 };
+	ByteStream stream {1024};
 	ASSERT_EQ(stream.writerIndex(), 0U);
 	stream << "abc";
 	ASSERT_EQ(stream.writerIndex(), 3U);
-	ByteStream stream2 { 1024 };
+	ByteStream stream2 {1024};
 	stream2 << "abc";
 	stream << stream2;
 	ASSERT_EQ(stream.writerIndex(), 6U);

@@ -7,184 +7,236 @@
 
 #include <atomic>
 #include <functional>
-#include <vector>
+#include <future>
 #include <memory>
+#include <vector>
+
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/concurrency/Mutex.h"
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Thread.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	class ThreadPool : Noncopyable
 	{
-		class ThreadPool : Noncopyable
+	public:
+		using SizeType = size_t;
+		using TaskType = ::std::function<void()>;
+		using AtomicBoolType = ::std::atomic<bool>;
+		using MutexType = Mutex;
+		using LockGuardType = LockGuard<MutexType>;
+		using ConditionVariableType = ConditionVariable;
+		using BlockingQueuePtr = ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
+		using ThreadPoolPtr = ThreadPool*;
+
+	public:
+		/**************************************************************************
+		 * When the thread pool is full and the task queue cannot continue accept
+		 * new tasks, the following rejection policy can be selected to deal with
+		 * new tasks
+		 **************************************************************************/
+		enum RejectionPolicy
 		{
-			public:
-				using SizeType = size_t;
-				using TaskType = ::std::function<void()>;
-				using MutexType = Mutex;
-				using LockGuardType = LockGuard<MutexType>;
-				using AtomicBoolType = ::std::atomic<bool>;
-				using ThreadPoolRawPtr = ThreadPool*;
-				using ConditionVariableType = ConditionVariable;
-				using BoundedBlockingQueuePtr = ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
-
-			public:
-				/**************************************************************************
-				 * When the thread pool is full and the task queue cannot continue accept
-				 * new tasks, the following rejection policy can be selected to deal with
-				 * new tasks
-				 **************************************************************************/
-				enum RejectionPolicy
-				{
-					// abandon new tasks and do nothing
-					DiscardPolicy = 0,
-					// abandon the task at the end of the task queue
-					// and try to add a new task to the end of task queue
-					DiscardOlderPolicy,
-					// the caller's thread runs the task directly
-					CallerRunsPolicy,
-				};
-
-			private:
-				struct ThreadWrapper : Noncopyable
-				{
-					public:
-						explicit ThreadWrapper(const ::std::string& name, bool isCoreThread,
-											   ThreadPoolRawPtr threadPoolRawPtr);
-
-						explicit ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task,
-											   ThreadPoolRawPtr threadPoolRawPtr);
-
-						~ThreadWrapper() = default;
-
-						void startThread();
-
-						bool isCoreThread_{false};
-						TaskType task_{nullptr};
-						Thread thread_{};
-						ThreadPoolRawPtr threadPoolRawPtr_{nullptr};
-				};
-
-				using ThreadWrapperRawPtr = ThreadWrapper*;
-				using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
-
-			public:
-				ThreadPool();
-
-				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize);
-
-				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, TimeType keepAliveTime);
-
-				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, TimeType keepAliveTime,
-									SizeType maxQueueSize);
-
-				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-									enum RejectionPolicy rejectionPolicy);
-
-				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-									TimeType keepAliveTime, enum RejectionPolicy rejectionPolicy);
-
-				explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maximumPoolSize,
-									TimeType keepAliveTime, SizeType maxQueueSize,
-									enum RejectionPolicy rejectionPolicy);
-
-				~ThreadPool();
-
-				void init();
-
-				void shutdown();
-
-				inline bool isRunning() const
-				{
-					return running_;
-				}
-
-				inline const ::std::string& threadPoolName() const
-				{
-					return name_;
-				}
-
-				inline SizeType poolSize()
-				{
-					LockGuardType lock(mutex_);
-					return threadPool_.size();
-				}
-
-				template<typename Fn, typename... Args>
-				bool execute(Fn func, Args... args);
-
-			private:
-				void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-
-				void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-
-				bool addThreadTask(const TaskType& task, bool isCore, SizeType threadSize);
-
-				bool rejectExecution(const TaskType& task);
-
-			private:
-				::std::string name_{};
-				AtomicBoolType running_{false};
-				// the numbers of core threads, once created,
-				// will be destroyed as the life cycle of the thread pool ends
-				SizeType corePoolSize_{0};
-				// the maximum numbers of threads that the thread pool can hold
-				SizeType maximumPoolSize_{0};
-				// time that idle threads can survive, unit: ms
-				TimeType keepAliveTime_{0};
-				// task queue
-				BoundedBlockingQueuePtr taskQueue_{nullptr};
-				::std::vector<ThreadWrapperPtr> threadPool_{};
-				MutexType mutex_{};
-				ConditionVariableType poolCV_{};
-				// rejection policy
-				RejectionPolicy rejectionPolicy_;
+			// abandon new tasks and do nothing
+			DiscardPolicy = 0,
+			// abandon the task at the end of the task queue
+			// and try to add a new task to the end of task queue
+			DiscardOlderPolicy,
+			// the caller's thread runs the task directly
+			CallerRunsPolicy,
 		};
 
-		template<typename Fn, typename... Args>
-		bool ThreadPool::execute(Fn func, Args... args)
+	private:
+		struct ThreadWrapper : Noncopyable
 		{
-			if (!running_)
-			{
-				LOGS_ERROR << "thread pool has not been initialized";
-				return false;
-			}
+		public:
+			explicit ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
+			~ThreadWrapper() = default;
+
+			void startThread();
+
+			bool isCoreThread_ {false};
+			TaskType task_ {nullptr};
+			Thread thread_ {};
+			ThreadPoolPtr threadPoolPtr_ {nullptr};
+		};
+
+		using ThreadWrapperRawPtr = ThreadWrapper*;
+		using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
+
+	public:
+		ThreadPool();
+
+		explicit ThreadPool(SizeType corePoolSize, SizeType maxPoolSize);
+
+		explicit ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime);
+
+		explicit ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime, SizeType maxQueueSize);
+
+		explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize,
+							enum RejectionPolicy rejectionPolicy);
+
+		explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime,
+							enum RejectionPolicy rejectionPolicy);
+
+		explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime,
+							SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy);
+
+		~ThreadPool();
+
+		void init();
+		void shutdown();
+
+		inline bool isRunning() const
+		{
+			return running_;
+		}
+
+		inline const ::std::string& name() const
+		{
+			return name_;
+		}
+
+		inline SizeType poolSize()
+		{
 			LockGuardType lock(mutex_);
-			::std::function<decltype(::std::declval<Fn>()(::std::declval<Args>()...))()> originFunc =
-				::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-			TaskType task = [f = ::std::move(originFunc)]() mutable
+			return threadPool_.size();
+		}
+
+		template <typename Fn, typename... Args>
+		void execute(Fn&& func, Args... args);
+
+		template <typename Fn, typename... Args,
+				  typename HasRet =
+					  typename ::std::enable_if<!::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type,
+				  typename Redundant = void>
+		::std::future<typename ::std::result_of<Fn(Args...)>> submit(Fn&& func, Args... args);
+
+		template <typename Fn, typename... Args,
+				  typename HasRet =
+					  typename ::std::enable_if<::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
+		::std::future<void> submit(Fn&& func, Args... args);
+
+	private:
+		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
+
+		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
+
+		bool addThreadTask(const TaskType& task, bool isCore, SizeType threadSize);
+
+		void reject(const TaskType& task);
+
+	private:
+		::std::string name_ {};
+		AtomicBoolType running_ {false};
+		// the numbers of core threads, once created,
+		// will be destroyed as the life cycle of the thread pool ends
+		SizeType corePoolSize_ {0};
+		// the maximum numbers of threads that the thread pool can hold
+		SizeType maxPoolSize_ {0};
+		// time that idle threads can survive, unit: ms
+		TimeType idleKeepAliveTime_ {0};
+		// task queue
+		BlockingQueuePtr taskQueue_ {nullptr};
+		::std::vector<ThreadWrapperPtr> threadPool_ {};
+		MutexType mutex_ {};
+		ConditionVariableType poolCV_ {};
+		// rejection policy
+		RejectionPolicy rejectionPolicy_;
+	};
+
+	template <typename Fn, typename... Args>
+	void ThreadPool::execute(Fn&& func, Args... args)
+	{
+	}
+
+	template <typename Fn, typename... Args, typename HasRet, typename Redundant>
+	::std::future<typename ::std::result_of<Fn(Args...)>> ThreadPool::submit(Fn&& func, Args... args)
+	{
+		if (!running_)
+		{
+			LOGS_ERROR << "thread pool has not been initialized";
+		}
+		LockGuardType lock(mutex_);
+		using RetType = typename ::std::result_of<Fn(Args...)>::type;
+		auto promise = ::std::make_unique<::std::promise<RetType>>();
+		::std::future<RetType> future = promise->get_future();
+		::std::function<RetType()> tmpTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType task = [t = ::std::move(tmpTask), p = ::std::move(promise)]() mutable
+		{
+			p->set_value(t());
+		};
+		SizeType threadSize = threadPool_.size();
+		// if still able to create core thread
+		if (threadSize < corePoolSize_)
+		{
+			addThreadTask(task, true, threadSize);
+		}
+		else
+		{
+			// if task queue is not full, try push task to task queue
+			if (!taskQueue_->tryPush(task))
 			{
-				originFunc();
-			};
-			SizeType threadSize = threadPool_.size();
-			// if still able to create core thread
-			if (threadSize < corePoolSize_)
-			{
-				return addThreadTask(task, true, threadSize);
-			}
-			else
-			{
-				//if task queue is not full, try push task to task queue
-				if (taskQueue_->tryPush(task))
+				// the thread pool is full, create non-core thread to perform task
+				if (threadSize < maxPoolSize_)
 				{
-					return true;
+					addThreadTask(task, false, threadSize);
 				}
-					// the thread pool is not full, create non-core thread to perform task
-				else if (threadSize < maximumPoolSize_)
-				{
-					return addThreadTask(task, false, threadSize);
-				}
-					// handle task with rejection policy
 				else
 				{
-					return rejectExecution(task);
+					// handle task with rejection policy
+					reject(task);
 				}
 			}
 		}
-	} // namespace base
-} // namespace nets
+		return future;
+	}
+
+	template <typename Fn, typename... Args, typename HasRet>
+	::std::future<void> ThreadPool::submit(Fn&& func, Args... args)
+	{
+		//		if (!running_)
+		//		{
+		//			LOGS_ERROR << "thread pool has not been initialized";
+		//			return;
+		//		}
+		//		LockGuardType lock(mutex_);
+		//		using RetType = typename ::std::result_of<Fn(Args...)>::type;
+		//		auto promise = ::std::make_unique<::std::promise<RetType>>();
+		//		::std::future<RetType> future = promise->get_future();
+		//		::std::function<RetType ()> tmpTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		//		TaskType task = [t = ::std::move(tmpTask), p = ::std::move(promise)]() mutable
+		//		{
+		//			p->set_value(t());
+		//		};
+		//		SizeType threadSize = threadPool_.size();
+		//		// if still able to create core thread
+		//		if (threadSize < corePoolSize_)
+		//		{
+		//			addThreadTask(task, true, threadSize);
+		//		}
+		//		else
+		//		{
+		//			// if task queue is not full, try push task to task queue
+		//			if (!taskQueue_->tryPush(task))
+		//			{
+		//				// the thread pool is full, create non-core thread to perform task
+		//				if (threadSize < maxPoolSize_)
+		//				{
+		//					addThreadTask(task, false, threadSize);
+		//				}
+		//				else
+		//				{
+		//					// handle task with rejection policy
+		//					reject(task);
+		//				}
+		//			}
+		//		}
+		::std::future<void> f;
+		return f;
+	}
+} // namespace nets::base
 
 #endif // NETS_BASE_THREAD_POOL_H

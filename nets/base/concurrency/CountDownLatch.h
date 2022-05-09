@@ -6,30 +6,28 @@
 #define NETS_COUNTDOWNLATCH_H
 
 #include <cstdint>
+
 #include "nets/base/concurrency/ConditionVariable.h"
 #include "nets/base/concurrency/Mutex.h"
 #include "nets/base/Noncopyable.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	class CountDownLatch : Noncopyable
 	{
-		class CountDownLatch : Noncopyable
-		{
-			public:
-				explicit CountDownLatch(uint32_t count);
+	public:
+		explicit CountDownLatch(uint32_t count);
 
-			public:
-				void wait();
-				void countDown();
-				uint32_t count();
+	public:
+		void wait();
+		void countDown();
+		uint32_t count();
 
-			private:
-				Mutex mutex_ {};
-				ConditionVariable cv_{};
-				uint32_t count_ { 0 };
-		};
-	} // namespace base
-} // namespace nets
+	private:
+		Mutex mutex_ {};
+		ConditionVariable cv_ {};
+		uint32_t count_ {0};
+	};
+} // namespace nets::base
 
-#endif //NETS_COUNTDOWNLATCH_H
+#endif // NETS_COUNTDOWNLATCH_H

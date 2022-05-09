@@ -8,357 +8,335 @@
 #include <ctime>
 #include <deque>
 #include <functional>
+
 #include "nets/base/concurrency/ConditionVariable.h"
 #include "nets/base/concurrency/Mutex.h"
 #include "nets/base/Noncopyable.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	template <typename T>
+	class BoundedBlockingQueue : Noncopyable
 	{
-		template<typename T, typename Container = ::std::deque<T>>
-		class BoundedBlockingQueue : Noncopyable
-		{
-			public:
-				using TimeType = ::time_t;
-				using SizeType = typename Container::size_type;
-				using ValueType = T;
-				using MutexType = Mutex;
-				using LockGuardType = LockGuard<MutexType>;
-				using ContainerType = Container;
-				using LReferenceType = ValueType &;
-				using RReferenceType = ValueType &&;
-				using ConstReferenceType = const ValueType &;
-				using ConditionVariableType = ConditionVariable;
+	public:
+		using ValueType = T;
+		using LReferenceType = ValueType&;
+		using RReferenceType = ValueType&&;
+		using ConstReferenceType = const ValueType&;
+		using MutexType = Mutex;
+		using LockGuardType = LockGuard<MutexType>;
+		using ConditionVariableType = ConditionVariable;
+		using TimeType = ::time_t;
+		using ContainerType = ::std::deque<ValueType>;
+		using SizeType = typename ContainerType::size_type;
+		using PredicateType = ::std::function<bool()>;
 
-			public:
-				explicit BoundedBlockingQueue(SizeType maxQueueSize) : maxQueueSize_(maxQueueSize)
-				{
-				}
+	public:
+		const static SizeType DefaultMaxQueueSize = INT32_MAX - 1;
 
-				~BoundedBlockingQueue() = default;
+		BoundedBlockingQueue() : maxQueueSize_(DefaultMaxQueueSize) {}
+		explicit BoundedBlockingQueue(SizeType maxQueueSize) : maxQueueSize_(maxQueueSize) {}
 
-				bool isEmpty()
-				{
-					LockGuardType lock(mutex_);
-					return queue_.empty();
-				}
+		~BoundedBlockingQueue() = default;
 
-				SizeType size()
-				{
-					LockGuardType lock(mutex_);
-					return queue_.size();
-				}
-
-				void popBack()
-				{
-					LockGuardType lock(mutex_);
-					queue_.pop_back();
-				}
-
-				// notify blocking thread
-				void notifyBlockingThread()
-				{
-					LockGuardType lock(mutex_);
-					notFullCV_.notifyAll();
-					notEmptyCV_.notifyAll();
-				}
-
-				void put(ConstReferenceType el);
-
-				void put(RReferenceType el);
-
-				void take(LReferenceType el);
-
-				template<typename Predicate>
-				bool put(ConstReferenceType el, Predicate p);
-
-				template<typename Predicate>
-				bool put(RReferenceType el, Predicate p);
-
-				template<typename Predicate>
-				bool take(LReferenceType el, Predicate p);
-
-				bool put(ConstReferenceType el, TimeType milliseconds);
-
-				bool put(RReferenceType el, TimeType milliseconds);
-
-				bool take(LReferenceType el, TimeType milliseconds);
-
-				template<typename Predicate>
-				bool put(ConstReferenceType el, TimeType milliseconds, Predicate p);
-
-				template<typename Predicate>
-				bool put(RReferenceType el, TimeType milliseconds, Predicate p);
-
-				template<typename Predicate>
-				bool take(LReferenceType el, TimeType milliseconds, Predicate p);
-
-				bool tryPush(ConstReferenceType el);
-
-				bool tryPush(RReferenceType el);
-
-				bool tryPop(LReferenceType el);
-
-			private:
-				bool isFull() const
-				{
-					return queue_.size() >= maxQueueSize_;
-				}
-
-			private:
-				SizeType maxQueueSize_{0};
-				ContainerType queue_{};
-				MutexType mutex_{};
-				ConditionVariableType notFullCV_{};
-				ConditionVariableType notEmptyCV_{};
-		};
-
-		template<typename T, typename Container>
-		void BoundedBlockingQueue<T, Container>::put(ConstReferenceType el)
+		bool isEmpty()
 		{
 			LockGuardType lock(mutex_);
-			while (isFull())
-			{
-				notFullCV_.wait(mutex_);
-			}
-			queue_.push_back(el);
-			notEmptyCV_.notifyOne();
+			return queue_.empty();
 		}
 
-		template<typename T, typename Container>
-		void BoundedBlockingQueue<T, Container>::put(RReferenceType el)
+		SizeType size()
 		{
 			LockGuardType lock(mutex_);
-			while (isFull())
-			{
-				notFullCV_.wait(mutex_);
-			}
-			queue_.push_back(::std::forward<RReferenceType>(el));
-			notEmptyCV_.notifyOne();
+			return queue_.size();
 		}
 
-		template<typename T, typename Container>
-		void BoundedBlockingQueue<T, Container>::take(LReferenceType el)
+		void popFront()
 		{
 			LockGuardType lock(mutex_);
-			while (queue_.empty())
-			{
-				notEmptyCV_.wait(mutex_);
-			}
-			el = queue_.front();
 			queue_.pop_front();
-			notFullCV_.notifyOne();
 		}
 
-		template<typename T, typename Container>
-		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, Predicate p)
+		// notify blocking thread
+		void notifyBlockingThread()
 		{
 			LockGuardType lock(mutex_);
-			while (isFull() && !p())
-			{
-				notFullCV_.wait(mutex_);
-			}
-			if (p())
-			{
-				return false;
-			}
-			queue_.push_back(el);
-			notEmptyCV_.notifyOne();
-			return true;
+			notFullCV_.notifyAll();
+			notEmptyCV_.notifyAll();
 		}
 
-		template<typename T, typename Container>
-		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, Predicate p)
+		void put(RReferenceType el);
+		void put(ConstReferenceType el);
+		void take(LReferenceType el);
+
+		bool put(RReferenceType el, const PredicateType& p);
+		bool put(ConstReferenceType el, const PredicateType& p);
+		bool take(LReferenceType el, const PredicateType& p);
+
+		bool put(RReferenceType el, TimeType milliseconds);
+		bool put(ConstReferenceType el, TimeType milliseconds);
+		bool take(LReferenceType el, TimeType milliseconds);
+
+		bool put(RReferenceType el, TimeType milliseconds, const PredicateType& p);
+		bool put(ConstReferenceType el, TimeType milliseconds, const PredicateType& p);
+		bool take(LReferenceType el, TimeType milliseconds, const PredicateType& p);
+
+		bool tryPush(RReferenceType el);
+		bool tryPush(ConstReferenceType el);
+		bool tryPop(LReferenceType el);
+
+	private:
+		bool isFull() const
 		{
-			LockGuardType lock(mutex_);
-			while (isFull() && !p())
-			{
-				notFullCV_.wait(mutex_);
-			}
-			if (p())
-			{
-				return false;
-			}
-			queue_.push_back(::std::forward<RReferenceType>(el));
-			notEmptyCV_.notifyOne();
-			return true;
+			return queue_.size() >= maxQueueSize_;
 		}
 
-		template<typename T, typename Container>
-		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, Predicate p)
-		{
-			LockGuardType lock(mutex_);
-			while (queue_.empty() && !p())
-			{
-				notEmptyCV_.wait(mutex_);
-			}
-			if (p())
-			{
-				return false;
-			}
-			el = queue_.front();
-			queue_.pop_front();
-			notFullCV_.notifyOne();
-			return true;
-		}
+	private:
+		SizeType maxQueueSize_ {0};
+		ContainerType queue_ {};
+		MutexType mutex_ {};
+		ConditionVariableType notFullCV_ {};
+		ConditionVariableType notEmptyCV_ {};
+	};
 
-		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, TimeType milliseconds)
+	template <typename T>
+	void BoundedBlockingQueue<T>::put(RReferenceType el)
+	{
+		LockGuardType lock(mutex_);
+		while (isFull())
 		{
-			LockGuardType lock(mutex_);
-			if (isFull())
-			{
-				if (!notFullCV_.waitTimeout(mutex_, milliseconds))
-				{
-					return false;
-				}
-			}
-			queue_.push_back(el);
-			notEmptyCV_.notifyOne();
-			return true;
+			notFullCV_.wait(mutex_);
 		}
+		queue_.push_back(::std::forward<RReferenceType>(el));
+		notEmptyCV_.notifyOne();
+	}
 
-		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, TimeType milliseconds)
+	template <typename T>
+	void BoundedBlockingQueue<T>::put(ConstReferenceType el)
+	{
+		LockGuardType lock(mutex_);
+		while (isFull())
 		{
-			LockGuardType lock(mutex_);
-			if (isFull())
-			{
-				if (!notFullCV_.waitTimeout(mutex_, milliseconds))
-				{
-					return false;
-				}
-			}
-			queue_.push_back(::std::forward<RReferenceType>(el));
-			notEmptyCV_.notifyOne();
-			return true;
+			notFullCV_.wait(mutex_);
 		}
+		queue_.push_back(el);
+		notEmptyCV_.notifyOne();
+	}
 
-		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, TimeType milliseconds)
+	template <typename T>
+	void BoundedBlockingQueue<T>::take(LReferenceType el)
+	{
+		LockGuardType lock(mutex_);
+		while (queue_.empty())
 		{
-			LockGuardType lock(mutex_);
-			if (queue_.empty())
-			{
-				if (!notEmptyCV_.waitTimeout(mutex_, milliseconds))
-				{
-					return false;
-				}
-			}
-			el = queue_.front();
-			queue_.pop_front();
-			notFullCV_.notifyOne();
-			return true;
+			notEmptyCV_.wait(mutex_);
 		}
+		el = queue_.front();
+		queue_.pop_front();
+		notFullCV_.notifyOne();
+	}
 
-		template<typename T, typename Container>
-		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::put(ConstReferenceType el, TimeType milliseconds, Predicate p)
+	template <typename T>
+	bool BoundedBlockingQueue<T>::put(RReferenceType el, const PredicateType& p)
+	{
+		LockGuardType lock(mutex_);
+		while (isFull() && !p())
 		{
-			LockGuardType lock(mutex_);
-			if (isFull() && !p())
-			{
-				if (!notFullCV_.waitTimeout(mutex_, milliseconds))
-				{
-					return false;
-				}
-			}
-			if (p())
-			{
-				return false;
-			}
-			queue_.push_back(el);
-			notFullCV_.notifyOne();
-			return true;
+			notFullCV_.wait(mutex_);
 		}
-
-		template<typename T, typename Container>
-		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::put(RReferenceType el, TimeType milliseconds, Predicate p)
+		if (p())
 		{
-			LockGuardType lock(mutex_);
-			if (isFull() && !p())
-			{
-				if (!notFullCV_.waitTimeout(mutex_, milliseconds))
-				{
-					return false;
-				}
-			}
-			if (p())
-			{
-				return false;
-			}
-			queue_.push_back(::std::forward<RReferenceType>(el));
-			notFullCV_.notifyOne();
-			return true;
-		}
-
-		template<typename T, typename Container>
-		template<typename Predicate>
-		bool BoundedBlockingQueue<T, Container>::take(LReferenceType el, TimeType milliseconds, Predicate p)
-		{
-			LockGuardType lock(mutex_);
-			if (queue_.empty() && !p())
-			{
-				if (!notEmptyCV_.waitTimeout(mutex_, milliseconds))
-				{
-					return false;
-				}
-			}
-			if (p())
-			{
-				return false;
-			}
-			el = queue_.front();
-			queue_.pop_front();
-			notFullCV_.notifyOne();
-			return true;
-		}
-
-		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::tryPush(ConstReferenceType el)
-		{
-			LockGuardType lock(mutex_, TRY);
-			if (lock.isLockedByCurrentThread() && !isFull())
-			{
-				queue_.push_back(el);
-				notEmptyCV_.notifyOne();
-				return true;
-			}
 			return false;
 		}
+		queue_.push_back(::std::forward<RReferenceType>(el));
+		notEmptyCV_.notifyOne();
+		return true;
+	}
 
-		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::tryPush(RReferenceType el)
+	template <typename T>
+	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, const PredicateType& p)
+	{
+		LockGuardType lock(mutex_);
+		while (isFull() && !p())
 		{
-			LockGuardType lock(mutex_, TRY);
-			if (lock.isLockedByCurrentThread() && !isFull())
-			{
-				queue_.push_back(::std::forward<RReferenceType>(el));
-				notEmptyCV_.notifyOne();
-				return true;
-			}
+			notFullCV_.wait(mutex_);
+		}
+		if (p())
+		{
 			return false;
 		}
+		queue_.push_back(el);
+		notEmptyCV_.notifyOne();
+		return true;
+	}
 
-		template<typename T, typename Container>
-		bool BoundedBlockingQueue<T, Container>::tryPop(LReferenceType el)
+	template <typename T>
+	bool BoundedBlockingQueue<T>::take(LReferenceType el, const PredicateType& p)
+	{
+		LockGuardType lock(mutex_);
+		while (queue_.empty() && !p())
 		{
-			LockGuardType lock(mutex_, TRY);
-			if (lock.isLockedByCurrentThread() && !isFull())
-			{
-				el = queue_.front();
-				queue_.pop_front();
-				notFullCV_.notifyOne();
-				return true;
-			}
+			notEmptyCV_.wait(mutex_);
+		}
+		if (p())
+		{
 			return false;
 		}
-	} // namespace base
-} // namespace nets
+		el = queue_.front();
+		queue_.pop_front();
+		notFullCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::put(RReferenceType el, TimeType milliseconds)
+	{
+		LockGuardType lock(mutex_);
+		if (isFull())
+		{
+			if (!notFullCV_.waitTimeout(mutex_, milliseconds))
+			{
+				return false;
+			}
+		}
+		queue_.push_back(::std::forward<RReferenceType>(el));
+		notEmptyCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, TimeType milliseconds)
+	{
+		LockGuardType lock(mutex_);
+		if (isFull())
+		{
+			if (!notFullCV_.waitTimeout(mutex_, milliseconds))
+			{
+				return false;
+			}
+		}
+		queue_.push_back(el);
+		notEmptyCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds)
+	{
+		LockGuardType lock(mutex_);
+		if (queue_.empty())
+		{
+			if (!notEmptyCV_.waitTimeout(mutex_, milliseconds))
+			{
+				return false;
+			}
+		}
+		el = queue_.front();
+		queue_.pop_front();
+		notFullCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::put(RReferenceType el, TimeType milliseconds, const PredicateType& p)
+	{
+		LockGuardType lock(mutex_);
+		if (isFull() && !p())
+		{
+			if (!notFullCV_.waitTimeout(mutex_, milliseconds))
+			{
+				return false;
+			}
+		}
+		if (p())
+		{
+			return false;
+		}
+		queue_.push_back(::std::forward<RReferenceType>(el));
+		notFullCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, TimeType milliseconds, const PredicateType& p)
+	{
+		LockGuardType lock(mutex_);
+		if (isFull() && !p())
+		{
+			if (!notFullCV_.waitTimeout(mutex_, milliseconds))
+			{
+				return false;
+			}
+		}
+		if (p())
+		{
+			return false;
+		}
+		queue_.push_back(el);
+		notFullCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds, const PredicateType& p)
+	{
+		LockGuardType lock(mutex_);
+		if (queue_.empty() && !p())
+		{
+			if (!notEmptyCV_.waitTimeout(mutex_, milliseconds))
+			{
+				return false;
+			}
+		}
+		if (p())
+		{
+			return false;
+		}
+		el = queue_.front();
+		queue_.pop_front();
+		notFullCV_.notifyOne();
+		return true;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::tryPush(RReferenceType el)
+	{
+		LockGuardType lock(mutex_, TRY);
+		if (lock.isLockedByCurrentThread() && !isFull())
+		{
+			queue_.push_back(::std::forward<RReferenceType>(el));
+			notEmptyCV_.notifyOne();
+			return true;
+		}
+		return false;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::tryPush(ConstReferenceType el)
+	{
+		LockGuardType lock(mutex_, TRY);
+		if (lock.isLockedByCurrentThread() && !isFull())
+		{
+			queue_.push_back(el);
+			notEmptyCV_.notifyOne();
+			return true;
+		}
+		return false;
+	}
+
+	template <typename T>
+	bool BoundedBlockingQueue<T>::tryPop(LReferenceType el)
+	{
+		LockGuardType lock(mutex_, TRY);
+		if (lock.isLockedByCurrentThread() && !isFull())
+		{
+			el = queue_.front();
+			queue_.pop_front();
+			notFullCV_.notifyOne();
+			return true;
+		}
+		return false;
+	}
+} // namespace nets::base
 
 #endif // NETS_BASE_BLOCKINGQUEUE_H

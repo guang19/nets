@@ -7,63 +7,52 @@
 #include "nets/base/CommonMacro.h"
 #include "nets/base/ThreadHelper.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	INIT_SINGLETON(DefaultLogFormatter);
+	INIT_SINGLETON(LogFormatterFactory);
+
+	namespace
 	{
-		INIT_SINGLETON(DefaultLogFormatter);
-		INIT_SINGLETON(LogFormatterFactory);
+		const char* const LogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
-		namespace
+		/**
+		 * log time cache
+		 */
+		__thread struct tm CacheTMS {};
+		__thread TimeType CacheSeconds {0};
+	} // namespace
+
+	void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
+	{
+		struct tm tmS {};
+		const Timestamp& logTime = logMessage.getLogTime();
+		TimeType seconds = logTime.secondsSinceEpoch();
+		if (seconds != CacheSeconds)
 		{
-			const char* const LogLevelName[LogLevel::NUM_OF_LOG_LEVELS] =
-				{
-					"TRACE",
-					"DEBUG",
-					"INFO",
-					"WARN",
-					"ERROR",
-					"FATAL"
-				};
-
-			/**
-			 * log time cache
-			 */
-			__thread struct tm CacheTMS {};
-			__thread TimeType CacheSeconds { 0 };
-		}
-
-		void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
-		{
-			struct tm tmS {};
-			const Timestamp& logTime = logMessage.getLogTime();
-			TimeType seconds = logTime.secondsSinceEpoch();
-			if (seconds != CacheSeconds)
+			if (localtime_r(&seconds, &tmS) == nullptr)
 			{
-				if (localtime_r(&seconds, &tmS) == nullptr)
-				{
-					MEMZERO(&tmS, sizeof(tmS));
-				}
-				CacheSeconds  = seconds;
-				CacheTMS = tmS;
+				MEMZERO(&tmS, sizeof(tmS));
 			}
-			else
-			{
-				tmS = CacheTMS;
-			}
-			char timeBuf[24] = { 0 };
-			::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900,
-				tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
-			logBuffer << timeBuf;
-			logBuffer << " [" << currentTid() << "] ";
-			logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';
-			logBuffer << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
-			logBuffer << logMessage.getStream();
+			CacheSeconds = seconds;
+			CacheTMS = tmS;
 		}
-
-		ILogFormatter* LogFormatterFactory::getLogFormatter() const
+		else
 		{
-			return DefaultLogFormatter::getInstance();
+			tmS = CacheTMS;
 		}
-	} // namespace base
-} // namespace nets
+		char timeBuf[24] = {0};
+		::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1,
+				   tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
+		logBuffer << timeBuf;
+		logBuffer << " [" << currentTid() << "] ";
+		logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';
+		logBuffer << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
+		logBuffer << logMessage.getStream();
+	}
+
+	ILogFormatter* LogFormatterFactory::getLogFormatter() const
+	{
+		return DefaultLogFormatter::getInstance();
+	}
+} // namespace nets::base

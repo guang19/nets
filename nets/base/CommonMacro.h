@@ -12,10 +12,12 @@
 
 #define MEMZERO(p, len) (::memset((p), 0, (len)))
 
+#define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
+
 /***********************************
   *
 #define DECLARE_HAS_MEMBER_FUNCTION(FUNC) \
-    template<class T, typename ...Args>	\
+	template<class T, typename ...Args>	\
 	struct HasMemberFunc_##FUNC	\
 	{	\
 		private:	\
@@ -36,22 +38,20 @@
  *
  ***********************************/
 
-#define DECLARE_HAS_MEMBER_FUNCTION(FUNC) \
-    template<class C, typename ...Args>      \
-    static bool HasMemberFunc_##FUNC(decltype(::std::declval<C>().FUNC(::std::declval<Args>()...))* = nullptr) \
-    {    \
-        return true;    \
-    }    \
-        \
-    template<class C, typename ...Args>    \
-    static bool HasMemberFunc_##FUNC(...)    \
-    {    \
-        return false;    \
-    }
+#define DECLARE_HAS_MEMBER_FUNCTION(FUNC)                                                                                   \
+	template <class C, typename... Args>                                                                                    \
+	static bool HasMemberFunc_##FUNC(decltype(::std::declval<C>().FUNC(::std::declval<Args>()...))* = nullptr)              \
+	{                                                                                                                       \
+		return true;                                                                                                        \
+	}                                                                                                                       \
+                                                                                                                            \
+	template <class C, typename... Args>                                                                                    \
+	static bool HasMemberFunc_##FUNC(...)                                                                                   \
+	{                                                                                                                       \
+		return false;                                                                                                       \
+	}
 
 // check if the class has the function
-#define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...) \
-    HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>(nullptr)
+#define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...) HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>(nullptr)
 
-
-#endif //NETS_COMMONMACRO_H
+#endif // NETS_COMMONMACRO_H

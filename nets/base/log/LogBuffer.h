@@ -8,24 +8,21 @@
 #include "nets/base/ByteStream.h"
 #include "nets/base/Noncopyable.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	class LogBuffer : public ByteStream
 	{
-		class LogBuffer : public ByteStream
+	public:
+		LogBuffer();
+		explicit LogBuffer(SizeTp logBufferLength);
+		~LogBuffer() override = default;
+
+	public:
+		const char* buffer() const
 		{
-			public:
-				LogBuffer();
-				explicit LogBuffer(SizeTp logBufferLength);
-				~LogBuffer() override = default;
+			return buffer_;
+		}
+	};
+} // namespace nets::base
 
-			public:
-				const char* buffer() const
-				{
-					return buffer_;
-				}
-		};
-	} // namespace base
-} // namespace nets
-
-#endif //NETS_LOGBUFFER_H
+#endif // NETS_LOGBUFFER_H

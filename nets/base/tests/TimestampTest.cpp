@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <sys/time.h>
+
 #include "nets/base/Timestamp.h"
 
 using namespace nets::base;

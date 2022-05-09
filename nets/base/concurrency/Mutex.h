@@ -7,149 +7,145 @@
 
 #include <cstdint>
 #include <pthread.h>
+
 #include "nets/base/Noncopyable.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	class Mutex : Noncopyable
 	{
-		class Mutex : Noncopyable
+	public:
+		Mutex();
+
+		~Mutex();
+
+	public:
+		void lock();
+
+		bool tryLock();
+
+		void unlock();
+
+		bool isLockedByCurrentThread() const;
+
+		inline ::pthread_mutex_t* mutexPtr()
 		{
-			public:
-				Mutex();
+			return &mutex_;
+		}
 
-				~Mutex();
-
-			public:
-				void lock();
-
-				bool tryLock();
-
-				void unlock();
-
-				bool isLockedByCurrentThread() const;
-
-				inline ::pthread_mutex_t* mutexPtr()
-				{
-					return& mutex_;
-				}
-
-			public:
-				typedef struct OwnerGuard_
-				{
-					public:
-						explicit OwnerGuard_(Mutex& mutex);
-						~OwnerGuard_();
-
-					private:
-						Mutex& mutex_;
-				} OwnerGuard;
-
-			private:
-				::pthread_mutex_t mutex_{};
-				::pid_t owner_{0};
-		};
-
-		class RecursiveMutex : Noncopyable
+	public:
+		typedef struct OwnerGuard_
 		{
-			public:
-				RecursiveMutex();
+		public:
+			explicit OwnerGuard_(Mutex& mutex);
+			~OwnerGuard_();
 
-				~RecursiveMutex();
+		private:
+			Mutex& mutex_;
+		} OwnerGuard;
 
-			public:
-				void lock();
+	private:
+		::pthread_mutex_t mutex_ {};
+		::pid_t owner_ {0};
+	};
 
-				bool tryLock();
+	class RecursiveMutex : Noncopyable
+	{
+	public:
+		RecursiveMutex();
 
-				void unlock();
+		~RecursiveMutex();
 
-				bool isLockedByCurrentThread() const;
+	public:
+		void lock();
 
-				inline ::pthread_mutex_t* mutexPtr()
-				{
-					return &mutex_;
-				}
+		bool tryLock();
 
-			private:
-				::pthread_mutex_t mutex_{};
-				::pid_t owner_{0};
-				uint16_t count_{0};
-		};
+		void unlock();
 
-		enum LockType
+		bool isLockedByCurrentThread() const;
+
+		inline ::pthread_mutex_t* mutexPtr()
 		{
-			NOW,
-			TRY,
-			DEFER
-		};
+			return &mutex_;
+		}
 
-		template<class MutexType>
-		class LockGuard : Noncopyable
+	private:
+		::pthread_mutex_t mutex_ {};
+		::pid_t owner_ {0};
+		uint16_t count_ {0};
+	};
+
+	enum LockType
+	{
+		NOW,
+		TRY,
+		DEFER
+	};
+
+	template <class MutexType>
+	class LockGuard : Noncopyable
+	{
+	public:
+		explicit LockGuard(MutexType& mutex) : LockGuard(mutex, LockType::NOW) {}
+
+		LockGuard(MutexType& mutex, LockType lockType) : mutex_(mutex), state_(false)
 		{
-			public:
-				explicit LockGuard(MutexType &mutex) : LockGuard(mutex, LockType::NOW)
-				{
-				}
+			switch (lockType)
+			{
+				case LockType::NOW:
+					mutex_.lock();
+					state_ = true;
+					break;
+				case LockType::TRY:
+					state_ = mutex_.tryLock();
+					break;
+				case LockType::DEFER:
+					state_ = false;
+					break;
+			}
+		}
 
-				LockGuard(MutexType &mutex, LockType lockType) : mutex_(mutex), state_(false)
-				{
-					switch (lockType)
-					{
-						case LockType::NOW:
-							mutex_.lock();
-							state_ = true;
-							break;
-						case LockType::TRY:
-							state_ = mutex_.tryLock();
-							break;
-						case LockType::DEFER:
-							state_ = false;
-							break;
-					}
-				}
+		inline void lock()
+		{
+			if (!state_)
+			{
+				mutex_.lock();
+				state_ = true;
+			}
+		}
 
-				inline void lock()
-				{
-					if (!state_)
-					{
-						mutex_.lock();
-						state_ = true;
-					}
-				}
+		inline void tryLock()
+		{
+			if (!state_)
+			{
+				state_ = mutex_.tryLock();
+			}
+		}
 
-				inline void tryLock()
-				{
-					if (!state_)
-					{
-						state_ = mutex_.tryLock();
-					}
-				}
+		inline void unlock()
+		{
+			if (state_)
+			{
+				mutex_.unlock();
+				state_ = false;
+			}
+		}
 
-				inline void unlock()
-				{
-					if (state_)
-					{
-						mutex_.unlock();
-						state_ = false;
-					}
-				}
+		inline bool isLockedByCurrentThread()
+		{
+			return state_;
+		}
 
-				inline bool isLockedByCurrentThread()
-				{
-					return state_;
-				}
+		~LockGuard()
+		{
+			unlock();
+		}
 
-				~LockGuard()
-				{
-					unlock();
-				}
+	private:
+		MutexType& mutex_;
+		bool state_ {false};
+	};
+} // namespace nets::base
 
-			private:
-				MutexType &mutex_;
-				bool state_{false};
-		};
-	} // namespace base
-} // namespace nets
-
-#endif //NETS_MUTEX_H
+#endif // NETS_MUTEX_H

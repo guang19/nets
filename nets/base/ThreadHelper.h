@@ -9,23 +9,20 @@
 #include <string>
 #include <sys/types.h>
 
-namespace nets
+namespace nets::base
 {
-	namespace base
-	{
-		::pid_t currentTid();
-		bool isMainThread();
+	::pid_t currentTid();
+	bool isMainThread();
 
-		void setCurrentThreadName(const char* threadName);
-		const char* currentThreadName();
+	void setCurrentThreadName(const char* threadName);
+	const char* currentThreadName();
 
-		using TimeType = ::time_t;
+	using TimeType = ::time_t;
 
-		void sleepS(TimeType seconds);
-		void sleepMillis(TimeType mseconds);
-		void sleepMicros(TimeType useconds);
-		void sleepNanos(TimeType nseconds);
-	} // namespace base
-} // namespace nets
+	void sleepS(TimeType seconds);
+	void sleepMillis(TimeType mseconds);
+	void sleepMicros(TimeType useconds);
+	void sleepNanos(TimeType nseconds);
+} // namespace nets::base
 
-#endif //NETS_THREADHELPER_H
+#endif // NETS_THREADHELPER_H

@@ -7,26 +7,23 @@
 #include "nets/base/log/LogFormatter.h"
 #include "nets/base/log/LogWriter.h"
 
-namespace nets
+namespace nets::base
 {
-	namespace base
+	LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line)
+		: logMessage_(logLevel, file, line)
 	{
-		LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line) :
-			logMessage_(logLevel, file, line)
-		{
-		}
+	}
 
-		LogMessageStream::~LogMessageStream()
+	LogMessageStream::~LogMessageStream()
+	{
+		logMessage_.getStream() << '\n';
+		LOG_FORMATTER->formatLogMessage(*this, logMessage_);
+		LOG_WRITER->write(buffer(), writerIndex());
+		if (logMessage_.getLogLevel() == LogLevel::FATAL)
 		{
-			logMessage_.getStream() << '\n';
-			LOG_FORMATTER->formatLogMessage(*this, logMessage_);
-			LOG_WRITER->write(buffer(), writerIndex());
-			if (logMessage_.getLogLevel() == LogLevel::FATAL)
-			{
-				// if exit directly, log buffer in memory probably will lost
-				sleepMillis(1500);
-				exit(1);
-			}
+			// if exit directly, log buffer in memory probably will lost
+			sleepMillis(1500);
+			exit(1);
 		}
-	} // namespace base
-} // namespace nets
+	}
+} // namespace nets::base

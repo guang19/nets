@@ -6,9 +6,10 @@
 
 #include <functional>
 #include <vector>
-#include "nets/base/Thread.h"
+
 #include "nets/base/concurrency/CountDownLatch.h"
 #include "nets/base/concurrency/Mutex.h"
+#include "nets/base/Thread.h"
 
 using namespace nets::base;
 
@@ -16,7 +17,8 @@ TEST(ConcurrencyTest, MutexLock)
 {
 	Mutex mutex {};
 	int Num = 0;
-	::std::function<void ()> func1 = ::std::bind([&]()
+	::std::function<void()> func1 = ::std::bind(
+		[&]()
 		{
 			LockGuard<Mutex> lock(mutex);
 			for (int i = 0; i < 100000000; ++i)
@@ -24,7 +26,8 @@ TEST(ConcurrencyTest, MutexLock)
 				Num += 1;
 			}
 		});
-	::std::function<void ()> func2 = ::std::bind([&]()
+	::std::function<void()> func2 = ::std::bind(
+		[&]()
 		{
 			LockGuard<Mutex> lock(mutex);
 			for (int i = 0; i < 100000000; ++i)
@@ -46,15 +49,17 @@ TEST(ConcurrencyTest, MutexTryLock)
 {
 	Mutex mutex {};
 	int Num = 0;
-	::std::function<void ()> func1 = ::std::bind([&]()
+	::std::function<void()> func1 = ::std::bind(
+		[&]()
 		{
-			 LockGuard<Mutex> lock(mutex, LockType::TRY);
-			 for (int i = 0; i < 100000000; ++i)
-			 {
-				 Num += 1;
-			 }
+			LockGuard<Mutex> lock(mutex, LockType::TRY);
+			for (int i = 0; i < 100000000; ++i)
+			{
+				Num += 1;
+			}
 		});
-	::std::function<void ()> func2 = ::std::bind([&]()
+	::std::function<void()> func2 = ::std::bind(
+		[&]()
 		{
 			LockGuard<Mutex> lock(mutex, LockType::TRY);
 			for (int i = 0; i < 100000000; ++i)
@@ -76,7 +81,8 @@ TEST(ConcurrencyTest, MutexDeferLock)
 {
 	Mutex mutex {};
 	int Num = 0;
-	::std::function<void ()> func1 = ::std::bind([&]()
+	::std::function<void()> func1 = ::std::bind(
+		[&]()
 		{
 			LockGuard<Mutex> lock(mutex, LockType::DEFER);
 			lock.lock();
@@ -85,7 +91,8 @@ TEST(ConcurrencyTest, MutexDeferLock)
 				Num += 1;
 			}
 		});
-	::std::function<void ()> func2 = ::std::bind([&]()
+	::std::function<void()> func2 = ::std::bind(
+		[&]()
 		{
 			LockGuard<Mutex> lock(mutex, LockType::DEFER);
 			lock.lock();
@@ -106,8 +113,9 @@ TEST(ConcurrencyTest, MutexDeferLock)
 
 TEST(ConcurrencyTest, CountDownLatchTest)
 {
-	CountDownLatch latch { 5 };
-	::std::function<void()> func = ::std::bind([&]()
+	CountDownLatch latch {5};
+	::std::function<void()> func = ::std::bind(
+		[&]()
 		{
 			latch.countDown();
 		});
@@ -132,7 +140,8 @@ TEST(ConcurrencyTest, ConditionVariableTest)
 	Mutex mutex {};
 	ConditionVariable notFull {};
 	ConditionVariable notEmpty {};
-	::std::function<void ()> produce = ::std::bind([&]()
+	::std::function<void()> produce = ::std::bind(
+		[&]()
 		{
 			while (true)
 			{
@@ -147,7 +156,8 @@ TEST(ConcurrencyTest, ConditionVariableTest)
 				notEmpty.notifyAll();
 			}
 		});
-	::std::function<void ()> consume = ::std::bind([&]()
+	::std::function<void()> consume = ::std::bind(
+		[&]()
 		{
 			while (true)
 			{
@@ -176,7 +186,6 @@ TEST(ConcurrencyTest, ConditionVariableTest)
 	t4.join();
 	::printf("------%lu", vec.size());
 }
-
 
 int main(int argc, char** argv)
 {

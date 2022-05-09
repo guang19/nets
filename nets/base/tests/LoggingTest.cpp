@@ -16,10 +16,11 @@ TEST(LoggingTest, BasicUse)
 	LOGS_INFO << "这是一条info信息";
 	LOGS_WARN << "这是一条warn信息";
 	LOGS_ERROR << "这是一条error信息";
-	Thread t1([&]()
-			  {
-				  LOGS_DEBUG << "这是一条debug信息";
-			  });
+	Thread t1(
+		[&]()
+		{
+			LOGS_DEBUG << "这是一条debug信息";
+		});
 	t1.start();
 	LOGS_FATAL << "这是一条流式fatal信息";
 }
@@ -50,15 +51,17 @@ TEST(LoggingTest, DailyFile)
 	::sleepS(2);
 }
 
-
 // before execute:
 // change LOG_WRITER_TYPE to 3（DLOG_FILE_ROLLING_SIZE）
 // and change constant "LogFileRollingSize(in LogWriter.cpp)" as small as possible
 TEST(LoggingTest, RollingFile)
 {
-	LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息"
-				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息"
-				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息";
+	LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
+				  "一条足够长的信息"
+				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
+				  "一条足够长的信息"
+				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
+				  "一条足够长的信息";
 	::sleepS(2);
 }
 

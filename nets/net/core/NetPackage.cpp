@@ -4,21 +4,14 @@
 
 #include "nets/net/core/NetPackage.h"
 
-namespace nets
+namespace nets::net
 {
-	namespace net
+	namespace
 	{
-		namespace
-		{
-			constexpr uint32_t DefaultNetPackageLength = 512;
-		}
+		constexpr uint32_t DefaultNetPackageLength = 512;
+	}
 
-		NetPackage::NetPackage() : ByteBuffer(DefaultNetPackageLength)
-		{
-		}
+	NetPackage::NetPackage() : ByteBuffer(DefaultNetPackageLength) {}
 
-		NetPackage::NetPackage(ByteBuffer::SizeTp capacity) : ByteBuffer(capacity)
-		{
-		}
-	} // namespace net
-} // namespace nets
+	NetPackage::NetPackage(ByteBuffer::SizeTp capacity) : ByteBuffer(capacity) {}
+} // namespace nets::net

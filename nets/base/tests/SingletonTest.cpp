@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
+
 #include "nets/base/Singleton.h"
 #include "nets/base/Thread.h"
 
@@ -14,22 +15,18 @@ DECLARE_SINGLETON_CLASS(Clazz)
 {
 	DEFINE_SINGLETON(Clazz);
 
-	public:
-		explicit Clazz(const ::std::string& name) : name_(name)
-		{
-		}
+public:
+	explicit Clazz(const ::std::string& name) : name_(name) {}
 
-		::std::string name() const
-		{
-			return name_;
-		}
+	::std::string name() const
+	{
+		return name_;
+	}
 
-	private:
-		::std::string name_ {};
-
+private:
+	::std::string name_ {};
 };
 INIT_SINGLETON(Clazz);
-
 
 // execute each test-case individually
 // because singleton instance has been initialized since getInstance called first time,
@@ -50,18 +47,24 @@ TEST(SingletonAddr, BasicUse)
 
 TEST(SingletonAddr, MultiThread)
 {
-    Clazz* cptr1 = nullptr;
+	Clazz* cptr1 = nullptr;
 	Clazz* cptr2 = nullptr;
 	Clazz* cptr3 = nullptr;
-	Thread t1([&] {
-		cptr1 = Clazz::getInstance("cp1");
-    });
-	Thread t2([&] {
-		cptr2 = Clazz::getInstance("cp2");
-    });
-	Thread t3([&] {
-		cptr3 = Clazz::getInstance("cp3");
-	});
+	Thread t1(
+		[&]
+		{
+			cptr1 = Clazz::getInstance("cp1");
+		});
+	Thread t2(
+		[&]
+		{
+			cptr2 = Clazz::getInstance("cp2");
+		});
+	Thread t3(
+		[&]
+		{
+			cptr3 = Clazz::getInstance("cp3");
+		});
 	t1.join();
 	t2.join();
 	t3.join();
@@ -76,12 +79,11 @@ DECLARE_SINGLETON_CLASS(Clazz2)
 {
 	DEFINE_SINGLETON(Clazz2);
 
-	public:
-		inline void afterInit()
-		{
-			::printf("afterInit without parameter\n");
-		}
-
+public:
+	inline void afterInit()
+	{
+		::printf("afterInit without parameter\n");
+	}
 };
 INIT_SINGLETON(Clazz2);
 
@@ -90,8 +92,7 @@ TEST(SingletonAddr, AfterInit)
 	Clazz2::getInstance();
 }
 
-
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();
