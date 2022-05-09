@@ -87,9 +87,9 @@ namespace nets
 				virtual void write(const char* data, uint32_t len) = 0;
 		};
 
-		DECLARE_SINGLETON_CLASS(StdoutLogWriter), public ILogWriter
+		DECLARE_SINGLETON_CLASS(StdOutLogWriter), public ILogWriter
 		{
-			DEFINE_SINGLETON(StdoutLogWriter);
+			DEFINE_SINGLETON(StdOutLogWriter);
 
 			public:
 				void write(const char* data, uint32_t len) override;
@@ -116,7 +116,8 @@ namespace nets
 
 				////////////////////////////////////////////////////////////////////////////
 			protected:
-				virtual void persist(const char* data, uint32_t len, ::time_t persistTime){};
+				virtual void persist(const char* data, uint32_t len, ::time_t persistTime) = 0;
+
 				FilePtr logFile_ { nullptr };
 				////////////////////////////////////////////////////////////////////////////
 

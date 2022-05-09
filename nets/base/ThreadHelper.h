@@ -24,8 +24,7 @@ namespace nets
 		void sleepS(TimeType seconds);
 		void sleepMillis(TimeType mseconds);
 		void sleepMicros(TimeType useconds);
-		void sleepNanos(TimeType useconds);
-
+		void sleepNanos(TimeType nseconds);
 	} // namespace base
 } // namespace nets
 

@@ -52,7 +52,7 @@ namespace nets
 				tmS = CacheTMS;
 			}
 			char timeBuf[24] = { 0 };
-			::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900,
+			::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900,
 				tmS.tm_mon + 1, tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
 			logBuffer << timeBuf;
 			logBuffer << " [" << currentTid() << "] ";

@@ -72,6 +72,8 @@ namespace nets
 				using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
 
 			public:
+				ThreadPool();
+
 				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize);
 
 				explicit ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize, TimeType keepAliveTime);
@@ -129,7 +131,6 @@ namespace nets
 				// the numbers of core threads, once created,
 				// will be destroyed as the life cycle of the thread pool ends
 				SizeType corePoolSize_{0};
-				// 线程池最大容纳的线程数
 				// the maximum numbers of threads that the thread pool can hold
 				SizeType maximumPoolSize_{0};
 				// time that idle threads can survive, unit: ms
@@ -154,7 +155,7 @@ namespace nets
 			LockGuardType lock(mutex_);
 			::std::function<decltype(::std::declval<Fn>()(::std::declval<Args>()...))()> originFunc =
 				::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-			TaskType task = [originFunc]()
+			TaskType task = [f = ::std::move(originFunc)]() mutable
 			{
 				originFunc();
 			};

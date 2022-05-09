@@ -27,8 +27,10 @@ namespace nets
 				ByteBuffer& operator=(const ByteBuffer& other);
 				ByteBuffer& operator=(ByteBuffer&& other) noexcept;
 
-			public:
 				void swap(ByteBuffer&& other);
+
+			public:
+
 
 			public:
 				inline SizeTp readerIndex() const

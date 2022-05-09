@@ -10,7 +10,7 @@
 
 #define UNUSED(x) ((void) (x))
 
-#define MEMZERO(p, len) ::memset((p), 0, (len))
+#define MEMZERO(p, len) (::memset((p), 0, (len)))
 
 /***********************************
   *

@@ -16,13 +16,13 @@ namespace nets
 {
 	namespace base
 	{
-		INIT_SINGLETON(StdoutLogWriter);
+		INIT_SINGLETON(StdOutLogWriter);
 		INIT_SINGLETON(AsyncSingleFileLogWriter);
 		INIT_SINGLETON(AsyncDailyFileLogWriter);
 		INIT_SINGLETON(AsyncRollingFileLogWriter);
 		INIT_SINGLETON(LogWriterFactory);
 
-		void StdoutLogWriter::write(const char* data, uint32_t len)
+		void StdOutLogWriter::write(const char* data, uint32_t len)
 		{
 			::fwrite(data,1, len, ::stdout);
 			::fflush(::stdout);
@@ -376,7 +376,7 @@ namespace nets
 			switch (LOG_WRITER_TYPE)
 			{
 				case LogWriterType::STDOUT:
-					return StdoutLogWriter::getInstance();
+					return StdOutLogWriter::getInstance();
 				case LogWriterType::SINGLE_FILE:
 					return AsyncSingleFileLogWriter::getInstance();
 				case LogWriterType::DAILY_FILE:
@@ -384,7 +384,7 @@ namespace nets
 				case LogWriterType::ROLLING_FILE:
 					return AsyncRollingFileLogWriter::getInstance();
 				default:
-					return StdoutLogWriter::getInstance();
+					return StdOutLogWriter::getInstance();
 			}
 		}
 	} // namespace base

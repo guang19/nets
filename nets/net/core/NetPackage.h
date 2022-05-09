@@ -11,9 +11,7 @@ namespace nets
 {
 	namespace net
 	{
-		using namespace nets::base;
-
-		class NetPackage : public ByteBuffer
+		class NetPackage : public base::ByteBuffer
 		{
 			public:
 				NetPackage();

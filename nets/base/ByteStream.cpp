@@ -86,6 +86,14 @@ namespace nets
 			}
 		}
 
+		void ByteStream::appendPointer(uintptr_t ptr)
+		{
+			if (writeableBytes() >= MaxNumSize)
+			{
+				writerIndex_ += convertToStr(buffer_ + writerIndex_, ptr, 16);
+			}
+		}
+
 		template<typename Float>
 		void ByteStream::appendFloat(Float f)
 		{
@@ -106,23 +114,6 @@ namespace nets
 				{
 					writerIndex_ += ::snprintf(cur, MaxNumSize, "%.18g", f);
 				}
-			}
-		}
-
-		void ByteStream::appendStr(const char* data, uint32_t len)
-		{
-			if (writeableBytes() > len)
-			{
-				::memcpy(buffer_ + writerIndex_, data, len);
-				writerIndex_ += len;
-			}
-		}
-
-		void ByteStream::appendPointer(uintptr_t ptr)
-		{
-			if (writeableBytes() >= MaxNumSize)
-			{
-				writerIndex_ += convertToStr(buffer_ + writerIndex_, ptr, 16);
 			}
 		}
 
@@ -196,6 +187,15 @@ namespace nets
 		{
 			appendFloat(f);
 			return *this;
+		}
+
+		void ByteStream::appendStr(const char* data, uint32_t len)
+		{
+			if (writeableBytes() > len)
+			{
+				::memcpy(buffer_ + writerIndex_, data, len);
+				writerIndex_ += len;
+			}
 		}
 
 		ByteStream& ByteStream::operator<<(const char* str)

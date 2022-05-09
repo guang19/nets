@@ -2,9 +2,10 @@
 // Created by guang19 on 2021/12/30.
 //
 
-#include <utility>
-
 #include "nets/base/concurrency/ThreadPool.h"
+
+#include <utility>
+#include <unistd.h>
 
 namespace nets
 {
@@ -12,7 +13,9 @@ namespace nets
     {
 		namespace
 		{
-			constexpr const char* DefaultThreadPoolName = "NetsThreadPool";
+			const static ThreadPool::SizeType AvailableProcessors = ::sysconf(_SC_NPROCESSORS_ONLN);
+			const static ThreadPool::SizeType  DefaultNumOfCoreThreads = AvailableProcessors << 1;
+			constexpr const char* const DefaultThreadPoolName = "NetsThreadPool";
 			constexpr TimeType DefaultKeepAliveTime = 30000;
 			constexpr ThreadPool::SizeType DefaultMaxQueueSize = INT32_MAX;
 			constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy =
@@ -37,9 +40,15 @@ namespace nets
 			threadPoolRawPtr_->runThread(this);
         }
 
-        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize) :
-			ThreadPool(DefaultThreadPoolName, corePoolSize, maximumPoolSize, DefaultKeepAliveTime,
-						 DefaultMaxQueueSize, DefaultRejectionPolicy)
+		ThreadPool::ThreadPool() : ThreadPool(DefaultThreadPoolName, DefaultNumOfCoreThreads,
+			DefaultNumOfCoreThreads, DefaultKeepAliveTime, DefaultMaxQueueSize,
+			DefaultRejectionPolicy)
+		{
+		}
+
+        ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maximumPoolSize) : ThreadPool(DefaultThreadPoolName,
+			corePoolSize, maximumPoolSize, DefaultKeepAliveTime, DefaultMaxQueueSize,
+			DefaultRejectionPolicy)
         {
 		}
 
