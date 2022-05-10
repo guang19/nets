@@ -112,7 +112,13 @@ namespace nets::base
 				int32_t err = ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(::stderr, "Error:log file append error ""\"""%s""\"""\n", ::strerror(err));
+					::fprintf(::stderr,
+							  "Error:log file append error "
+							  "\""
+							  "%s"
+							  "\""
+							  "\n",
+							  ::strerror(err));
 					break;
 				}
 			}
@@ -392,9 +398,12 @@ namespace nets::base
 				return StdoutLogWriter::getInstance();
 		}
 	}
-	//
-	//	void AsyncLogWriter::write(LogBuffer& logBuffer)
-	//	{
-	//
-	//	}
+
+	INIT_SINGLETON(AsyncLogWriter);
+
+	void AsyncLogWriter::write(LogBuffer logBuffer)
+	{
+		::fwrite(logBuffer.buffer(), 1, logBuffer.writerIndex(), ::stdout);
+		::fflush(::stdout);
+	}
 } // namespace nets::base

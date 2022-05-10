@@ -15,4 +15,20 @@ namespace nets::base
 	LogBuffer::LogBuffer() : ByteStream(DefaultLogBufferLength) {}
 
 	LogBuffer::LogBuffer(uint32_t logBufferLength) : ByteStream(logBufferLength) {}
+
+	LogBuffer::LogBuffer(const LogBuffer& logBuffer) : ByteStream(logBuffer) {}
+
+	LogBuffer::LogBuffer(LogBuffer&& logBuffer) noexcept : ByteStream(::std::move(logBuffer)) {}
+
+	LogBuffer& LogBuffer::operator=(const LogBuffer& logBuffer)
+	{
+		ByteStream::operator=(logBuffer);
+		return *this;
+	}
+
+	LogBuffer& LogBuffer::operator=(LogBuffer&& logBuffer) noexcept
+	{
+		ByteStream::operator=(logBuffer);
+		return *this;
+	}
 } // namespace nets::base

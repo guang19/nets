@@ -18,7 +18,9 @@ namespace nets::base
 	{
 		logMessage_.getStream() << '\n';
 		LOG_FORMATTER->formatLogMessage(*this, logMessage_);
-		LOG_WRITER->write(buffer(), writerIndex());
+//		LOG_WRITER->write(buffer(), writerIndex());
+		AsyncLogWriter logWriter;
+		logWriter.write(::std::move(*this));
 		if (logMessage_.getLogLevel() == LogLevel::FATAL)
 		{
 			// if exit directly, log buffer in memory probably will lost

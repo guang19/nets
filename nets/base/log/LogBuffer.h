@@ -17,6 +17,11 @@ namespace nets::base
 		explicit LogBuffer(SizeTp logBufferLength);
 		~LogBuffer() override = default;
 
+		LogBuffer(const LogBuffer& logBuffer);
+		LogBuffer(LogBuffer&& logBuffer) noexcept;
+		LogBuffer& operator=(const LogBuffer& logBuffer);
+		LogBuffer& operator=(LogBuffer&& logBuffer) noexcept;
+
 	public:
 		const char* buffer() const
 		{

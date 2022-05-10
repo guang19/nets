@@ -31,9 +31,6 @@
 #define DEFINE_SINGLETON(CLASS_NAME)                                                                                        \
                                                                                                                             \
 protected:                                                                                                                  \
-	CLASS_NAME() = default;                                                                                                 \
-	~CLASS_NAME() = default;                                                                                                \
-                                                                                                                            \
 	template <typename C>                                                                                                   \
 	static void callAfterInit(...)                                                                                          \
 	{                                                                                                                       \

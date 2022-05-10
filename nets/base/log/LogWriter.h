@@ -9,12 +9,15 @@
 #include <condition_variable>
 #include <memory>
 #include <mutex>
+#include <functional>
 #include <thread>
 #include <vector>
 
 #include "nets/base/log/LogBuffer.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Singleton.h"
+
+#include "nets/base/concurrency/BoundedBlockingQueue.h"
 
 #ifndef LOG_WRITER_TYPE
 #define LOG_WRITER_TYPE STDOUT
@@ -77,6 +80,60 @@ namespace nets::base
 		char* buffer_ {nullptr};
 	};
 
+	//////////////////////////////////////////////////////
+	class IPersister
+	{
+
+	};
+
+	class ILogWriter2
+	{
+	protected:
+		virtual ~ILogWriter2() = default;
+
+	public:
+		virtual void write(LogBuffer logBuffer) = 0;
+	};
+
+	DECLARE_SINGLETON_CLASS(AsyncLogWriter), public ILogWriter2
+	{
+		DEFINE_SINGLETON(AsyncLogWriter);
+
+	private:
+		using FilePtr = ::std::unique_ptr<LogFile>;
+		using BufferPtr = ::std::unique_ptr<LogBuffer>;
+		using MutexType = ::std::mutex;
+		using LockGuardType = ::std::lock_guard<MutexType>;
+		using UniqueLockType = ::std::unique_lock<MutexType>;
+		using AtomicBoolType = ::std::atomic<bool>;
+		using ConditionVarType = ::std::condition_variable;
+		using BufferVectorType = ::std::vector<BufferPtr>;
+		using TaskType = ::std::function<void()>;
+		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
+
+	private:
+		AsyncLogWriter()
+		{
+
+		}
+
+		~AsyncLogWriter()
+		{
+
+		}
+
+	public:
+		void write(LogBuffer logBuffer) override;
+
+	private:
+		MutexType mutex_ {};
+		::std::thread writerProducer {};
+		::std::thread writerConsumer {};
+		BufferVectorType buffers_ {};
+		BlockingQueuePtr writerQueue_ {nullptr};
+	};
+	///////////////////////////////////////////////////
+
 	class ILogWriter
 	{
 	protected:
@@ -93,33 +150,6 @@ namespace nets::base
 	public:
 		void write(const char* data, uint32_t len) override;
 	};
-	//////////////////////////////////////////////////////
-	//#include <memory>
-	//
-	//#include "nets/base/concurrency/BoundedBlockingQueue.h"
-	//
-	//	class ILogWriter2
-	//	{
-	//	protected:
-	//		virtual ~ILogWriter2() = default;
-	//
-	//	public:
-	//		virtual void write(LogBuffer& logBuffer) = 0;
-	//	};
-	//
-	//	class AsyncLogWriter : public ILogWriter2
-	//	{
-	//	public:
-	//		using TaskType = ::std::function<void()>;
-	//		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
-	//
-	//	public:
-	//		void write(LogBuffer& logBuffer) override;
-	//
-	//	private:
-	//		BlockingQueuePtr taskQueue_;
-	//	};
-	///////////////////////////////////////////////////
 
 	class AsyncFileLogWriter : public ILogWriter
 	{
