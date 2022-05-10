@@ -16,7 +16,6 @@ namespace nets::base
 	{
 		constexpr uint32_t MillisecondsPerSecond = 1000U;
 		constexpr uint32_t MicrosecondsPerSecond = 1000000U;
-		constexpr uint32_t NanosecondsPerSecond = 1000000000U;
 	} // namespace
 
 	class Timestamp : public Copyable

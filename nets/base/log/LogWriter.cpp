@@ -7,12 +7,13 @@
 #include <cstring>
 #include <ctime>
 #include <libgen.h>
+#include <memory>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <memory>
 #include <utility>
 
 #include "nets/base/CommonMacro.h"
+#include "nets/base/ThreadHelper.h"
 
 namespace nets::base
 {
@@ -132,9 +133,7 @@ namespace nets::base
 			::fclose(fp_);
 			fp_ = nullptr;
 		}
-		struct tm tmS
-		{
-		};
+		struct tm tmS {};
 		::localtime_r(&now, &tmS);
 		char newFilename[24] = {0};
 		MEMZERO(newFilename, 24);
@@ -196,9 +195,7 @@ namespace nets::base
 
 	void LogFile::getFileInfo(uint64_t* fileSize, ::time_t* createTime)
 	{
-		struct stat fileInfo
-		{
-		};
+		struct stat fileInfo {};
 		if (::fstat(::fileno(fp_), &fileInfo) != 0)
 		{
 			return;
@@ -215,6 +212,7 @@ namespace nets::base
 
 	namespace
 	{
+		const char* const AsyncLogThreadName = "AsyncLogThread";
 		// Log buffer cache 2M
 		constexpr uint32_t MaxLogBufferSize = 2 * 1024 * 1024;
 		// Log buffer flush interval,unit：milliseconds
@@ -223,8 +221,7 @@ namespace nets::base
 
 	AsyncFileLogWriter::AsyncFileLogWriter()
 		: logFile_(new LogFile(LOG_FILE)), running_(false), cacheBuffer_(new LogBuffer(MaxLogBufferSize)),
-		  backupCacheBuffer_(new LogBuffer(MaxLogBufferSize)), buffers_(),
-		  asyncThread_(::std::bind(&AsyncFileLogWriter::asyncWrite, this)), mutex_(), cv_()
+		  backupCacheBuffer_(new LogBuffer(MaxLogBufferSize)), buffers_(), mutex_(), cv_()
 	{
 		buffers_.reserve(LOG_FILE_ROLLING_SIZE >> 1);
 	}
@@ -241,7 +238,8 @@ namespace nets::base
 			return;
 		}
 		running_ = true;
-		asyncThread_.start();
+		persistThread_ = ::std::thread(&AsyncFileLogWriter::asyncWrite, this);
+		setThreadName(persistThread_.native_handle(), AsyncLogThreadName);
 	}
 
 	void AsyncFileLogWriter::stop()
@@ -249,10 +247,10 @@ namespace nets::base
 		if (running_)
 		{
 			running_ = false;
-			cv_.notifyOne();
-			if (asyncThread_.joinable())
+			cv_.notify_one();
+			if (persistThread_.joinable())
 			{
-				asyncThread_.join();
+				persistThread_.join();
 			}
 		}
 	}
@@ -276,7 +274,7 @@ namespace nets::base
 				cacheBuffer_ = std::make_unique<LogBuffer>(MaxLogBufferSize);
 			}
 			cacheBuffer_->appendStr(data, len);
-			cv_.notifyOne();
+			cv_.notify_one();
 		}
 	}
 
@@ -292,11 +290,12 @@ namespace nets::base
 			while (running_)
 			{
 				{
-					LockGuardType lock(mutex_);
-					if (buffers_.empty())
-					{
-						cv_.waitTimeout(mutex_, LogBufferFlushInterval);
-					}
+					UniqueLockType lock(mutex_);
+					cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
+								 [&]() -> bool
+								 {
+									 return !buffers_.empty();
+								 });
 					buffers_.push_back(::std::move(cacheBuffer_));
 					tmpBuffers.swap(buffers_);
 					cacheBuffer_ = ::std::move(tmpBuffer1);
@@ -305,7 +304,7 @@ namespace nets::base
 						backupCacheBuffer_ = ::std::move(tmpBuffer2);
 					}
 				}
-				currentTime = ::time(nullptr);
+				::time(&currentTime);
 				for (const BufferPtr& buf: tmpBuffers)
 				{
 					persist(buf->buffer(), buf->writerIndex(), currentTime);
@@ -393,9 +392,9 @@ namespace nets::base
 				return StdoutLogWriter::getInstance();
 		}
 	}
-//
-//	void AsyncLogWriter::write(LogBuffer& logBuffer)
-//	{
-//
-//	}
+	//
+	//	void AsyncLogWriter::write(LogBuffer& logBuffer)
+	//	{
+	//
+	//	}
 } // namespace nets::base

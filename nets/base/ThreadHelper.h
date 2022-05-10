@@ -5,24 +5,24 @@
 #ifndef NETS_THREADHELPER_H
 #define NETS_THREADHELPER_H
 
-#include <ctime>
-#include <string>
-#include <sys/types.h>
+#include <cstdint>
+#include <pthread.h>
 
 namespace nets::base
 {
+	namespace
+	{
+		constexpr int32_t ThreadNameMaxLength = 16;
+	}
+
 	::pid_t currentTid();
 	bool isMainThread();
 
+	void setThreadName(::pthread_t threadId, const char* threadName);
+	void getThreadName(::pthread_t threadId, char* threadName, int32_t len);
+
 	void setCurrentThreadName(const char* threadName);
 	const char* currentThreadName();
-
-	using TimeType = ::time_t;
-
-	void sleepS(TimeType seconds);
-	void sleepMillis(TimeType mseconds);
-	void sleepMicros(TimeType useconds);
-	void sleepNanos(TimeType nseconds);
 } // namespace nets::base
 
 #endif // NETS_THREADHELPER_H

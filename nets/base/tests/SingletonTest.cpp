@@ -5,9 +5,9 @@
 #include <gtest/gtest.h>
 
 #include <string>
+#include <thread>
 
 #include "nets/base/Singleton.h"
-#include "nets/base/Thread.h"
 
 using namespace nets::base;
 
@@ -50,17 +50,17 @@ TEST(SingletonAddr, MultiThread)
 	Clazz* cptr1 = nullptr;
 	Clazz* cptr2 = nullptr;
 	Clazz* cptr3 = nullptr;
-	Thread t1(
+	::std::thread t1(
 		[&]
 		{
 			cptr1 = Clazz::getInstance("cp1");
 		});
-	Thread t2(
+	::std::thread t2(
 		[&]
 		{
 			cptr2 = Clazz::getInstance("cp2");
 		});
-	Thread t3(
+	::std::thread t3(
 		[&]
 		{
 			cptr3 = Clazz::getInstance("cp3");

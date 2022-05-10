@@ -4,9 +4,8 @@
 
 #include <gtest/gtest.h>
 
-#include <functional>
-
 #include "nets/base/concurrency/ThreadPool.h"
+#include "nets/base/ThreadHelper.h"
 
 using namespace nets::base;
 
@@ -53,6 +52,7 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 			return true;
 		},
 		5);
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(3000));
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
@@ -68,14 +68,13 @@ TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 				}
 			});
 	}
-	sleepS(3);
 }
 
 TEST_F(ThreadPoolTest, SubmitHasRetval)
 {
 	::std::function<int32_t()> f = []() -> int32_t
 	{
-		printf("%s\n", currentThreadName());
+		::printf("%s\n", currentThreadName());
 		return 5;
 	};
 	auto future1 = threadPool->submit(f);
@@ -90,7 +89,7 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 {
 	::std::function<void()> f = []()
 	{
-		printf("%s\n", currentThreadName());
+		::printf("%s\n", currentThreadName());
 	};
 	auto future1 = threadPool->submit(f);
 	future1.wait();

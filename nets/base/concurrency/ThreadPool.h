@@ -10,13 +10,12 @@
 #include <functional>
 #include <future>
 #include <memory>
+#include <thread>
 #include <vector>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
-#include "nets/base/concurrency/Mutex.h"
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
-#include "nets/base/Thread.h"
 
 namespace nets::base
 {
@@ -24,11 +23,13 @@ namespace nets::base
 	{
 	public:
 		using SizeType = size_t;
+		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
 		using AtomicBoolType = ::std::atomic<bool>;
-		using MutexType = Mutex;
-		using LockGuardType = LockGuard<MutexType>;
-		using ConditionVariableType = ConditionVariable;
+		using MutexType = ::std::mutex;
+		using LockGuardType = ::std::lock_guard<MutexType>;
+		using UniqueLockType = ::std::unique_lock<MutexType>;
+		using ConditionVariableType = ::std::condition_variable;
 		using BlockingQueuePtr = ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
 		using ThreadPoolPtr = ThreadPool*;
 
@@ -53,14 +54,15 @@ namespace nets::base
 		struct ThreadWrapper : Noncopyable
 		{
 		public:
-			explicit ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
+			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
 			~ThreadWrapper() = default;
 
-			void startThread();
+			void start();
 
+			::std::string threadName_ {};
 			bool isCoreThread_ {false};
 			TaskType task_ {nullptr};
-			Thread thread_ {};
+			::std::thread thread_ {};
 			ThreadPoolPtr threadPoolPtr_ {nullptr};
 		};
 

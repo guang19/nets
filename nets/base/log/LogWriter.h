@@ -6,15 +6,15 @@
 #define NETS_LOGWRITER_H
 
 #include <atomic>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
+#include <thread>
 #include <vector>
 
-#include "nets/base/concurrency/ConditionVariable.h"
-#include "nets/base/concurrency/Mutex.h"
 #include "nets/base/log/LogBuffer.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Singleton.h"
-#include "nets/base/Thread.h"
 
 #ifndef LOG_WRITER_TYPE
 #define LOG_WRITER_TYPE STDOUT
@@ -93,42 +93,43 @@ namespace nets::base
 	public:
 		void write(const char* data, uint32_t len) override;
 	};
-//////////////////////////////////////////////////////
-//#include <memory>
-//
-//#include "nets/base/concurrency/BoundedBlockingQueue.h"
-//
-//	class ILogWriter2
-//	{
-//	protected:
-//		virtual ~ILogWriter2() = default;
-//
-//	public:
-//		virtual void write(LogBuffer& logBuffer) = 0;
-//	};
-//
-//	class AsyncLogWriter : public ILogWriter2
-//	{
-//	public:
-//		using TaskType = ::std::function<void()>;
-//		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
-//
-//	public:
-//		void write(LogBuffer& logBuffer) override;
-//
-//	private:
-//		BlockingQueuePtr taskQueue_;
-//	};
+	//////////////////////////////////////////////////////
+	//#include <memory>
+	//
+	//#include "nets/base/concurrency/BoundedBlockingQueue.h"
+	//
+	//	class ILogWriter2
+	//	{
+	//	protected:
+	//		virtual ~ILogWriter2() = default;
+	//
+	//	public:
+	//		virtual void write(LogBuffer& logBuffer) = 0;
+	//	};
+	//
+	//	class AsyncLogWriter : public ILogWriter2
+	//	{
+	//	public:
+	//		using TaskType = ::std::function<void()>;
+	//		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
+	//
+	//	public:
+	//		void write(LogBuffer& logBuffer) override;
+	//
+	//	private:
+	//		BlockingQueuePtr taskQueue_;
+	//	};
 	///////////////////////////////////////////////////
 
 	class AsyncFileLogWriter : public ILogWriter
 	{
 		using FilePtr = ::std::unique_ptr<LogFile>;
 		using BufferPtr = ::std::unique_ptr<LogBuffer>;
-		using MutexType = Mutex;
-		using LockGuardType = LockGuard<MutexType>;
+		using MutexType = ::std::mutex;
+		using LockGuardType = ::std::lock_guard<MutexType>;
+		using UniqueLockType = ::std::unique_lock<MutexType>;
 		using AtomicBoolType = ::std::atomic<bool>;
-		using ConditionVarType = ConditionVariable;
+		using ConditionVarType = ::std::condition_variable;
 		using BufferVectorType = ::std::vector<BufferPtr>;
 
 	public:
@@ -155,7 +156,7 @@ namespace nets::base
 		BufferPtr cacheBuffer_ {nullptr};
 		BufferPtr backupCacheBuffer_ {nullptr};
 		BufferVectorType buffers_ {};
-		Thread asyncThread_ {};
+		::std::thread persistThread_ {};
 		MutexType mutex_ {};
 		ConditionVarType cv_ {};
 	};

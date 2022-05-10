@@ -2,10 +2,10 @@
 // Created by YangGuang on 2022/5/2.
 //
 
+#include "nets/base/Timestamp.h"
+
 #include <sys/time.h>
 #include <utility>
-
-#include "nets/base/Timestamp.h"
 
 namespace nets::base
 {

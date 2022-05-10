@@ -20,14 +20,14 @@ namespace nets::base
 		 * log time cache
 		 */
 		__thread struct tm CacheTMS {};
-		__thread TimeType CacheSeconds {0};
+		__thread Timestamp::TimeType CacheSeconds {0};
 	} // namespace
 
 	void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
 	{
 		struct tm tmS {};
 		const Timestamp& logTime = logMessage.getLogTime();
-		TimeType seconds = logTime.secondsSinceEpoch();
+		Timestamp::TimeType seconds = logTime.secondsSinceEpoch();
 		if (seconds != CacheSeconds)
 		{
 			if (localtime_r(&seconds, &tmS) == nullptr)
@@ -42,8 +42,8 @@ namespace nets::base
 			tmS = CacheTMS;
 		}
 		char timeBuf[24] = {0};
-		::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1,
-				   tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
+		::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday,
+				   tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
 		logBuffer << timeBuf;
 		logBuffer << " [" << currentTid() << "] ";
 		logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';

@@ -4,15 +4,16 @@
 
 #include "nets/base/ThreadHelper.h"
 
+#include <cstring>
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#include "nets/base/Timestamp.h"
+#include "nets/base/CommonMacro.h"
 
 namespace nets::base
 {
 	__thread ::pid_t cacheTid_ = 0;
-	__thread const char* threadName_ = "unnamed";
+	__thread char threadName_[ThreadNameMaxLength] = "unnamed";
 
 	::pid_t getTid()
 	{
@@ -41,7 +42,8 @@ namespace nets::base
 	void afterFork()
 	{
 		cacheTid_ = 0;
-		threadName_ = MainThreadName;
+		MEMZERO(threadName_, ThreadNameMaxLength);
+		::memcpy(threadName_, MainThreadName, strlen(MainThreadName));
 	}
 
 	struct ThreadInitializer
@@ -49,45 +51,40 @@ namespace nets::base
 		ThreadInitializer()
 		{
 			currentTid();
-			threadName_ = MainThreadName;
-			pthread_atfork(nullptr, nullptr, &afterFork);
+			MEMZERO(threadName_, ThreadNameMaxLength);
+			::memcpy(threadName_, MainThreadName, strlen(MainThreadName));
+			::pthread_atfork(nullptr, nullptr, &afterFork);
 		}
 	};
 
 	ThreadInitializer threadInitializer {};
 
+	bool setPosixThreadName(::pthread_t threadId, const char* threadName)
+	{
+		return (::pthread_setname_np(threadId, threadName) == 0);
+	}
+
+	void setThreadName(::pthread_t threadId, const char* threadName)
+	{
+		if (setPosixThreadName(threadId, threadName))
+		{
+			MEMZERO(threadName_, ThreadNameMaxLength);
+			::memcpy(threadName_, threadName, strlen(threadName));
+		}
+	}
+
+	void getThreadName(::pthread_t threadId, char* threadName, int32_t len)
+	{
+		pthread_getname_np(threadId, threadName, len);
+	}
+
 	void setCurrentThreadName(const char* threadName)
 	{
-		threadName_ = threadName;
+		setThreadName(pthread_self(), threadName);
 	}
 
 	const char* currentThreadName()
 	{
 		return threadName_;
-	}
-
-	void sleepS(TimeType seconds)
-	{
-		::sleep(seconds);
-	}
-
-	void sleepMillis(TimeType mseconds)
-	{
-		::usleep(mseconds * 1000);
-	}
-
-	void sleepMicros(TimeType useconds)
-	{
-		::usleep(useconds);
-	}
-
-	void sleepNanos(TimeType nseconds)
-	{
-		struct timespec timSpec
-		{
-		};
-		timSpec.tv_sec = (nseconds / NanosecondsPerSecond);
-		timSpec.tv_nsec = nseconds % NanosecondsPerSecond;
-		::nanosleep(&timSpec, nullptr);
 	}
 } // namespace nets::base

@@ -11,8 +11,6 @@
 #include <functional>
 #include <mutex>
 
-#include "nets/base/concurrency/ConditionVariable.h"
-#include "nets/base/concurrency/Mutex.h"
 #include "nets/base/Noncopyable.h"
 
 namespace nets::base
@@ -25,10 +23,10 @@ namespace nets::base
 		using LReferenceType = ValueType&;
 		using RReferenceType = ValueType&&;
 		using ConstReferenceType = const ValueType&;
-		using MutexType = ::std::mutex;
+		using MutexType = ::std::recursive_mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using ConditionVariableType = ::std::condition_variable;
+		using ConditionVariableType = ::std::condition_variable_any;
 		using TimeType = ::time_t;
 		using MillisTimeType = ::std::chrono::milliseconds;
 		using ContainerType = ::std::deque<ValueType>;
@@ -202,80 +200,84 @@ namespace nets::base
 	bool BoundedBlockingQueue<T>::put(RReferenceType el, TimeType milliseconds)
 	{
 		UniqueLockType lock(mutex_);
-		notFullCV_.wait_for(
-			lock,
-			[&]() -> bool
-			{
-				return !isFull();
-			},
-			MillisTimeType(milliseconds));
-		queue_.push_back(::std::forward<RReferenceType>(el));
-		notEmptyCV_.notify_one();
-		return true;
+		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
+								[&]() -> bool
+								{
+									return !isFull();
+								}))
+		{
+			queue_.push_back(::std::forward<RReferenceType>(el));
+			notEmptyCV_.notify_one();
+			return true;
+		}
+		return false;
 	}
 
 	template <typename T>
 	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, TimeType milliseconds)
 	{
 		UniqueLockType lock(mutex_);
-		notFullCV_.wait_for(
-			lock,
-			[&]() -> bool
-			{
-				return !isFull();
-			},
-			MillisTimeType(milliseconds));
-		queue_.push_back(el);
-		notEmptyCV_.notify_one();
-		return true;
+		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
+								[&]() -> bool
+								{
+									return !isFull();
+								}))
+		{
+			queue_.push_back(el);
+			notEmptyCV_.notify_one();
+			return true;
+		}
+		return false;
 	}
 
 	template <typename T>
 	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds)
 	{
 		UniqueLockType lock(mutex_);
-		notFullCV_.wait_for(lock,
-						[&]() -> bool
-						{
-							return !queue_.empty();
-						}, MillisTimeType(milliseconds));
-		el = queue_.front();
-		queue_.pop_front();
-		notFullCV_.notify_one();
-		return true;
+		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
+								[&]() -> bool
+								{
+									return !queue_.empty();
+								}))
+		{
+			el = queue_.front();
+			queue_.pop_front();
+			notFullCV_.notify_one();
+			return true;
+		}
+		return false;
 	}
 
 	template <typename T>
 	bool BoundedBlockingQueue<T>::put(RReferenceType el, TimeType milliseconds, PredicateType p)
 	{
 		UniqueLockType lock(mutex_);
-		notFullCV_.wait_for(
-			lock,
-			[&]() -> bool
-			{
-				return (!isFull() || p());
-			},
-			MillisTimeType(milliseconds));
-		if (p())
+		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
+								[&]() -> bool
+								{
+									return (!isFull() || p());
+								}))
 		{
-			return false;
+			if (p())
+			{
+				return false;
+			}
+			queue_.push_back(::std::forward<RReferenceType>(el));
+			notFullCV_.notify_one();
+			return true;
 		}
-		queue_.push_back(::std::forward<RReferenceType>(el));
-		notFullCV_.notify_one();
-		return true;
+		return false;
 	}
 
 	template <typename T>
 	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, TimeType milliseconds, PredicateType p)
 	{
 		UniqueLockType lock(mutex_);
-		if(notFullCV_.wait_for(
-			lock,
-			[&]() -> bool
-			{
-				return (!isFull() || p());
-			},
-			MillisTimeType(milliseconds)))
+		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
+								[&]() -> bool
+								{
+									return (!isFull() || p());
+								}))
 		{
 			if (p())
 			{
@@ -292,14 +294,16 @@ namespace nets::base
 	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds, PredicateType p)
 	{
 		UniqueLockType lock(mutex_);
-		if (notEmptyCV_.wait_for(
-			lock,
-			[&]()
-			{
-				return (!queue_.empty() || p());
-			},
-			MillisTimeType(milliseconds)))
+		if (notEmptyCV_.wait_for(lock, MillisTimeType(milliseconds),
+								 [&]()
+								 {
+									 return (!queue_.empty() || p());
+								 }))
 		{
+			if (p())
+			{
+				return false;
+			}
 			el = queue_.front();
 			queue_.pop_front();
 			notFullCV_.notify_one();

@@ -4,8 +4,9 @@
 
 #include <gtest/gtest.h>
 
+#include <thread>
+
 #include "nets/base/log/Logging.h"
-#include "nets/base/Thread.h"
 
 using namespace nets::base;
 
@@ -16,12 +17,11 @@ TEST(LoggingTest, BasicUse)
 	LOGS_INFO << "这是一条info信息";
 	LOGS_WARN << "这是一条warn信息";
 	LOGS_ERROR << "这是一条error信息";
-	Thread t1(
+	::std::thread t1(
 		[&]()
 		{
 			LOGS_DEBUG << "这是一条debug信息";
 		});
-	t1.start();
 	LOGS_FATAL << "这是一条流式fatal信息";
 }
 
@@ -33,8 +33,8 @@ TEST(LoggingTest, SingleFile)
 	LOGS_INFO << "这是一条info信息 stream";
 	LOGS_WARN << "这是一条warn信息 stream";
 	LOGS_ERROR << "这是一条error信息 stream";
-	LOGS_FATAL << "这是一条流式fatal信息 stream";
-	::sleepS(2);
+//	LOGS_FATAL << "这是一条流式fatal信息 stream";
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
 }
 
 // before execute:
@@ -48,7 +48,6 @@ TEST(LoggingTest, DailyFile)
 	LOGS_WARN << "这是一条warn信息 stream";
 	LOGS_ERROR << "这是一条error信息 stream";
 	LOGS_FATAL << "这是一条fatal信息 stream";
-	::sleepS(2);
 }
 
 // before execute:
@@ -62,7 +61,6 @@ TEST(LoggingTest, RollingFile)
 				  "一条足够长的信息"
 				  "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
 				  "一条足够长的信息";
-	::sleepS(2);
 }
 
 int main(int argc, char** argv)

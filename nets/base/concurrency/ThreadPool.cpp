@@ -8,6 +8,7 @@
 #include <utility>
 
 #include "nets/base/CommonMacro.h"
+#include "nets/base/ThreadHelper.h"
 
 #ifndef CORE_POOL_SIZE
 #define CORE_POOL_SIZE (AVAILABLE_PROCESSOR << 1)
@@ -29,24 +30,23 @@ namespace nets::base
 {
 	namespace
 	{
-		constexpr const char* const DefaultThreadPoolName = "NetsThreadPool";
+		constexpr const char* const DefaultThreadPoolName = "ThreadPool";
 		constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy = ThreadPool::RejectionPolicy::DiscardOlderPolicy;
 	} // namespace
 
-	ThreadPool::ThreadWrapper::ThreadWrapper(const ::std::string& name, bool isCoreThread, TaskType task,
+	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
-		: isCoreThread_(isCoreThread), task_(std::move(task)), thread_(
-																   [this]
-																   {
-																	   startThread();
-																   },
-																   name),
-		  threadPoolPtr_(threadPoolPtr)
+		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
+		  thread_(&ThreadPool::ThreadWrapper::start, this), threadPoolPtr_(threadPoolPtr)
 	{
-		thread_.start();
+		setThreadName(thread_.native_handle(), threadName_.c_str());
+		if (thread_.joinable())
+		{
+			thread_.detach();
+		}
 	}
 
-	void ThreadPool::ThreadWrapper::startThread()
+	void ThreadPool::ThreadWrapper::start()
 	{
 		threadPoolPtr_->runThread(this);
 	}
@@ -123,13 +123,14 @@ namespace nets::base
 			return;
 		}
 		running_ = false;
-		LockGuardType lock(mutex_);
+		UniqueLockType lock(mutex_);
 		// notify blocking thread
 		taskQueue_->notifyBlockingThread();
-		while (!threadPool_.empty())
-		{
-			poolCV_.wait(mutex_);
-		}
+		poolCV_.wait(lock,
+					 [&]() -> bool
+					 {
+						 return threadPool_.empty();
+					 });
 		assert(taskQueue_->isEmpty());
 		assert(threadPool_.empty());
 		LOGS_DEBUG << "thread pool has been shutdown";
@@ -145,12 +146,12 @@ namespace nets::base
 			}
 			catch (const ::std::exception& exception)
 			{
-				LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.threadName()
+				LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->threadName_
 						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
-				LOGS_ERROR << "unknown exception caught during thread [" << threadWrapperRawPtr->thread_.threadName()
+				LOGS_ERROR << "unknown exception caught during thread [" << threadWrapperRawPtr->threadName_
 						   << "] execution in thread pool [" << name_ << ']';
 			}
 			threadWrapperRawPtr->task_ = nullptr;
@@ -182,12 +183,12 @@ namespace nets::base
 				}
 				catch (const ::std::exception& exception)
 				{
-					LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->thread_.threadName()
+					LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->threadName_
 							   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
 				}
 				catch (...)
 				{
-					LOGS_ERROR << "unknown exception caught during thread [" << threadWrapperRawPtr->thread_.threadName()
+					LOGS_ERROR << "unknown exception caught during thread [" << threadWrapperRawPtr->threadName_
 							   << "] execution in thread pool [" << name_ << ']';
 				}
 				threadWrapperRawPtr->task_ = nullptr;
@@ -204,7 +205,7 @@ namespace nets::base
 			if (it->get() == threadWrapperRawPtr)
 			{
 				threadPool_.erase(it);
-				poolCV_.notifyAll();
+				poolCV_.notify_all();
 				break;
 			}
 		}
@@ -213,8 +214,8 @@ namespace nets::base
 	bool ThreadPool::addThreadTask(const TaskType& task, bool isCore, SizeType threadSize)
 	{
 		threadSize += 1;
-		char threadName[24] = {0};
-		::snprintf(threadName, 24, "%s-%lu", name_.c_str(), threadSize);
+		char threadName[ThreadNameMaxLength] = {0};
+		::snprintf(threadName, ThreadNameMaxLength, "Thread-%zu", threadSize);
 		threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
 		return true;
 	}
