@@ -70,7 +70,7 @@ namespace nets::base
 
 		void* startThread(void* arg)
 		{
-			ThreadRouter* router = static_cast<ThreadRouter*>(arg);
+			auto router = static_cast<ThreadRouter*>(arg);
 			router->route();
 			delete router;
 			return nullptr;
@@ -80,7 +80,7 @@ namespace nets::base
 	void Thread::start()
 	{
 		setDefaultThreadName();
-		ThreadRouter* router = new ThreadRouter(threadName_, &tid_, threadFunc_, latch_);
+		auto router = new ThreadRouter(threadName_, &tid_, threadFunc_, latch_);
 		runnable_ = true;
 		joinable_ = true;
 		if (pthread_create(&threadId_, nullptr, startThread, router) != 0)

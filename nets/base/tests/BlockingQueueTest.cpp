@@ -4,11 +4,9 @@
 
 #include <gtest/gtest.h>
 
-#include <atomic>
-#include <deque>
+#include <thread>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
-#include "nets/base/Thread.h"
 #include "nets/base/Timestamp.h"
 
 using namespace nets::base;
@@ -56,23 +54,21 @@ TEST_F(BlockingQueueTest, PutTakeMultiThread)
 {
 	for (int i = 0; i < 5; ++i)
 	{
-		Thread t1(
+		::std::thread t1(
 			[&]
 			{
 				blockingQueue->put(i);
 			});
-		t1.start();
 		t1.detach();
-		Thread t2(
+		::std::thread t2(
 			[&]
 			{
 				int32_t n;
 				blockingQueue->take(n);
 			});
-		t2.start();
 		t2.detach();
 	}
-	sleepS(1);
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
 	ASSERT_EQ(blockingQueue->size(), 0u);
 }
 

@@ -5,8 +5,7 @@
 #ifndef NETS_BASE_SINGLETON_H
 #define NETS_BASE_SINGLETON_H
 
-#include <functional>
-#include <pthread.h>
+#include <mutex>
 
 #include "nets/base/CommonMacro.h"
 #include "nets/base/Noncopyable.h"
@@ -46,9 +45,11 @@ protected:                                                                      
 		c->afterInit();                                                                                                     \
 	}                                                                                                                       \
                                                                                                                             \
-	static void init()                                                                                                      \
+	template <typename... Args>                                                                                             \
+	static void init(Args&&... args)                                                                                        \
 	{                                                                                                                       \
-		Init##CLASS_NAME##InstanceFunc();                                                                                   \
+		Instance = new CLASS_NAME(::std::forward<Args>(args)...);                                                           \
+		callAfterInit<CLASS_NAME>(Instance);                                                                                \
 	}                                                                                                                       \
                                                                                                                             \
 	static void destroy()                                                                                                   \
@@ -67,25 +68,26 @@ public:                                                                         
 	template <typename... Args>                                                                                             \
 	static inline CLASS_NAME* getInstance(Args&&... args)                                                                   \
 	{                                                                                                                       \
-		Init##CLASS_NAME##InstanceFunc = ::std::bind(                                                                       \
-			[&]()                                                                                                           \
+		::std::call_once(                                                                                                   \
+			OnceFlag,                                                                                                       \
+			[](Args&&... args0)                                                                                             \
 			{                                                                                                               \
-				Instance = new CLASS_NAME(::std::forward<Args>(args)...);                                                   \
-				callAfterInit<CLASS_NAME>(Instance);                                                                        \
+				if (Instance == nullptr)                                                                                    \
+				{                                                                                                           \
+					CLASS_NAME::init(::std::forward<Args>(args0)...);                                                       \
+				}                                                                                                           \
 				::atexit(&CLASS_NAME::destroy);                                                                             \
-			});                                                                                                             \
-		::pthread_once(&OnceFlag, &CLASS_NAME::init);                                                                       \
+			},                                                                                                              \
+			::std::forward<Args>(args)...);                                                                                 \
 		return Instance;                                                                                                    \
 	}                                                                                                                       \
                                                                                                                             \
 private:                                                                                                                    \
 	static CLASS_NAME* Instance;                                                                                            \
-	static ::pthread_once_t OnceFlag;                                                                                       \
-	static ::std::function<void()> Init##CLASS_NAME##InstanceFunc
+	static ::std::once_flag OnceFlag;
 
 #define INIT_SINGLETON(CLASS_NAME)                                                                                          \
 	CLASS_NAME* CLASS_NAME::Instance {nullptr};                                                                             \
-	::pthread_once_t CLASS_NAME::OnceFlag {PTHREAD_ONCE_INIT};                                                              \
-	::std::function<void()> CLASS_NAME::Init##CLASS_NAME##InstanceFunc {}
+	::std::once_flag CLASS_NAME::OnceFlag {};
 
 #endif // NETS_BASE_SINGLETON_H

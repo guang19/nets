@@ -111,8 +111,7 @@ namespace nets::base
 
 		template <typename Fn, typename... Args,
 				  typename HasRet =
-					  typename ::std::enable_if<!::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type,
-				  typename Redundant = void>
+					  typename ::std::enable_if<!::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
 		::std::future<typename ::std::result_of<Fn(Args...)>::type> submit(Fn&& func, Args... args);
 
 		template <typename Fn, typename... Args,
@@ -151,9 +150,10 @@ namespace nets::base
 	template <typename Fn, typename... Args>
 	void ThreadPool::execute(Fn&& func, Args... args)
 	{
+		submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 	}
 
-	template <typename Fn, typename... Args, typename HasRet, typename Redundant>
+	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args... args)
 	{
 		if (!running_)
@@ -165,6 +165,7 @@ namespace nets::base
 		auto promiseTask = ::std::make_shared<::std::packaged_task<RetType()>>(
 			::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...));
 		auto future = promiseTask->get_future();
+		// value capture, ref count plus 1
 		TaskType task = [promiseTask]() mutable
 		{
 			assert(promiseTask.use_count() > 0);
@@ -208,6 +209,7 @@ namespace nets::base
 		auto promiseTask = ::std::make_shared<::std::packaged_task<void()>>(
 			::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...));
 		auto future = promiseTask->get_future();
+		// value capture, ref count plus 1
 		TaskType task = [promiseTask]() mutable
 		{
 			assert(promiseTask.use_count() > 0);

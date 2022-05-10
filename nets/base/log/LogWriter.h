@@ -86,13 +86,40 @@ namespace nets::base
 		virtual void write(const char* data, uint32_t len) = 0;
 	};
 
-	DECLARE_SINGLETON_CLASS(StdOutLogWriter), public ILogWriter
+	DECLARE_SINGLETON_CLASS(StdoutLogWriter), public ILogWriter
 	{
-		DEFINE_SINGLETON(StdOutLogWriter);
+		DEFINE_SINGLETON(StdoutLogWriter);
 
 	public:
 		void write(const char* data, uint32_t len) override;
 	};
+//////////////////////////////////////////////////////
+//#include <memory>
+//
+//#include "nets/base/concurrency/BoundedBlockingQueue.h"
+//
+//	class ILogWriter2
+//	{
+//	protected:
+//		virtual ~ILogWriter2() = default;
+//
+//	public:
+//		virtual void write(LogBuffer& logBuffer) = 0;
+//	};
+//
+//	class AsyncLogWriter : public ILogWriter2
+//	{
+//	public:
+//		using TaskType = ::std::function<void()>;
+//		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
+//
+//	public:
+//		void write(LogBuffer& logBuffer) override;
+//
+//	private:
+//		BlockingQueuePtr taskQueue_;
+//	};
+	///////////////////////////////////////////////////
 
 	class AsyncFileLogWriter : public ILogWriter
 	{

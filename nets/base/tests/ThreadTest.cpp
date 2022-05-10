@@ -72,6 +72,7 @@ TEST(ThreadTest, ThreadJoin)
 	::printf("%lu\n", t1.threadId());;
 	::printf("%lu\n", t1.tid());
 }
+#include <mutex>
 
 TEST(ThreadTest, ThreadDetach)
 {
@@ -85,8 +86,9 @@ TEST(ThreadTest, ThreadDetach)
 	::printf("%s\n", t1.threadName().c_str());
 	::printf("%lu\n", t1.threadId());;
 	::printf("%lu\n", t1.tid());
+	::std::once_flag f{};
+	::std::call_once(f, [](){});
 }
-
 
 int main(int argc, char** argv)
 {

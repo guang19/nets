@@ -17,7 +17,7 @@ public:
 	void SetUp() override
 	{
 		// set parameters to be smaller, you can observe the result of execute more intuitively
-		threadPool = new ThreadPool(16, 24, 30000, 5);
+		threadPool = new ThreadPool();
 		threadPool->init();
 	}
 
@@ -40,35 +40,31 @@ TEST_F(ThreadPoolTest, ConstructParameter)
 
 TEST_F(ThreadPoolTest, ExecuteTask)
 {
-	//	ASSERT_TRUE(threadPool->execute(
-	//		[]() -> bool
-	//		{
-	//			::printf("hello thread pool");
-	//			return true;
-	//		}));
-	//	ASSERT_TRUE(threadPool->execute(
-	//		[](int num) -> bool
-	//		{
-	//			::printf("your enter number is: %d\n", num);
-	//			return true;
-	//		},
-	//		5));
+	threadPool->execute(
+		[]() -> bool
+		{
+			::printf("%s\n", currentThreadName());
+			return true;
+		});
+	threadPool->execute(
+		[](int num) -> bool
+		{
+			::printf("%s\n", currentThreadName());
+			return true;
+		},
+		5);
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 {
-	for (int i = 0; i < 100; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		threadPool->execute(
 			[&]()
 			{
-				if (i == 5)
+				for (int j = 0; j < 1000; ++j)
 				{
-					throw ::std::invalid_argument("haha");
-				}
-				for (int j = 0; j < 10000; ++j)
-				{
-					::printf("your enter number is: %d, threadId:%d\n", j, currentTid());
+					::printf("your enter number is: %d, threadName:%s\n", j, currentThreadName());
 				}
 			});
 	}
