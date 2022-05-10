@@ -6,6 +6,7 @@
 #define NETS_BASE_THREAD_POOL_H
 
 #include <atomic>
+#include <cassert>
 #include <functional>
 #include <future>
 #include <memory>
@@ -112,7 +113,7 @@ namespace nets::base
 				  typename HasRet =
 					  typename ::std::enable_if<!::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type,
 				  typename Redundant = void>
-		::std::future<typename ::std::result_of<Fn(Args...)>> submit(Fn&& func, Args... args);
+		::std::future<typename ::std::result_of<Fn(Args...)>::type> submit(Fn&& func, Args... args);
 
 		template <typename Fn, typename... Args,
 				  typename HasRet =
@@ -153,21 +154,23 @@ namespace nets::base
 	}
 
 	template <typename Fn, typename... Args, typename HasRet, typename Redundant>
-	::std::future<typename ::std::result_of<Fn(Args...)>> ThreadPool::submit(Fn&& func, Args... args)
+	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args... args)
 	{
 		if (!running_)
 		{
-			LOGS_ERROR << "thread pool has not been initialized";
+			LOGS_FATAL << "thread pool has not been initialized";
 		}
 		LockGuardType lock(mutex_);
 		using RetType = typename ::std::result_of<Fn(Args...)>::type;
-		auto promise = ::std::make_unique<::std::promise<RetType>>();
-		::std::future<RetType> future = promise->get_future();
-		::std::function<RetType()> tmpTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		TaskType task = [t = ::std::move(tmpTask), p = ::std::move(promise)]() mutable
+		auto promiseTask = ::std::make_shared<::std::packaged_task<RetType()>>(
+			::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...));
+		auto future = promiseTask->get_future();
+		TaskType task = [promiseTask]() mutable
 		{
-			p->set_value(t());
+			assert(promiseTask.use_count() > 0);
+			(*promiseTask)();
 		};
+		assert(promiseTask.use_count() == 2);
 		SizeType threadSize = threadPool_.size();
 		// if still able to create core thread
 		if (threadSize < corePoolSize_)
@@ -197,45 +200,44 @@ namespace nets::base
 	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<void> ThreadPool::submit(Fn&& func, Args... args)
 	{
-		//		if (!running_)
-		//		{
-		//			LOGS_ERROR << "thread pool has not been initialized";
-		//			return;
-		//		}
-		//		LockGuardType lock(mutex_);
-		//		using RetType = typename ::std::result_of<Fn(Args...)>::type;
-		//		auto promise = ::std::make_unique<::std::promise<RetType>>();
-		//		::std::future<RetType> future = promise->get_future();
-		//		::std::function<RetType ()> tmpTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		//		TaskType task = [t = ::std::move(tmpTask), p = ::std::move(promise)]() mutable
-		//		{
-		//			p->set_value(t());
-		//		};
-		//		SizeType threadSize = threadPool_.size();
-		//		// if still able to create core thread
-		//		if (threadSize < corePoolSize_)
-		//		{
-		//			addThreadTask(task, true, threadSize);
-		//		}
-		//		else
-		//		{
-		//			// if task queue is not full, try push task to task queue
-		//			if (!taskQueue_->tryPush(task))
-		//			{
-		//				// the thread pool is full, create non-core thread to perform task
-		//				if (threadSize < maxPoolSize_)
-		//				{
-		//					addThreadTask(task, false, threadSize);
-		//				}
-		//				else
-		//				{
-		//					// handle task with rejection policy
-		//					reject(task);
-		//				}
-		//			}
-		//		}
-		::std::future<void> f;
-		return f;
+		if (!running_)
+		{
+			LOGS_FATAL << "thread pool has not been initialized";
+		}
+		LockGuardType lock(mutex_);
+		auto promiseTask = ::std::make_shared<::std::packaged_task<void()>>(
+			::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...));
+		auto future = promiseTask->get_future();
+		TaskType task = [promiseTask]() mutable
+		{
+			assert(promiseTask.use_count() > 0);
+			(*promiseTask)();
+		};
+		assert(promiseTask.use_count() == 2);
+		SizeType threadSize = threadPool_.size();
+		// if still able to create core thread
+		if (threadSize < corePoolSize_)
+		{
+			addThreadTask(task, true, threadSize);
+		}
+		else
+		{
+			// if task queue is not full, try push task to task queue
+			if (!taskQueue_->tryPush(task))
+			{
+				// the thread pool is full, create non-core thread to perform task
+				if (threadSize < maxPoolSize_)
+				{
+					addThreadTask(task, false, threadSize);
+				}
+				else
+				{
+					// handle task with rejection policy
+					reject(task);
+				}
+			}
+		}
+		return future;
 	}
 } // namespace nets::base
 

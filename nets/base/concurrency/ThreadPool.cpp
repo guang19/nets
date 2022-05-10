@@ -125,6 +125,8 @@ namespace nets::base
 		{
 			poolCV_.wait(mutex_);
 		}
+		assert(taskQueue_->isEmpty());
+		assert(threadPool_.empty());
 		LOGS_DEBUG << "thread pool has been shutdown";
 	}
 

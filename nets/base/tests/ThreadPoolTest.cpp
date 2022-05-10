@@ -40,19 +40,19 @@ TEST_F(ThreadPoolTest, ConstructParameter)
 
 TEST_F(ThreadPoolTest, ExecuteTask)
 {
-//	ASSERT_TRUE(threadPool->execute(
-//		[]() -> bool
-//		{
-//			::printf("hello thread pool");
-//			return true;
-//		}));
-//	ASSERT_TRUE(threadPool->execute(
-//		[](int num) -> bool
-//		{
-//			::printf("your enter number is: %d\n", num);
-//			return true;
-//		},
-//		5));
+	//	ASSERT_TRUE(threadPool->execute(
+	//		[]() -> bool
+	//		{
+	//			::printf("hello thread pool");
+	//			return true;
+	//		}));
+	//	ASSERT_TRUE(threadPool->execute(
+	//		[](int num) -> bool
+	//		{
+	//			::printf("your enter number is: %d\n", num);
+	//			return true;
+	//		},
+	//		5));
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
@@ -77,11 +77,31 @@ TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 
 TEST_F(ThreadPoolTest, SubmitHasRetval)
 {
-	::std::function<int32_t ()> f = []() -> int32_t
+	::std::function<int32_t()> f = []() -> int32_t
 	{
+		printf("%s\n", currentThreadName());
 		return 5;
 	};
-	threadPool->submit(f);
+	auto future1 = threadPool->submit(f);
+	future1.wait();
+	ASSERT_EQ(future1.get(), 5);
+	auto future2 = threadPool->submit(f);
+	future2.wait();
+	ASSERT_EQ(future2.get(), 5);
+}
+
+TEST_F(ThreadPoolTest, SubmitNoRetval)
+{
+	::std::function<void()> f = []()
+	{
+		printf("%s\n", currentThreadName());
+	};
+	auto future1 = threadPool->submit(f);
+	future1.wait();
+	future1.get();
+	auto future2 = threadPool->submit(f);
+	future2.wait();
+	future2.get();
 }
 
 int main(int argc, char** argv)
