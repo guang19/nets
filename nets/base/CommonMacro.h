@@ -12,31 +12,11 @@
 
 #define MEMZERO(p, len) (::memset((p), 0, (len)))
 
+#define CHECK_CLASS_COMPLETE_TYPE(CLASS)	\
+	char CLASS_MUST_BE_COMPLETE_TYPE[sizeof(CLASS)];	\
+	UNUSED(CLASS_MUST_BE_COMPLETE_TYPE)
+
 #define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
-
-/***********************************
-  *
-#define DECLARE_HAS_MEMBER_FUNCTION(FUNC) \
-	template<class T, typename ...Args>	\
-	struct HasMemberFunc_##FUNC	\
-	{	\
-		private:	\
-			template<class C>	\
-			constexpr static auto check(const void*) ->	\
-				decltype(::std::declval<C>().FUNC(::std::declval<Args>()...), ::std::true_type());	\
-				\
-			template<class C>	\
-			constexpr static ::std::false_type check(...);	\
-			\
-		public:	\
-			constexpr static bool value = decltype(check<T>(nullptr))::value;	\
-	}
-
-// check if the class has the function
-#define HAS_MEMBER_FUNCTION(CLASS, FUNC, ...)	\
-		HasMemberFunc_##FUNC<CLASS, ##__VA_ARGS__>::value
- *
- ***********************************/
 
 #define DECLARE_HAS_MEMBER_FUNCTION(FUNC)                                                                                   \
 	template <class C, typename... Args>                                                                                    \

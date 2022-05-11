@@ -24,7 +24,7 @@ namespace nets::base
 		DEFINE_SINGLETON(DefaultLogFormatter);
 
 	public:
-		void formatLogMessage(LogBuffer & logBuffer, LogMessage & logMessage) override;
+		void formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage) override;
 	};
 
 	DECLARE_SINGLETON_CLASS(LogFormatterFactory)

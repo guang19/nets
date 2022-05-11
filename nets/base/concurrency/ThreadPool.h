@@ -22,7 +22,7 @@ namespace nets::base
 	class ThreadPool : Noncopyable
 	{
 	public:
-		using SizeType = size_t;
+		using SizeType = ::size_t;
 		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
 		using AtomicBoolType = ::std::atomic<bool>;

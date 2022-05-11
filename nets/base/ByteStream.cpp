@@ -16,7 +16,7 @@ namespace nets::base
 	{
 		constexpr char Digits[] = {"0123456789"};
 		constexpr char HexDigits[] = {"0123456789abcdef"};
-		constexpr uint32_t MaxNumSize = ::std::numeric_limits<uint64_t>::digits10 + 6;
+		constexpr uint32_t MaxNumLen = ::std::numeric_limits<uint64_t>::digits10 + 2;
 	} // namespace
 
 	template <typename Number>
@@ -58,42 +58,28 @@ namespace nets::base
 	}
 
 	template <typename Number>
-	uint32_t convertToStr(char* buffer, Number n, uint16_t base)
-	{
-		if (base == 10)
-		{
-			return intToStr(buffer, n);
-		}
-		else if (base == 16)
-		{
-			return hexToStr(buffer, n);
-		}
-		return 0;
-	}
-
-	template <typename Number>
 	void ByteStream::appendInteger(Number n)
 	{
-		if (writeableBytes() > MaxNumSize)
+		if (writeableBytes() > MaxNumLen)
 		{
-			writerIndex_ += convertToStr(buffer_ + writerIndex_, n, 10);
+			writerIndex_ += intToStr(buffer_.get() + writerIndex_, n);
 		}
 	}
 
-	void ByteStream::appendPointer(uintptr_t ptr)
+	void ByteStream::appendPointer(const void* ptr)
 	{
-		if (writeableBytes() >= MaxNumSize)
+		if (writeableBytes() >= MaxNumLen)
 		{
-			writerIndex_ += convertToStr(buffer_ + writerIndex_, ptr, 16);
+			writerIndex_ += hexToStr(buffer_.get() + writerIndex_, reinterpret_cast<uintptr_t>(ptr));
 		}
 	}
 
 	template <typename Float>
 	void ByteStream::appendFloat(Float f)
 	{
-		if (writeableBytes() > MaxNumSize)
+		if (writeableBytes() > MaxNumLen)
 		{
-			char* cur = buffer_ + writerIndex_;
+			char* cur = buffer_.get() + writerIndex_;
 			if (::std::isnan(f))
 			{
 				::memcpy(cur, "nan", 3);
@@ -106,8 +92,17 @@ namespace nets::base
 			}
 			else
 			{
-				writerIndex_ += ::snprintf(cur, MaxNumSize, "%.18g", f);
+				writerIndex_ += ::snprintf(cur, writeableBytes(), "%.18g", f);
 			}
+		}
+	}
+
+	void ByteStream::appendStr(const char* data, uint32_t len)
+	{
+		if (writeableBytes() > len)
+		{
+			::memcpy(buffer_.get() + writerIndex_, data, len);
+			writerIndex_ += len;
 		}
 	}
 
@@ -167,7 +162,7 @@ namespace nets::base
 
 	ByteStream& ByteStream::operator<<(const void* ptr)
 	{
-		appendPointer(reinterpret_cast<uintptr_t>(ptr));
+		appendPointer(ptr);
 		return *this;
 	}
 
@@ -181,15 +176,6 @@ namespace nets::base
 	{
 		appendFloat(f);
 		return *this;
-	}
-
-	void ByteStream::appendStr(const char* data, uint32_t len)
-	{
-		if (writeableBytes() > len)
-		{
-			::memcpy(buffer_ + writerIndex_, data, len);
-			writerIndex_ += len;
-		}
 	}
 
 	ByteStream& ByteStream::operator<<(const char* str)
@@ -206,13 +192,14 @@ namespace nets::base
 
 	ByteStream& ByteStream::operator<<(const std::string_view& str)
 	{
-		appendStr(str.data(), str.length());;
+		appendStr(str.data(), str.length());
+		;
 		return *this;
 	}
 
 	ByteStream& ByteStream::operator<<(const ByteStream& stream)
 	{
-		appendStr(stream.buffer_, stream.writerIndex_);
+		appendStr(stream.buffer_.get(), stream.writerIndex_);
 		return *this;
 	}
 

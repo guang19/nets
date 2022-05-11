@@ -213,7 +213,7 @@ namespace nets::base
 
 	bool ThreadPool::addThreadTask(const TaskType& task, bool isCore, SizeType threadSize)
 	{
-		threadSize += 1;
+		++threadSize;
 		char threadName[ThreadNameMaxLength] = {0};
 		::snprintf(threadName, ThreadNameMaxLength, "Thread-%zu", threadSize);
 		threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));

@@ -7,6 +7,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <memory>
 
 #include "nets/base/Copyable.h"
 
@@ -19,7 +20,7 @@ namespace nets::base
 
 	public:
 		explicit ByteBuffer(SizeTp capacity);
-		virtual ~ByteBuffer();
+		virtual ~ByteBuffer() = default;
 
 		ByteBuffer(const ByteBuffer& other);
 		ByteBuffer(ByteBuffer&& other) noexcept;
@@ -80,8 +81,11 @@ namespace nets::base
 			return capacity_;
 		}
 
+	private:
+		using CharPtr = ::std::unique_ptr<char[]>;
+
 	protected:
-		char* buffer_ {nullptr};
+		CharPtr buffer_ {nullptr};
 		// reader pointer
 		SizeTp readerIndex_ {0};
 		// writer pointer

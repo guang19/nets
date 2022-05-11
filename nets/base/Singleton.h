@@ -51,9 +51,7 @@ protected:                                                                      
                                                                                                                             \
 	static void destroy()                                                                                                   \
 	{                                                                                                                       \
-		typedef char T_must_be_complete_type[sizeof(CLASS_NAME) == 0 ? -1 : 1];                                             \
-		T_must_be_complete_type jugg;                                                                                       \
-		UNUSED(jugg);                                                                                                       \
+		CHECK_CLASS_COMPLETE_TYPE(CLASS_NAME);                                                                              \
 		if (Instance != nullptr)                                                                                            \
 		{                                                                                                                   \
 			delete Instance;                                                                                                \
@@ -81,10 +79,10 @@ public:                                                                         
                                                                                                                             \
 private:                                                                                                                    \
 	static CLASS_NAME* Instance;                                                                                            \
-	static ::std::once_flag OnceFlag;
+	static ::std::once_flag OnceFlag
 
 #define INIT_SINGLETON(CLASS_NAME)                                                                                          \
 	CLASS_NAME* CLASS_NAME::Instance {nullptr};                                                                             \
-	::std::once_flag CLASS_NAME::OnceFlag {};
+	::std::once_flag CLASS_NAME::OnceFlag {}
 
 #endif // NETS_BASE_SINGLETON_H

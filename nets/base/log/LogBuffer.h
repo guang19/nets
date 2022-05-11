@@ -25,7 +25,12 @@ namespace nets::base
 	public:
 		const char* buffer() const
 		{
-			return buffer_;
+			return buffer_.get() + readerIndex_;
+		}
+
+		SizeTp len() const
+		{
+			return readableBytes();
 		}
 	};
 } // namespace nets::base

@@ -8,8 +8,8 @@ namespace nets::base
 {
 	namespace
 	{
-		// log length limit: 4K
-		constexpr uint32_t DefaultLogBufferLength = (1024 << 2);
+		// log length limit: 2K
+		constexpr uint32_t DefaultLogBufferLength = (1024 << 1);
 	} // namespace
 
 	LogBuffer::LogBuffer() : ByteStream(DefaultLogBufferLength) {}

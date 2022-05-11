@@ -34,8 +34,6 @@ namespace nets::base
 		using PredicateType = ::std::function<bool()>;
 
 	public:
-		const static SizeType DefaultMaxQueueSize = INT32_MAX - 1;
-
 		BoundedBlockingQueue() : maxQueueSize_(DefaultMaxQueueSize) {}
 		explicit BoundedBlockingQueue(SizeType maxQueueSize) : maxQueueSize_(maxQueueSize) {}
 
@@ -99,6 +97,8 @@ namespace nets::base
 		MutexType mutex_ {};
 		ConditionVariableType notFullCV_ {};
 		ConditionVariableType notEmptyCV_ {};
+
+		const static SizeType DefaultMaxQueueSize = INT32_MAX - 1;
 	};
 
 	template <typename T>

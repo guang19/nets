@@ -5,6 +5,7 @@
 #include "nets/base/ByteBuffer.h"
 
 #include <algorithm>
+#include <limits>
 
 #include "nets/base/CommonMacro.h"
 
@@ -13,16 +14,7 @@ namespace nets::base
 	ByteBuffer::ByteBuffer(SizeTp capacity)
 		: buffer_(new char[capacity]), readerIndex_(0), writerIndex_(0), capacity_(capacity)
 	{
-		MEMZERO(buffer_, capacity_);
-	}
-
-	ByteBuffer::~ByteBuffer()
-	{
-		if (buffer_ != nullptr)
-		{
-			delete[] buffer_;
-			buffer_ = nullptr;
-		}
+		MEMZERO(buffer_.get(), capacity_);
 	}
 
 	ByteBuffer::ByteBuffer(const ByteBuffer& other)
@@ -30,9 +22,9 @@ namespace nets::base
 		readerIndex_ = other.readerIndex_;
 		writerIndex_ = other.writerIndex_;
 		capacity_ = other.capacity_;
-		buffer_ = new char[capacity_];
-		MEMZERO(buffer_, capacity_);
-		::memcpy(buffer_, other.buffer_, capacity_);
+		buffer_.reset(new char[capacity_]);
+		MEMZERO(buffer_.get(), capacity_);
+		::memcpy(buffer_.get(), other.buffer_.get(), capacity_);
 	}
 
 	ByteBuffer::ByteBuffer(ByteBuffer&& other) noexcept
@@ -40,8 +32,7 @@ namespace nets::base
 		readerIndex_ = other.readerIndex_;
 		writerIndex_ = other.writerIndex_;
 		capacity_ = other.capacity_;
-		buffer_ = other.buffer_;
-		other.buffer_ = nullptr;
+		buffer_ = ::std::move(other.buffer_);
 		other.readerIndex_ = 0;
 		other.writerIndex_ = 0;
 		other.capacity_ = 0;
@@ -54,13 +45,9 @@ namespace nets::base
 			readerIndex_ = other.readerIndex_;
 			writerIndex_ = other.writerIndex_;
 			capacity_ = other.capacity_;
-			if (buffer_ != nullptr)
-			{
-				delete[] buffer_;
-			}
-			buffer_ = new char[capacity_];
-			MEMZERO(buffer_, capacity_);
-			::memcpy(buffer_, other.buffer_, capacity_);
+			buffer_.reset(new char[capacity_]);
+			MEMZERO(buffer_.get(), capacity_);
+			::memcpy(buffer_.get(), other.buffer_.get(), capacity_);
 		}
 		return *this;
 	}
@@ -72,12 +59,7 @@ namespace nets::base
 			readerIndex_ = other.readerIndex_;
 			writerIndex_ = other.writerIndex_;
 			capacity_ = other.capacity_;
-			if (buffer_ != nullptr)
-			{
-				delete[] buffer_;
-			}
-			buffer_ = other.buffer_;
-			other.buffer_ = nullptr;
+			buffer_ = ::std::move(other.buffer_);
 			other.readerIndex_ = 0;
 			other.writerIndex_ = 0;
 			other.capacity_ = 0;

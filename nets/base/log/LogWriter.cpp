@@ -112,13 +112,7 @@ namespace nets::base
 				int32_t err = ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(::stderr,
-							  "Error:log file append error "
-							  "\""
-							  "%s"
-							  "\""
-							  "\n",
-							  ::strerror(err));
+					::fprintf(::stderr,"Error:log file append error ""\"%s\"""\n", ::strerror(err));
 					break;
 				}
 			}
@@ -201,7 +195,9 @@ namespace nets::base
 
 	void LogFile::getFileInfo(uint64_t* fileSize, ::time_t* createTime)
 	{
-		struct stat fileInfo {};
+		struct stat fileInfo
+		{
+		};
 		if (::fstat(::fileno(fp_), &fileInfo) != 0)
 		{
 			return;
@@ -400,10 +396,14 @@ namespace nets::base
 	}
 
 	INIT_SINGLETON(AsyncLogWriter);
+	INIT_SINGLETON(StdoutPersistentWriter);
 
-	void AsyncLogWriter::write(LogBuffer logBuffer)
+	void AsyncLogWriter::write(const char* data, uint32_t len)
+	{}
+
+	void StdoutPersistentWriter::persist(const char* data, uint32_t len)
 	{
-		::fwrite(logBuffer.buffer(), 1, logBuffer.writerIndex(), ::stdout);
+		::fwrite(data, 1, len, ::stdout);
 		::fflush(::stdout);
-	}
+	};
 } // namespace nets::base

@@ -31,7 +31,7 @@ namespace nets::base
 		void appendFloat(Float f);
 
 		void appendStr(const char* data, uint32_t len);
-		void appendPointer(uintptr_t ptr);
+		void appendPointer(const void* ptr);
 
 	public:
 		ByteStream& operator<<(char c);

@@ -7,9 +7,9 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <memory>
 #include <mutex>
-#include <functional>
 #include <thread>
 #include <vector>
 
@@ -81,9 +81,21 @@ namespace nets::base
 	};
 
 	//////////////////////////////////////////////////////
-	class IPersister
+	class IPersistentWriter
 	{
+	public:
+		virtual ~IPersistentWriter() {}
 
+		virtual void persist(const char* data, uint32_t len) = 0;
+	};
+
+	DECLARE_SINGLETON_CLASS(StdoutPersistentWriter), public IPersistentWriter
+	{
+		DEFINE_SINGLETON(StdoutPersistentWriter);
+
+	public:
+		~StdoutPersistentWriter() override = default;
+		void persist(const char* data, uint32_t len) override;
 	};
 
 	class ILogWriter2
@@ -92,7 +104,7 @@ namespace nets::base
 		virtual ~ILogWriter2() = default;
 
 	public:
-		virtual void write(LogBuffer logBuffer) = 0;
+		virtual void write(const char* data, uint32_t len) = 0;
 	};
 
 	DECLARE_SINGLETON_CLASS(AsyncLogWriter), public ILogWriter2
@@ -112,18 +124,12 @@ namespace nets::base
 		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
 
 	private:
-		AsyncLogWriter()
-		{
+		AsyncLogWriter() {}
 
-		}
-
-		~AsyncLogWriter()
-		{
-
-		}
+		~AsyncLogWriter() override = default;
 
 	public:
-		void write(LogBuffer logBuffer) override;
+		void write(const char* data, uint32_t len) override;
 
 	private:
 		MutexType mutex_ {};
