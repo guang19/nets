@@ -13,5 +13,5 @@ namespace nets::net
 
 	NetPackage::NetPackage() : ByteBuffer(DefaultNetPackageLength) {}
 
-	NetPackage::NetPackage(ByteBuffer::SizeTp capacity) : ByteBuffer(capacity) {}
+	NetPackage::NetPackage(ByteBuffer::SizeType capacity) : ByteBuffer(capacity) {}
 } // namespace nets::net

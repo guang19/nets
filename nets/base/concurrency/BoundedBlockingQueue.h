@@ -98,7 +98,7 @@ namespace nets::base
 		ConditionVariableType notFullCV_ {};
 		ConditionVariableType notEmptyCV_ {};
 
-		const static SizeType DefaultMaxQueueSize = INT32_MAX - 1;
+		static const SizeType DefaultMaxQueueSize = INT32_MAX - 1;
 	};
 
 	template <typename T>

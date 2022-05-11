@@ -16,10 +16,10 @@ namespace nets::base
 	class ByteBuffer : public Copyable
 	{
 	public:
-		using SizeTp = uint32_t;
+		using SizeType = uint32_t;
 
 	public:
-		explicit ByteBuffer(SizeTp capacity);
+		explicit ByteBuffer(SizeType capacity);
 		virtual ~ByteBuffer() = default;
 
 		ByteBuffer(const ByteBuffer& other);
@@ -30,38 +30,38 @@ namespace nets::base
 		void swap(ByteBuffer&& other);
 
 	public:
-		inline SizeTp readerIndex() const
+		inline SizeType readerIndex() const
 		{
 			return readerIndex_;
 		}
 
-		inline SizeTp writerIndex() const
+		inline SizeType writerIndex() const
 		{
 			return writerIndex_;
 		}
 
-		inline void setIndex(SizeTp readerIndex, SizeTp writerIndex)
+		inline void setIndex(SizeType readerIndex, SizeType writerIndex)
 		{
 			readerIndex_ = readerIndex;
 			writerIndex_ = writerIndex;
 		}
 
-		inline void setReaderIndex(SizeTp readerIndex)
+		inline void setReaderIndex(SizeType readerIndex)
 		{
 			readerIndex_ = readerIndex;
 		}
 
-		inline void setWriterIndex(SizeTp writerIndex)
+		inline void setWriterIndex(SizeType writerIndex)
 		{
 			writerIndex_ = writerIndex;
 		}
 
-		inline SizeTp readableBytes() const
+		inline SizeType readableBytes() const
 		{
 			return writerIndex_ - readerIndex_;
 		}
 
-		inline SizeTp writeableBytes() const
+		inline SizeType writeableBytes() const
 		{
 			return capacity_ - writerIndex_;
 		}
@@ -76,7 +76,7 @@ namespace nets::base
 			return (capacity_ - writerIndex_) > 0;
 		}
 
-		inline SizeTp capacity() const
+		inline SizeType capacity() const
 		{
 			return capacity_;
 		}
@@ -87,10 +87,10 @@ namespace nets::base
 	protected:
 		CharPtr buffer_ {nullptr};
 		// reader pointer
-		SizeTp readerIndex_ {0};
+		SizeType readerIndex_ {0};
 		// writer pointer
-		SizeTp writerIndex_ {0};
-		SizeTp capacity_ {0};
+		SizeType writerIndex_ {0};
+		SizeType capacity_ {0};
 	};
 } // namespace nets::base
 

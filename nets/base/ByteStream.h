@@ -15,7 +15,7 @@ namespace nets::base
 	class ByteStream : public ByteBuffer
 	{
 	public:
-		explicit ByteStream(SizeTp capacity);
+		explicit ByteStream(SizeType capacity);
 		~ByteStream() override = default;
 
 		ByteStream(const ByteStream& stream);

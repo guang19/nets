@@ -13,10 +13,10 @@ using namespace nets::base;
 TEST(TimestampTest, BasicUse)
 {
 	Timestamp now(Timestamp::now());
-	::time_t tmp = now.secondsSinceEpoch();
+	::time_t tmp = now.secsFromTimestamp();
 	Timestamp now2 = ::std::move(now);
-	ASSERT_EQ(now2.secondsSinceEpoch(), tmp);
-	ASSERT_EQ(now.secondsSinceEpoch(), 0);
+	ASSERT_EQ(now2.secsFromTimestamp(), tmp);
+	ASSERT_EQ(now.secsFromTimestamp(), 0);
 }
 
 int main(int argc, char** argv)

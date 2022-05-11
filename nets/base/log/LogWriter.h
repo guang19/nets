@@ -47,23 +47,27 @@ namespace nets::base
 	class LogFile : Noncopyable
 	{
 	public:
+		using SizeType = ::size_t;
+		using TimeType = ::time_t;
+
+	public:
 		explicit LogFile(const char* file);
 		~LogFile();
 
 	public:
-		void append(const char* data, uint32_t len);
+		void append(const char* data, SizeType len);
 		void flush();
 
-		void renameByNowTime(::time_t now);
+		void renameByNowTime(TimeType now);
 
 		void mkdirR(const char* multiLevelDir);
 
-		inline uint32_t size() const
+		inline SizeType size() const
 		{
 			return bytes_;
 		}
 
-		inline ::time_t lastRollTime() const
+		inline TimeType lastRollTime() const
 		{
 			return lastRollTime_;
 		}
@@ -80,174 +84,139 @@ namespace nets::base
 		char* buffer_ {nullptr};
 	};
 
-	//////////////////////////////////////////////////////
 	class IPersistentWriter
 	{
-	public:
-		virtual ~IPersistentWriter() {}
+	protected:
+		using SizeType = ::size_t;
+		using TimeType = ::time_t;
+		using FilePtr = ::std::unique_ptr<LogFile>;
 
-		virtual void persist(const char* data, uint32_t len) = 0;
+		FilePtr logFile_ {nullptr};
+
+		IPersistentWriter();
+		virtual ~IPersistentWriter() = default;
+
+	public:
+		virtual void persist(const char* data, SizeType len, TimeType persistTime) = 0;
 	};
 
 	DECLARE_SINGLETON_CLASS(StdoutPersistentWriter), public IPersistentWriter
 	{
 		DEFINE_SINGLETON(StdoutPersistentWriter);
 
-	public:
+	private:
+		StdoutPersistentWriter() = default;
 		~StdoutPersistentWriter() override = default;
-		void persist(const char* data, uint32_t len) override;
-	};
-
-	class ILogWriter2
-	{
-	protected:
-		virtual ~ILogWriter2() = default;
 
 	public:
-		virtual void write(const char* data, uint32_t len) = 0;
+		void persist(const char* data, SizeType len, TimeType persistTime) override;
 	};
 
-	DECLARE_SINGLETON_CLASS(AsyncLogWriter), public ILogWriter2
+	DECLARE_SINGLETON_CLASS(SingleLogFilePersistentWriter), public IPersistentWriter
 	{
-		DEFINE_SINGLETON(AsyncLogWriter);
+		DEFINE_SINGLETON(SingleLogFilePersistentWriter);
 
 	private:
-		using FilePtr = ::std::unique_ptr<LogFile>;
-		using BufferPtr = ::std::unique_ptr<LogBuffer>;
-		using MutexType = ::std::mutex;
-		using LockGuardType = ::std::lock_guard<MutexType>;
-		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using AtomicBoolType = ::std::atomic<bool>;
-		using ConditionVarType = ::std::condition_variable;
-		using BufferVectorType = ::std::vector<BufferPtr>;
-		using TaskType = ::std::function<void()>;
-		using BlockingQueuePtr = ::std::unique_ptr<nets::base::BoundedBlockingQueue<TaskType>>;
-
-	private:
-		AsyncLogWriter() {}
-
-		~AsyncLogWriter() override = default;
+		SingleLogFilePersistentWriter() = default;
+		~SingleLogFilePersistentWriter() override = default;
 
 	public:
-		void write(const char* data, uint32_t len) override;
+		void persist(const char* data, SizeType len, TimeType persistTime) override;
+	};
+
+	DECLARE_SINGLETON_CLASS(DailyLogFilePersistentWriter), public IPersistentWriter
+	{
+		DEFINE_SINGLETON(DailyLogFilePersistentWriter);
 
 	private:
-		MutexType mutex_ {};
-		::std::thread writerProducer {};
-		::std::thread writerConsumer {};
-		BufferVectorType buffers_ {};
-		BlockingQueuePtr writerQueue_ {nullptr};
+		DailyLogFilePersistentWriter() = default;
+		~DailyLogFilePersistentWriter() override = default;
+
+	public:
+		void persist(const char* data, SizeType len, TimeType persistTime) override;
+
+	private:
 	};
-	///////////////////////////////////////////////////
+
+	DECLARE_SINGLETON_CLASS(RollingLogFilePersistentWriter), public IPersistentWriter
+	{
+		DEFINE_SINGLETON(RollingLogFilePersistentWriter);
+
+	private:
+		RollingLogFilePersistentWriter() = default;
+		~RollingLogFilePersistentWriter() override = default;
+
+	public:
+		void persist(const char* data, SizeType len, TimeType persistTime) override;
+	};
+
+	class PersistentWriterFactory
+	{
+	public:
+		static ::std::shared_ptr<IPersistentWriter> getPersistentWriter();
+	};
 
 	class ILogWriter
 	{
 	protected:
+		using SizeType = ::size_t;
+		using TimeType = ::time_t;
+
+		ILogWriter() = default;
 		virtual ~ILogWriter() = default;
 
 	public:
-		virtual void write(const char* data, uint32_t len) = 0;
+		virtual void write(const char* data, SizeType len) = 0;
 	};
 
-	DECLARE_SINGLETON_CLASS(StdoutLogWriter), public ILogWriter
+	DECLARE_SINGLETON_CLASS(AsyncLogWriter), public ILogWriter
 	{
-		DEFINE_SINGLETON(StdoutLogWriter);
+		DEFINE_SINGLETON(AsyncLogWriter);
 
-	public:
-		void write(const char* data, uint32_t len) override;
-	};
-
-	class AsyncFileLogWriter : public ILogWriter
-	{
-		using FilePtr = ::std::unique_ptr<LogFile>;
+	private:
 		using BufferPtr = ::std::unique_ptr<LogBuffer>;
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
 		using AtomicBoolType = ::std::atomic<bool>;
 		using ConditionVarType = ::std::condition_variable;
+		using PersistentWriterPtr = ::std::shared_ptr<IPersistentWriter>;
 		using BufferVectorType = ::std::vector<BufferPtr>;
+		using WriterTaskType = ::std::function<void()>;
+		using BlockingQueueType = BoundedBlockingQueue<WriterTaskType>;
+		using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
+
+	protected:
+		AsyncLogWriter();
+		~AsyncLogWriter() override;
 
 	public:
-		AsyncFileLogWriter();
-		~AsyncFileLogWriter() override;
-
-		void write(const char* data, uint32_t len) override;
-
-		void start();
-		void stop();
-
-		////////////////////////////////////////////////////////////////////////////
-	protected:
-		virtual void persist(const char* data, uint32_t len, ::time_t persistTime) = 0;
-
-		FilePtr logFile_ {nullptr};
-		////////////////////////////////////////////////////////////////////////////
+		void write(const char* data, SizeType len) override;
 
 	private:
+		void afterInit()
+		{
+			start();
+		}
+
+		void start();
 		void asyncWrite();
+		void asyncPersist();
 
 	private:
 		AtomicBoolType running_ {false};
 		BufferPtr cacheBuffer_ {nullptr};
 		BufferPtr backupCacheBuffer_ {nullptr};
-		BufferVectorType buffers_ {};
-		::std::thread persistThread_ {};
+		PersistentWriterPtr persistentWriter_ {nullptr};
+		::std::thread writerTaskProducer {};
+		::std::thread writerTaskConsumer {};
 		MutexType mutex_ {};
 		ConditionVarType cv_ {};
-	};
-
-	DECLARE_SINGLETON_CLASS(AsyncSingleFileLogWriter), public AsyncFileLogWriter
-	{
-		DEFINE_SINGLETON(AsyncSingleFileLogWriter);
-
-	private:
-		inline void afterInit()
-		{
-			start();
-		}
-
-	protected:
-		void persist(const char* data, uint32_t len, ::time_t persistTime) override;
-	};
-
-	DECLARE_SINGLETON_CLASS(AsyncDailyFileLogWriter), public AsyncFileLogWriter
-	{
-		DEFINE_SINGLETON(AsyncDailyFileLogWriter);
-
-	private:
-		inline void afterInit()
-		{
-			start();
-		}
-
-	protected:
-		void persist(const char* data, uint32_t len, ::time_t persistTime) override;
-	};
-
-	DECLARE_SINGLETON_CLASS(AsyncRollingFileLogWriter), public AsyncFileLogWriter
-	{
-		DEFINE_SINGLETON(AsyncRollingFileLogWriter);
-
-	private:
-		inline void afterInit()
-		{
-			start();
-		}
-
-	protected:
-		void persist(const char* data, uint32_t len, ::time_t persistTime) override;
-	};
-
-	DECLARE_SINGLETON_CLASS(LogWriterFactory)
-	{
-		DEFINE_SINGLETON(LogWriterFactory);
-
-	public:
-		ILogWriter* getLogWriter() const;
+		BufferVectorType buffers_ {};
+		BlockingQueuePtr writerTaskQueue_ {nullptr};
 	};
 } // namespace nets::base
 
-#define LOG_WRITER (nets::base::LogWriterFactory::getInstance()->getLogWriter())
+#define LOG_WRITER (nets::base::AsyncLogWriter::getInstance())
 
 #endif // NETS_LOGWRITER_H

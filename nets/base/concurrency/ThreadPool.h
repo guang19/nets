@@ -30,7 +30,8 @@ namespace nets::base
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
 		using ConditionVariableType = ::std::condition_variable;
-		using BlockingQueuePtr = ::std::unique_ptr<BoundedBlockingQueue<TaskType>>;
+		using BlockingQueueType = BoundedBlockingQueue<TaskType>;
+		using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
 		using ThreadPoolPtr = ThreadPool*;
 
 	public:

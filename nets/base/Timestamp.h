@@ -31,11 +31,8 @@ namespace nets::base
 		explicit Timestamp(TimeType secondsSinceEpoch, uint32_t microseconds);
 
 		Timestamp(const Timestamp& other);
-
 		Timestamp(Timestamp&& other) noexcept;
-
 		Timestamp& operator=(const Timestamp& other);
-
 		Timestamp& operator=(Timestamp&& other) noexcept;
 
 		void swap(Timestamp&& other);
@@ -48,12 +45,12 @@ namespace nets::base
 			return timestampSinceEpoch_;
 		}
 
-		inline TimeType secondsSinceEpoch() const
+		inline TimeType secsFromTimestamp() const
 		{
 			return static_cast<TimeType>(timestampSinceEpoch_ / MicrosecondsPerSecond);
 		}
 
-		inline uint32_t microseconds() const
+		inline uint32_t microsFromTimestamp() const
 		{
 			return static_cast<uint32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
 		}

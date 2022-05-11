@@ -27,7 +27,7 @@ namespace nets::base
 	{
 		struct tm tmS {};
 		const Timestamp& logTime = logMessage.getLogTime();
-		Timestamp::TimeType seconds = logTime.secondsSinceEpoch();
+		Timestamp::TimeType seconds = logTime.secsFromTimestamp();
 		if (seconds != CacheSeconds)
 		{
 			if (localtime_r(&seconds, &tmS) == nullptr)
@@ -43,7 +43,7 @@ namespace nets::base
 		}
 		char timeBuf[24] = {0};
 		::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday,
-				   tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microseconds());
+				   tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp());
 		logBuffer << timeBuf;
 		logBuffer << " [" << currentTid() << "] ";
 		logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';
@@ -51,7 +51,7 @@ namespace nets::base
 		logBuffer << logMessage.getStream();
 	}
 
-	ILogFormatter* LogFormatterFactory::getLogFormatter() const
+	::std::shared_ptr<ILogFormatter> LogFormatterFactory::getLogFormatter() const
 	{
 		return DefaultLogFormatter::getInstance();
 	}

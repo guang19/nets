@@ -10,7 +10,7 @@
 
 namespace nets::base
 {
-	ByteStream::ByteStream(ByteBuffer::SizeTp capacity) : ByteBuffer(capacity) {}
+	ByteStream::ByteStream(ByteBuffer::SizeType capacity) : ByteBuffer(capacity) {}
 
 	namespace
 	{

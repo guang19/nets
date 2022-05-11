@@ -5,6 +5,7 @@
 #ifndef NETS_BASE_SINGLETON_H
 #define NETS_BASE_SINGLETON_H
 
+#include <memory>
 #include <mutex>
 
 #include "nets/base/CommonMacro.h"
@@ -30,7 +31,7 @@
 
 #define DEFINE_SINGLETON(CLASS_NAME)                                                                                        \
                                                                                                                             \
-protected:                                                                                                                  \
+private:                                                                                                                    \
 	template <typename C>                                                                                                   \
 	static void callAfterInit(...)                                                                                          \
 	{                                                                                                                       \
@@ -42,26 +43,22 @@ protected:                                                                      
 		c->afterInit();                                                                                                     \
 	}                                                                                                                       \
                                                                                                                             \
+	static void destroy(CLASS_NAME* instance)                                                                               \
+	{                                                                                                                       \
+		delete instance;                                                                                                    \
+	}                                                                                                                       \
+                                                                                                                            \
 	template <typename... Args>                                                                                             \
 	static void init(Args&&... args)                                                                                        \
 	{                                                                                                                       \
-		Instance = new CLASS_NAME(::std::forward<Args>(args)...);                                                           \
-		callAfterInit<CLASS_NAME>(Instance);                                                                                \
-	}                                                                                                                       \
-                                                                                                                            \
-	static void destroy()                                                                                                   \
-	{                                                                                                                       \
 		CHECK_CLASS_COMPLETE_TYPE(CLASS_NAME);                                                                              \
-		if (Instance != nullptr)                                                                                            \
-		{                                                                                                                   \
-			delete Instance;                                                                                                \
-			Instance = nullptr;                                                                                             \
-		}                                                                                                                   \
+		Instance = ::std::shared_ptr<CLASS_NAME>(new CLASS_NAME(::std::forward<Args>(args)...), &CLASS_NAME::destroy);      \
+		callAfterInit<CLASS_NAME>(Instance.get());                                                                          \
 	}                                                                                                                       \
                                                                                                                             \
 public:                                                                                                                     \
 	template <typename... Args>                                                                                             \
-	static inline CLASS_NAME* getInstance(Args&&... args)                                                                   \
+	static inline ::std::shared_ptr<CLASS_NAME> getInstance(Args&&... args)                                                 \
 	{                                                                                                                       \
 		::std::call_once(                                                                                                   \
 			OnceFlag,                                                                                                       \
@@ -71,18 +68,17 @@ public:                                                                         
 				{                                                                                                           \
 					CLASS_NAME::init(::std::forward<Args>(args0)...);                                                       \
 				}                                                                                                           \
-				::atexit(&CLASS_NAME::destroy);                                                                             \
 			},                                                                                                              \
 			::std::forward<Args>(args)...);                                                                                 \
 		return Instance;                                                                                                    \
 	}                                                                                                                       \
                                                                                                                             \
 private:                                                                                                                    \
-	static CLASS_NAME* Instance;                                                                                            \
+	static ::std::shared_ptr<CLASS_NAME> Instance;                                                                          \
 	static ::std::once_flag OnceFlag
 
 #define INIT_SINGLETON(CLASS_NAME)                                                                                          \
-	CLASS_NAME* CLASS_NAME::Instance {nullptr};                                                                             \
+	::std::shared_ptr<CLASS_NAME> CLASS_NAME::Instance {nullptr};                                                           \
 	::std::once_flag CLASS_NAME::OnceFlag {}
 
 #endif // NETS_BASE_SINGLETON_H

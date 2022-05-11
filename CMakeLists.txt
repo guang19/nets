@@ -30,7 +30,7 @@ ADD_DEFINITIONS(-DLOG_LEVEL=1)
 # 1：SINGLE_FILE：输出单文件，不回滚，不计大小与时间；
 # 2：DAILY_FILE：每日生成一个文件，不计大小；
 # 3：ROLLING_FILE：按照文件大小回滚
-ADD_DEFINITIONS(-DLOG_WRITER_TYPE=1)
+ADD_DEFINITIONS(-DLOG_WRITER_TYPE=0)
 # 日志文件，默认为：“/tmp/nets/nets.log”，请使用绝对路径；
 ADD_DEFINITIONS(-DLOG_FILE="/tmp/nets/nets.log")
 # 日志文件回滚大小，单位:MB，默认24M。（仅当LOG_WRITER为ROLLING_FILE时有效）

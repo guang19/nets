@@ -10,6 +10,12 @@
 
 using namespace nets::base;
 
+TEST(LoggingTest, BasicUse2)
+{
+	::std::unique_ptr<int> ptr = ::std::make_unique<int>(1);
+	::std::unique_ptr<int> ptr2 = ::std::move(ptr);
+}
+
 TEST(LoggingTest, BasicUse)
 {
 	LOGS_TRACE << "这是一条trace信息";
@@ -22,7 +28,7 @@ TEST(LoggingTest, BasicUse)
 		{
 			LOGS_DEBUG << "这是一条debug信息";
 		});
-	LOGS_FATAL << "这是一条流式fatal信息";
+//	LOGS_FATAL << "这是一条流式fatal信息";
 }
 
 // change option LOG_WRITER_TYPE to 1（SINGLE_FILE）

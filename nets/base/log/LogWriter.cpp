@@ -17,27 +17,15 @@
 
 namespace nets::base
 {
-	INIT_SINGLETON(StdoutLogWriter);
-	INIT_SINGLETON(AsyncSingleFileLogWriter);
-	INIT_SINGLETON(AsyncDailyFileLogWriter);
-	INIT_SINGLETON(AsyncRollingFileLogWriter);
-	INIT_SINGLETON(LogWriterFactory);
-
-	void StdoutLogWriter::write(const char* data, uint32_t len)
-	{
-		::fwrite(data, 1, len, ::stdout);
-		::fflush(::stdout);
-	}
-
 	namespace
 	{
-		constexpr uint32_t FileIOBufferSize = 1024 << 3;
+		constexpr ::size_t FileIOBufferSize = 1024 << 3;
 		constexpr uint32_t MaxFilePathLen = 256;
 	} // namespace
 
 	LogFile::LogFile(const char* file)
 	{
-		uint32_t filePathLen = ::strlen(file);
+		::uint32_t filePathLen = ::strlen(file);
 		if (filePathLen > MaxFilePathLen)
 		{
 
@@ -49,9 +37,9 @@ namespace nets::base
 		::memcpy(tmpFile, file, filePathLen);
 		// <dirname> will modify input str, so called <basename> before <dirname>
 		const char* filename = ::basename(tmpFile);
-		uint32_t filenameLen = ::strlen(filename);
+		::uint32_t filenameLen = ::strlen(filename);
 		const char* dir = ::dirname(tmpFile);
-		uint32_t dirLen = ::strlen(dir);
+		::uint32_t dirLen = ::strlen(dir);
 		dir_ = new char[dirLen + 1];
 		filename_ = new char[filenameLen + 1];
 		MEMZERO(dir_, dirLen + 1);
@@ -99,7 +87,7 @@ namespace nets::base
 		}
 	}
 
-	void LogFile::append(const char* data, uint32_t len)
+	void LogFile::append(const char* data, SizeType len)
 	{
 		uint64_t writtenBytes = 0;
 		while (writtenBytes < len)
@@ -112,7 +100,11 @@ namespace nets::base
 				int32_t err = ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(::stderr,"Error:log file append error ""\"%s\"""\n", ::strerror(err));
+					::fprintf(::stderr,
+							  "Error:log file append error "
+							  "\"%s\""
+							  "\n",
+							  ::strerror(err));
 					break;
 				}
 			}
@@ -126,14 +118,16 @@ namespace nets::base
 		::fflush(fp_);
 	}
 
-	void LogFile::renameByNowTime(::time_t now)
+	void LogFile::renameByNowTime(TimeType now)
 	{
 		if (fp_ != nullptr)
 		{
 			::fclose(fp_);
 			fp_ = nullptr;
 		}
-		struct tm tmS {};
+		struct tm tmS
+		{
+		};
 		::localtime_r(&now, &tmS);
 		char newFilename[24] = {0};
 		MEMZERO(newFilename, 24);
@@ -193,7 +187,7 @@ namespace nets::base
 		}
 	}
 
-	void LogFile::getFileInfo(uint64_t* fileSize, ::time_t* createTime)
+	void LogFile::getFileInfo(SizeType* fileSize, TimeType* createTime)
 	{
 		struct stat fileInfo
 		{
@@ -214,50 +208,113 @@ namespace nets::base
 
 	namespace
 	{
-		const char* const AsyncLogThreadName = "AsyncLogThread";
 		// Log buffer cache 2M
-		constexpr uint32_t MaxLogBufferSize = 2 * 1024 * 1024;
+		constexpr ::size_t MaxLogBufferSize = 2 * 1024 * 1024;
 		// Log buffer flush interval,unit：milliseconds
-		constexpr uint32_t LogBufferFlushInterval = 1000;
+		constexpr ::time_t LogBufferFlushInterval = 1000;
 	} // namespace
 
-	AsyncFileLogWriter::AsyncFileLogWriter()
-		: logFile_(new LogFile(LOG_FILE)), running_(false), cacheBuffer_(new LogBuffer(MaxLogBufferSize)),
-		  backupCacheBuffer_(new LogBuffer(MaxLogBufferSize)), buffers_(), mutex_(), cv_()
+	INIT_SINGLETON(StdoutPersistentWriter);
+	INIT_SINGLETON(SingleLogFilePersistentWriter);
+	INIT_SINGLETON(DailyLogFilePersistentWriter);
+	INIT_SINGLETON(RollingLogFilePersistentWriter);
+
+	IPersistentWriter::IPersistentWriter() : logFile_(new LogFile(LOG_FILE)) {}
+
+	void StdoutPersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	{
+		UNUSED(persistTime);
+		::fwrite(data, 1, len, ::stdout);
+		::fflush(::stdout);
+	}
+
+	void SingleLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	{
+		UNUSED(persistTime);
+		logFile_->append(data, len);
+	}
+
+	namespace
+	{
+		// if you need test DAILY_FILE LogWriter, you need to adjust this
+		// constant for short intervals, not for the whole day
+		constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
+		// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
+		// constexpr ::time_t SecondsPerDay = 30;
+	} // namespace
+
+	void DailyLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	{
+		if (persistTime - logFile_->lastRollTime() >= SecondsPerDay)
+		{
+			logFile_->renameByNowTime(persistTime);
+		}
+		logFile_->append(data, len);
+	}
+
+	namespace
+	{
+		// if you need test ROLLING_FILE LogWriter, you need to adjust this
+		// constant  as small as possible
+		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
+		// constexpr ::size_t LogFileRollingSize = 200;
+	} // namespace
+
+	void RollingLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	{
+		if (logFile_->size() + len > LogFileRollingSize)
+		{
+			logFile_->renameByNowTime(persistTime);
+		}
+		logFile_->append(data, len);
+	}
+
+	::std::shared_ptr<IPersistentWriter> PersistentWriterFactory::getPersistentWriter()
+	{
+		switch (LOG_WRITER_TYPE)
+		{
+			case LogWriterType::STDOUT:
+				return StdoutPersistentWriter::getInstance();
+			case LogWriterType::SINGLE_FILE:
+				return SingleLogFilePersistentWriter::getInstance();
+			case LogWriterType::DAILY_FILE:
+				return DailyLogFilePersistentWriter::getInstance();
+			case LogWriterType::ROLLING_FILE:
+				return RollingLogFilePersistentWriter::getInstance();
+			default:
+				return StdoutPersistentWriter::getInstance();
+		}
+	}
+
+	INIT_SINGLETON(AsyncLogWriter);
+
+	AsyncLogWriter::AsyncLogWriter()
+		: running_(false), cacheBuffer_(), backupCacheBuffer_(),
+		  persistentWriter_(PersistentWriterFactory::getPersistentWriter()), mutex_(), cv_(), buffers_(),
+		  writerTaskQueue_(::std::make_unique<BlockingQueueType>())
 	{
 		buffers_.reserve(LOG_FILE_ROLLING_SIZE >> 1);
 	}
 
-	AsyncFileLogWriter::~AsyncFileLogWriter()
-	{
-		stop();
-	}
-
-	void AsyncFileLogWriter::start()
-	{
-		if (running_)
-		{
-			return;
-		}
-		running_ = true;
-		persistThread_ = ::std::thread(&AsyncFileLogWriter::asyncWrite, this);
-		setThreadName(persistThread_.native_handle(), AsyncLogThreadName);
-	}
-
-	void AsyncFileLogWriter::stop()
+	AsyncLogWriter::~AsyncLogWriter()
 	{
 		if (running_)
 		{
 			running_ = false;
 			cv_.notify_one();
-			if (persistThread_.joinable())
+			if (writerTaskProducer.joinable())
 			{
-				persistThread_.join();
+				writerTaskProducer.join();
+			}
+			if (writerTaskConsumer.joinable())
+			{
+				writerTaskConsumer.join();
 			}
 		}
 	}
 
-	void AsyncFileLogWriter::write(const char* data, uint32_t len)
+	void AsyncLogWriter::write(const char* data, SizeType len)
 	{
 		LockGuardType lock(mutex_);
 		if (cacheBuffer_->writeableBytes() > len)
@@ -280,130 +337,81 @@ namespace nets::base
 		}
 	}
 
-	void AsyncFileLogWriter::asyncWrite()
+	void AsyncLogWriter::start()
 	{
-		BufferVectorType tmpBuffers;
-		tmpBuffers.reserve(LOG_FILE_ROLLING_SIZE >> 1);
-		BufferPtr tmpBuffer1(new LogBuffer(MaxLogBufferSize));
-		BufferPtr tmpBuffer2(new LogBuffer(MaxLogBufferSize));
-		::time_t currentTime = 0;
-		try
+		if (running_)
 		{
-			while (running_)
+			return;
+		}
+		running_ = true;
+		writerTaskProducer = ::std::thread(&AsyncLogWriter::asyncWrite, this);
+		writerTaskConsumer = ::std::thread(&AsyncLogWriter::asyncPersist, this);
+	}
+
+	void AsyncLogWriter::asyncWrite()
+	{
+		auto buffers = ::std::make_unique<BufferVectorType>();
+		buffers->reserve(LOG_FILE_ROLLING_SIZE >> 1);
+		BufferPtr tmpBuffer1 = ::std::make_unique<LogBuffer>(MaxLogBufferSize);
+		BufferPtr tmpBuffer2 = ::std::make_unique<LogBuffer>(MaxLogBufferSize);
+		TimeType currentTime = 0;
+		while (running_)
+		{
 			{
+				UniqueLockType lock(mutex_);
+				cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
+							 [this]() -> bool
+							 {
+								 return !buffers_.empty();
+							 });
+				if (buffers_.empty())
 				{
-					UniqueLockType lock(mutex_);
-					cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
-								 [&]() -> bool
-								 {
-									 return !buffers_.empty();
-								 });
-					buffers_.push_back(::std::move(cacheBuffer_));
-					tmpBuffers.swap(buffers_);
-					cacheBuffer_ = ::std::move(tmpBuffer1);
-					if (backupCacheBuffer_ == nullptr)
-					{
-						backupCacheBuffer_ = ::std::move(tmpBuffer2);
-					}
+					lock.unlock();
+					continue;
 				}
-				::time(&currentTime);
-				for (const BufferPtr& buf: tmpBuffers)
+				buffers_.push_back(::std::move(cacheBuffer_));
+				buffers->swap(buffers_);
+				cacheBuffer_ = ::std::move(tmpBuffer1);
+				if (backupCacheBuffer_ == nullptr)
 				{
-					persist(buf->buffer(), buf->writerIndex(), currentTime);
-				}
-				logFile_->flush();
-				tmpBuffers.clear();
-				tmpBuffer1 = std::make_unique<LogBuffer>(MaxLogBufferSize);
-				if (tmpBuffer2 == nullptr)
-				{
-					tmpBuffer2 = std::make_unique<LogBuffer>(MaxLogBufferSize);
+					backupCacheBuffer_ = ::std::move(tmpBuffer2);
 				}
 			}
-			logFile_->flush();
-		}
-		catch (const ::std::exception& exception)
-		{
-			::fprintf(::stderr,
-					  "Error:exception caught while write log to file asynchronously,"
-					  "reason %s\n",
-					  exception.what());
-			::exit(1);
-		}
-		catch (...)
-		{
-			::fprintf(::stderr, "Error:unknown exception caught in log writer asynchronously thread\n");
-			::exit(1);
-		}
-	}
-
-	void AsyncSingleFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
-	{
-		UNUSED(persistTime);
-		logFile_->append(data, len);
-	}
-
-	namespace
-	{
-		// if you need test DAILY_FILE LogWriter, you need to adjust this
-		// constant for short intervals, not for the whole day
-		constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
-		// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-		// constexpr ::time_t SecondsPerDay = 30;
-	} // namespace
-
-	void AsyncDailyFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
-	{
-		if (persistTime - logFile_->lastRollTime() >= SecondsPerDay)
-		{
-			logFile_->renameByNowTime(persistTime);
-		}
-		logFile_->append(data, len);
-	}
-
-	namespace
-	{
-		// if you need test ROLLING_FILE LogWriter, you need to adjust this
-		// constant  as small as possible
-		constexpr uint64_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
-		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-		// constexpr uint64_t LogFileRollingSize = 200;
-	} // namespace
-
-	void AsyncRollingFileLogWriter::persist(const char* data, uint32_t len, ::time_t persistTime)
-	{
-		if (logFile_->size() + len > LogFileRollingSize)
-		{
-			logFile_->renameByNowTime(persistTime);
-		}
-		logFile_->append(data, len);
-	}
-
-	ILogWriter* LogWriterFactory::getLogWriter() const
-	{
-		switch (LOG_WRITER_TYPE)
-		{
-			case LogWriterType::STDOUT:
-				return StdoutLogWriter::getInstance();
-			case LogWriterType::SINGLE_FILE:
-				return AsyncSingleFileLogWriter::getInstance();
-			case LogWriterType::DAILY_FILE:
-				return AsyncDailyFileLogWriter::getInstance();
-			case LogWriterType::ROLLING_FILE:
-				return AsyncRollingFileLogWriter::getInstance();
-			default:
-				return StdoutLogWriter::getInstance();
+			::time(&currentTime);
+			auto writerTask = [this, tmpBuffers = buffers.release(), currentTime]()
+			{
+				for (auto it = tmpBuffers->begin(), end = tmpBuffers->end(); it != end; ++it)
+				{
+					auto logBuffer = it->get();
+					persistentWriter_->persist(logBuffer->buffer() + logBuffer->writerIndex(), logBuffer->len(), currentTime);
+				}
+			};
+			// if not running, the writer task that is not added to the queue will be discarded
+			writerTaskQueue_->put(::std::move(writerTask));
+			buffers = ::std::make_unique<BufferVectorType>();
+			tmpBuffer1 = std::make_unique<LogBuffer>(MaxLogBufferSize);
+			if (tmpBuffer2 == nullptr)
+			{
+				tmpBuffer2 = std::make_unique<LogBuffer>(MaxLogBufferSize);
+			}
 		}
 	}
 
-	INIT_SINGLETON(AsyncLogWriter);
-	INIT_SINGLETON(StdoutPersistentWriter);
-
-	void AsyncLogWriter::write(const char* data, uint32_t len)
-	{}
-
-	void StdoutPersistentWriter::persist(const char* data, uint32_t len)
+	void AsyncLogWriter::asyncPersist()
 	{
-		::fwrite(data, 1, len, ::stdout);
-		::fflush(::stdout);
-	};
+		WriterTaskType writerTask = nullptr;
+		while (running_)
+		{
+			if (writerTaskQueue_->take(writerTask, LogBufferFlushInterval))
+			{
+				writerTask();
+				writerTask = nullptr;
+			}
+		}
+		if (writerTaskQueue_->take(writerTask, LogBufferFlushInterval))
+		{
+			writerTask();
+			writerTask = nullptr;
+		}
+	}
 } // namespace nets::base

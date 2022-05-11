@@ -32,7 +32,7 @@ namespace nets::base
 		DEFINE_SINGLETON(LogFormatterFactory);
 
 	public:
-		ILogFormatter* getLogFormatter() const;
+		::std::shared_ptr<ILogFormatter> getLogFormatter() const;
 	};
 } // namespace nets::base
 

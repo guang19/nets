@@ -13,7 +13,7 @@ namespace nets::net
 	{
 	public:
 		NetPackage();
-		explicit NetPackage(SizeTp capacity);
+		explicit NetPackage(SizeType capacity);
 		~NetPackage() override = default;
 	};
 } // namespace nets::net

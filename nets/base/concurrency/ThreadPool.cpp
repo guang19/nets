@@ -89,7 +89,7 @@ namespace nets::base
 	ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize,
 						   TimeType idleKeepAliveTime, SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy)
 		: name_(name), running_(false), corePoolSize_(corePoolSize), maxPoolSize_(maxPoolSize),
-		  idleKeepAliveTime_(idleKeepAliveTime), taskQueue_(new BoundedBlockingQueue<TaskType>(maxQueueSize)),
+		  idleKeepAliveTime_(idleKeepAliveTime), taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)),
 		  rejectionPolicy_(rejectionPolicy)
 
 	{
@@ -156,7 +156,7 @@ namespace nets::base
 			}
 			threadWrapperRawPtr->task_ = nullptr;
 		}
-		const ::std::function<bool()> notRunning = [this]() -> bool
+		::std::function<bool()> notRunning = [this]() -> bool
 		{
 			return !isRunning();
 		};

@@ -12,9 +12,10 @@
 
 #define MEMZERO(p, len) (::memset((p), 0, (len)))
 
-#define CHECK_CLASS_COMPLETE_TYPE(CLASS)	\
-	char CLASS_MUST_BE_COMPLETE_TYPE[sizeof(CLASS)];	\
-	UNUSED(CLASS_MUST_BE_COMPLETE_TYPE)
+#define CHECK_CLASS_COMPLETE_TYPE(CLASS)                                                                                    \
+	typedef char CLASS_MUST_BE_COMPLETE_TYPE[sizeof(CLASS) == 0 ? -1 : 1];                                                  \
+	CLASS_MUST_BE_COMPLETE_TYPE jugg;                                                                                       \
+	UNUSED(jugg)
 
 #define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
 

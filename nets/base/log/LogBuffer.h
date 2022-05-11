@@ -14,7 +14,7 @@ namespace nets::base
 	{
 	public:
 		LogBuffer();
-		explicit LogBuffer(SizeTp logBufferLength);
+		explicit LogBuffer(SizeType logBufferLength);
 		~LogBuffer() override = default;
 
 		LogBuffer(const LogBuffer& logBuffer);
@@ -28,7 +28,7 @@ namespace nets::base
 			return buffer_.get() + readerIndex_;
 		}
 
-		SizeTp len() const
+		SizeType len() const
 		{
 			return readableBytes();
 		}

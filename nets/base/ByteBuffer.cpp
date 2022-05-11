@@ -11,8 +11,8 @@
 
 namespace nets::base
 {
-	ByteBuffer::ByteBuffer(SizeTp capacity)
-		: buffer_(new char[capacity]), readerIndex_(0), writerIndex_(0), capacity_(capacity)
+	ByteBuffer::ByteBuffer(SizeType capacity)
+		: buffer_(::std::make_unique<char[]>(capacity)), readerIndex_(0), writerIndex_(0), capacity_(capacity)
 	{
 		MEMZERO(buffer_.get(), capacity_);
 	}
