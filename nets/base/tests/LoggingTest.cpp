@@ -10,12 +10,6 @@
 
 using namespace nets::base;
 
-TEST(LoggingTest, BasicUse2)
-{
-	::std::unique_ptr<int> ptr = ::std::make_unique<int>(1);
-	::std::unique_ptr<int> ptr2 = ::std::move(ptr);
-}
-
 TEST(LoggingTest, BasicUse)
 {
 	LOGS_TRACE << "这是一条trace信息";
@@ -28,7 +22,9 @@ TEST(LoggingTest, BasicUse)
 		{
 			LOGS_DEBUG << "这是一条debug信息";
 		});
+	t1.join();
 //	LOGS_FATAL << "这是一条流式fatal信息";
+//	::std::this_thread::sleep_for(::std::chrono::milliseconds(500));
 }
 
 // change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
@@ -39,8 +35,7 @@ TEST(LoggingTest, SingleFile)
 	LOGS_INFO << "这是一条info信息 stream";
 	LOGS_WARN << "这是一条warn信息 stream";
 	LOGS_ERROR << "这是一条error信息 stream";
-//	LOGS_FATAL << "这是一条流式fatal信息 stream";
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+	LOGS_FATAL << "这是一条流式fatal信息 stream";
 }
 
 // before execute:

@@ -127,7 +127,7 @@ namespace nets::base
 		// notify blocking thread
 		taskQueue_->notifyBlockingThread();
 		poolCV_.wait(lock,
-					 [&]() -> bool
+					 [this]() -> bool
 					 {
 						 return threadPool_.empty();
 					 });

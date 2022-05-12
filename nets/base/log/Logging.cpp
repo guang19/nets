@@ -18,11 +18,11 @@ namespace nets::base
 	{
 		logMessage_.getStream() << '\n';
 		LOG_FORMATTER->formatLogMessage(*this, logMessage_);
-		LOG_WRITER->write(buffer() + readerIndex(), writerIndex());
+		LOG_WRITER->write(buffer(), writerIndex());
 		if (logMessage_.getLogLevel() == LogLevel::FATAL)
 		{
 			// if exit directly, log buffer in memory probably will lost
-			::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+			::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
 			exit(1);
 		}
 	}

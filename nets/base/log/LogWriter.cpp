@@ -4,16 +4,13 @@
 
 #include "nets/base/log/LogWriter.h"
 
+#include <cassert>
 #include <cstring>
-#include <ctime>
 #include <libgen.h>
-#include <memory>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <utility>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/base/ThreadHelper.h"
 
 namespace nets::base
 {
@@ -32,20 +29,20 @@ namespace nets::base
 			::fprintf(::stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
 			::exit(1);
 		}
+		file_ = ::std::make_unique<char[]>(filePathLen);
+		MEMZERO(file_.get(), filePathLen);
+		::memcpy(file_.get(), file, filePathLen);
+
 		char tmpFile[MaxFilePathLen] = {0};
-		MEMZERO(tmpFile, MaxFilePathLen);
 		::memcpy(tmpFile, file, filePathLen);
 		// <dirname> will modify input str, so called <basename> before <dirname>
 		const char* filename = ::basename(tmpFile);
 		::uint32_t filenameLen = ::strlen(filename);
 		const char* dir = ::dirname(tmpFile);
 		::uint32_t dirLen = ::strlen(dir);
-		dir_ = new char[dirLen + 1];
-		filename_ = new char[filenameLen + 1];
-		MEMZERO(dir_, dirLen + 1);
-		::memcpy(dir_, dir, dirLen);
-		MEMZERO(filename_, filenameLen + 1);
-		::memcpy(filename_, filename, filenameLen);
+		dir_ = ::std::make_unique<char[]>(dirLen);
+		MEMZERO(dir_.get(), dirLen);
+		::memcpy(dir_.get(), dir, dirLen);
 		// log file has parent directory
 		if (::strcmp(dir, ".") != 0)
 		{
@@ -58,9 +55,9 @@ namespace nets::base
 			::exit(1);
 		}
 		getFileInfo(&bytes_, &lastRollTime_);
-		buffer_ = new char[FileIOBufferSize];
-		MEMZERO(buffer_, FileIOBufferSize);
-		::setbuffer(fp_, buffer_, FileIOBufferSize);
+		buffer_ = ::std::make_unique<char[]>(FileIOBufferSize);
+		MEMZERO(buffer_.get(), FileIOBufferSize);
+		::setbuffer(fp_, buffer_.get(), FileIOBufferSize);
 	}
 
 	LogFile::~LogFile()
@@ -69,21 +66,6 @@ namespace nets::base
 		{
 			::fclose(fp_);
 			fp_ = nullptr;
-		}
-		if (dir_ != nullptr)
-		{
-			delete[] dir_;
-			dir_ = nullptr;
-		}
-		if (filename_ != nullptr)
-		{
-			delete[] filename_;
-			filename_ = nullptr;
-		}
-		if (buffer_ != nullptr)
-		{
-			delete[] buffer_;
-			buffer_ = nullptr;
 		}
 	}
 
@@ -133,7 +115,7 @@ namespace nets::base
 		MEMZERO(newFilename, 24);
 		::strftime(newFilename, 20, "%Y-%m-%d_%H-%M-%S", &tmS);
 		::memcpy(newFilename + 19, ".log", 4);
-		if (::strcmp(dir_, ".") != 0)
+		if (::strcmp(dir_.get(), ".") != 0)
 		{
 			char tmpFile1[MaxFilePathLen] = {0};
 			char tmpFile2[MaxFilePathLen] = {0};
@@ -144,12 +126,12 @@ namespace nets::base
 			::strcat(tmpFile2, "/");
 			::strcat(tmpFile2, newFilename);
 			::rename(tmpFile1, tmpFile2);
-			fp_ = ::fopen(tmpFile1, "a");
+			fp_ = ::fopen(file_.get(), "a");
 		}
 		else
 		{
-			::rename(filename_, newFilename);
-			fp_ = ::fopen(filename_, "a");
+			::rename(file_.get(), newFilename);
+			fp_ = ::fopen(file_.get(), "a");
 		}
 		getFileInfo(&bytes_, nullptr);
 		lastRollTime_ = now;
@@ -206,33 +188,36 @@ namespace nets::base
 		}
 	}
 
-	namespace
-	{
-		// Log buffer cache 2M
-		constexpr ::size_t MaxLogBufferSize = 2 * 1024 * 1024;
-		// Log buffer flush interval,unit：milliseconds
-		constexpr ::time_t LogBufferFlushInterval = 1000;
-	} // namespace
-
 	INIT_SINGLETON(StdoutPersistentWriter);
 	INIT_SINGLETON(SingleLogFilePersistentWriter);
 	INIT_SINGLETON(DailyLogFilePersistentWriter);
 	INIT_SINGLETON(RollingLogFilePersistentWriter);
 
-	IPersistentWriter::IPersistentWriter() : logFile_(new LogFile(LOG_FILE)) {}
-
 	void StdoutPersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
 	{
 		UNUSED(persistTime);
 		::fwrite(data, 1, len, ::stdout);
+	}
+
+	void StdoutPersistentWriter::flush()
+	{
 		::fflush(::stdout);
 	}
+
+	SingleLogFilePersistentWriter::SingleLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
 
 	void SingleLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
 	{
 		UNUSED(persistTime);
 		logFile_->append(data, len);
 	}
+
+	void SingleLogFilePersistentWriter::flush()
+	{
+		::fflush(::stdout);
+	}
+
+	DailyLogFilePersistentWriter::DailyLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
 
 	namespace
 	{
@@ -252,13 +237,20 @@ namespace nets::base
 		logFile_->append(data, len);
 	}
 
+	void DailyLogFilePersistentWriter::flush()
+	{
+		logFile_->flush();
+	}
+
+	RollingLogFilePersistentWriter::RollingLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
+
 	namespace
 	{
 		// if you need test ROLLING_FILE LogWriter, you need to adjust this
 		// constant  as small as possible
-		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+		//		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
 		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-		// constexpr ::size_t LogFileRollingSize = 200;
+		constexpr ::size_t LogFileRollingSize = 200;
 	} // namespace
 
 	void RollingLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
@@ -268,6 +260,11 @@ namespace nets::base
 			logFile_->renameByNowTime(persistTime);
 		}
 		logFile_->append(data, len);
+	}
+
+	void RollingLogFilePersistentWriter::flush()
+	{
+		::fflush(::stdout);
 	}
 
 	::std::shared_ptr<IPersistentWriter> PersistentWriterFactory::getPersistentWriter()
@@ -289,12 +286,21 @@ namespace nets::base
 
 	INIT_SINGLETON(AsyncLogWriter);
 
-	AsyncLogWriter::AsyncLogWriter()
-		: running_(false), cacheBuffer_(), backupCacheBuffer_(),
-		  persistentWriter_(PersistentWriterFactory::getPersistentWriter()), mutex_(), cv_(), buffers_(),
-		  writerTaskQueue_(::std::make_unique<BlockingQueueType>())
+	namespace
 	{
-		buffers_.reserve(LOG_FILE_ROLLING_SIZE >> 1);
+		// Log buffer cache 2M
+		constexpr ::size_t MaxLogBufferSize = 2 * 1024 * 1024;
+		// Log buffer flush interval,unit：milliseconds
+		constexpr ::time_t LogBufferFlushInterval = 1000;
+	} // namespace
+
+	AsyncLogWriter::AsyncLogWriter()
+		: running_(false), cacheBuffer_(::std::make_unique<BufferType>(MaxLogBufferSize)),
+		  backupCacheBuffer_(::std::make_unique<BufferType>(MaxLogBufferSize)),
+		  persistentWriter_(PersistentWriterFactory::getPersistentWriter()), mutex_(), cv_(),
+		  buffers_(::std::make_unique<BufferVectorType>()), writerTaskQueue_(::std::make_unique<BlockingQueueType>())
+	{
+		buffers_->reserve(LOG_FILE_ROLLING_SIZE >> 1);
 	}
 
 	AsyncLogWriter::~AsyncLogWriter()
@@ -323,7 +329,7 @@ namespace nets::base
 		}
 		else
 		{
-			buffers_.push_back(::std::move(cacheBuffer_));
+			buffers_->push_back(::std::move(cacheBuffer_));
 			if (backupCacheBuffer_ != nullptr)
 			{
 				cacheBuffer_ = ::std::move(backupCacheBuffer_);
@@ -359,18 +365,19 @@ namespace nets::base
 		{
 			{
 				UniqueLockType lock(mutex_);
+				// first determine whether the buffer vector is empty, and then determine whether cache buffer has data
 				cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
 							 [this]() -> bool
 							 {
-								 return !buffers_.empty();
+								 return !buffers_->empty();
 							 });
-				if (buffers_.empty())
+				if (buffers_->empty() && cacheBuffer_->readableBytes() <= 0)
 				{
 					lock.unlock();
 					continue;
 				}
-				buffers_.push_back(::std::move(cacheBuffer_));
-				buffers->swap(buffers_);
+				buffers_->push_back(::std::move(cacheBuffer_));
+				buffers->swap(*buffers_);
 				cacheBuffer_ = ::std::move(tmpBuffer1);
 				if (backupCacheBuffer_ == nullptr)
 				{
@@ -378,13 +385,14 @@ namespace nets::base
 				}
 			}
 			::time(&currentTime);
-			auto writerTask = [this, tmpBuffers = buffers.release(), currentTime]()
+			auto writerTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
 			{
 				for (auto it = tmpBuffers->begin(), end = tmpBuffers->end(); it != end; ++it)
 				{
 					auto logBuffer = it->get();
-					persistentWriter_->persist(logBuffer->buffer() + logBuffer->writerIndex(), logBuffer->len(), currentTime);
+					persistentWriter_->persist(logBuffer->buffer(), logBuffer->len(), currentTime);
 				}
+				persistentWriter_->flush();
 			};
 			// if not running, the writer task that is not added to the queue will be discarded
 			writerTaskQueue_->put(::std::move(writerTask));
@@ -394,6 +402,24 @@ namespace nets::base
 			{
 				tmpBuffer2 = std::make_unique<LogBuffer>(MaxLogBufferSize);
 			}
+		}
+		// last check
+		assert(!running_);
+		if (!buffers_->empty() || cacheBuffer_->readableBytes() > 0)
+		{
+			buffers_->push_back(::std::move(cacheBuffer_));
+			::time(&currentTime);
+			auto writerTask = [this, tmpBuffers = buffers_.release(), currentTime]() mutable
+			{
+				for (auto it = tmpBuffers->begin(), end = tmpBuffers->end(); it != end; ++it)
+				{
+					auto logBuffer = it->get();
+					persistentWriter_->persist(logBuffer->buffer(), logBuffer->len(), currentTime);
+				}
+				persistentWriter_->flush();
+			};
+			// if not running, the writer task that is not added to the queue will be discarded
+			writerTaskQueue_->put(::std::move(writerTask));
 		}
 	}
 
@@ -408,6 +434,8 @@ namespace nets::base
 				writerTask = nullptr;
 			}
 		}
+		// last check
+		assert(!running_);
 		if (writerTaskQueue_->take(writerTask, LogBufferFlushInterval))
 		{
 			writerTask();
