@@ -40,19 +40,27 @@ TEST_F(ThreadPoolTest, ConstructParameter)
 TEST_F(ThreadPoolTest, ExecuteTask)
 {
 	threadPool->execute(
-		[]() -> bool
+		[]() -> void
 		{
-			::printf("%s\n", currentThreadName());
-			return true;
+			::printf("===%s\n", currentThreadName());
 		});
+
 	threadPool->execute(
 		[](int num) -> bool
 		{
-			::printf("%s\n", currentThreadName());
-			return true;
+			::printf("===%s\n", currentThreadName());
+		  throw ::std::invalid_argument("23123123123");
+		  return true;
 		},
 		5);
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(3000));
+
+	threadPool->execute(
+		[]() -> bool
+		{
+			::printf("===%s\n", currentThreadName());
+			throw "12312312312313123";
+			return true;
+		});
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
@@ -89,6 +97,7 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 {
 	::std::function<void()> f = []()
 	{
+		throw ::std::invalid_argument("123123123");
 		::printf("%s\n", currentThreadName());
 	};
 	auto future1 = threadPool->submit(f);

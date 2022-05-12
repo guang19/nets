@@ -208,9 +208,9 @@ namespace nets::base
 	{
 		// if you need test DAILY_FILE LogWriter, you need to adjust this
 		// constant for short intervals, not for the whole day
-		// constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
-		// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-		 constexpr ::time_t SecondsPerDay = 30;
+		 constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
+		 // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
+		 // constexpr ::time_t SecondsPerDay = 30;
 	} // namespace
 
 	void DailyLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
@@ -403,7 +403,6 @@ namespace nets::base
 				}
 				persistentWriter_->flush();
 			};
-			// if not running, the writer task that is not added to the queue will be discarded
 			writerTaskQueue_->put(::std::move(writerTask));
 		}
 	}

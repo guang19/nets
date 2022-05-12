@@ -8,7 +8,6 @@
 #include <utility>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/base/ThreadHelper.h"
 
 #ifndef CORE_POOL_SIZE
 #define CORE_POOL_SIZE (AVAILABLE_PROCESSOR << 1)
@@ -37,9 +36,12 @@ namespace nets::base
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
 		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
-		  thread_(&ThreadPool::ThreadWrapper::start, this), threadPoolPtr_(threadPoolPtr)
+		  thread_(&ThreadWrapper::start, this), threadPoolPtr_(threadPoolPtr)
 	{
-		setThreadName(thread_.native_handle(), threadName_.c_str());
+	}
+
+	ThreadPool::ThreadWrapper::~ThreadWrapper()
+	{
 		if (thread_.joinable())
 		{
 			thread_.detach();
@@ -48,6 +50,7 @@ namespace nets::base
 
 	void ThreadPool::ThreadWrapper::start()
 	{
+		setCurrentThreadName(threadName_.c_str());
 		threadPoolPtr_->runThread(this);
 	}
 
@@ -140,20 +143,7 @@ namespace nets::base
 	{
 		if (threadWrapperRawPtr->task_ != nullptr)
 		{
-			try
-			{
-				threadWrapperRawPtr->task_();
-			}
-			catch (const ::std::exception& exception)
-			{
-				LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->threadName_
-						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
-			}
-			catch (...)
-			{
-				LOGS_ERROR << "unknown exception caught during thread [" << threadWrapperRawPtr->threadName_
-						   << "] execution in thread pool [" << name_ << ']';
-			}
+			threadWrapperRawPtr->task_();
 			threadWrapperRawPtr->task_ = nullptr;
 		}
 		::std::function<bool()> notRunning = [this]() -> bool
@@ -177,20 +167,7 @@ namespace nets::base
 			}
 			if (threadWrapperRawPtr->task_ != nullptr)
 			{
-				try
-				{
-					threadWrapperRawPtr->task_();
-				}
-				catch (const ::std::exception& exception)
-				{
-					LOGS_ERROR << "exception caught during thread [" << threadWrapperRawPtr->threadName_
-							   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
-				}
-				catch (...)
-				{
-					LOGS_ERROR << "unknown exception caught during thread [" << threadWrapperRawPtr->threadName_
-							   << "] execution in thread pool [" << name_ << ']';
-				}
+				threadWrapperRawPtr->task_();
 				threadWrapperRawPtr->task_ = nullptr;
 			}
 		}
@@ -229,25 +206,12 @@ namespace nets::base
 			case RejectionPolicy::DiscardOlderPolicy:
 			{
 				taskQueue_->popFront();
-				execute(task);
+				submit(task);
 				break;
 			}
 			case RejectionPolicy::CallerRunsPolicy:
 			{
-				try
-				{
-					task();
-				}
-				catch (const ::std::exception& exception)
-				{
-					LOGS_ERROR << "after task is rejected by thread pool [" << name_ << "], exception caught during thread ["
-							   << currentThreadName() << "] execution, reason " << exception.what();
-				}
-				catch (...)
-				{
-					LOGS_ERROR << "after task is rejected by thread pool [" << name_ << "], exception caught during thread ["
-							   << currentThreadName() << "] execution";
-				}
+				task();
 			}
 		}
 	}

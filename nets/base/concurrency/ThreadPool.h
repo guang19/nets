@@ -16,6 +16,7 @@
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
+#include "nets/base/ThreadHelper.h"
 
 namespace nets::base
 {
@@ -26,10 +27,10 @@ namespace nets::base
 		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
 		using AtomicBoolType = ::std::atomic<bool>;
-		using MutexType = ::std::mutex;
+		using MutexType = ::std::recursive_mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using ConditionVariableType = ::std::condition_variable;
+		using ConditionVariableType = ::std::condition_variable_any;
 		using BlockingQueueType = BoundedBlockingQueue<TaskType>;
 		using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
 		using ThreadPoolPtr = ThreadPool*;
@@ -56,7 +57,7 @@ namespace nets::base
 		{
 		public:
 			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
-			~ThreadWrapper() = default;
+			~ThreadWrapper();
 
 			void start();
 
@@ -110,25 +111,28 @@ namespace nets::base
 		}
 
 		template <typename Fn, typename... Args>
-		void execute(Fn&& func, Args... args);
+		void execute(Fn&& func, Args&&... args);
 
 		template <typename Fn, typename... Args,
 				  typename HasRet =
 					  typename ::std::enable_if<!::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
-		::std::future<typename ::std::result_of<Fn(Args...)>::type> submit(Fn&& func, Args... args);
+		::std::future<typename ::std::result_of<Fn(Args...)>::type> submit(Fn&& func, Args&&... args);
 
 		template <typename Fn, typename... Args,
 				  typename HasRet =
 					  typename ::std::enable_if<::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
-		::std::future<void> submit(Fn&& func, Args... args);
+		::std::future<void> submit(Fn&& func, Args&&... args);
+
+	private:
+		template <class RetType>
+		TaskType makeTask(::std::shared_ptr<::std::promise<RetType>> promise, ::std::function<RetType()> promiseTask);
+
+		TaskType makeTask(::std::function<void()> promiseTask);
 
 	private:
 		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-
 		bool addThreadTask(const TaskType& task, bool isCore, SizeType threadSize);
-
 		void reject(const TaskType& task);
 
 	private:
@@ -151,30 +155,27 @@ namespace nets::base
 	};
 
 	template <typename Fn, typename... Args>
-	void ThreadPool::execute(Fn&& func, Args... args)
+	void ThreadPool::execute(Fn&& func, Args&&... args)
 	{
 		submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 	}
 
 	template <typename Fn, typename... Args, typename HasRet>
-	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args... args)
+	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
+		assert(running_);
 		if (!running_)
 		{
 			LOGS_FATAL << "thread pool has not been initialized";
 		}
 		LockGuardType lock(mutex_);
 		using RetType = typename ::std::result_of<Fn(Args...)>::type;
-		auto promiseTask = ::std::make_shared<::std::packaged_task<RetType()>>(
-			::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...));
-		auto future = promiseTask->get_future();
+		auto promise = ::std::make_shared<::std::promise<RetType>>();
+		auto future = promise->get_future();
 		// value capture, ref count plus 1
-		TaskType task = [promiseTask]() mutable
-		{
-			assert(promiseTask.use_count() > 0);
-			(*promiseTask)();
-		};
-		assert(promiseTask.use_count() == 2);
+		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType task = makeTask<RetType>(promise, promiseTask);
+		assert(promise.use_count() == 2);
 		SizeType threadSize = threadPool_.size();
 		// if still able to create core thread
 		if (threadSize < corePoolSize_)
@@ -202,23 +203,17 @@ namespace nets::base
 	}
 
 	template <typename Fn, typename... Args, typename HasRet>
-	::std::future<void> ThreadPool::submit(Fn&& func, Args... args)
+	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
+		assert(running_);
 		if (!running_)
 		{
 			LOGS_FATAL << "thread pool has not been initialized";
 		}
 		LockGuardType lock(mutex_);
-		auto promiseTask = ::std::make_shared<::std::packaged_task<void()>>(
-			::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...));
-		auto future = promiseTask->get_future();
 		// value capture, ref count plus 1
-		TaskType task = [promiseTask]() mutable
-		{
-			assert(promiseTask.use_count() > 0);
-			(*promiseTask)();
-		};
-		assert(promiseTask.use_count() == 2);
+		::std::function<void ()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType task = makeTask(promiseTask);
 		SizeType threadSize = threadPool_.size();
 		// if still able to create core thread
 		if (threadSize < corePoolSize_)
@@ -242,7 +237,53 @@ namespace nets::base
 				}
 			}
 		}
-		return future;
+		return {};
+	}
+
+	template <class RetType>
+	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<RetType>> promise, ::std::function<RetType()> promiseTask)
+	{
+		TaskType task = [this, promise, t = ::std::move(promiseTask)]() mutable
+		{
+			assert(promise.use_count() > 0);
+			try
+			{
+				promise->set_value(t());
+			}
+			catch (const ::std::exception& exception)
+			{
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName()
+						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
+			}
+			catch (...)
+			{
+				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
+						   << "] execution in thread pool [" << name_ << ']';
+			}
+		};
+		return task;
+	}
+
+	ThreadPool::TaskType ThreadPool::makeTask(::std::function<void()> promiseTask)
+	{
+		TaskType task = [this, t = ::std::move(promiseTask)]() mutable
+		{
+			try
+			{
+				t();
+			}
+			catch (const ::std::exception& exception)
+			{
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName()
+						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
+			}
+			catch (...)
+			{
+				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
+						   << "] execution in thread pool [" << name_ << ']';
+			}
+		};
+		return task;
 	}
 } // namespace nets::base
 
