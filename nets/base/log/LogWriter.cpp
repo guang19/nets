@@ -31,18 +31,15 @@ namespace nets::base
 		}
 		file_ = ::std::make_unique<char[]>(filePathLen);
 		MEMZERO(file_.get(), filePathLen);
-		::memcpy(file_.get(), file, filePathLen);
-
+		::strncat(file_.get(), file, filePathLen);
+		// <dirname> will modifies input str, so reallocate an array
 		char tmpFile[MaxFilePathLen] = {0};
-		::memcpy(tmpFile, file, filePathLen);
-		// <dirname> will modify input str, so called <basename> before <dirname>
-		const char* filename = ::basename(tmpFile);
-		::uint32_t filenameLen = ::strlen(filename);
+		::strncat(tmpFile, file, filePathLen);
 		const char* dir = ::dirname(tmpFile);
 		::uint32_t dirLen = ::strlen(dir);
 		dir_ = ::std::make_unique<char[]>(dirLen);
 		MEMZERO(dir_.get(), dirLen);
-		::memcpy(dir_.get(), dir, dirLen);
+		::strncat(dir_.get(), dir, dirLen);
 		// log file has parent directory
 		if (::strcmp(dir, ".") != 0)
 		{
@@ -82,11 +79,7 @@ namespace nets::base
 				int32_t err = ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(::stderr,
-							  "Error:log file append error "
-							  "\"%s\""
-							  "\n",
-							  ::strerror(err));
+					::fprintf(::stderr, "Error:log file append error ""\"%s\"""\n", ::strerror(err));
 					break;
 				}
 			}
@@ -107,25 +100,19 @@ namespace nets::base
 			::fclose(fp_);
 			fp_ = nullptr;
 		}
-		struct tm tmS
-		{
-		};
+		struct tm tmS {};
 		::localtime_r(&now, &tmS);
-		char newFilename[24] = {0};
-		MEMZERO(newFilename, 24);
-		::strftime(newFilename, 20, "%Y-%m-%d_%H-%M-%S", &tmS);
-		::memcpy(newFilename + 19, ".log", 4);
+		char newFilename[26] = {0};
+		MEMZERO(newFilename, 26);
+		::strftime(newFilename, 21, "%Y-%m-%d_%H-%M-%S", &tmS);
+		::strncat(newFilename, ".log", 5);
 		if (::strcmp(dir_.get(), ".") != 0)
 		{
 			char tmpFile1[MaxFilePathLen] = {0};
-			char tmpFile2[MaxFilePathLen] = {0};
-			::strcat(tmpFile1, dir_);
+			::strcat(tmpFile1, dir_.get());
 			::strcat(tmpFile1, "/");
-			::strcat(tmpFile1, filename_);
-			::strcat(tmpFile2, dir_);
-			::strcat(tmpFile2, "/");
-			::strcat(tmpFile2, newFilename);
-			::rename(tmpFile1, tmpFile2);
+			::strcat(tmpFile1, newFilename);
+			::rename(file_.get(), tmpFile1);
 			fp_ = ::fopen(file_.get(), "a");
 		}
 		else
@@ -149,8 +136,8 @@ namespace nets::base
 		char dir2[MaxFilePathLen] = {0};
 		MEMZERO(dir1, MaxFilePathLen);
 		MEMZERO(dir2, MaxFilePathLen);
-		::memcpy(dir1, multiLevelDir, len);
-		char* spStr;
+		::strncat(dir1, multiLevelDir, len);
+		char* spStr = nullptr;
 		while ((spStr = strsep(&dirptr, "/")) != nullptr)
 		{
 			if (::strlen(spStr) > 0)
@@ -171,9 +158,7 @@ namespace nets::base
 
 	void LogFile::getFileInfo(SizeType* fileSize, TimeType* createTime)
 	{
-		struct stat fileInfo
-		{
-		};
+		struct stat fileInfo {};
 		if (::fstat(::fileno(fp_), &fileInfo) != 0)
 		{
 			return;
@@ -223,9 +208,9 @@ namespace nets::base
 	{
 		// if you need test DAILY_FILE LogWriter, you need to adjust this
 		// constant for short intervals, not for the whole day
-		constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
+		// constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
 		// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-		// constexpr ::time_t SecondsPerDay = 30;
+		 constexpr ::time_t SecondsPerDay = 30;
 	} // namespace
 
 	void DailyLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
@@ -248,9 +233,9 @@ namespace nets::base
 	{
 		// if you need test ROLLING_FILE LogWriter, you need to adjust this
 		// constant  as small as possible
-		//		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
 		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-		constexpr ::size_t LogFileRollingSize = 200;
+		// constexpr ::size_t LogFileRollingSize = 200;
 	} // namespace
 
 	void RollingLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)

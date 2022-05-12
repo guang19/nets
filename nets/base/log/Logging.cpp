@@ -22,7 +22,8 @@ namespace nets::base
 		if (logMessage_.getLogLevel() == LogLevel::FATAL)
 		{
 			// if exit directly, log buffer in memory probably will lost
-			::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
+			::std::this_thread::sleep_for(::std::chrono::milliseconds(MillisecondsPerSecond));
+			::fprintf(::stderr, "log fatal, exit");
 			exit(1);
 		}
 	}
