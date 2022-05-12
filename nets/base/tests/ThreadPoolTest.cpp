@@ -49,8 +49,8 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 		[](int num) -> bool
 		{
 			::printf("===%s\n", currentThreadName());
-		  throw ::std::invalid_argument("23123123123");
-		  return true;
+			throw ::std::invalid_argument("ExecuteTask");
+			return true;
 		},
 		5);
 
@@ -58,7 +58,7 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 		[]() -> bool
 		{
 			::printf("===%s\n", currentThreadName());
-			throw "12312312312313123";
+			throw "ExecuteTask";
 			return true;
 		});
 }
@@ -85,6 +85,7 @@ TEST_F(ThreadPoolTest, SubmitHasRetval)
 		::printf("%s\n", currentThreadName());
 		return 5;
 	};
+
 	auto future1 = threadPool->submit(f);
 	future1.wait();
 	ASSERT_EQ(future1.get(), 5);
@@ -97,7 +98,6 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 {
 	::std::function<void()> f = []()
 	{
-		throw ::std::invalid_argument("123123123");
 		::printf("%s\n", currentThreadName());
 	};
 	auto future1 = threadPool->submit(f);
@@ -106,6 +106,22 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 	auto future2 = threadPool->submit(f);
 	future2.wait();
 	future2.get();
+}
+
+TEST_F(ThreadPoolTest, SubmitFutureThrow)
+{
+	::std::function<int32_t()> f = []() -> int32_t
+	{
+		::printf("%s\n", currentThreadName());
+		throw ::std::invalid_argument("123123123");
+		return 5;
+	};
+	auto future1 = threadPool->submit(f);
+	future1.wait();
+	ASSERT_THROW(future1.get(), ::std::future_error);
+	auto future2 = threadPool->submit(f);
+	future2.wait();
+	ASSERT_THROW(future2.get(), ::std::future_error);
 }
 
 int main(int argc, char** argv)

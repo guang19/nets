@@ -39,8 +39,8 @@ TEST(NetPackageTest, Endian)
 
 TEST(NetPackageTest, TT)
 {
-	printf("%ld", sysconf(_SC_NPROCESSORS_CONF));
-	printf("%ld", sysconf(_SC_NPROCESSORS_ONLN));
+	::printf("%ld", sysconf(_SC_NPROCESSORS_CONF));
+	::printf("%ld", sysconf(_SC_NPROCESSORS_ONLN));
 }
 
 int main(int argc, char** argv)

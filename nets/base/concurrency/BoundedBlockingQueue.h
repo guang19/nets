@@ -69,17 +69,17 @@ namespace nets::base
 		void put(ConstReferenceType el);
 		void take(LReferenceType el);
 
-		bool put(RReferenceType el, PredicateType p);
-		bool put(ConstReferenceType el, PredicateType p);
-		bool take(LReferenceType el, PredicateType p);
+		bool put(RReferenceType el, const PredicateType& p);
+		bool put(ConstReferenceType el, const PredicateType& p);
+		bool take(LReferenceType el, const PredicateType& p);
 
 		bool put(RReferenceType el, TimeType milliseconds);
 		bool put(ConstReferenceType el, TimeType milliseconds);
 		bool take(LReferenceType el, TimeType milliseconds);
 
-		bool put(RReferenceType el, TimeType milliseconds, PredicateType p);
-		bool put(ConstReferenceType el, TimeType milliseconds, PredicateType p);
-		bool take(LReferenceType el, TimeType milliseconds, PredicateType p);
+		bool put(RReferenceType el, TimeType milliseconds, const PredicateType& p);
+		bool put(ConstReferenceType el, TimeType milliseconds, const PredicateType& p);
+		bool take(LReferenceType el, TimeType milliseconds, const PredicateType& p);
 
 		bool tryPush(RReferenceType el);
 		bool tryPush(ConstReferenceType el);
@@ -142,7 +142,7 @@ namespace nets::base
 	}
 
 	template <typename T>
-	bool BoundedBlockingQueue<T>::put(RReferenceType el, PredicateType p)
+	bool BoundedBlockingQueue<T>::put(RReferenceType el, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
 		notFullCV_.wait(lock,
@@ -160,7 +160,7 @@ namespace nets::base
 	}
 
 	template <typename T>
-	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, PredicateType p)
+	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
 		notFullCV_.wait(lock,
@@ -178,7 +178,7 @@ namespace nets::base
 	}
 
 	template <typename T>
-	bool BoundedBlockingQueue<T>::take(LReferenceType el, PredicateType p)
+	bool BoundedBlockingQueue<T>::take(LReferenceType el, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
 		notFullCV_.wait(lock,
@@ -249,7 +249,7 @@ namespace nets::base
 	}
 
 	template <typename T>
-	bool BoundedBlockingQueue<T>::put(RReferenceType el, TimeType milliseconds, PredicateType p)
+	bool BoundedBlockingQueue<T>::put(RReferenceType el, TimeType milliseconds, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
 		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
@@ -270,7 +270,7 @@ namespace nets::base
 	}
 
 	template <typename T>
-	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, TimeType milliseconds, PredicateType p)
+	bool BoundedBlockingQueue<T>::put(ConstReferenceType el, TimeType milliseconds, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
 		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
@@ -291,7 +291,7 @@ namespace nets::base
 	}
 
 	template <typename T>
-	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds, PredicateType p)
+	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
 		if (notEmptyCV_.wait_for(lock, MillisTimeType(milliseconds),

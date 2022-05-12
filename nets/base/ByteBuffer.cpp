@@ -5,7 +5,7 @@
 #include "nets/base/ByteBuffer.h"
 
 #include <algorithm>
-#include <limits>
+#include <utility>
 
 #include "nets/base/CommonMacro.h"
 
@@ -59,7 +59,7 @@ namespace nets::base
 			readerIndex_ = other.readerIndex_;
 			writerIndex_ = other.writerIndex_;
 			capacity_ = other.capacity_;
-			buffer_ = ::std::move(other.buffer_);
+			buffer_ = std::move(other.buffer_);
 			other.readerIndex_ = 0;
 			other.writerIndex_ = 0;
 			other.capacity_ = 0;

@@ -57,7 +57,7 @@ namespace nets::base
 		{
 		public:
 			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
-			~ThreadWrapper();
+			~ThreadWrapper() = default;
 
 			void start();
 
@@ -124,10 +124,10 @@ namespace nets::base
 		::std::future<void> submit(Fn&& func, Args&&... args);
 
 	private:
-		template <class RetType>
+		template <typename RetType>
 		TaskType makeTask(::std::shared_ptr<::std::promise<RetType>> promise, ::std::function<RetType()> promiseTask);
 
-		TaskType makeTask(::std::function<void()> promiseTask);
+		TaskType makeTask(::std::shared_ptr<::std::promise<void>> promise, ::std::function<void()> promiseTask);
 
 	private:
 		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
@@ -212,8 +212,10 @@ namespace nets::base
 		}
 		LockGuardType lock(mutex_);
 		// value capture, ref count plus 1
-		::std::function<void ()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		TaskType task = makeTask(promiseTask);
+		auto promise = ::std::make_shared<::std::promise<void>>();
+		auto future = promise->get_future();
+		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType task = makeTask(promise, promiseTask);
 		SizeType threadSize = threadPool_.size();
 		// if still able to create core thread
 		if (threadSize < corePoolSize_)
@@ -237,11 +239,12 @@ namespace nets::base
 				}
 			}
 		}
-		return {};
+		return future;
 	}
 
-	template <class RetType>
-	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<RetType>> promise, ::std::function<RetType()> promiseTask)
+	template <typename RetType>
+	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<RetType>> promise,
+											  ::std::function<RetType()> promiseTask)
 	{
 		TaskType task = [this, promise, t = ::std::move(promiseTask)]() mutable
 		{
@@ -252,8 +255,8 @@ namespace nets::base
 			}
 			catch (const ::std::exception& exception)
 			{
-				LOGS_ERROR << "exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
+						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
@@ -264,18 +267,20 @@ namespace nets::base
 		return task;
 	}
 
-	ThreadPool::TaskType ThreadPool::makeTask(::std::function<void()> promiseTask)
+	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<void>> promise,
+											  ::std::function<void()> promiseTask)
 	{
-		TaskType task = [this, t = ::std::move(promiseTask)]() mutable
+		TaskType task = [this, promise, t = ::std::move(promiseTask)]() mutable
 		{
 			try
 			{
 				t();
+				promise->set_value();
 			}
 			catch (const ::std::exception& exception)
 			{
-				LOGS_ERROR << "exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
+						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{

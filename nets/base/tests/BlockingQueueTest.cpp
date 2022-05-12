@@ -99,9 +99,9 @@ TEST_F(BlockingQueueTest, PutTimeout)
 	blockingQueue->put(5);
 	ASSERT_EQ(blockingQueue->size(), 5U);
 	int32_t takeVal = 0;
-	int64_t start = Timestamp::now().secondsSinceEpoch();
+	int64_t start = Timestamp::now().secsFromTimestamp();
 	ASSERT_EQ(blockingQueue->put(takeVal, 3000L), false);
-	int64_t end = Timestamp::now().secondsSinceEpoch();
+	int64_t end = Timestamp::now().secsFromTimestamp();
 	ASSERT_GT(end, start);
 	ASSERT_GE((end - start), 3);
 	ASSERT_EQ(takeVal, 0);
@@ -110,10 +110,10 @@ TEST_F(BlockingQueueTest, PutTimeout)
 TEST_F(BlockingQueueTest, TakeTimeout)
 {
 	int32_t takeVal = 0;
-	int64_t start = Timestamp::now().secondsSinceEpoch();
+	int64_t start = Timestamp::now().secsFromTimestamp();
 	ASSERT_EQ(blockingQueue->isEmpty(), true);
 	ASSERT_EQ(blockingQueue->take(takeVal, 3000L), false);
-	int64_t end = Timestamp::now().secondsSinceEpoch();
+	int64_t end = Timestamp::now().secsFromTimestamp();
 	ASSERT_GT(end, start);
 	ASSERT_GE((end - start), 3);
 	ASSERT_EQ(takeVal, 0);

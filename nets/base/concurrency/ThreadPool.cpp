@@ -35,12 +35,8 @@ namespace nets::base
 
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
-		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
-		  thread_(&ThreadWrapper::start, this), threadPoolPtr_(threadPoolPtr)
-	{
-	}
-
-	ThreadPool::ThreadWrapper::~ThreadWrapper()
+		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(&ThreadWrapper::start, this),
+		  threadPoolPtr_(threadPoolPtr)
 	{
 		if (thread_.joinable())
 		{

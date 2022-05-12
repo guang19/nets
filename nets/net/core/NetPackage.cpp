@@ -8,10 +8,10 @@ namespace nets::net
 {
 	namespace
 	{
-		constexpr uint32_t DefaultNetPackageLength = 512;
+		constexpr base::ByteBuffer::SizeType DefaultNetPackageLength = 1024;
 	}
 
 	NetPackage::NetPackage() : ByteBuffer(DefaultNetPackageLength) {}
 
-	NetPackage::NetPackage(ByteBuffer::SizeType capacity) : ByteBuffer(capacity) {}
+	NetPackage::NetPackage(SizeType capacity) : ByteBuffer(capacity) {}
 } // namespace nets::net

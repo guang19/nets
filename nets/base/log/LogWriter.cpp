@@ -104,8 +104,8 @@ namespace nets::base
 		::localtime_r(&now, &tmS);
 		char newFilename[26] = {0};
 		MEMZERO(newFilename, 26);
-		::strftime(newFilename, 21, "%Y-%m-%d_%H-%M-%S", &tmS);
-		::strncat(newFilename, ".log", 5);
+		::strftime(newFilename, 26, "%Y-%m-%d_%H-%M-%S", &tmS);
+		::strcat(newFilename, ".log");
 		if (::strcmp(dir_.get(), ".") != 0)
 		{
 			char tmpFile1[MaxFilePathLen] = {0};
@@ -274,7 +274,7 @@ namespace nets::base
 	namespace
 	{
 		// Log buffer cache 2M
-		constexpr ::size_t MaxLogBufferSize = 2 * 1024 * 1024;
+		constexpr ::size_t MaxLogBufferSize =  1024 * 1024 << 1;
 		// Log buffer flush interval,unit：milliseconds
 		constexpr ::time_t LogBufferFlushInterval = 1000;
 	} // namespace
