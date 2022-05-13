@@ -199,7 +199,7 @@ namespace nets::base
 
 	void SingleLogFilePersistentWriter::flush()
 	{
-		::fflush(stdout);
+		logFile_->flush();
 	}
 
 	DailyLogFilePersistentWriter::DailyLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
@@ -249,7 +249,7 @@ namespace nets::base
 
 	void RollingLogFilePersistentWriter::flush()
 	{
-		::fflush(stdout);
+		logFile_->flush();
 	}
 
 	::std::shared_ptr<IPersistentWriter> PersistentWriterFactory::getPersistentWriter()
