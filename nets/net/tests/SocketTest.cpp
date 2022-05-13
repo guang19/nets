@@ -8,9 +8,13 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "nets/net/core/Socket.h"
+
 TEST(SocketTest, Server)
 {
 	int32_t socketFd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	printf("%lu\t%lu\t%lu\n", sizeof(struct sockaddr), sizeof(struct sockaddr_in6), sizeof(struct sockaddr_in));
 
 	struct sockaddr_in serverAddr {};
 	serverAddr.sin_family = AF_INET;
@@ -89,7 +93,6 @@ TEST(SocketTest, Client)
 		::fflush(::stderr);
 	}
 }
-
 
 int main(int argc, char** argv)
 {
