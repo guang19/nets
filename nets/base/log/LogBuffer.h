@@ -23,12 +23,12 @@ namespace nets::base
 		LogBuffer& operator=(LogBuffer&& logBuffer) noexcept;
 
 	public:
-		const char* buffer() const
+		inline const char* buffer() const
 		{
 			return buffer_.get() + readerIndex_;
 		}
 
-		SizeType len() const
+		inline SizeType len() const
 		{
 			return readableBytes();
 		}

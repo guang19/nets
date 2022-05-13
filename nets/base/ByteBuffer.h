@@ -17,6 +17,7 @@ namespace nets::base
 	{
 	public:
 		using SizeType = uint32_t;
+		using CharPtr = ::std::unique_ptr<char[]>;
 
 	public:
 		explicit ByteBuffer(SizeType capacity);
@@ -80,9 +81,6 @@ namespace nets::base
 		{
 			return capacity_;
 		}
-
-	private:
-		using CharPtr = ::std::unique_ptr<char[]>;
 
 	protected:
 		CharPtr buffer_ {nullptr};

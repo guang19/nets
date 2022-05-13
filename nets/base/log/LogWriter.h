@@ -51,6 +51,7 @@ namespace nets::base
 	public:
 		using SizeType = ::size_t;
 		using TimeType = ::time_t;
+		using CharPtr = ::std::unique_ptr<char[]>;
 
 	public:
 		explicit LogFile(const char* file);
@@ -79,11 +80,11 @@ namespace nets::base
 
 	private:
 		FILE* fp_ {nullptr};
-		::std::unique_ptr<char[]> dir_ {nullptr};
-		::std::unique_ptr<char[]> file_ {nullptr};
+		CharPtr dir_ {nullptr};
+		CharPtr file_ {nullptr};
 		SizeType bytes_ {0};
 		TimeType lastRollTime_ {0};
-		::std::unique_ptr<char[]> buffer_ {nullptr};
+		CharPtr buffer_ {nullptr};
 	};
 
 	class IPersistentWriter
