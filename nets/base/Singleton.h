@@ -18,7 +18,7 @@
  *  If a class needs to use a singleton, use the following three macros directly.
  *
  *	If you need to do some work after the singleton is initialized, you need to define a function
- *	named <afterInit>, function is automatically called after the singleton is initialized.
+ *	named <afterInit>, the function named afterInit is automatically called after the singleton is initialized.
  *
  * return type and parameter are void
  * /////////////////////////

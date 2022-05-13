@@ -57,6 +57,7 @@ namespace nets::base
 		}
 	};
 
+	// init main thread
 	ThreadInitializer threadInitializer {};
 
 	bool setPosixThreadName(::pthread_t threadId, const char* threadName)

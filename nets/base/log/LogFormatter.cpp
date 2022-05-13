@@ -10,7 +10,6 @@
 namespace nets::base
 {
 	INIT_SINGLETON(DefaultLogFormatter);
-	INIT_SINGLETON(LogFormatterFactory);
 
 	namespace
 	{
@@ -51,7 +50,7 @@ namespace nets::base
 		logBuffer << logMessage.getStream();
 	}
 
-	::std::shared_ptr<ILogFormatter> LogFormatterFactory::getLogFormatter() const
+	::std::shared_ptr<ILogFormatter> LogFormatterFactory::getLogFormatter()
 	{
 		return DefaultLogFormatter::getInstance();
 	}

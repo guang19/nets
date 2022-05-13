@@ -27,15 +27,13 @@ namespace nets::base
 		void formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage) override;
 	};
 
-	DECLARE_SINGLETON_CLASS(LogFormatterFactory)
+	class LogFormatterFactory
 	{
-		DEFINE_SINGLETON(LogFormatterFactory);
-
 	public:
-		::std::shared_ptr<ILogFormatter> getLogFormatter() const;
+		static ::std::shared_ptr<ILogFormatter> getLogFormatter();
 	};
 } // namespace nets::base
 
-#define LOG_FORMATTER (nets::base::LogFormatterFactory::getInstance()->getLogFormatter())
+#define LOG_FORMATTER (nets::base::LogFormatterFactory::getLogFormatter())
 
 #endif // NETS_LOGFORMATTER_H

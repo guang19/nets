@@ -108,17 +108,20 @@ namespace nets::base
 		::strcat(newFilename, ".log");
 		if (::strcmp(dir_.get(), ".") != 0)
 		{
-			char tmpFile1[MaxFilePathLen] = {0};
-			::strcat(tmpFile1, dir_.get());
-			::strcat(tmpFile1, "/");
-			::strcat(tmpFile1, newFilename);
-			::rename(file_.get(), tmpFile1);
-			fp_ = ::fopen(file_.get(), "a");
+			char tmpFile[MaxFilePathLen] = {0};
+			::strcat(tmpFile, dir_.get());
+			::strcat(tmpFile, "/");
+			::strcat(tmpFile, newFilename);
+			::rename(file_.get(), tmpFile);
 		}
 		else
 		{
 			::rename(file_.get(), newFilename);
-			fp_ = ::fopen(file_.get(), "a");
+		}
+		if ((fp_ = ::fopen(file_.get(), "a")) == nullptr)
+		{
+			::fprintf(stderr, "Error:after rename log file,failed to open log file\n");
+			::exit(1);
 		}
 		getFileInfo(&bytes_, nullptr);
 		lastRollTime_ = now;

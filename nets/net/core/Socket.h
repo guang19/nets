@@ -23,7 +23,14 @@ namespace nets::net
 		static InetAddress createLoopBackInetAddress(PortType port, bool ipv6 = false);
 
 	public:
+		inline sa_family_t ipFamily() const
+		{
+			return addr4_.sin_family;
+		}
 
+		::std::string ip() const;
+		PortType port() const;
+		::std::string toString() const;
 
 	public:
 		union
