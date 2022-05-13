@@ -16,8 +16,11 @@ namespace nets::net
 	public:
 		explicit InetAddress(const Ipv4Addr& addr4);
 		explicit InetAddress(const Ipv6Addr& addr6);
-		explicit InetAddress(const ::std::string& addr, bool ipv6 = false);
 		explicit InetAddress(const char* ip, PortType port, bool ipv6 = false);
+
+	public:
+		static InetAddress createAnyInetAddress(PortType port, bool ipv6 = false);
+		static InetAddress createLoopBackInetAddress(PortType port, bool ipv6 = false);
 
 	public:
 
@@ -27,7 +30,7 @@ namespace nets::net
 		{
 			Ipv4Addr addr4_;
 			Ipv6Addr addr6_;
-		};
+		} ;
 	};
 
 	class Socket

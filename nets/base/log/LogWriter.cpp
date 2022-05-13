@@ -26,7 +26,7 @@ namespace nets::base
 		if (filePathLen > MaxFilePathLen)
 		{
 
-			::fprintf(::stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
+			::fprintf(stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
 			::exit(1);
 		}
 		file_ = ::std::make_unique<char[]>(filePathLen);
@@ -48,7 +48,7 @@ namespace nets::base
 		}
 		if ((fp_ = ::fopen(file, "a")) == nullptr)
 		{
-			::fprintf(::stderr, "Error:failed to open log file\n");
+			::fprintf(stderr, "Error:failed to open log file\n");
 			::exit(1);
 		}
 		getFileInfo(&bytes_, &lastRollTime_);
@@ -79,7 +79,7 @@ namespace nets::base
 				int32_t err = ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(::stderr, "Error:log file append error ""\"%s\"""\n", ::strerror(err));
+					::fprintf(stderr, "Error:log file append error ""\"%s\"""\n", ::strerror(err));
 					break;
 				}
 			}
@@ -148,7 +148,7 @@ namespace nets::base
 				{
 					if (::mkdir(dir2, 0775) != 0)
 					{
-						::fprintf(::stderr, "Error: failed to create parent directory of log file\n");
+						::fprintf(stderr, "Error: failed to create parent directory of log file\n");
 						::exit(1);
 					}
 				}
@@ -181,12 +181,12 @@ namespace nets::base
 	void StdoutPersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
 	{
 		UNUSED(persistTime);
-		::fwrite(data, 1, len, ::stdout);
+		::fwrite(data, 1, len, stdout);
 	}
 
 	void StdoutPersistentWriter::flush()
 	{
-		::fflush(::stdout);
+		::fflush(stdout);
 	}
 
 	SingleLogFilePersistentWriter::SingleLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
@@ -199,7 +199,7 @@ namespace nets::base
 
 	void SingleLogFilePersistentWriter::flush()
 	{
-		::fflush(::stdout);
+		::fflush(stdout);
 	}
 
 	DailyLogFilePersistentWriter::DailyLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
@@ -249,7 +249,7 @@ namespace nets::base
 
 	void RollingLogFilePersistentWriter::flush()
 	{
-		::fflush(::stdout);
+		::fflush(stdout);
 	}
 
 	::std::shared_ptr<IPersistentWriter> PersistentWriterFactory::getPersistentWriter()

@@ -23,8 +23,8 @@ namespace nets::base
 		{
 			// if exit directly, log buffer in memory probably will lost
 			::std::this_thread::sleep_for(::std::chrono::milliseconds(MillisecondsPerSecond));
-			::fprintf(::stderr, "log fatal, exit");
-			exit(1);
+			::fprintf(stderr, "log fatal, exit");
+			::exit(1);
 		}
 	}
 } // namespace nets::base

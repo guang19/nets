@@ -5,23 +5,25 @@
 #ifndef NETS_INETUTIL_H
 #define NETS_INETUTIL_H
 
-#include <netinet/in.h>
 #include <cstdint>
+#include <netinet/in.h>
 #include <string>
 
 namespace nets::net
 {
+	using IpType = uint32_t;
 	using PortType = uint16_t;
 	using Ipv4Addr = struct sockaddr_in;
 	using Ipv6Addr = struct sockaddr_in6;
 
-	//like: "127.0.0.1:8080"
-	void strToInet4(const ::std::string& str, Ipv4Addr* addr);
-	//like: "[FF01:02::05]:8080"
-	void strToInet6(const ::std::string& str, Ipv6Addr* addr);
+	void setLoopBackInet4Address(PortType port, Ipv4Addr* addr);
+	void setLoopBackInet6Address(PortType port, Ipv6Addr* addr);
 
-	void ipPortToInet4(const char* ip, PortType port, Ipv4Addr* addr);
-	void ipPortToInet6(const char* ip, PortType port, Ipv6Addr* addr);
-};
+	void setAnyInet4Address(PortType port, Ipv4Addr* addr);
+	void setAnyInet6Address(PortType port, Ipv6Addr* addr);
+
+	void ipPortToInet4Address(const char* ip, PortType port, Ipv4Addr* addr);
+	void ipPortToInet6Address(const char* ip, PortType port, Ipv6Addr* addr);
+}; // namespace nets::net
 
 #endif // NETS_INETUTIL_H
