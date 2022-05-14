@@ -5,22 +5,20 @@
 #ifndef NETS_SOCKET_H
 #define NETS_SOCKET_H
 
-#include <string>
-
 #include "nets/net/core/InetUtil.h"
 
 namespace nets::net
 {
-	struct InetAddress
+	class InetAddress
 	{
 	public:
 		explicit InetAddress(const Ipv4Addr& addr4);
 		explicit InetAddress(const Ipv6Addr& addr6);
-		explicit InetAddress(const char* ip, PortType port, bool ipv6 = false);
+		explicit InetAddress(const char* ip, PortType port, bool ipv4 = true);
 
 	public:
-		static InetAddress createAnyInetAddress(PortType port, bool ipv6 = false);
-		static InetAddress createLoopBackInetAddress(PortType port, bool ipv6 = false);
+		static InetAddress createAnyInetAddress(PortType port, bool ipv4 = true);
+		static InetAddress createLoopBackInetAddress(PortType port, bool ipv4 = true);
 
 	public:
 		inline sa_family_t ipFamily() const
@@ -32,9 +30,10 @@ namespace nets::net
 		PortType port() const;
 		::std::string toString() const;
 
-	public:
+	private:
 		union
 		{
+			SockAddr addr_;
 			Ipv4Addr addr4_;
 			Ipv6Addr addr6_;
 		} ;

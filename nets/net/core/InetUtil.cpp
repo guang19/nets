@@ -8,10 +8,20 @@
 
 namespace nets::net
 {
+	PortType netToHost16(PortType netPort)
+	{
+		return be16toh(netPort);
+	}
+
+	PortType hostToNet16(PortType hostPort)
+	{
+		return htobe16(hostPort);
+	}
+
 	void setLoopBackInet4Address(PortType port, Ipv4Addr* addr)
 	{
 		addr->sin_family = AF_INET;
-		addr->sin_port = ::htobe16(port);
+		addr->sin_port = htobe16(port);
 		addr->sin_addr.s_addr = INADDR_LOOPBACK;
 	}
 
@@ -55,6 +65,19 @@ namespace nets::net
 		{
 			::fprintf(stderr, "Error:inet_pton\n");
 			::exit(1);
+		}
+	}
+	void getSockAddressIp(const SockAddr* sockAddr, char* buffer, ::size_t len)
+	{
+		if (sockAddr->sa_family == AF_INET)
+		{
+			auto addr4 = reinterpret_cast<const Ipv4Addr*>(sockAddr);
+			::inet_ntop(AF_INET, &addr4->sin_addr, buffer, len);
+		}
+		else if(sockAddr->sa_family == AF_INET6)
+		{
+			auto addr6 = reinterpret_cast<const Ipv6Addr*>(sockAddr);
+			::inet_ntop(AF_INET6, &addr6->sin6_addr, buffer, len);
 		}
 	}
 } // namespace nets::net

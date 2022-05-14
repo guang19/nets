@@ -11,10 +11,13 @@
 
 namespace nets::net
 {
-	using IpType = uint32_t;
 	using PortType = uint16_t;
+	using SockAddr = struct sockaddr;
 	using Ipv4Addr = struct sockaddr_in;
 	using Ipv6Addr = struct sockaddr_in6;
+
+	PortType netToHost16(PortType netPort);
+	PortType hostToNet16(PortType hostPort);
 
 	void setLoopBackInet4Address(PortType port, Ipv4Addr* addr);
 	void setLoopBackInet6Address(PortType port, Ipv6Addr* addr);
@@ -24,6 +27,8 @@ namespace nets::net
 
 	void ipPortToInet4Address(const char* ip, PortType port, Ipv4Addr* addr);
 	void ipPortToInet6Address(const char* ip, PortType port, Ipv6Addr* addr);
+
+	void getSockAddressIp(const SockAddr* sockAddr, char* buffer, ::size_t len);
 }; // namespace nets::net
 
 #endif // NETS_INETUTIL_H

@@ -10,7 +10,7 @@
 
 using namespace nets::net;
 
-TEST(SocketTest, IPV4Convert)
+TEST(InetUtilTest, IPV4Convert)
 {
 	struct sockaddr_in addr4 {};
 	ipPortToInet4Address("127.0.0.1", 8080, &addr4);
@@ -20,7 +20,7 @@ TEST(SocketTest, IPV4Convert)
 	::printf("%u\n", ::inet_addr("127.0.0.1"));
 }
 
-TEST(SocketTest, IPV6Convert)
+TEST(InetUtilTest, IPV6Convert)
 {
 	struct sockaddr_in6 addr6 {};
 	ipPortToInet6Address("2a01:198:603:0:396e:4789:8e99:890f", 8080, &addr6);
@@ -35,6 +35,26 @@ TEST(SocketTest, IPV6Convert)
 	ASSERT_STREQ(buf1, buf2);
 	::printf("%s\n", buf1);
 	::printf("%s\n", buf2);
+}
+
+TEST(InetUtilTest, GetSockAddressIp)
+{
+
+	Ipv4Addr addr4 {};
+	char ipv4[] = {"192.168.0.1"};
+	ipPortToInet4Address(ipv4, 8080, &addr4);
+	char buffer1[64] = {0};
+	getSockAddressIp(reinterpret_cast<const SockAddr*>(&addr4), buffer1, sizeof(buffer1));
+	ASSERT_STREQ(ipv4, buffer1);
+	PortType port1 = 0;
+
+	Ipv6Addr addr6 {};
+	char ipv6[] = {"2a01:198:603:0:396e:4789:8e99:890f"};
+	ipPortToInet6Address(ipv6, 8080, &addr6);
+	char buffer2[64] = {0};
+	getSockAddressIp(reinterpret_cast<const SockAddr*>(&addr6), buffer2, sizeof(buffer2));
+	ASSERT_STREQ(ipv6, buffer2);
+	PortType port2 = 0;
 }
 
 int main(int argc, char** argv)
