@@ -87,7 +87,7 @@ TEST_F(BlockingQueueTest, PutTakeConditionVar)
 	running = false;
 	ASSERT_EQ(blockingQueue->take(takeVal, func), false);
 	ASSERT_EQ(takeVal, 1);
-	ASSERT_TRUE((blockingQueue->size() == 1));
+	ASSERT_TRUE(1 == (blockingQueue->size()));
 }
 
 TEST_F(BlockingQueueTest, PutTimeout)

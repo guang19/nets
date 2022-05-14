@@ -64,7 +64,7 @@ public:                                                                         
 			OnceFlag,                                                                                                       \
 			[](Args&&... args0)                                                                                             \
 			{                                                                                                               \
-				if (Instance == nullptr)                                                                                    \
+				if (nullptr == Instance)                                                                                    \
 				{                                                                                                           \
 					CLASS_NAME::init(::std::forward<Args>(args0)...);                                                       \
 				}                                                                                                           \

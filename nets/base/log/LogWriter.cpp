@@ -41,12 +41,12 @@ namespace nets::base
 		MEMZERO(dir_.get(), dirLen);
 		::strncat(dir_.get(), dir, dirLen);
 		// log file has parent directory
-		if (::strcmp(dir, ".") != 0)
+		if (0 != ::strcmp(dir, "."))
 		{
 			// create parent directory of log file
 			mkdirR(dir);
 		}
-		if ((fp_ = ::fopen(file, "a")) == nullptr)
+		if (nullptr == (fp_ = ::fopen(file, "ae")))
 		{
 			::fprintf(stderr, "Error:failed to open log file\n");
 			::exit(1);
@@ -103,8 +103,8 @@ namespace nets::base
 		struct tm tmS {};
 		::localtime_r(&now, &tmS);
 		char newFilename[26] = {0};
-		MEMZERO(newFilename, 26);
-		::strftime(newFilename, 26, "%Y-%m-%d_%H-%M-%S", &tmS);
+		MEMZERO(newFilename, sizeof(newFilename));
+		::strftime(newFilename, sizeof(newFilename), "%Y-%m-%d_%H-%M-%S", &tmS);
 		::strcat(newFilename, ".log");
 		if (::strcmp(dir_.get(), ".") != 0)
 		{
@@ -118,7 +118,7 @@ namespace nets::base
 		{
 			::rename(file_.get(), newFilename);
 		}
-		if ((fp_ = ::fopen(file_.get(), "a")) == nullptr)
+		if (nullptr == (fp_ = ::fopen(file_.get(), "ae")))
 		{
 			::fprintf(stderr, "Error:after rename log file,failed to open log file\n");
 			::exit(1);
@@ -129,7 +129,7 @@ namespace nets::base
 
 	void LogFile::mkdirR(const char* multiLevelDir)
 	{
-		if (access(multiLevelDir, F_OK) == 0)
+		if (0 == access(multiLevelDir, F_OK))
 		{
 			return;
 		}
@@ -141,15 +141,15 @@ namespace nets::base
 		MEMZERO(dir2, MaxFilePathLen);
 		::strncat(dir1, multiLevelDir, len);
 		char* spStr = nullptr;
-		while ((spStr = strsep(&dirptr, "/")) != nullptr)
+		while (nullptr != (spStr = strsep(&dirptr, "/")))
 		{
 			if (::strlen(spStr) > 0)
 			{
 				::strcat(dir2, "/");
 				::strcat(dir2, spStr);
-				if (access(dir2, F_OK) != 0)
+				if (0 != access(dir2, F_OK))
 				{
-					if (::mkdir(dir2, 0775) != 0)
+					if (0 != ::mkdir(dir2, 0775))
 					{
 						::fprintf(stderr, "Error: failed to create parent directory of log file\n");
 						::exit(1);
@@ -162,7 +162,7 @@ namespace nets::base
 	void LogFile::getFileInfo(SizeType* fileSize, TimeType* createTime)
 	{
 		struct stat fileInfo {};
-		if (::fstat(::fileno(fp_), &fileInfo) != 0)
+		if (0 != ::fstat(::fileno(fp_), &fileInfo))
 		{
 			return;
 		}
@@ -367,7 +367,7 @@ namespace nets::base
 				buffers_->push_back(::std::move(cacheBuffer_));
 				buffers->swap(*buffers_);
 				cacheBuffer_ = ::std::move(tmpBuffer1);
-				if (backupCacheBuffer_ == nullptr)
+				if (nullptr == backupCacheBuffer_)
 				{
 					backupCacheBuffer_ = ::std::move(tmpBuffer2);
 				}
@@ -386,14 +386,14 @@ namespace nets::base
 			writerTaskQueue_->put(::std::move(writerTask));
 			buffers = ::std::make_unique<BufferVectorType>();
 			tmpBuffer1 = std::make_unique<LogBuffer>(MaxLogBufferSize);
-			if (tmpBuffer2 == nullptr)
+			if (nullptr == tmpBuffer2)
 			{
 				tmpBuffer2 = std::make_unique<LogBuffer>(MaxLogBufferSize);
 			}
 		}
 		// last check
 		assert(!running_);
-		if (!buffers_->empty() || cacheBuffer_->readableBytes() > 0)
+		if (!buffers_->empty() || (0 < cacheBuffer_->readableBytes()))
 		{
 			buffers_->push_back(::std::move(cacheBuffer_));
 			::time(&currentTime);

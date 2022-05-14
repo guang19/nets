@@ -29,7 +29,7 @@ namespace nets::base
 		Timestamp::TimeType seconds = logTime.secsFromTimestamp();
 		if (seconds != CacheSeconds)
 		{
-			if (localtime_r(&seconds, &tmS) == nullptr)
+			if (nullptr == localtime_r(&seconds, &tmS))
 			{
 				MEMZERO(&tmS, sizeof(tmS));
 			}
@@ -40,9 +40,10 @@ namespace nets::base
 		{
 			tmS = CacheTMS;
 		}
-		char timeBuf[24] = {0};
-		::snprintf(timeBuf, 24, "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday,
-				   tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp());
+		char timeBuf[32] = {0};
+		// check return value to circumvent [-Werror=format-truncation]
+		::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday,
+			tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp()) < 0 ? exit(1) : ((void) 0);
 		logBuffer << timeBuf;
 		logBuffer << " [" << currentTid() << "] ";
 		logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';

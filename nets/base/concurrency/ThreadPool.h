@@ -175,7 +175,7 @@ namespace nets::base
 		// value capture, ref count plus 1
 		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask<RetType>(promise, promiseTask);
-		assert(promise.use_count() == 2);
+		assert(2 == promise.use_count());
 		SizeType threadSize = threadPool_.size();
 		// if still able to create core thread
 		if (threadSize < corePoolSize_)
