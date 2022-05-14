@@ -19,7 +19,7 @@ bool isBigEndian()
 bool isLittleEndian()
 {
 	uint16_t var = 1;
-	if (*((uint8_t*) &var) == 1)
+	if (1 == *((uint8_t*) &var))
 	{
 		return true;
 	}

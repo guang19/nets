@@ -62,7 +62,7 @@ namespace nets::base
 
 	bool setPosixThreadName(::pthread_t threadId, const char* threadName)
 	{
-		return (::pthread_setname_np(threadId, threadName) == 0);
+		return (0 == ::pthread_setname_np(threadId, threadName));
 	}
 
 	void setThreadName(::pthread_t threadId, const char* threadName)

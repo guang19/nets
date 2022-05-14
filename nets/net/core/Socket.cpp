@@ -17,12 +17,12 @@ namespace nets::net
 		if (ipv4)
 		{
 			MEMZERO(&addr4_, sizeof(Ipv4Addr));
-			ipPortToInet4Address(ip, port, &addr4_);
+			ipPortToInet4Addr(ip, port, &addr4_);
 		}
 		else
 		{
 			MEMZERO(&addr6_, sizeof(Ipv6Addr));
-			ipPortToInet6Address(ip, port, &addr6_);
+			ipPortToInet6Addr(ip, port, &addr6_);
 		}
 	}
 
@@ -32,14 +32,14 @@ namespace nets::net
 		{
 			Ipv4Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv4Addr));
-			setAnyInet4Address(port, &addr);
+			createAnyInet4Addr(port, &addr);
 			return InetAddress(addr);
 		}
 		else
 		{
 			Ipv6Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv6Addr));
-			setAnyInet6Address(port, &addr);
+			createAnyInet6Addr(port, &addr);
 			return InetAddress(addr);
 		}
 	}
@@ -50,21 +50,21 @@ namespace nets::net
 		{
 			Ipv4Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv4Addr));
-			setLoopBackInet4Address(port, &addr);
+			createLoopBackInet4Addr(port, &addr);
 			return InetAddress(addr);
 		}
 		else
 		{
 			Ipv6Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv6Addr));
-			setLoopBackInet6Address(port, &addr);
+			createLoopBackInet6Addr(port, &addr);
 			return InetAddress(addr);
 		}
 	}
 	::std::string InetAddress::ip() const
 	{
 		char buffer[64] = {0};
-		getSockAddressIp(&addr_, buffer, sizeof(buffer));
+		getIpFromSockAddr(&addr_, buffer, static_cast<SockLenType>(sizeof(buffer)));
 		return buffer;
 	}
 
@@ -75,6 +75,43 @@ namespace nets::net
 
 	::std::string InetAddress::toString() const
 	{
-		return std::string();
+		char buffer[64] = {0};
+		sockAddrToString(&addr_, buffer, sizeof(buffer));
+		return buffer;
+	}
+
+	void Socket::setSendBuf(SockLenType sendBufLen)
+	{
+		setSockSendBuf(sockFd_, sendBufLen);
+	}
+
+	void Socket::setRecvBuf(SockLenType recvBufLen)
+	{
+		setSockRecvBuf(sockFd_, recvBufLen);
+	}
+
+	void Socket::setAddrReuse(bool enable)
+	{
+		setSockAddrReuse(sockFd_, enable);
+	}
+
+	void Socket::setPortReuse(bool enable)
+	{
+		setSockPortReuse(sockFd_, enable);
+	}
+
+	void Socket::setKeepAlive(bool enable)
+	{
+		setSockKeepAlive(sockFd_, enable);
+	}
+
+	void Socket::setTcpNoDelay(bool enable)
+	{
+		setIpTcpNoDelay(sockFd_, enable);
+	}
+
+	void Socket::setNonBlock(bool enable)
+	{
+		setSockNonBlock(sockFd_, enable);
 	}
 } // namespace nets::net

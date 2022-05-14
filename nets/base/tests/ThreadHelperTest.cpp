@@ -10,12 +10,12 @@ using namespace nets::base;
 
 TEST(ThreadHelperTest, ThreadName)
 {
-	ASSERT_TRUE((::strcmp("Main", currentThreadName()) == 0));
+	ASSERT_TRUE(0 == (::strcmp("Main", currentThreadName())));
 	setThreadName(pthread_self(), "MainThread");
 	char name[ThreadNameMaxLength] = {0};
 	getThreadName(pthread_self(), name, ThreadNameMaxLength);
-	ASSERT_TRUE((::strcmp("MainThread", name) == 0));
-	ASSERT_TRUE((::strcmp(name, currentThreadName()) == 0));
+	ASSERT_TRUE(0 == (::strcmp("MainThread", name)));
+	ASSERT_TRUE(0 == (::strcmp(name, currentThreadName())));
 }
 
 TEST(ThreadHelperTest, Tid)
