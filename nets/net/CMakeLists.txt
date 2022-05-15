@@ -3,7 +3,7 @@ INSTALL(FILES ${CoreHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/core
 
 FILE(GLOB NetSrcs ${PROJECT_SOURCE_DIR}/nets/net/core/*.cpp)
 
-ADD_LIBRARY(nets_net SHARED ${NetSrcs} core/EventLoop.cpp core/EventLoop.h core/Channel.cpp core/Channel.h)
+ADD_LIBRARY(nets_net SHARED ${NetSrcs})
 TARGET_LINK_LIBRARIES(nets_net nets_base)
 
 INSTALL(TARGETS nets_net DESTINATION ${PROJECT_BINARY_DIR}/lib)
