@@ -9,11 +9,54 @@
 #include <fcntl.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
+#include <unistd.h>
 
 #include "nets/base/log/Logging.h"
 
-namespace nets::net
+namespace nets::net::util
 {
+
+	FdType createTcpSocket(SockAddrFamily family)
+	{
+		FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
+		if (sockFd < 0)
+		{
+			LOGS_FATAL << "create tcp socket failed";
+		}
+		return sockFd;
+	}
+
+	FdType createNonBlockTcpSocket(SockAddrFamily family)
+	{
+		FdType sockFd = ::socket(family, SOCK_STREAM | O_NONBLOCK | FD_CLOEXEC, IPPROTO_TCP);
+		if (sockFd < 0)
+		{
+			LOGS_FATAL << "create tcp socket failed";
+		}
+		return sockFd;
+	}
+
+	FdType createUdpSocket(SockAddrFamily family)
+	{
+		FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
+		if (sockFd < 0)
+		{
+			LOGS_ERROR << "create udp socket failed";
+		}
+		return sockFd;
+	}
+
+	void closeSocket(FdType sockFd)
+	{
+		if (sockFd > 0)
+		{
+			if (::close(sockFd) != 0)
+			{
+				LOGS_ERROR << "close socket failed";
+			}
+		}
+	}
+
 	PortType netToHost16(PortType netPort)
 	{
 		return be16toh(netPort);
@@ -30,7 +73,7 @@ namespace nets::net
 		addr->sin_port = htobe16(port);
 		addr->sin_addr.s_addr = INADDR_LOOPBACK;
 	}
-s
+
 	void createLoopBackInet6Addr(PortType port, Ipv6Addr* addr)
 	{
 		addr->sin6_family = AF_INET6;
@@ -186,4 +229,4 @@ s
 			LOGS_ERROR << "fcntl FD_CLOEXEC failed";
 		}
 	}
-} // namespace nets::net
+} // namespace nets::net::util

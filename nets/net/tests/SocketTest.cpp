@@ -33,9 +33,7 @@ TEST(SocketTest, Server)
 
 	::printf("%lu\t%lu\t%lu\n", sizeof(struct sockaddr), sizeof(struct sockaddr_in6), sizeof(struct sockaddr_in));
 
-	struct sockaddr_in serverAddr
-	{
-	};
+	struct sockaddr_in serverAddr {};
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htobe16(8080);
 	serverAddr.sin_addr.s_addr = htobe16(INADDR_ANY);
@@ -48,9 +46,7 @@ TEST(SocketTest, Server)
 		{
 			::printf("server socket start listen\n");
 			::fflush(stdout);
-			struct sockaddr_in clientAddr
-			{
-			};
+			struct sockaddr_in clientAddr {};
 			uint32_t len = sizeof(clientAddr);
 			::printf("server socket start accept...\n");
 			::fflush(stdout);
@@ -106,7 +102,7 @@ TEST(SocketTest, Client)
 		{
 			ret = ::send(socketFd, buffer, strlen(buffer), 0);
 		} while (ret > 0);
-		close(socketFd);
+		::close(socketFd);
 	}
 	else
 	{

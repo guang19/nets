@@ -17,31 +17,40 @@ namespace nets::net
 	using SockAddr = struct sockaddr;
 	using Ipv4Addr = struct sockaddr_in;
 	using Ipv6Addr = struct sockaddr_in6;
+	using SockAddrFamily = ::sa_family_t;
 
-	PortType netToHost16(PortType netPort);
-	PortType hostToNet16(PortType hostPort);
+	namespace util
+	{
+		FdType createTcpSocket(SockAddrFamily family);
+		FdType createTcpNonBlockSocket(SockAddrFamily family);
+		FdType createUdpSocket(SockAddrFamily family);
+		void closeSocket(FdType sockFd);
 
-	void createLoopBackInet4Addr(PortType port, Ipv4Addr* addr);
-	void createLoopBackInet6Addr(PortType port, Ipv6Addr* addr);
+		PortType netToHost16(PortType netPort);
+		PortType hostToNet16(PortType hostPort);
 
-	void createAnyInet4Addr(PortType port, Ipv4Addr* addr);
-	void createAnyInet6Addr(PortType port, Ipv6Addr* addr);
+		void createLoopBackInet4Addr(PortType port, Ipv4Addr* addr);
+		void createLoopBackInet6Addr(PortType port, Ipv6Addr* addr);
 
-	void ipPortToInet4Addr(const char* ip, PortType port, Ipv4Addr* addr);
-	void ipPortToInet6Addr(const char* ip, PortType port, Ipv6Addr* addr);
+		void createAnyInet4Addr(PortType port, Ipv4Addr* addr);
+		void createAnyInet6Addr(PortType port, Ipv6Addr* addr);
 
-	void getIpFromSockAddr(const SockAddr* sockAddr, char* buffer, SockLenType len);
+		void ipPortToInet4Addr(const char* ip, PortType port, Ipv4Addr* addr);
+		void ipPortToInet6Addr(const char* ip, PortType port, Ipv6Addr* addr);
 
-	void sockAddrToString(const SockAddr* sockAddr, char* buffer, ::size_t len);
+		void getIpFromSockAddr(const SockAddr* sockAddr, char* buffer, SockLenType len);
 
-	void setSockSendBuf(FdType sockFd, SockLenType sendBufLen);
-	void setSockRecvBuf(FdType sockFd, SockLenType recvBufLen);
-	void setSockAddrReuse(FdType sockFd, bool enable);
-	void setSockPortReuse(PortType sockFd, bool enable);
-	void setSockKeepAlive(PortType sockFd, bool enable);
-	void setIpTcpNoDelay(FdType sockFd, bool enable);
+		void sockAddrToString(const SockAddr* sockAddr, char* buffer, ::size_t len);
 
-	void setSockNonBlock(FdType sockFd, bool enable);
-}; // namespace nets::net
+		void setSockSendBuf(FdType sockFd, SockLenType sendBufLen);
+		void setSockRecvBuf(FdType sockFd, SockLenType recvBufLen);
+		void setSockAddrReuse(FdType sockFd, bool enable);
+		void setSockPortReuse(PortType sockFd, bool enable);
+		void setSockKeepAlive(PortType sockFd, bool enable);
+		void setIpTcpNoDelay(FdType sockFd, bool enable);
+
+		void setSockNonBlock(FdType sockFd, bool enable);
+	} // namespace util
+};    // namespace nets::net
 
 #endif // NETS_NETUTIL_H

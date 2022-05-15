@@ -17,12 +17,12 @@ namespace nets::net
 		if (ipv4)
 		{
 			MEMZERO(&addr4_, sizeof(Ipv4Addr));
-			ipPortToInet4Addr(ip, port, &addr4_);
+			util::ipPortToInet4Addr(ip, port, &addr4_);
 		}
 		else
 		{
 			MEMZERO(&addr6_, sizeof(Ipv6Addr));
-			ipPortToInet6Addr(ip, port, &addr6_);
+			util::ipPortToInet6Addr(ip, port, &addr6_);
 		}
 	}
 
@@ -32,14 +32,14 @@ namespace nets::net
 		{
 			Ipv4Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv4Addr));
-			createAnyInet4Addr(port, &addr);
+			util::createAnyInet4Addr(port, &addr);
 			return InetAddress(addr);
 		}
 		else
 		{
 			Ipv6Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv6Addr));
-			createAnyInet6Addr(port, &addr);
+			util::createAnyInet6Addr(port, &addr);
 			return InetAddress(addr);
 		}
 	}
@@ -50,68 +50,75 @@ namespace nets::net
 		{
 			Ipv4Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv4Addr));
-			createLoopBackInet4Addr(port, &addr);
+			util::createLoopBackInet4Addr(port, &addr);
 			return InetAddress(addr);
 		}
 		else
 		{
 			Ipv6Addr addr {};
 			MEMZERO(&addr, sizeof(Ipv6Addr));
-			createLoopBackInet6Addr(port, &addr);
+			util::createLoopBackInet6Addr(port, &addr);
 			return InetAddress(addr);
 		}
 	}
 	::std::string InetAddress::ip() const
 	{
 		char buffer[64] = {0};
-		getIpFromSockAddr(&addr_, buffer, static_cast<SockLenType>(sizeof(buffer)));
+		util::getIpFromSockAddr(&addr_, buffer, static_cast<SockLenType>(sizeof(buffer)));
 		return buffer;
 	}
 
 	PortType InetAddress::port() const
 	{
-		return netToHost16(addr4_.sin_port);
+		return util::netToHost16(addr4_.sin_port);
 	}
 
 	::std::string InetAddress::toString() const
 	{
 		char buffer[64] = {0};
-		sockAddrToString(&addr_, buffer, sizeof(buffer));
+		util::sockAddrToString(&addr_, buffer, sizeof(buffer));
 		return buffer;
+	}
+
+	Socket::Socket(FdType sockFd) : sockFd_(sockFd) {}
+
+	Socket::~Socket()
+	{
+		util::closeSocket(sockFd_);
 	}
 
 	void Socket::setSendBuf(SockLenType sendBufLen)
 	{
-		setSockSendBuf(sockFd_, sendBufLen);
+		util::setSockSendBuf(sockFd_, sendBufLen);
 	}
 
 	void Socket::setRecvBuf(SockLenType recvBufLen)
 	{
-		setSockRecvBuf(sockFd_, recvBufLen);
+		util::setSockRecvBuf(sockFd_, recvBufLen);
 	}
 
 	void Socket::setAddrReuse(bool enable)
 	{
-		setSockAddrReuse(sockFd_, enable);
+		util::setSockAddrReuse(sockFd_, enable);
 	}
 
 	void Socket::setPortReuse(bool enable)
 	{
-		setSockPortReuse(sockFd_, enable);
+		util::setSockPortReuse(sockFd_, enable);
 	}
 
 	void Socket::setKeepAlive(bool enable)
 	{
-		setSockKeepAlive(sockFd_, enable);
+		util::setSockKeepAlive(sockFd_, enable);
 	}
 
 	void Socket::setTcpNoDelay(bool enable)
 	{
-		setIpTcpNoDelay(sockFd_, enable);
+		util::setIpTcpNoDelay(sockFd_, enable);
 	}
 
 	void Socket::setNonBlock(bool enable)
 	{
-		setSockNonBlock(sockFd_, enable);
+		util::setSockNonBlock(sockFd_, enable);
 	}
 } // namespace nets::net

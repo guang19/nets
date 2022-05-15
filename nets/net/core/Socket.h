@@ -44,8 +44,8 @@ namespace nets::net
 	class Socket : base::Noncopyable
 	{
 	public:
-		explicit Socket(FdType sockFd) : sockFd_(sockFd) {}
-		~Socket() = default;
+		explicit Socket(FdType sockFd);
+		~Socket();
 
 	public:
 		// usually, newer os all support dynamic sock buffer resizing
