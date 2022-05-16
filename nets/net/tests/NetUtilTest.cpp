@@ -9,6 +9,7 @@
 #include "nets/net/core/NetUtil.h"
 
 using namespace nets::net;
+using namespace nets::net::util;
 
 TEST(NetUtilTest, IPV4Convert)
 {

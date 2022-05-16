@@ -14,7 +14,8 @@ namespace nets::net
 	namespace
 	{
 		constexpr ::size_t InitEventSize = 12;
-	}
+		constexpr ::time_t Timeout = 1;
+	} // namespace
 
 	EpollSelector::EpollSelector(EventLoopPtr eventLoop)
 		: Selector(::std::move(eventLoop)), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEventSize)
@@ -33,7 +34,19 @@ namespace nets::net
 
 	void EpollSelector::select()
 	{
-
+		int32_t requestEvents = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(events_.size()), Timeout);
+		if (requestEvents > 0)
+		{
+			LOGS_INFO << "epoll:" << requestEvents << " events";
+		}
+		else if (requestEvents == 0)
+		{
+			LOGS_DEBUG << "epoll no events";
+		}
+		else
+		{
+			LOGS_ERROR << "epoll error";
+		}
 	}
 
 	void EpollSelector::addChannel(Selector::ChannelPtr channel) {}

@@ -32,19 +32,19 @@ namespace nets::base
 
 // stream api
 #define LOGS_TRACE                                                                                                          \
-	if (LogLevel::TRACE >= LOG_LEVEL)                                                                                       \
+	if (nets::base::LogLevel::TRACE >= LOG_LEVEL)                                                                                       \
 	nets::base::LogMessageStream(nets::base::LogLevel::TRACE, __FILE__, __LINE__).stream()
 
 #define LOGS_DEBUG                                                                                                          \
-	if (LogLevel::DEBUG >= LOG_LEVEL)                                                                                       \
+	if (nets::base::LogLevel::DEBUG >= LOG_LEVEL)                                                                                       \
 	nets::base::LogMessageStream(nets::base::LogLevel::DEBUG, __FILE__, __LINE__).stream()
 
 #define LOGS_INFO                                                                                                           \
-	if (LogLevel::INFO >= LOG_LEVEL)                                                                                        \
+	if (nets::base::LogLevel::INFO >= LOG_LEVEL)                                                                                        \
 	nets::base::LogMessageStream(nets::base::LogLevel::INFO, __FILE__, __LINE__).stream()
 
 #define LOGS_WARN                                                                                                           \
-	if (LogLevel::WARN >= LOG_LEVEL)                                                                                        \
+	if (nets::base::LogLevel::WARN >= LOG_LEVEL)                                                                                        \
 	nets::base::LogMessageStream(nets::base::LogLevel::WARN, __FILE__, __LINE__).stream()
 
 #define LOGS_ERROR nets::base::LogMessageStream(nets::base::LogLevel::ERROR, __FILE__, __LINE__).stream()
