@@ -192,7 +192,6 @@ namespace nets::base
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using AtomicBoolType = ::std::atomic<bool>;
 		using ConditionVarType = ::std::condition_variable;
 		using PersistentWriterPtr = ::std::shared_ptr<IPersistentWriter>;
 		using BufferVectorType = ::std::vector<BufferPtr>;
@@ -219,7 +218,7 @@ namespace nets::base
 		void asyncPersist();
 
 	private:
-		AtomicBoolType running_ {false};
+		::std::atomic_bool running_ {false};
 		BufferPtr cacheBuffer_ {nullptr};
 		BufferPtr backupCacheBuffer_ {nullptr};
 		PersistentWriterPtr persistentWriter_ {nullptr};
