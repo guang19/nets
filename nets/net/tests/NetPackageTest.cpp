@@ -37,12 +37,6 @@ TEST(NetPackageTest, Endian)
 	ASSERT_EQ(x, z);
 }
 
-TEST(NetPackageTest, TT)
-{
-	::printf("%ld", sysconf(_SC_NPROCESSORS_CONF));
-	::printf("%ld", sysconf(_SC_NPROCESSORS_ONLN));
-}
-
 int main(int argc, char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);
