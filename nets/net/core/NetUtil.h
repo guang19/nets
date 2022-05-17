@@ -15,28 +15,23 @@ namespace nets::net
 	using SockLenType = ::socklen_t;
 	using PortType = uint16_t;
 	using SockAddr = struct sockaddr;
-	using Ipv4Addr = struct sockaddr_in;
-	using Ipv6Addr = struct sockaddr_in6;
+	using SockAddr4 = struct sockaddr_in;
+	using SockAddr6 = struct sockaddr_in6;
 	using SockAddrFamily = ::sa_family_t;
 
 	namespace util
 	{
-		FdType createTcpSocket(SockAddrFamily family);
-		FdType createTcpNonBlockSocket(SockAddrFamily family);
-		FdType createUdpSocket(SockAddrFamily family);
-		void closeSocket(FdType sockFd);
-
 		PortType netToHost16(PortType netPort);
 		PortType hostToNet16(PortType hostPort);
 
-		void createLoopBackInet4Addr(PortType port, Ipv4Addr* addr);
-		void createLoopBackInet6Addr(PortType port, Ipv6Addr* addr);
+		void createLoopBackInet4Addr(PortType port, SockAddr4* addr);
+		void createLoopBackInet6Addr(PortType port, SockAddr6* addr);
 
-		void createAnyInet4Addr(PortType port, Ipv4Addr* addr);
-		void createAnyInet6Addr(PortType port, Ipv6Addr* addr);
+		void createAnyInet4Addr(PortType port, SockAddr4* addr);
+		void createAnyInet6Addr(PortType port, SockAddr6* addr);
 
-		void ipPortToInet4Addr(const char* ip, PortType port, Ipv4Addr* addr);
-		void ipPortToInet6Addr(const char* ip, PortType port, Ipv6Addr* addr);
+		void ipPortToInet4Addr(const char* ip, PortType port, SockAddr4* addr);
+		void ipPortToInet6Addr(const char* ip, PortType port, SockAddr6* addr);
 
 		void getIpFromSockAddr(const SockAddr* sockAddr, char* buffer, SockLenType len);
 
@@ -50,6 +45,15 @@ namespace nets::net
 		void setIpTcpNoDelay(FdType sockFd, bool enable);
 
 		void setSockNonBlock(FdType sockFd, bool enable);
+
+		FdType createTcpSocket(SockAddrFamily family);
+		FdType createTcpNonBlockSocket(SockAddrFamily family);
+		FdType createUdpSocket(SockAddrFamily family);
+		void closeSocket(FdType sockFd);
+
+		void bind(FdType sockFd, const SockAddr* sockAddr);
+		void listen(FdType sockFd);
+		FdType accept(FdType sockFd, SockAddr* sockAddr);
 	} // namespace util
 };    // namespace nets::net
 

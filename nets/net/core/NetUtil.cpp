@@ -15,48 +15,6 @@
 
 namespace nets::net::util
 {
-
-	FdType createTcpSocket(SockAddrFamily family)
-	{
-		FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
-		if (sockFd < 0)
-		{
-			LOGS_FATAL << "create tcp socket failed";
-		}
-		return sockFd;
-	}
-
-	FdType createNonBlockTcpSocket(SockAddrFamily family)
-	{
-		FdType sockFd = ::socket(family, SOCK_STREAM | O_NONBLOCK | FD_CLOEXEC, IPPROTO_TCP);
-		if (sockFd < 0)
-		{
-			LOGS_FATAL << "create tcp socket failed";
-		}
-		return sockFd;
-	}
-
-	FdType createUdpSocket(SockAddrFamily family)
-	{
-		FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
-		if (sockFd < 0)
-		{
-			LOGS_ERROR << "create udp socket failed";
-		}
-		return sockFd;
-	}
-
-	void closeSocket(FdType sockFd)
-	{
-		if (sockFd > 0)
-		{
-			if (::close(sockFd) != 0)
-			{
-				LOGS_ERROR << "close socket failed";
-			}
-		}
-	}
-
 	PortType netToHost16(PortType netPort)
 	{
 		return be16toh(netPort);
@@ -67,35 +25,35 @@ namespace nets::net::util
 		return htobe16(hostPort);
 	}
 
-	void createLoopBackInet4Addr(PortType port, Ipv4Addr* addr)
+	void createLoopBackInet4Addr(PortType port, SockAddr4* addr)
 	{
 		addr->sin_family = AF_INET;
 		addr->sin_port = htobe16(port);
 		addr->sin_addr.s_addr = INADDR_LOOPBACK;
 	}
 
-	void createLoopBackInet6Addr(PortType port, Ipv6Addr* addr)
+	void createLoopBackInet6Addr(PortType port, SockAddr6* addr)
 	{
 		addr->sin6_family = AF_INET6;
 		addr->sin6_port = htobe16(port);
 		addr->sin6_addr = in6addr_loopback;
 	}
 
-	void createAnyInet4Addr(PortType port, Ipv4Addr* addr)
+	void createAnyInet4Addr(PortType port, SockAddr4* addr)
 	{
 		addr->sin_family = AF_INET;
 		addr->sin_port = htobe16(port);
 		addr->sin_addr.s_addr = INADDR_ANY;
 	}
 
-	void createAnyInet6Addr(PortType port, Ipv6Addr* addr)
+	void createAnyInet6Addr(PortType port, SockAddr6* addr)
 	{
 		addr->sin6_family = AF_INET6;
 		addr->sin6_port = htobe16(port);
 		addr->sin6_addr = in6addr_any;
 	}
 
-	void ipPortToInet4Addr(const char* ip, PortType port, Ipv4Addr* addr)
+	void ipPortToInet4Addr(const char* ip, PortType port, SockAddr4* addr)
 	{
 		addr->sin_family = AF_INET;
 		addr->sin_port = htobe16(port);
@@ -105,7 +63,7 @@ namespace nets::net::util
 		}
 	}
 
-	void ipPortToInet6Addr(const char* ip, PortType port, Ipv6Addr* addr)
+	void ipPortToInet6Addr(const char* ip, PortType port, SockAddr6* addr)
 	{
 		addr->sin6_family = AF_INET6;
 		addr->sin6_port = htobe16(port);
@@ -119,7 +77,7 @@ namespace nets::net::util
 	{
 		if (AF_INET == sockAddr->sa_family)
 		{
-			auto addr4 = reinterpret_cast<const Ipv4Addr*>(sockAddr);
+			auto addr4 = reinterpret_cast<const SockAddr4*>(sockAddr);
 			if (nullptr == ::inet_ntop(AF_INET, &addr4->sin_addr, buffer, len))
 			{
 				LOGS_FATAL << "inet_ntop AF_INET";
@@ -127,7 +85,7 @@ namespace nets::net::util
 		}
 		else if (AF_INET6 == sockAddr->sa_family)
 		{
-			auto addr6 = reinterpret_cast<const Ipv6Addr*>(sockAddr);
+			auto addr6 = reinterpret_cast<const SockAddr6*>(sockAddr);
 			if (nullptr == ::inet_ntop(AF_INET6, &addr6->sin6_addr, buffer, len))
 			{
 				LOGS_FATAL << "inet_ntop AF_INET6";
@@ -141,7 +99,7 @@ namespace nets::net::util
 		{
 			getIpFromSockAddr(sockAddr, buffer, static_cast<SockLenType>(len));
 			SockLenType ipLen = ::strlen(buffer);
-			PortType port = be16toh(reinterpret_cast<const Ipv4Addr*>(sockAddr)->sin_port);
+			PortType port = be16toh(reinterpret_cast<const SockAddr4*>(sockAddr)->sin_port);
 			::snprintf(buffer + ipLen, len - ipLen, ":%u", port);
 		}
 		else if (AF_INET6 == sockAddr->sa_family)
@@ -150,7 +108,7 @@ namespace nets::net::util
 			buffer[0] = '[';
 			getIpFromSockAddr(sockAddr, buffer + 1, static_cast<SockLenType>(len - 1));
 			SockLenType ipLen = ::strlen(buffer);
-			PortType port = be16toh(reinterpret_cast<const Ipv6Addr*>(sockAddr)->sin6_port);
+			PortType port = be16toh(reinterpret_cast<const SockAddr6*>(sockAddr)->sin6_port);
 			::snprintf(buffer + ipLen, len - ipLen, "]:%u", port);
 		}
 	}
@@ -228,5 +186,74 @@ namespace nets::net::util
 		{
 			LOGS_ERROR << "fcntl FD_CLOEXEC failed";
 		}
+	}
+
+	FdType createTcpSocket(SockAddrFamily family)
+	{
+		FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
+		if (sockFd < 0)
+		{
+			LOGS_FATAL << "create tcp socket failed";
+		}
+		return sockFd;
+	}
+
+	FdType createTcpNonBlockSocket(SockAddrFamily family)
+	{
+		FdType sockFd = ::socket(family, SOCK_STREAM | O_NONBLOCK | FD_CLOEXEC, IPPROTO_TCP);
+		if (sockFd < 0)
+		{
+			LOGS_FATAL << "create tcp socket failed";
+		}
+		return sockFd;
+	}
+
+	FdType createUdpSocket(SockAddrFamily family)
+	{
+		FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
+		if (sockFd < 0)
+		{
+			LOGS_ERROR << "create udp socket failed";
+		}
+		return sockFd;
+	}
+
+	void closeSocket(FdType sockFd)
+	{
+		if (sockFd > 0)
+		{
+			if (::close(sockFd) != 0)
+			{
+				LOGS_ERROR << "close socket failed";
+			}
+		}
+	}
+
+	void bind(FdType sockFd, const SockAddr* sockAddr)
+	{
+		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4)) : static_cast<SockLenType>(sizeof(SockAddr6));
+		if (::bind(sockFd, sockAddr, len) != 0)
+		{
+			LOGS_FATAL << "bind socket failed";
+		}
+	}
+
+	void listen(FdType sockFd)
+	{
+		if (::listen(sockFd, SOMAXCONN) != 0)
+		{
+			LOGS_FATAL << "listen socket failed";
+		}
+	}
+
+	FdType accept(FdType sockFd, SockAddr* sockAddr)
+	{
+		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4)) : static_cast<SockLenType>(sizeof(SockAddr6));
+		FdType connFd = -1;
+		if ((connFd = ::accept4(sockFd, sockAddr, &len, O_NONBLOCK | SOCK_CLOEXEC)) < 0)
+		{
+			LOGS_FATAL << "accept socket failed";
+		}
+		return connFd;
 	}
 } // namespace nets::net::util

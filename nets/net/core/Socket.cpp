@@ -8,20 +8,20 @@
 
 namespace nets::net
 {
-	InetAddress::InetAddress(const Ipv4Addr& addr4) : addr4_(addr4) {}
+	InetAddress::InetAddress(const SockAddr4& addr4) : addr4_(addr4) {}
 
-	InetAddress::InetAddress(const Ipv6Addr& addr6) : addr6_(addr6) {}
+	InetAddress::InetAddress(const SockAddr6& addr6) : addr6_(addr6) {}
 
 	InetAddress::InetAddress(const char* ip, PortType port, bool ipv4)
 	{
 		if (ipv4)
 		{
-			MEMZERO(&addr4_, sizeof(Ipv4Addr));
+			MEMZERO(&addr4_, sizeof(SockAddr4));
 			util::ipPortToInet4Addr(ip, port, &addr4_);
 		}
 		else
 		{
-			MEMZERO(&addr6_, sizeof(Ipv6Addr));
+			MEMZERO(&addr6_, sizeof(SockAddr6));
 			util::ipPortToInet6Addr(ip, port, &addr6_);
 		}
 	}
@@ -30,15 +30,15 @@ namespace nets::net
 	{
 		if (ipv4)
 		{
-			Ipv4Addr addr {};
-			MEMZERO(&addr, sizeof(Ipv4Addr));
+			SockAddr4 addr {};
+			MEMZERO(&addr, sizeof(SockAddr4));
 			util::createAnyInet4Addr(port, &addr);
 			return InetAddress(addr);
 		}
 		else
 		{
-			Ipv6Addr addr {};
-			MEMZERO(&addr, sizeof(Ipv6Addr));
+			SockAddr6 addr {};
+			MEMZERO(&addr, sizeof(SockAddr6));
 			util::createAnyInet6Addr(port, &addr);
 			return InetAddress(addr);
 		}
@@ -48,15 +48,15 @@ namespace nets::net
 	{
 		if (ipv4)
 		{
-			Ipv4Addr addr {};
-			MEMZERO(&addr, sizeof(Ipv4Addr));
+			SockAddr4 addr {};
+			MEMZERO(&addr, sizeof(SockAddr4));
 			util::createLoopBackInet4Addr(port, &addr);
 			return InetAddress(addr);
 		}
 		else
 		{
-			Ipv6Addr addr {};
-			MEMZERO(&addr, sizeof(Ipv6Addr));
+			SockAddr6 addr {};
+			MEMZERO(&addr, sizeof(SockAddr6));
 			util::createLoopBackInet6Addr(port, &addr);
 			return InetAddress(addr);
 		}
@@ -120,5 +120,20 @@ namespace nets::net
 	void Socket::setNonBlock(bool enable)
 	{
 		util::setSockNonBlock(sockFd_, enable);
+	}
+
+	void Socket::bind(const InetAddress& addr)
+	{
+		util::bind(sockFd_, addr.cSockAddr());
+	}
+
+	void Socket::listen()
+	{
+		util::listen(sockFd_);
+	}
+
+	FdType Socket::accept(InetAddress* addr)
+	{
+		return util::accept(sockFd_, addr->sockAddr());
 	}
 } // namespace nets::net

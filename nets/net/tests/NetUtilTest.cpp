@@ -40,14 +40,14 @@ TEST(NetUtilTest, IPV6Convert)
 
 TEST(NetUtilTest, GetSockAddressIp)
 {
-	Ipv4Addr addr4 {};
+	SockAddr4 addr4 {};
 	char ipv4[] = {"192.168.0.1"};
 	ipPortToInet4Addr(ipv4, 8080, &addr4);
 	char buffer1[64] = {0};
 	getIpFromSockAddr(reinterpret_cast<const SockAddr*>(&addr4), buffer1, static_cast<SockLenType>(sizeof(buffer1)));
 	ASSERT_STREQ(ipv4, buffer1);
 
-	Ipv6Addr addr6 {};
+	SockAddr6 addr6 {};
 	char ipv6[] = {"2a01:198:603:0:396e:4789:8e99:890f"};
 	ipPortToInet6Addr(ipv6, 8080, &addr6);
 	char buffer2[64] = {0};
@@ -57,14 +57,14 @@ TEST(NetUtilTest, GetSockAddressIp)
 
 TEST(NetUtilTest, SockAddressToString)
 {
-	Ipv4Addr addr4 {};
+	SockAddr4 addr4 {};
 	char ipv4[] = {"192.168.0.1"};
 	ipPortToInet4Addr(ipv4, 8080, &addr4);
 	char buffer1[64] = {0};
 	sockAddrToString(reinterpret_cast<const SockAddr*>(&addr4), buffer1, sizeof(buffer1));
 	ASSERT_STREQ(buffer1, "192.168.0.1:8080");
 
-	Ipv6Addr addr6 {};
+	SockAddr6 addr6 {};
 	char ipv6[] = {"2a01:198:603:0:396e:4789:8e99:890f"};
 	ipPortToInet6Addr(ipv6, 8080, &addr6);
 	char buffer2[64] = {0};

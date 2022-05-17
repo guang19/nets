@@ -17,11 +17,6 @@ namespace nets::net
 		constexpr ::time_t Timeout = 1;
 	} // namespace
 
-	EpollSelector::EpollSelector() : Selector(nullptr)
-	{
-
-	}
-
 	EpollSelector::EpollSelector(EventLoopPtr eventLoop)
 		: Selector(::std::move(eventLoop)), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEventSize)
 	{

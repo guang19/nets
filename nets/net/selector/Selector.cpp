@@ -14,8 +14,8 @@ namespace nets::net
 		return it != channels_.end() && it->second == channel;
 	}
 
-	::std::shared_ptr<Selector> SelectorFactory::getSelector()
+	Selector* SelectorFactory::getSelector()
 	{
-		return ::std::shared_ptr<EpollSelector>(new EpollSelector());
+		return new EpollSelector(nullptr);
 	}
 }; // namespace nets::net

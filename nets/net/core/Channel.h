@@ -6,14 +6,11 @@
 #define NETS_CHANNEL_H
 
 #include <cstdint>
-#include <memory>
 
 #include "nets/net/core/EventLoop.h"
 
 namespace nets::net
 {
-	class EvetLoop;
-
 	class Channel : base::Noncopyable
 	{
 	public:

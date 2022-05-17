@@ -112,7 +112,7 @@ namespace nets::base
 		}
 		running_ = true;
 		threadPool_.reserve(maxPoolSize_);
-		LOGS_DEBUG << "thread pool init success";
+		LOGS_INFO << "thread pool init success";
 	}
 
 	void ThreadPool::shutdown()
@@ -132,7 +132,7 @@ namespace nets::base
 					 });
 		assert(taskQueue_->isEmpty());
 		assert(threadPool_.empty());
-		LOGS_DEBUG << "thread pool has been shutdown";
+		LOGS_INFO << "thread pool has been shutdown";
 	}
 
 	void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)

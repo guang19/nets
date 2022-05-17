@@ -7,7 +7,6 @@
 
 #include <cstdint>
 #include <map>
-#include <memory>
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Channel.h"
@@ -48,7 +47,7 @@ namespace nets::net
 	class SelectorFactory
 	{
 	public:
-		static ::std::shared_ptr<Selector> getSelector();
+		static Selector* getSelector();
 	};
 }; // namespace nets::net
 

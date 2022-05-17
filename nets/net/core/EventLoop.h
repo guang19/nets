@@ -16,7 +16,7 @@ namespace nets::net
 	class Selector;
 	class SelectorFactory;
 
-	class EventLoop : base::Noncopyable
+	class EventLoop : base::Noncopyable, public ::std::enable_shared_from_this<EventLoop>
 	{
 	public:
 		using ChannelPtr = ::std::shared_ptr<Channel>;
@@ -27,6 +27,9 @@ namespace nets::net
 		~EventLoop();
 
 	public:
+		bool isInEventLoopThread() const;
+		EventLoopPtr currentThreadEventLoop() const;
+
 		void loop();
 		void shutdown();
 
@@ -36,7 +39,8 @@ namespace nets::net
 
 	private:
 		::std::atomic_bool running_ {false};
-		::std::shared_ptr<Selector> selector_ {nullptr};
+		::std::unique_ptr<Selector> selector_ {nullptr};
+		const ::pid_t currentTid_ {0};
 	};
 } // namespace nets::net
 

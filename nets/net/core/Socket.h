@@ -14,8 +14,8 @@ namespace nets::net
 	class InetAddress
 	{
 	public:
-		explicit InetAddress(const Ipv4Addr& addr4);
-		explicit InetAddress(const Ipv6Addr& addr6);
+		explicit InetAddress(const SockAddr4& addr4);
+		explicit InetAddress(const SockAddr6& addr6);
 		explicit InetAddress(const char* ip, PortType port, bool ipv4 = true);
 
 	public:
@@ -28,6 +28,16 @@ namespace nets::net
 			return addr4_.sin_family;
 		}
 
+		inline const SockAddr* cSockAddr() const
+		{
+			return &addr_;
+		}
+
+		inline SockAddr* sockAddr()
+		{
+			return &addr_;
+		}
+
 		::std::string ip() const;
 		PortType port() const;
 		::std::string toString() const;
@@ -36,8 +46,8 @@ namespace nets::net
 		union
 		{
 			SockAddr addr_;
-			Ipv4Addr addr4_;
-			Ipv6Addr addr6_;
+			SockAddr4 addr4_;
+			SockAddr6 addr6_;
 		};
 	};
 
@@ -59,6 +69,17 @@ namespace nets::net
 		void setTcpNoDelay(bool enable = true);
 
 		void setNonBlock(bool enable = true);
+
+	public:
+		void bind(const InetAddress& addr);
+		void listen();
+		FdType accept(InetAddress* addr);
+
+
+		inline FdType sockFd() const
+		{
+			return sockFd_;
+		}
 
 	private:
 		FdType sockFd_ {-1};
