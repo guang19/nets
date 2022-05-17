@@ -5,13 +5,17 @@
 #ifndef NETS_SELECTOR_H
 #define NETS_SELECTOR_H
 
+#include <cstdint>
 #include <map>
+#include <memory>
 
+#include "nets/base/Noncopyable.h"
 #include "nets/net/core/Channel.h"
-#include "nets/net/core/EventLoop.h"
 
 namespace nets::net
 {
+	class EventLoop;
+
 	class Selector : base::Noncopyable
 	{
 	public:
@@ -43,6 +47,8 @@ namespace nets::net
 
 	class SelectorFactory
 	{
+	public:
+		static ::std::shared_ptr<Selector> getSelector();
 	};
 }; // namespace nets::net
 

@@ -19,6 +19,7 @@ namespace nets::net
 		using EventList = ::std::vector<Event>;
 
 	public:
+		EpollSelector();
 		explicit EpollSelector(EventLoopPtr eventLoop);
 		~EpollSelector() override;
 

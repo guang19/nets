@@ -12,16 +12,31 @@
 
 namespace nets::net
 {
+	class Channel;
+	class Selector;
+	class SelectorFactory;
+
 	class EventLoop : base::Noncopyable
 	{
 	public:
+		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 
 	public:
+		EventLoop();
+		~EventLoop();
+
+	public:
 		void loop();
-		void exit();
+		void shutdown();
+
+		void addChannel(ChannelPtr channel);
+		void updateChannel(ChannelPtr channel);
+		void removeChannel(ChannelPtr channel);
+
 	private:
 		::std::atomic_bool running_ {false};
+		::std::shared_ptr<Selector> selector_ {nullptr};
 	};
 } // namespace nets::net
 

@@ -4,6 +4,8 @@
 
 #include "nets/net/selector/Selector.h"
 
+#include "nets/net/selector/EpollSelector.h"
+
 namespace nets::net
 {
 	bool Selector::hasChannel(const ChannelPtr& channel)
@@ -12,4 +14,8 @@ namespace nets::net
 		return it != channels_.end() && it->second == channel;
 	}
 
+	::std::shared_ptr<Selector> SelectorFactory::getSelector()
+	{
+		return ::std::shared_ptr<EpollSelector>(new EpollSelector());
+	}
 }; // namespace nets::net
