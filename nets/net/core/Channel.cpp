@@ -7,7 +7,23 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopPtr eventLoop, FdType fd)
-		: socket_(fd), events_(EventType::None), eventLoop_(::std::move(eventLoop))
+		: socket_(fd), events_(EventType::None), isRegistered_(false), eventLoop_(::std::move(eventLoop))
 	{
 	}
+
+	void Channel::registerTo()
+	{
+		eventLoop_->registerChannel(shared_from_this());
+	}
+
+	void Channel::unregister()
+	{
+		eventLoop_->unregisterChannel(shared_from_this());
+	}
+
+	void Channel::modify()
+	{
+		eventLoop_->modifyChannel(shared_from_this());
+	}
+
 } // namespace nets::net

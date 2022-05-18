@@ -33,9 +33,9 @@ namespace nets::net
 		void loop();
 		void shutdown();
 
-		void addChannel(ChannelPtr channel);
-		void updateChannel(ChannelPtr channel);
-		void removeChannel(ChannelPtr channel);
+		void registerChannel(ChannelPtr channel);
+		void modifyChannel(ChannelPtr channel);
+		void unregisterChannel(ChannelPtr channel);
 		bool hasChannel(ChannelPtr channel);
 
 	private:

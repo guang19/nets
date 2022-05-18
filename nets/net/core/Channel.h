@@ -13,17 +13,14 @@
 
 namespace nets::net
 {
-	namespace
+	enum EventType
 	{
-		enum EventType
-		{
-			None = 0,
-			ReadEvent = EPOLLIN,
-			PriReadEvent = EPOLLPRI,
-			WriteEvent = EPOLLOUT,
-			ErrorEvent = EPOLLERR,
-		};
-	}
+		None = 0,
+		ReadEvent = EPOLLIN,
+		PriReadEvent = EPOLLPRI,
+		WriteEvent = EPOLLOUT,
+		ErrorEvent = EPOLLERR,
+	};
 
 	class Channel : base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{
@@ -37,6 +34,10 @@ namespace nets::net
 		virtual ~Channel() = default;
 
 	public:
+		void registerTo();
+		void unregister();
+		void modify();
+
 		virtual void handleReadEvent() = 0;
 		virtual void handleWriteEvent() = 0;
 		virtual void handleErrorEvent() = 0;
@@ -47,6 +48,21 @@ namespace nets::net
 			return socket_.sockFd();
 		}
 
+		inline int32_t events() const
+		{
+			return events_;
+		}
+
+		inline bool isRegistered() const
+		{
+			return isRegistered_;
+		}
+
+		inline void setRegistered(bool isRegistered)
+		{
+			isRegistered_ = isRegistered;
+		}
+
 		inline EventLoopPtr eventLoop() const
 		{
 			return eventLoop_;
@@ -55,6 +71,7 @@ namespace nets::net
 	protected:
 		Socket socket_ {-1};
 		int32_t events_ {EventType::None};
+		::std::atomic_bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

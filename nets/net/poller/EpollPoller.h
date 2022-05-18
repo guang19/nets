@@ -15,8 +15,8 @@ namespace nets::net
 	class EpollPoller : public Poller
 	{
 	public:
-		using Event = struct epoll_event;
-		using EventList = ::std::vector<Event>;
+		using EpollEvent = struct epoll_event;
+		using EventList = ::std::vector<EpollEvent>;
 
 	public:
 		explicit EpollPoller(EventLoopPtr eventLoop);
@@ -24,12 +24,16 @@ namespace nets::net
 
 	public:
 		void poll() override;
-		void addChannel(ChannelPtr channel) override;
-		void updateChannel(ChannelPtr channel) override;
-		void removeChannel(ChannelPtr channel) override;
+		void registerChannel(ChannelPtr channel) override;
+		void modifyChannel(ChannelPtr channel) override;
+		void unregisterChannel(ChannelPtr channel) override;
 
 	private:
-		FdType epollFd_ {0};
+		void epollCtl(int32_t opt, const ChannelPtr& channel);
+		const char* epollOptToString(int32_t opt);
+
+	private:
+		FdType epollFd_ {-1};
 		// dynamically growing array of events
 		EventList events_ {};
 	};

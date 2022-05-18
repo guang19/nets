@@ -31,6 +31,7 @@ namespace nets::net
 
 	void Acceptor::handleReadEvent()
 	{
+		while (true) {}
 	}
 
 	void Acceptor::handleWriteEvent() {}

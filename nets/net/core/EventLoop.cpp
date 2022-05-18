@@ -50,19 +50,19 @@ namespace nets::net
 
 	void EventLoop::shutdown() {}
 
-	void EventLoop::addChannel(ChannelPtr channel)
+	void EventLoop::registerChannel(ChannelPtr channel)
 	{
-		poller_->addChannel(std::move(channel));
+		poller_->registerChannel(std::move(channel));
 	}
 
-	void EventLoop::updateChannel(ChannelPtr channel)
+	void EventLoop::modifyChannel(ChannelPtr channel)
 	{
-		poller_->updateChannel(std::move(channel));
+		poller_->modifyChannel(std::move(channel));
 	}
 
-	void EventLoop::removeChannel(ChannelPtr channel)
+	void EventLoop::unregisterChannel(ChannelPtr channel)
 	{
-		poller_->removeChannel(std::move(channel));
+		poller_->unregisterChannel(std::move(channel));
 	}
 
 	bool EventLoop::hasChannel(ChannelPtr channel)

@@ -29,9 +29,9 @@ namespace nets::net
 
 	public:
 		virtual void poll() = 0;
-		virtual void addChannel(ChannelPtr channel) = 0;
-		virtual void updateChannel(ChannelPtr channel) = 0;
-		virtual void removeChannel(ChannelPtr channel) = 0;
+		virtual void registerChannel(ChannelPtr channel) = 0;
+		virtual void modifyChannel(ChannelPtr channel) = 0;
+		virtual void unregisterChannel(ChannelPtr channel) = 0;
 		bool hasChannel(ChannelPtr channel);
 
 		inline EventLoopPtr eventLoop() const

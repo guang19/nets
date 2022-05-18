@@ -26,7 +26,6 @@ namespace nets::net
 		void handleReadEvent();
 		void handleWriteEvent();
 		void handleErrorEvent();
-
 	};
 } // namespace nets::net
 

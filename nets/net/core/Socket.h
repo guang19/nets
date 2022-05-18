@@ -75,7 +75,6 @@ namespace nets::net
 		void listen();
 		FdType accept(InetAddress* addr);
 
-
 		inline FdType sockFd() const
 		{
 			return sockFd_;

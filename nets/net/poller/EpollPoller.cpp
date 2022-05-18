@@ -7,6 +7,7 @@
 #include <cassert>
 #include <unistd.h>
 
+#include "nets/base/CommonMacro.h"
 #include "nets/base/log/Logging.h"
 
 namespace nets::net
@@ -49,9 +50,54 @@ namespace nets::net
 		}
 	}
 
-	void EpollPoller::addChannel(Poller::ChannelPtr channel) {}
+	void EpollPoller::registerChannel(ChannelPtr channel)
+	{
+		assert(!hasChannel(channel));
+		assert(!channel->isRegistered());
+		channels_[channel->fd()] = channel;
+		epollCtl(EPOLL_CTL_ADD, channel);
+		channel->setRegistered(	true);
+	}
 
-	void EpollPoller::updateChannel(Poller::ChannelPtr channel) {}
+	void EpollPoller::modifyChannel(ChannelPtr channel)
+	{
+		assert(hasChannel(channel));
+		assert(channel->isRegistered());
+		epollCtl(EPOLL_CTL_MOD, channel);
+	}
 
-	void EpollPoller::removeChannel(Poller::ChannelPtr channel) {}
+	void EpollPoller::unregisterChannel(ChannelPtr channel)
+	{
+		assert(hasChannel(channel));
+		assert(channel->isRegistered());
+		channels_.erase(channel->fd());
+		epollCtl(EPOLL_CTL_DEL, channel);
+		channel->setRegistered(true);
+	}
+
+	void EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)
+	{
+		EpollEvent event {};
+		event.data.ptr = channel.get();
+		event.events = channel->events();
+		if (::epoll_ctl(epollFd_, opt, channel->fd(), &event) != 0)
+		{
+			LOGS_FATAL << "epoll ctl " << epollOptToString(opt) << " failed";
+		}
+	}
+
+	const char* EpollPoller::epollOptToString(int32_t opt)
+	{
+		switch (opt)
+		{
+			case EPOLL_CTL_ADD:
+			return "add";
+			case EPOLL_CTL_MOD:
+				return "mod";
+			case EPOLL_CTL_DEL:
+				return "del";
+			default:
+				return "unknown operation";
+		}
+	}
 } // namespace nets::net
