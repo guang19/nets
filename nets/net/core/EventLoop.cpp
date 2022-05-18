@@ -15,40 +15,45 @@ namespace nets::net
 {
 	namespace
 	{
-		__thread EventLoop* CurrentEventLoop = nullptr;
+		__thread EventLoop* CurrentThreadEventLoop = nullptr;
 	}
 
-	EventLoop::EventLoop() : running_(false), poller_(PollerFactory::getPoller()), currentTid_(base::currentTid())
+	EventLoop::EventLoop() : running_(false), poller_(PollerFactory::getPoller())
 	{
-		assert(CurrentEventLoop == nullptr);
+		assert(CurrentThreadEventLoop == nullptr);
 		// one loop per thread
-		if (CurrentEventLoop != nullptr)
+		if (CurrentThreadEventLoop != nullptr)
 		{
 			LOGS_FATAL << "there must be only one loop per thread";
 		}
 		else
 		{
-			CurrentEventLoop = this;
+			CurrentThreadEventLoop = this;
 		}
-		LOGS_INFO << "one loop is created in thread" << currentTid_;
+		LOGS_INFO << "one loop is created in thread" << base::currentTid();
 	}
 
 	EventLoop::~EventLoop() {}
 
+	void EventLoop::loop() {}
+
+	void EventLoop::shutdown() {}
+
 	bool EventLoop::isInEventLoopThread() const
 	{
-		return this == CurrentEventLoop;
+		return (this == CurrentThreadEventLoop);
 	}
 
 	EventLoop::EventLoopPtr EventLoop::currentThreadEventLoop() const
 	{
-		assert(CurrentEventLoop != nullptr);
-		return CurrentEventLoop->shared_from_this();
+		assert(CurrentThreadEventLoop != nullptr);
+		return CurrentThreadEventLoop->shared_from_this();
 	}
 
-	void EventLoop::loop() {}
+	void EventLoop::notify()
+	{
 
-	void EventLoop::shutdown() {}
+	}
 
 	void EventLoop::registerChannel(ChannelPtr channel)
 	{

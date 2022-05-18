@@ -20,6 +20,7 @@ namespace nets::net
 	{
 	public:
 		using ChannelPtr = ::std::shared_ptr<Channel>;
+		using PollerPtr = ::std::unique_ptr<Poller>;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 
 	public:
@@ -27,11 +28,13 @@ namespace nets::net
 		~EventLoop();
 
 	public:
+		void loop();
+		void shutdown();
+
 		bool isInEventLoopThread() const;
 		EventLoopPtr currentThreadEventLoop() const;
 
-		void loop();
-		void shutdown();
+		void notify();
 
 		void registerChannel(ChannelPtr channel);
 		void modifyChannel(ChannelPtr channel);
@@ -40,8 +43,8 @@ namespace nets::net
 
 	private:
 		::std::atomic_bool running_ {false};
-		::std::unique_ptr<Poller> poller_ {nullptr};
-		const ::pid_t currentTid_ {0};
+		PollerPtr poller_ {nullptr};
+		ChannelPtr notifier_ {nullptr};
 	};
 } // namespace nets::net
 

@@ -40,17 +40,23 @@ namespace nets::net
 
 		virtual void handleReadEvent() = 0;
 		virtual void handleWriteEvent() = 0;
+		virtual void handleCloseEvent() = 0;
 		virtual void handleErrorEvent() = 0;
 
 	public:
 		inline FdType fd() const
 		{
-			return socket_.sockFd();
+			return fd_;
 		}
 
 		inline int32_t events() const
 		{
 			return events_;
+		}
+
+		inline void setReadyEvents(int32_t readyEvents)
+		{
+			readyEvents_ = readyEvents;
 		}
 
 		inline bool isRegistered() const
@@ -69,8 +75,9 @@ namespace nets::net
 		}
 
 	protected:
-		Socket socket_ {-1};
+		FdType fd_ {-1};
 		int32_t events_ {EventType::None};
+		int32_t readyEvents_ {EventType::None};
 		::std::atomic_bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
 	};

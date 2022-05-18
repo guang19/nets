@@ -30,7 +30,7 @@ namespace nets::base
 	namespace
 	{
 		constexpr const char* const DefaultThreadPoolName = "ThreadPool";
-		constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy = ThreadPool::RejectionPolicy::DiscardOlderPolicy;
+		constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy = ThreadPool::RejectionPolicy::DiscardPolicy;
 	} // namespace
 
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
@@ -107,7 +107,7 @@ namespace nets::base
 	{
 		if (running_)
 		{
-			LOGS_WARN << "thread pool has been initialized";
+			LOGS_DEBUG << "thread pool has been initialized";
 			return;
 		}
 		running_ = true;
@@ -119,6 +119,7 @@ namespace nets::base
 	{
 		if (!running_)
 		{
+			LOGS_DEBUG << "thread pool has been shutdown";
 			return;
 		}
 		running_ = false;
@@ -132,7 +133,7 @@ namespace nets::base
 					 });
 		assert(taskQueue_->isEmpty());
 		assert(threadPool_.empty());
-		LOGS_INFO << "thread pool has been shutdown";
+		LOGS_INFO << "thread pool shutdown success";
 	}
 
 	void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)

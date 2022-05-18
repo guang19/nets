@@ -11,51 +11,11 @@
 
 namespace nets::net
 {
-	class InetAddress
-	{
-	public:
-		explicit InetAddress(const SockAddr4& addr4);
-		explicit InetAddress(const SockAddr6& addr6);
-		explicit InetAddress(const char* ip, PortType port, bool ipv4 = true);
-
-	public:
-		static InetAddress createAnyInetAddress(PortType port, bool ipv4 = true);
-		static InetAddress createLoopBackInetAddress(PortType port, bool ipv4 = true);
-
-	public:
-		inline sa_family_t ipFamily() const
-		{
-			return addr4_.sin_family;
-		}
-
-		inline const SockAddr* cSockAddr() const
-		{
-			return &addr_;
-		}
-
-		inline SockAddr* sockAddr()
-		{
-			return &addr_;
-		}
-
-		::std::string ip() const;
-		PortType port() const;
-		::std::string toString() const;
-
-	private:
-		union
-		{
-			SockAddr addr_;
-			SockAddr4 addr4_;
-			SockAddr6 addr6_;
-		};
-	};
-
 	class Socket : base::Noncopyable
 	{
 	public:
 		explicit Socket(FdType sockFd);
-		~Socket();
+		virtual ~Socket();
 
 	public:
 		// usually, newer os all support dynamic sock buffer resizing
@@ -67,20 +27,15 @@ namespace nets::net
 		void setPortReuse(bool enable = true);
 		void setKeepAlive(bool enable = true);
 		void setTcpNoDelay(bool enable = true);
-
 		void setNonBlock(bool enable = true);
 
 	public:
-		void bind(const InetAddress& addr);
-		void listen();
-		FdType accept(InetAddress* addr);
-
 		inline FdType sockFd() const
 		{
 			return sockFd_;
 		}
 
-	private:
+	protected:
 		FdType sockFd_ {-1};
 	};
 } // namespace nets::net

@@ -7,7 +7,7 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopPtr eventLoop, FdType fd)
-		: socket_(fd), events_(EventType::None), isRegistered_(false), eventLoop_(::std::move(eventLoop))
+		: fd_(fd), events_(EventType::None), isRegistered_(false), eventLoop_(::std::move(eventLoop))
 	{
 	}
 

@@ -7,6 +7,7 @@
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Channel.h"
+#include "nets/net/core/InetAddress.h"
 
 namespace nets::net
 {
@@ -17,15 +18,17 @@ namespace nets::net
 
 	public:
 		explicit Acceptor(EventLoopPtr eventLoop, const InetAddress& listenAddr);
+		explicit Acceptor(EventLoopPtr eventLoop, const char* ip, PortType port, bool ipv4 = true);
 		~Acceptor();
 
 	public:
 		void listen();
 
 	public:
-		void handleReadEvent();
-		void handleWriteEvent();
-		void handleErrorEvent();
+		void handleReadEvent() override;
+		void handleWriteEvent() override;
+		void handleCloseEvent() override;
+		void handleErrorEvent() override;
 	};
 } // namespace nets::net
 
