@@ -37,10 +37,10 @@ namespace nets::base
 {
 	enum LogWriterType
 	{
-		STDOUT = 0,
-		SINGLE_FILE,
-		DAILY_FILE,
-		ROLLING_FILE
+		Stdout = 0,
+		SingFile,
+		DailyFile,
+		RollingFile
 	};
 
 	/**

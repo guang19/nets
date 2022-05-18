@@ -8,22 +8,22 @@
 #include <vector>
 #include <sys/epoll.h>
 
-#include "nets/net/selector/Selector.h"
+#include "nets/net/poller/Poller.h"
 
 namespace nets::net
 {
-	class EpollSelector : public Selector
+	class EpollPoller : public Poller
 	{
 	public:
 		using Event = struct epoll_event;
 		using EventList = ::std::vector<Event>;
 
 	public:
-		explicit EpollSelector(EventLoopPtr eventLoop);
-		~EpollSelector() override;
+		explicit EpollPoller(EventLoopPtr eventLoop);
+		~EpollPoller() override;
 
 	public:
-		void select() override;
+		void poll() override;
 		void addChannel(ChannelPtr channel) override;
 		void updateChannel(ChannelPtr channel) override;
 		void removeChannel(ChannelPtr channel) override;

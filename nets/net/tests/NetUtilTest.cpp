@@ -72,7 +72,6 @@ TEST(NetUtilTest, SockAddressToString)
 	ASSERT_STREQ(buffer2, "[2a01:198:603:0:396e:4789:8e99:890f]:8080");
 }
 
-
 int main(int argc, char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

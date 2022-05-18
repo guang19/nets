@@ -231,7 +231,8 @@ namespace nets::net::util
 
 	void bind(FdType sockFd, const SockAddr* sockAddr)
 	{
-		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4)) : static_cast<SockLenType>(sizeof(SockAddr6));
+		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4))
+														 : static_cast<SockLenType>(sizeof(SockAddr6));
 		if (::bind(sockFd, sockAddr, len) != 0)
 		{
 			LOGS_FATAL << "bind socket failed";
@@ -248,7 +249,8 @@ namespace nets::net::util
 
 	FdType accept(FdType sockFd, SockAddr* sockAddr)
 	{
-		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4)) : static_cast<SockLenType>(sizeof(SockAddr6));
+		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4))
+														 : static_cast<SockLenType>(sizeof(SockAddr6));
 		FdType connFd = -1;
 		if ((connFd = ::accept4(sockFd, sockAddr, &len, O_NONBLOCK | SOCK_CLOEXEC)) < 0)
 		{

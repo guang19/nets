@@ -6,12 +6,25 @@
 #define NETS_CHANNEL_H
 
 #include <cstdint>
+#include <sys/epoll.h>
 
 #include "nets/net/core/EventLoop.h"
+#include "nets/net/core/Socket.h"
 
 namespace nets::net
 {
-	class Channel : base::Noncopyable
+	namespace
+	{
+		enum EventType
+		{
+			None = 0,
+			ReadEvent = EPOLLIN | EPOLLPRI,
+			WriteEvent = EPOLLOUT,
+			ErrorEvent = EPOLLERR
+		};
+	}
+
+	class Channel : base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
 		using FdType = int32_t;
@@ -19,13 +32,18 @@ namespace nets::net
 		using ChannelPtr = ::std::shared_ptr<Channel>;
 
 	public:
-		explicit Channel(EventLoopPtr eventLoop, FdType fd) : fd_(fd), eventLoop_(std::move(eventLoop)) {}
+		explicit Channel(EventLoopPtr eventLoop, FdType fd);
 		virtual ~Channel() = default;
+
+	public:
+		void addChannel(ChannelPtr channel);
+		void updateChannel(ChannelPtr channel);
+		void removeChannel(ChannelPtr channel);
 
 	public:
 		inline FdType fd() const
 		{
-			return fd_;
+			return socket_.sockFd();
 		}
 
 		inline EventLoopPtr eventLoop() const
@@ -33,8 +51,8 @@ namespace nets::net
 			return eventLoop_;
 		}
 
-	private:
-		FdType fd_ {-1};
+	protected:
+		Socket socket_ {-1};
 		EventLoopPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

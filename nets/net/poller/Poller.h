@@ -2,8 +2,8 @@
 // Created by n021949 on 2022/5/16.
 //
 
-#ifndef NETS_SELECTOR_H
-#define NETS_SELECTOR_H
+#ifndef NETS_POLLER_H
+#define NETS_POLLER_H
 
 #include <cstdint>
 #include <map>
@@ -15,7 +15,7 @@ namespace nets::net
 {
 	class EventLoop;
 
-	class Selector : base::Noncopyable
+	class Poller : base::Noncopyable
 	{
 	public:
 		using FdType = int32_t;
@@ -24,11 +24,11 @@ namespace nets::net
 		using ChannelMap = ::std::map<FdType, ChannelPtr>;
 
 	public:
-		explicit Selector(EventLoopPtr eventLoop) : eventLoop_(::std::move(eventLoop)) {}
-		virtual ~Selector() = default;
+		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(::std::move(eventLoop)) {}
+		virtual ~Poller() = default;
 
 	public:
-		virtual void select() = 0;
+		virtual void poll() = 0;
 		virtual void addChannel(ChannelPtr channel) = 0;
 		virtual void updateChannel(ChannelPtr channel) = 0;
 		virtual void removeChannel(ChannelPtr channel) = 0;
@@ -44,11 +44,11 @@ namespace nets::net
 		EventLoopPtr eventLoop_ {nullptr};
 	};
 
-	class SelectorFactory
+	class PollerFactory
 	{
 	public:
-		static Selector* getSelector();
+		static Poller* getPoller();
 	};
 }; // namespace nets::net
 
-#endif // NETS_SELECTOR_H
+#endif // NETS_POLLER_H

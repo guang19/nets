@@ -13,8 +13,8 @@
 namespace nets::net
 {
 	class Channel;
-	class Selector;
-	class SelectorFactory;
+	class Poller;
+	class PollerFactory;
 
 	class EventLoop : base::Noncopyable, public ::std::enable_shared_from_this<EventLoop>
 	{
@@ -36,10 +36,11 @@ namespace nets::net
 		void addChannel(ChannelPtr channel);
 		void updateChannel(ChannelPtr channel);
 		void removeChannel(ChannelPtr channel);
+		bool hasChannel(ChannelPtr channel);
 
 	private:
 		::std::atomic_bool running_ {false};
-		::std::unique_ptr<Selector> selector_ {nullptr};
+		::std::unique_ptr<Poller> poller_ {nullptr};
 		const ::pid_t currentTid_ {0};
 	};
 } // namespace nets::net

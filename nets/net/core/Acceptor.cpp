@@ -7,17 +7,17 @@
 namespace nets::net
 {
 	Acceptor::Acceptor(EventLoopPtr eventLoop, const InetAddress& listenAddr)
-		: acceptSocket_(util::createTcpNonBlockSocket(listenAddr.ipFamily())), eventLoop_(::std::move(eventLoop))
+		: Channel(::std::move(eventLoop), util::createTcpNonBlockSocket(listenAddr.ipFamily()))
 	{
-		acceptSocket_.setAddrReuse();
-		acceptSocket_.setPortReuse();
-		acceptSocket_.bind(listenAddr);
+		socket_.setAddrReuse();
+		socket_.setPortReuse();
+		socket_.bind(listenAddr);
 	}
 
 	Acceptor::~Acceptor() {}
 
 	void Acceptor::listen()
 	{
-		acceptSocket_.listen();
+		socket_.listen();
 	}
 } // namespace nets::net

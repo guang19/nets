@@ -8,8 +8,7 @@
 
 #include "nets/base/log/Logging.h"
 #include "nets/base/ThreadHelper.h"
-#include "nets/net/core/Channel.h"
-#include "nets/net/selector/Selector.h"
+#include "nets/net/poller/Poller.h"
 
 namespace nets::net
 {
@@ -18,7 +17,7 @@ namespace nets::net
 		__thread EventLoop* CurrentEventLoop = nullptr;
 	}
 
-	EventLoop::EventLoop() : running_(false), selector_(SelectorFactory::getSelector()), currentTid_(base::currentTid())
+	EventLoop::EventLoop() : running_(false), poller_(PollerFactory::getPoller()), currentTid_(base::currentTid())
 	{
 		assert(CurrentEventLoop == nullptr);
 		// one loop per thread
@@ -52,16 +51,21 @@ namespace nets::net
 
 	void EventLoop::addChannel(ChannelPtr channel)
 	{
-		selector_->addChannel(channel);
+		poller_->addChannel(channel);
 	}
 
 	void EventLoop::updateChannel(ChannelPtr channel)
 	{
-		selector_->updateChannel(channel);
+		poller_->updateChannel(channel);
 	}
 
 	void EventLoop::removeChannel(ChannelPtr channel)
 	{
-		selector_->removeChannel(channel);
+		poller_->removeChannel(channel);
+	}
+
+	bool EventLoop::hasChannel(ChannelPtr channel)
+	{
+		return poller_->hasChannel(channel);
 	}
 } // namespace nets::net

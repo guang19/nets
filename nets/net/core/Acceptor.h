@@ -5,13 +5,12 @@
 #ifndef NETS_ACCEPTOR_H
 #define NETS_ACCEPTOR_H
 
-#include "nets/net/core/Socket.h"
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/EventLoop.h"
+#include "nets/net/core/Channel.h"
 
 namespace nets::net
 {
-	class Acceptor : base::Noncopyable
+	class Acceptor : public Channel
 	{
 	public:
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
@@ -22,10 +21,6 @@ namespace nets::net
 
 	public:
 		void listen();
-
-	private:
-		Socket acceptSocket_ {-1};
-		EventLoopPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net
 

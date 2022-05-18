@@ -259,13 +259,13 @@ namespace nets::base
 	{
 		switch (LOG_WRITER_TYPE)
 		{
-			case LogWriterType::STDOUT:
+			case LogWriterType::Stdout:
 				return StdoutPersistentWriter::getInstance();
-			case LogWriterType::SINGLE_FILE:
+			case LogWriterType::SingFile:
 				return SingleLogFilePersistentWriter::getInstance();
-			case LogWriterType::DAILY_FILE:
+			case LogWriterType::DailyFile:
 				return DailyLogFilePersistentWriter::getInstance();
-			case LogWriterType::ROLLING_FILE:
+			case LogWriterType::RollingFile:
 				return RollingLogFilePersistentWriter::getInstance();
 			default:
 				return StdoutPersistentWriter::getInstance();

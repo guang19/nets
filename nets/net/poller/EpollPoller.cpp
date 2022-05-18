@@ -2,7 +2,7 @@
 // Created by n021949 on 2022/5/16.
 //
 
-#include "nets/net/selector/EpollSelector.h"
+#include "nets/net/poller/EpollPoller.h"
 
 #include <cassert>
 #include <unistd.h>
@@ -17,8 +17,8 @@ namespace nets::net
 		constexpr ::time_t Timeout = 1;
 	} // namespace
 
-	EpollSelector::EpollSelector(EventLoopPtr eventLoop)
-		: Selector(::std::move(eventLoop)), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEventSize)
+	EpollPoller::EpollPoller(EventLoopPtr eventLoop)
+		: Poller(::std::move(eventLoop)), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEventSize)
 	{
 		assert(epollFd_ >= 0);
 		if (epollFd_ < 0)
@@ -27,12 +27,12 @@ namespace nets::net
 		}
 	}
 
-	EpollSelector::~EpollSelector()
+	EpollPoller::~EpollPoller()
 	{
 		::close(epollFd_);
 	}
 
-	void EpollSelector::select()
+	void EpollPoller::poll()
 	{
 		int32_t requestEvents = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(events_.size()), Timeout);
 		if (requestEvents > 0)
@@ -49,9 +49,9 @@ namespace nets::net
 		}
 	}
 
-	void EpollSelector::addChannel(Selector::ChannelPtr channel) {}
+	void EpollPoller::addChannel(Poller::ChannelPtr channel) {}
 
-	void EpollSelector::updateChannel(Selector::ChannelPtr channel) {}
+	void EpollPoller::updateChannel(Poller::ChannelPtr channel) {}
 
-	void EpollSelector::removeChannel(Selector::ChannelPtr channel) {}
+	void EpollPoller::removeChannel(Poller::ChannelPtr channel) {}
 } // namespace nets::net
