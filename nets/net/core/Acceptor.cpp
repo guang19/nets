@@ -19,5 +19,21 @@ namespace nets::net
 	void Acceptor::listen()
 	{
 		socket_.listen();
+		if (eventLoop_->hasChannel(shared_from_this()))
+		{
+			eventLoop_->updateChannel(shared_from_this());
+		}
+		else
+		{
+			eventLoop_->addChannel(shared_from_this());
+		}
 	}
+
+	void Acceptor::handleReadEvent()
+	{
+	}
+
+	void Acceptor::handleWriteEvent() {}
+
+	void Acceptor::handleErrorEvent() {}
 } // namespace nets::net

@@ -32,7 +32,7 @@ namespace nets::net
 		virtual void addChannel(ChannelPtr channel) = 0;
 		virtual void updateChannel(ChannelPtr channel) = 0;
 		virtual void removeChannel(ChannelPtr channel) = 0;
-		bool hasChannel(const ChannelPtr& channel);
+		bool hasChannel(ChannelPtr channel);
 
 		inline EventLoopPtr eventLoop() const
 		{

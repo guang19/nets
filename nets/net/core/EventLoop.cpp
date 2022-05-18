@@ -5,6 +5,7 @@
 #include "nets/net/core/EventLoop.h"
 
 #include <cassert>
+#include <utility>
 
 #include "nets/base/log/Logging.h"
 #include "nets/base/ThreadHelper.h"
@@ -51,21 +52,21 @@ namespace nets::net
 
 	void EventLoop::addChannel(ChannelPtr channel)
 	{
-		poller_->addChannel(channel);
+		poller_->addChannel(std::move(channel));
 	}
 
 	void EventLoop::updateChannel(ChannelPtr channel)
 	{
-		poller_->updateChannel(channel);
+		poller_->updateChannel(std::move(channel));
 	}
 
 	void EventLoop::removeChannel(ChannelPtr channel)
 	{
-		poller_->removeChannel(channel);
+		poller_->removeChannel(std::move(channel));
 	}
 
 	bool EventLoop::hasChannel(ChannelPtr channel)
 	{
-		return poller_->hasChannel(channel);
+		return poller_->hasChannel(std::move(channel));
 	}
 } // namespace nets::net

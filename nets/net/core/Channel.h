@@ -18,9 +18,10 @@ namespace nets::net
 		enum EventType
 		{
 			None = 0,
-			ReadEvent = EPOLLIN | EPOLLPRI,
+			ReadEvent = EPOLLIN,
+			PriReadEvent = EPOLLPRI,
 			WriteEvent = EPOLLOUT,
-			ErrorEvent = EPOLLERR
+			ErrorEvent = EPOLLERR,
 		};
 	}
 
@@ -36,9 +37,9 @@ namespace nets::net
 		virtual ~Channel() = default;
 
 	public:
-		void addChannel(ChannelPtr channel);
-		void updateChannel(ChannelPtr channel);
-		void removeChannel(ChannelPtr channel);
+		virtual void handleReadEvent() = 0;
+		virtual void handleWriteEvent() = 0;
+		virtual void handleErrorEvent() = 0;
 
 	public:
 		inline FdType fd() const
@@ -53,6 +54,7 @@ namespace nets::net
 
 	protected:
 		Socket socket_ {-1};
+		int32_t events_ {EventType::None};
 		EventLoopPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

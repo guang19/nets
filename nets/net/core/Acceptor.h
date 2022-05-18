@@ -21,6 +21,12 @@ namespace nets::net
 
 	public:
 		void listen();
+
+	public:
+		void handleReadEvent();
+		void handleWriteEvent();
+		void handleErrorEvent();
+
 	};
 } // namespace nets::net
 
