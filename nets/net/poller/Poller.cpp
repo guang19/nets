@@ -10,7 +10,7 @@ namespace nets::net
 {
 	bool Poller::hasChannel(ChannelPtr channel)
 	{
-		const auto it = channels_.find(channel->fd());
+		const auto it = channels_.find(channel->sockFd());
 		return it != channels_.end() && it->second == channel;
 	}
 

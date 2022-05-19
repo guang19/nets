@@ -6,13 +6,16 @@
 #define NETS_CHANNEL_H
 
 #include <cstdint>
+#include <memory>
 #include <sys/epoll.h>
 
-#include "nets/net/core/EventLoop.h"
 #include "nets/net/core/Socket.h"
 
 namespace nets::net
 {
+
+	class EventLoop;
+
 	enum EventType
 	{
 		None = 0,
@@ -22,41 +25,36 @@ namespace nets::net
 		ErrorEvent = EPOLLERR,
 	};
 
-	class Channel : base::Noncopyable, public ::std::enable_shared_from_this<Channel>
+	class Channel : public Socket, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
-		using FdType = int32_t;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
 
 	public:
-		explicit Channel(EventLoopPtr eventLoop, FdType fd);
-		virtual ~Channel() = default;
+		explicit Channel(EventLoopPtr eventLoop);
+		~Channel() override = default;
 
 	public:
 		void registerTo();
 		void unregister();
 		void modify();
 
-		virtual void handleReadEvent() = 0;
-		virtual void handleWriteEvent() = 0;
-		virtual void handleCloseEvent() = 0;
-		virtual void handleErrorEvent() = 0;
-
 	public:
-		inline FdType fd() const
-		{
-			return fd_;
-		}
+		void addReadEvent();
+		void removeReadEvent();
+		void addWriteEvent();
+		void removeWriteEvent();
+		void resetEvent();
 
 		inline int32_t events() const
 		{
 			return events_;
 		}
 
-		inline void setReadyEvents(int32_t readyEvents)
+		inline void setReadyEvent(EventType event)
 		{
-			readyEvents_ = readyEvents;
+			readyEvents_ |= event;
 		}
 
 		inline bool isRegistered() const
@@ -64,21 +62,19 @@ namespace nets::net
 			return isRegistered_;
 		}
 
-		inline void setRegistered(bool isRegistered)
-		{
-			isRegistered_ = isRegistered;
-		}
-
 		inline EventLoopPtr eventLoop() const
 		{
 			return eventLoop_;
 		}
 
+	private:
+		void addEvent(EventType event);
+		void removeEvent(EventType event);
+
 	protected:
-		FdType fd_ {-1};
 		int32_t events_ {EventType::None};
 		int32_t readyEvents_ {EventType::None};
-		::std::atomic_bool isRegistered_ {false};
+		bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

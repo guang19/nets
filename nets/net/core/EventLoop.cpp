@@ -50,10 +50,7 @@ namespace nets::net
 		return CurrentThreadEventLoop->shared_from_this();
 	}
 
-	void EventLoop::notify()
-	{
-
-	}
+	void EventLoop::notify() {}
 
 	void EventLoop::registerChannel(ChannelPtr channel)
 	{

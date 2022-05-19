@@ -4,15 +4,18 @@
 
 #include "nets/net/core/Socket.h"
 
-#include "nets/base/CommonMacro.h"
-
 namespace nets::net
 {
-	Socket::Socket(FdType sockFd) : sockFd_(sockFd) {}
+	Socket::Socket() : sockFd_(-1) {}
 
 	Socket::~Socket()
 	{
 		util::closeSocket(sockFd_);
+	}
+
+	void Socket::bind(const InetAddress& addr)
+	{
+		util::bind(sockFd_, addr.cSockAddr());
 	}
 
 	void Socket::setSendBuf(SockLenType sendBufLen)

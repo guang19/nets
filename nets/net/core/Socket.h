@@ -8,14 +8,19 @@
 #include "nets/base/Copyable.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/NetUtil.h"
+#include "nets/net/core/InetAddress.h"
 
 namespace nets::net
 {
 	class Socket : base::Noncopyable
 	{
 	public:
-		explicit Socket(FdType sockFd);
+		Socket();
 		virtual ~Socket();
+
+	public:
+		virtual void socket(bool ipv4) = 0;
+		void bind(const InetAddress& addr);
 
 	public:
 		// usually, newer os all support dynamic sock buffer resizing

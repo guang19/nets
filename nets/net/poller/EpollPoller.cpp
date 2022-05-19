@@ -54,9 +54,8 @@ namespace nets::net
 	{
 		assert(!hasChannel(channel));
 		assert(!channel->isRegistered());
-		channels_[channel->fd()] = channel;
+		channels_[channel->sockFd()] = channel;
 		epollCtl(EPOLL_CTL_ADD, channel);
-		channel->setRegistered(	true);
 	}
 
 	void EpollPoller::modifyChannel(ChannelPtr channel)
@@ -70,9 +69,8 @@ namespace nets::net
 	{
 		assert(hasChannel(channel));
 		assert(channel->isRegistered());
-		channels_.erase(channel->fd());
+		channels_.erase(channel->sockFd());
 		epollCtl(EPOLL_CTL_DEL, channel);
-		channel->setRegistered(true);
 	}
 
 	void EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)
@@ -80,7 +78,7 @@ namespace nets::net
 		EpollEvent event {};
 		event.data.ptr = channel.get();
 		event.events = channel->events();
-		if (::epoll_ctl(epollFd_, opt, channel->fd(), &event) != 0)
+		if (::epoll_ctl(epollFd_, opt, channel->sockFd(), &event) != 0)
 		{
 			LOGS_FATAL << "epoll ctl " << epollOptToString(opt) << " failed";
 		}

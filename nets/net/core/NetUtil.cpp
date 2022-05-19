@@ -220,12 +220,9 @@ namespace nets::net::util
 
 	void closeSocket(FdType sockFd)
 	{
-		if (sockFd > 0)
+		if (0 != ::close(sockFd))
 		{
-			if (::close(sockFd) != 0)
-			{
-				LOGS_ERROR << "close socket failed";
-			}
+			LOGS_ERROR << "close socket failed";
 		}
 	}
 
@@ -233,7 +230,7 @@ namespace nets::net::util
 	{
 		SockLenType len = sockAddr->sa_family == AF_INET ? static_cast<SockLenType>(sizeof(SockAddr4))
 														 : static_cast<SockLenType>(sizeof(SockAddr6));
-		if (::bind(sockFd, sockAddr, len) != 0)
+		if (0 != ::bind(sockFd, sockAddr, len))
 		{
 			LOGS_FATAL << "bind socket failed";
 		}
@@ -241,7 +238,7 @@ namespace nets::net::util
 
 	void listen(FdType sockFd)
 	{
-		if (::listen(sockFd, SOMAXCONN) != 0)
+		if (0 != ::listen(sockFd, SOMAXCONN))
 		{
 			LOGS_FATAL << "listen socket failed";
 		}
