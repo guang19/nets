@@ -6,7 +6,7 @@
 #define NETS_POLLER_H
 
 #include <cstdint>
-#include <map>
+#include <unordered_map>
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Channel.h"
@@ -21,7 +21,7 @@ namespace nets::net
 		using FdType = int32_t;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
-		using ChannelMap = ::std::map<FdType, ChannelPtr>;
+		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
 
 	public:
 		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(::std::move(eventLoop)) {}
@@ -46,8 +46,9 @@ namespace nets::net
 
 	class PollerFactory
 	{
+		using PollerPtr = ::std::unique_ptr<Poller>;
 	public:
-		static Poller* getPoller();
+		static PollerPtr getPoller();
 	};
 }; // namespace nets::net
 

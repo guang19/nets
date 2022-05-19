@@ -18,9 +18,8 @@ namespace nets::net
 
 	enum EventType
 	{
-		None = 0,
-		ReadEvent = EPOLLIN,
-		PriReadEvent = EPOLLPRI,
+		NoneEvent = 0,
+		ReadEvent = EPOLLIN | EPOLLPRI,
 		WriteEvent = EPOLLOUT,
 		ErrorEvent = EPOLLERR,
 	};
@@ -37,8 +36,8 @@ namespace nets::net
 
 	public:
 		void registerTo();
-		void unregister();
 		void modify();
+		void unregister();
 
 	public:
 		void addReadEvent();
@@ -46,20 +45,26 @@ namespace nets::net
 		void addWriteEvent();
 		void removeWriteEvent();
 		void resetEvent();
+		void setReadyEvent(EventType event);
 
 		inline int32_t events() const
 		{
 			return events_;
 		}
 
-		inline void setReadyEvent(EventType event)
+		inline bool isNoneEvent() const
 		{
-			readyEvents_ |= event;
+			return events_ == EventType::NoneEvent;
 		}
 
 		inline bool isRegistered() const
 		{
 			return isRegistered_;
+		}
+
+		inline void setRegistered(bool registered)
+		{
+			isRegistered_ = registered;
 		}
 
 		inline EventLoopPtr eventLoop() const
@@ -72,8 +77,8 @@ namespace nets::net
 		void removeEvent(EventType event);
 
 	protected:
-		int32_t events_ {EventType::None};
-		int32_t readyEvents_ {EventType::None};
+		int32_t events_ {EventType::NoneEvent};
+		int32_t readyEvents_ {EventType::NoneEvent};
 		bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
 	};

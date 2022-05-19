@@ -25,20 +25,37 @@ TEST(InetAddressTest, BasicUse)
 	ASSERT_STREQ(inetAddress2.ip().c_str(), "2a01:198:603:0:396e:4789:8e99:890f");
 	ASSERT_EQ(inetAddress2.port(), 8080);
 	ASSERT_STREQ(inetAddress2.toString().c_str(), "[2a01:198:603:0:396e:4789:8e99:890f]:8080");
+
+	InetAddress inetAddress3(inetAddress2);
+	ASSERT_EQ(inetAddress3.ipFamily(), inetAddress2.ipFamily());
+	ASSERT_STREQ(inetAddress3.ip().c_str(), inetAddress2.ip().c_str());
+	ASSERT_EQ(inetAddress3.port(), inetAddress2.port());
+	ASSERT_STREQ(inetAddress3.toString().c_str(), inetAddress2.toString().c_str());
+
+	InetAddress inetAddress4(::std::move(inetAddress3));
+	ASSERT_EQ(inetAddress4.ipFamily(), inetAddress2.ipFamily());
+	ASSERT_STREQ(inetAddress4.ip().c_str(), inetAddress2.ip().c_str());
+	ASSERT_EQ(inetAddress4.port(), inetAddress2.port());
+	ASSERT_STREQ(inetAddress4.toString().c_str(), inetAddress2.toString().c_str());
+
+	ASSERT_EQ(inetAddress3.ipFamily(), 0);
+	ASSERT_STREQ(inetAddress3.ip().c_str(), "");
+	ASSERT_EQ(inetAddress3.port(), 0);
+	ASSERT_STREQ(inetAddress3.toString().c_str(), "");
 }
 
 TEST(SocketTest, Server)
 {
 	int32_t socketFd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	::printf("%lu\t%lu\t%lu\n", sizeof(struct sockaddr), sizeof(struct sockaddr_in6), sizeof(struct sockaddr_in));
+	::printf("%lu\t%lu\t%lu\n", sizeof(SockAddr), sizeof(SockAddr4), sizeof(SockAddr6));
 
-	struct sockaddr_in serverAddr {};
+	SockAddr4 serverAddr {};
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htobe16(8080);
 	serverAddr.sin_addr.s_addr = htobe16(INADDR_ANY);
 	int32_t ret = -1;
-	if (0 == (ret = ::bind(socketFd, (struct sockaddr*) &serverAddr, sizeof(sockaddr))))
+	if (0 == (ret = ::bind(socketFd, (SockAddr*) &serverAddr, sizeof(sockaddr))))
 	{
 		::printf("server socket bind success\n");
 		::fflush(stdout);
@@ -46,13 +63,13 @@ TEST(SocketTest, Server)
 		{
 			::printf("server socket start listen\n");
 			::fflush(stdout);
-			struct sockaddr_in clientAddr {};
+			SockAddr4 clientAddr {};
 			uint32_t len = sizeof(clientAddr);
 			::printf("server socket start accept...\n");
 			::fflush(stdout);
 			while (true)
 			{
-				int32_t connectFd = ::accept(socketFd, (struct sockaddr*) &clientAddr, &len);
+				int32_t connectFd = ::accept(socketFd, (SockAddr*) &clientAddr, &len);
 				char buffer[256] = {0};
 				int32_t nbytes = 0;
 				while (true)
@@ -87,13 +104,13 @@ TEST(SocketTest, Client)
 {
 	int32_t socketFd = ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-	struct sockaddr_in serverAddr {};
+	SockAddr4 serverAddr {};
 	serverAddr.sin_family = AF_INET;
 	serverAddr.sin_port = htobe16(8080);
 	serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
 	int32_t ret = 0;
-	if (0 == (ret = ::connect(socketFd, (struct sockaddr*) &serverAddr, sizeof(serverAddr))))
+	if (0 == (ret = ::connect(socketFd, (SockAddr*) &serverAddr, sizeof(serverAddr))))
 	{
 		::printf("%s", "connect server success\n");
 		::fflush(stdout);

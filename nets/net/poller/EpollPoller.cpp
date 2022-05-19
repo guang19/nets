@@ -52,36 +52,68 @@ namespace nets::net
 
 	void EpollPoller::registerChannel(ChannelPtr channel)
 	{
-		assert(!hasChannel(channel));
-		assert(!channel->isRegistered());
-		channels_[channel->sockFd()] = channel;
-		epollCtl(EPOLL_CTL_ADD, channel);
+		if (!channel->isRegistered())
+		{
+			assert(!hasChannel(channel));
+			if (epollCtl(EPOLL_CTL_ADD, channel))
+			{
+				channels_[channel->sockFd()] = channel;
+				channel->setRegistered(true);
+			}
+		}
+		else
+		{
+			modifyChannel(::std::move(channel));
+		}
 	}
 
 	void EpollPoller::modifyChannel(ChannelPtr channel)
 	{
-		assert(hasChannel(channel));
-		assert(channel->isRegistered());
-		epollCtl(EPOLL_CTL_MOD, channel);
+		if (channel->isRegistered())
+		{
+			assert(hasChannel(channel));
+			if (channel->isNoneEvent())
+			{
+				if (epollCtl(EPOLL_CTL_DEL, channel))
+				{
+					channels_.erase(channel->sockFd());
+					channel->setRegistered(false);
+				}
+			}
+			else
+			{
+				epollCtl(EPOLL_CTL_MOD, channel);
+			}
+		}
+		else
+		{
+			registerChannel(::std::move(channel));
+		}
 	}
 
 	void EpollPoller::unregisterChannel(ChannelPtr channel)
 	{
 		assert(hasChannel(channel));
 		assert(channel->isRegistered());
-		channels_.erase(channel->sockFd());
+		assert(channel->isNoneEvent());
 		epollCtl(EPOLL_CTL_DEL, channel);
+		channel->setRegistered(false);
+		channels_.erase(channel->sockFd());
 	}
 
-	void EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)
+	bool EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)
 	{
 		EpollEvent event {};
+		FdType fd = channel->sockFd();
+		event.data.fd = fd;
 		event.data.ptr = channel.get();
 		event.events = channel->events();
-		if (::epoll_ctl(epollFd_, opt, channel->sockFd(), &event) != 0)
+		if (::epoll_ctl(epollFd_, opt, fd, &event) == 0)
 		{
-			LOGS_FATAL << "epoll ctl " << epollOptToString(opt) << " failed";
+			return true;
 		}
+		LOGS_ERROR << "epoll ctl " << epollOptToString(opt) << " failed";
+		return false;
 	}
 
 	const char* EpollPoller::epollOptToString(int32_t opt)
@@ -89,7 +121,7 @@ namespace nets::net
 		switch (opt)
 		{
 			case EPOLL_CTL_ADD:
-			return "add";
+				return "add";
 			case EPOLL_CTL_MOD:
 				return "mod";
 			case EPOLL_CTL_DEL:

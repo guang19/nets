@@ -46,7 +46,7 @@ namespace nets::net
 
 	EventLoop::EventLoopPtr EventLoop::currentThreadEventLoop() const
 	{
-		assert(CurrentThreadEventLoop != nullptr);
+		assert(isInEventLoopThread());
 		return CurrentThreadEventLoop->shared_from_this();
 	}
 

@@ -29,7 +29,7 @@ namespace nets::net
 		void unregisterChannel(ChannelPtr channel) override;
 
 	private:
-		void epollCtl(int32_t opt, const ChannelPtr& channel);
+		bool epollCtl(int32_t opt, const ChannelPtr& channel);
 		const char* epollOptToString(int32_t opt);
 
 	private:
