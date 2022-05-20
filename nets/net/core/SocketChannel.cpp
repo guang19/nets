@@ -7,6 +7,4 @@
 namespace nets::net
 {
 	SocketChannel::SocketChannel(EventLoopPtr eventLoop) : Channel(::std::move(eventLoop)) {}
-
-	void SocketChannel::socket(bool ipv4) {}
 } // namespace nets::net

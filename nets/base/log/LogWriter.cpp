@@ -5,7 +5,6 @@
 #include "nets/base/log/LogWriter.h"
 
 #include <cassert>
-#include <cstring>
 #include <libgen.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -18,14 +17,30 @@ namespace nets::base
 	{
 		constexpr ::size_t FileIOBufferSize = 1024 << 3;
 		constexpr uint32_t MaxFilePathLen = 256;
+
+		// if you need test DAILY_FILE LogWriter, you need to adjust this
+		// constant for short intervals, not for the whole day
+		constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
+		// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
+		// constexpr ::time_t SecondsPerDay = 30;
+
+		// if you need test ROLLING_FILE LogWriter, you need to adjust this
+		// constant  as small as possible
+		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
+		// constexpr ::size_t LogFileRollingSize = 200;
+
+		// Log buffer cache 2M
+		constexpr ::size_t MaxLogBufferSize = 1024 * 1024 << 1;
+		// Log buffer flush interval,unit：milliseconds
+		constexpr ::time_t LogBufferFlushInterval = 1000;
 	} // namespace
 
 	LogFile::LogFile(const char* file)
 	{
-		::uint32_t filePathLen = ::strlen(file);
+		uint32_t filePathLen = ::strlen(file);
 		if (filePathLen > MaxFilePathLen)
 		{
-
 			::fprintf(stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
 			::exit(1);
 		}
@@ -36,7 +51,7 @@ namespace nets::base
 		char tmpFile[MaxFilePathLen] = {0};
 		::strncat(tmpFile, file, filePathLen);
 		const char* dir = ::dirname(tmpFile);
-		::uint32_t dirLen = ::strlen(dir);
+		uint32_t dirLen = ::strlen(dir);
 		dir_ = ::std::make_unique<char[]>(dirLen);
 		MEMZERO(dir_.get(), dirLen);
 		::strncat(dir_.get(), dir, dirLen);
@@ -79,7 +94,11 @@ namespace nets::base
 				int32_t err = ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(stderr, "Error:log file append error ""\"%s\"""\n", ::strerror(err));
+					::fprintf(stderr,
+							  "Error:log file append error "
+							  "\"%s\""
+							  "\n",
+							  ::strerror(err));
 					break;
 				}
 			}
@@ -100,7 +119,9 @@ namespace nets::base
 			::fclose(fp_);
 			fp_ = nullptr;
 		}
-		struct tm tmS {};
+		struct tm tmS
+		{
+		};
 		::localtime_r(&now, &tmS);
 		char newFilename[26] = {0};
 		MEMZERO(newFilename, sizeof(newFilename));
@@ -161,7 +182,9 @@ namespace nets::base
 
 	void LogFile::getFileInfo(SizeType* fileSize, TimeType* createTime)
 	{
-		struct stat fileInfo {};
+		struct stat fileInfo
+		{
+		};
 		if (0 != ::fstat(::fileno(fp_), &fileInfo))
 		{
 			return;
@@ -180,6 +203,7 @@ namespace nets::base
 	INIT_SINGLETON(SingleLogFilePersistentWriter);
 	INIT_SINGLETON(DailyLogFilePersistentWriter);
 	INIT_SINGLETON(RollingLogFilePersistentWriter);
+	INIT_SINGLETON(AsyncLogWriter);
 
 	void StdoutPersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
 	{
@@ -207,15 +231,6 @@ namespace nets::base
 
 	DailyLogFilePersistentWriter::DailyLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
 
-	namespace
-	{
-		// if you need test DAILY_FILE LogWriter, you need to adjust this
-		// constant for short intervals, not for the whole day
-		 constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
-		 // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-		 // constexpr ::time_t SecondsPerDay = 30;
-	} // namespace
-
 	void DailyLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
 	{
 		if (persistTime - logFile_->lastRollTime() >= SecondsPerDay)
@@ -231,15 +246,6 @@ namespace nets::base
 	}
 
 	RollingLogFilePersistentWriter::RollingLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
-
-	namespace
-	{
-		// if you need test ROLLING_FILE LogWriter, you need to adjust this
-		// constant  as small as possible
-		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
-		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-		// constexpr ::size_t LogFileRollingSize = 200;
-	} // namespace
 
 	void RollingLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
 	{
@@ -271,16 +277,6 @@ namespace nets::base
 				return StdoutPersistentWriter::getInstance();
 		}
 	}
-
-	INIT_SINGLETON(AsyncLogWriter);
-
-	namespace
-	{
-		// Log buffer cache 2M
-		constexpr ::size_t MaxLogBufferSize =  1024 * 1024 << 1;
-		// Log buffer flush interval,unit：milliseconds
-		constexpr ::time_t LogBufferFlushInterval = 1000;
-	} // namespace
 
 	AsyncLogWriter::AsyncLogWriter()
 		: running_(false), cacheBuffer_(::std::make_unique<BufferType>(MaxLogBufferSize)),
@@ -375,9 +371,9 @@ namespace nets::base
 			::time(&currentTime);
 			auto writerTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
 			{
-				for (auto it = tmpBuffers->begin(), end = tmpBuffers->end(); it != end; ++it)
+				for (auto& tmpBuffer : *tmpBuffers)
 				{
-					auto logBuffer = it->get();
+					auto logBuffer = tmpBuffer.get();
 					persistentWriter_->persist(logBuffer->buffer(), logBuffer->len(), currentTime);
 				}
 				persistentWriter_->flush();

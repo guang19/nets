@@ -5,7 +5,7 @@
 #ifndef NETS_POLLER_H
 #define NETS_POLLER_H
 
-#include <cstdint>
+#include <vector>
 #include <unordered_map>
 
 #include "nets/base/Noncopyable.h"
@@ -20,7 +20,9 @@ namespace nets::net
 	public:
 		using FdType = int32_t;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
+		using ChannelRawPtr = Channel*;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
+		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
 		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
 
 	public:
@@ -28,7 +30,7 @@ namespace nets::net
 		virtual ~Poller() = default;
 
 	public:
-		virtual void poll() = 0;
+		virtual void poll(int32_t timeoutMs, ChannelList activeChannels) = 0;
 		virtual void registerChannel(ChannelPtr channel) = 0;
 		virtual void modifyChannel(ChannelPtr channel) = 0;
 		virtual void unregisterChannel(ChannelPtr channel) = 0;

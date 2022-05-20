@@ -14,9 +14,6 @@ namespace nets::net
 	public:
 		explicit SocketChannel(EventLoopPtr eventLoop);
 		~SocketChannel() override = default;
-
-	public:
-		void socket(bool ipv4 = true) override;
 	};
 } // namespace nets::net
 

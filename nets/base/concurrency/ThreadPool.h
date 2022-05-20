@@ -13,10 +13,27 @@
 #include <thread>
 #include <vector>
 
+#include "nets/base/CommonMacro.h"
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
+
+#ifndef CORE_POOL_SIZE
+#define CORE_POOL_SIZE (AVAILABLE_PROCESSOR << 1)
+#endif
+
+#ifndef MAX_POOL_SIZE
+#define MAX_POOL_SIZE CORE_POOL_SIZE
+#endif
+
+#ifndef IDLE_KEEP_ALIVE_TIME
+#define IDLE_KEEP_ALIVE_TIME 30000
+#endif
+
+#ifndef TASK_QUEUE_SIZE
+#define TASK_QUEUE_SIZE 24
+#endif
 
 namespace nets::base
 {
@@ -71,23 +88,9 @@ namespace nets::base
 		using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
 
 	public:
-		ThreadPool();
-
-		explicit ThreadPool(SizeType corePoolSize, SizeType maxPoolSize);
-
-		explicit ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime);
-
-		explicit ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime, SizeType maxQueueSize);
-
-		explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize,
-							enum RejectionPolicy rejectionPolicy);
-
-		explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime,
-							enum RejectionPolicy rejectionPolicy);
-
-		explicit ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime,
-							SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy);
-
+		explicit ThreadPool(SizeType corePoolSize = CORE_POOL_SIZE, SizeType maxPoolSize = MAX_POOL_SIZE,
+							TimeType keepAliveTime = IDLE_KEEP_ALIVE_TIME, SizeType maxQueueSize = TASK_QUEUE_SIZE,
+							enum RejectionPolicy rejectionPolicy = DiscardPolicy, const ::std::string& name = "ThreadPool");
 		~ThreadPool();
 
 		void init();

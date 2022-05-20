@@ -6,11 +6,9 @@
 
 namespace nets::net
 {
-	ServerSocketChannel::ServerSocketChannel(EventLoopPtr eventLoop) : Channel(::std::move(eventLoop)) {}
-
-	void ServerSocketChannel::socket(bool ipv4)
+	ServerSocketChannel::ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily) : Channel(::std::move(eventLoop))
 	{
-		sockFd_ = util::createTcpNonBlockSocket(ipv4 ? AF_INET : AF_INET6);
+		sockFd_ = util::createTcpNonBlockSocket(sockAddrFamily);
 		setAddrReuse();
 		setPortReuse();
 	}

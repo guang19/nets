@@ -4,35 +4,10 @@
 
 #include "nets/base/concurrency/ThreadPool.h"
 
-#include <unistd.h>
 #include <utility>
-
-#include "nets/base/CommonMacro.h"
-
-#ifndef CORE_POOL_SIZE
-#define CORE_POOL_SIZE (AVAILABLE_PROCESSOR << 1)
-#endif
-
-#ifndef MAX_POOL_SIZE
-#define MAX_POOL_SIZE CORE_POOL_SIZE
-#endif
-
-#ifndef IDLE_KEEP_ALIVE_TIME
-#define IDLE_KEEP_ALIVE_TIME 30000
-#endif
-
-#ifndef TASK_QUEUE_SIZE
-#define TASK_QUEUE_SIZE 24
-#endif
 
 namespace nets::base
 {
-	namespace
-	{
-		constexpr const char* const DefaultThreadPoolName = "ThreadPool";
-		constexpr enum ThreadPool::RejectionPolicy DefaultRejectionPolicy = ThreadPool::RejectionPolicy::DiscardPolicy;
-	} // namespace
-
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
 		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(&ThreadWrapper::start, this),
@@ -50,47 +25,11 @@ namespace nets::base
 		threadPoolPtr_->runThread(this);
 	}
 
-	ThreadPool::ThreadPool()
-		: ThreadPool(DefaultThreadPoolName, CORE_POOL_SIZE, MAX_POOL_SIZE, IDLE_KEEP_ALIVE_TIME, TASK_QUEUE_SIZE,
-					 DefaultRejectionPolicy)
-	{
-	}
-
-	ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maxPoolSize)
-		: ThreadPool(DefaultThreadPoolName, corePoolSize, maxPoolSize, IDLE_KEEP_ALIVE_TIME, TASK_QUEUE_SIZE,
-					 DefaultRejectionPolicy)
-	{
-	}
-
-	ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime)
-		: ThreadPool(DefaultThreadPoolName, corePoolSize, maxPoolSize, keepAliveTime, TASK_QUEUE_SIZE,
-					 DefaultRejectionPolicy)
-	{
-	}
-
-	ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime, SizeType maxQueueSize)
-		: ThreadPool(DefaultThreadPoolName, corePoolSize, maxPoolSize, keepAliveTime, maxQueueSize, DefaultRejectionPolicy)
-	{
-	}
-
-	ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize,
-						   enum RejectionPolicy rejectionPolicy)
-		: ThreadPool(name, corePoolSize, maxPoolSize, IDLE_KEEP_ALIVE_TIME, TASK_QUEUE_SIZE, rejectionPolicy)
-	{
-	}
-
-	ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize, TimeType keepAliveTime,
-						   enum RejectionPolicy rejectionPolicy)
-		: ThreadPool(name, corePoolSize, maxPoolSize, keepAliveTime, TASK_QUEUE_SIZE, rejectionPolicy)
-	{
-	}
-
-	ThreadPool::ThreadPool(const ::std::string& name, SizeType corePoolSize, SizeType maxPoolSize,
-						   TimeType idleKeepAliveTime, SizeType maxQueueSize, enum RejectionPolicy rejectionPolicy)
+	ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType idleKeepAliveTime, SizeType maxQueueSize,
+						   enum RejectionPolicy rejectionPolicy, const ::std::string& name)
 		: name_(name), running_(false), corePoolSize_(corePoolSize), maxPoolSize_(maxPoolSize),
 		  idleKeepAliveTime_(idleKeepAliveTime), taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)),
 		  rejectionPolicy_(rejectionPolicy)
-
 	{
 		if (corePoolSize_ <= 0 || corePoolSize_ > maxPoolSize_)
 		{

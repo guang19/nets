@@ -10,7 +10,10 @@ namespace nets::net
 
 	Socket::~Socket()
 	{
-		util::closeSocket(sockFd_);
+		if (sockFd_ >= 0)
+		{
+			util::closeSocket(sockFd_);
+		}
 	}
 
 	void Socket::bind(const InetAddress& addr)

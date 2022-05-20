@@ -9,7 +9,7 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopPtr eventLoop)
-		: events_(EventType::NoneEvent), isRegistered_(false), eventLoop_(::std::move(eventLoop))
+		: events_(NoneEvent), isRegistered_(false), eventLoop_(::std::move(eventLoop))
 	{
 	}
 
@@ -30,27 +30,27 @@ namespace nets::net
 
 	void Channel::addReadEvent()
 	{
-		addEvent(EventType::ReadEvent);
+		addEvent(ReadEvent);
 	}
 
 	void Channel::removeReadEvent()
 	{
-		removeEvent(EventType::ReadEvent);
+		removeEvent(ReadEvent);
 	}
 
 	void Channel::addWriteEvent()
 	{
-		addEvent(EventType::WriteEvent);
+		addEvent(WriteEvent);
 	}
 
 	void Channel::removeWriteEvent()
 	{
-		removeEvent(EventType::WriteEvent);
+		removeEvent(WriteEvent);
 	}
 
 	void Channel::resetEvent()
 	{
-		events_ = EventType::NoneEvent;
+		events_ = NoneEvent;
 	}
 
 	void Channel::setReadyEvent(EventType event)

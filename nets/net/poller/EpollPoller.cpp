@@ -33,20 +33,31 @@ namespace nets::net
 		::close(epollFd_);
 	}
 
-	void EpollPoller::poll()
+	void EpollPoller::poll(int32_t timeoutMs, ChannelList activeChannels)
 	{
-		int32_t requestEvents = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(events_.size()), Timeout);
-		if (requestEvents > 0)
+		SizeType size = events_.size();
+		int32_t numOfReadyEvent = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
+		if (numOfReadyEvent > 0)
 		{
-			LOGS_INFO << "epoll:" << requestEvents << " events";
+			LOGS_DEBUG << "epoll wait:" << numOfReadyEvent << " events";
+			prepareChannelEvents(numOfReadyEvent, activeChannels);
+			if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
+			{
+				events_.resize(size + (size >> 1));
+			}
 		}
-		else if (requestEvents == 0)
-		{
-			LOGS_DEBUG << "epoll no events";
-		}
-		else
+		else if (numOfReadyEvent < 0)
 		{
 			LOGS_ERROR << "epoll error";
+		}
+	}
+
+	void EpollPoller::prepareChannelEvents(int32_t numOfReadyEvent, ChannelList activeChannels)
+	{
+		for (int32_t i = 0; i< numOfReadyEvent; ++i)
+		{
+			auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
+			channel->setReadyEvent(events_[i].events);
 		}
 	}
 

@@ -10,14 +10,14 @@
 
 namespace nets::base
 {
-	ByteStream::ByteStream(ByteBuffer::SizeType capacity) : ByteBuffer(capacity) {}
-
 	namespace
 	{
 		constexpr char Digits[] = {"0123456789"};
 		constexpr char HexDigits[] = {"0123456789abcdef"};
 		constexpr uint32_t MaxNumLen = ::std::numeric_limits<uint64_t>::digits10 + 2;
 	} // namespace
+
+	ByteStream::ByteStream(ByteBuffer::SizeType capacity) : ByteBuffer(capacity) {}
 
 	template <typename Number>
 	uint32_t intToStr(char* buffer, Number n)

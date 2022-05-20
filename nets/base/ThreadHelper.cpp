@@ -4,7 +4,6 @@
 
 #include "nets/base/ThreadHelper.h"
 
-#include <cstring>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -12,8 +11,12 @@
 
 namespace nets::base
 {
-	__thread ::pid_t cacheTid_ = 0;
-	__thread char threadName_[ThreadNameMaxLength] = "unnamed";
+	namespace
+	{
+		constexpr const char* const MainThreadName = "Main";
+		__thread ::pid_t cacheTid_ = 0;
+		__thread char threadName_[ThreadNameMaxLength] = "unnamed";
+	}
 
 	::pid_t getTid()
 	{
@@ -32,11 +35,6 @@ namespace nets::base
 	bool isMainThread()
 	{
 		return ::getpid() == currentTid();
-	}
-
-	namespace
-	{
-		constexpr const char* const MainThreadName = "Main";
 	}
 
 	void afterFork()

@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <memory>
+#include <vector>
 
 #include "nets/base/Noncopyable.h"
 
@@ -20,6 +21,7 @@ namespace nets::net
 	{
 	public:
 		using ChannelPtr = ::std::shared_ptr<Channel>;
+		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
 		using PollerPtr = ::std::unique_ptr<Poller>;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 
@@ -44,6 +46,7 @@ namespace nets::net
 	private:
 		::std::atomic_bool running_ {false};
 		PollerPtr poller_ {nullptr};
+		ChannelList activeChannels_ {nullptr};
 		ChannelPtr notifier_ {nullptr};
 	};
 } // namespace nets::net

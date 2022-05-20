@@ -5,7 +5,6 @@
 #ifndef NETS_CHANNEL_H
 #define NETS_CHANNEL_H
 
-#include <cstdint>
 #include <memory>
 #include <sys/epoll.h>
 
@@ -16,19 +15,20 @@ namespace nets::net
 
 	class EventLoop;
 
-	enum EventType
+	namespace
 	{
-		NoneEvent = 0,
-		ReadEvent = EPOLLIN | EPOLLPRI,
-		WriteEvent = EPOLLOUT,
-		ErrorEvent = EPOLLERR,
-	};
+		using EventType = uint32_t;
+		// event type
+		EventType NoneEvent = 0;
+		EventType ReadEvent = EPOLLIN | EPOLLPRI;
+		EventType WriteEvent = EPOLLOUT;
+		EventType ErrorEvent = EPOLLERR;
+	} // namespace
 
 	class Channel : public Socket, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
-		using ChannelPtr = ::std::shared_ptr<Channel>;
 
 	public:
 		explicit Channel(EventLoopPtr eventLoop);
@@ -47,14 +47,14 @@ namespace nets::net
 		void resetEvent();
 		void setReadyEvent(EventType event);
 
-		inline int32_t events() const
+		inline EventType events() const
 		{
 			return events_;
 		}
 
 		inline bool isNoneEvent() const
 		{
-			return events_ == EventType::NoneEvent;
+			return events_ == NoneEvent;
 		}
 
 		inline bool isRegistered() const
@@ -77,8 +77,8 @@ namespace nets::net
 		void removeEvent(EventType event);
 
 	protected:
-		int32_t events_ {EventType::NoneEvent};
-		int32_t readyEvents_ {EventType::NoneEvent};
+		EventType events_ {NoneEvent};
+		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
 	};

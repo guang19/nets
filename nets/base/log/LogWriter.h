@@ -7,7 +7,6 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <cstdint>
 #include <ctime>
 #include <functional>
 #include <memory>
@@ -18,7 +17,6 @@
 #include "nets/base/log/LogBuffer.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Singleton.h"
-
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 
 #ifndef LOG_WRITER_TYPE

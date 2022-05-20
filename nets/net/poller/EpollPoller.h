@@ -17,18 +17,20 @@ namespace nets::net
 	public:
 		using EpollEvent = struct epoll_event;
 		using EventList = ::std::vector<EpollEvent>;
+		using SizeType = EventList::size_type;
 
 	public:
 		explicit EpollPoller(EventLoopPtr eventLoop);
 		~EpollPoller() override;
 
 	public:
-		void poll() override;
+		void poll(int32_t timeoutMs, ChannelList activeChannels) override;
 		void registerChannel(ChannelPtr channel) override;
 		void modifyChannel(ChannelPtr channel) override;
 		void unregisterChannel(ChannelPtr channel) override;
 
 	private:
+		void prepareChannelEvents(int32_t numOfReadyEvent, ChannelList activeChannels);
 		bool epollCtl(int32_t opt, const ChannelPtr& channel);
 		const char* epollOptToString(int32_t opt);
 

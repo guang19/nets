@@ -12,11 +12,8 @@ namespace nets::net
 	class ServerSocketChannel : public Channel
 	{
 	public:
-		explicit ServerSocketChannel(EventLoopPtr eventLoop);
+		explicit ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily);
 		~ServerSocketChannel() override = default;
-
-	public:
-		void socket(bool ipv4 = true) override;
 	};
 } // namespace nets::net
 

@@ -19,7 +19,6 @@ namespace nets::net
 		virtual ~Socket();
 
 	public:
-		virtual void socket(bool ipv4) = 0;
 		void bind(const InetAddress& addr);
 
 	public:

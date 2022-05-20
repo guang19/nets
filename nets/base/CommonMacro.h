@@ -6,6 +6,7 @@
 #define NETS_COMMONMACRO_H
 
 #include <cstring>
+#include <unistd.h>
 #include <utility>
 
 #define UNUSED(x) ((void) (x))
