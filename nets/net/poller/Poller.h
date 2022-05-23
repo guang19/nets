@@ -20,12 +20,13 @@ namespace nets::net
 	public:
 		using FdType = int32_t;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
-		using ChannelPtr = Channel*;
+		using ChannelRawPtr = Channel*;
+		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
 		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
 
 	public:
-		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(::std::move(eventLoop)) {}
+		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(eventLoop) {}
 		virtual ~Poller() = default;
 
 	public:

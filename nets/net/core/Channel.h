@@ -21,10 +21,10 @@ namespace nets::net
 		EventType NoneEvent = 0;
 		EventType ReadEvent = EPOLLIN | EPOLLPRI;
 		EventType WriteEvent = EPOLLOUT;
-		EventType ErrorEvent = EPOLLERR;
+//		EventType ErrorEvent = EPOLLERR;
 	} // namespace
 
-	class Channel : nets::base::Noncopyable
+	class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
 		using IdType = uint32_t;
@@ -41,13 +41,13 @@ namespace nets::net
 		void deregister();
 
 	public:
-		IdType uniqueId() const
+		// return socket file descriptor
+		virtual FdType sockFd() const = 0;
+
+		inline IdType uniqueId() const
 		{
 			return uniqueId_;
 		}
-
-		// return socket file descriptor
-		virtual FdType sockFd() const = 0;
 
 		inline EventType events() const
 		{

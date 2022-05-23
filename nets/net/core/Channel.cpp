@@ -9,23 +9,23 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopPtr eventLoop)
-		: uniqueId_(0), events_(NoneEvent), readyEvents_(NoneEvent), isRegistered_(false), eventLoop_(::std::move(eventLoop))
+		: uniqueId_(0), events_(NoneEvent), readyEvents_(NoneEvent), isRegistered_(false), eventLoop_(eventLoop)
 	{
 	}
 
 	void Channel::registerTo()
 	{
-		eventLoop_->registerChannel(this);
+		eventLoop_->registerChannel(shared_from_this());
 	}
 
 	void Channel::modify()
 	{
-		eventLoop_->modifyChannel(this);
+		eventLoop_->modifyChannel(shared_from_this());
 	}
 
 	void Channel::deregister()
 	{
-		eventLoop_->deregisterChannel(this);
+		eventLoop_->deregisterChannel(shared_from_this());
 	}
 
 	void Channel::addReadEvent()

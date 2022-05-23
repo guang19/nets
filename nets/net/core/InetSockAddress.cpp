@@ -2,7 +2,7 @@
 // Created by guang19 on 2022/5/19.
 //
 
-#include "nets/net/core/InetAddress.h"
+#include "nets/net/core/InetSockAddress.h"
 
 #include <arpa/inet.h>
 
@@ -11,11 +11,11 @@
 
 namespace nets::net
 {
-	InetAddress::InetAddress(const SockAddr4& addr4) : addr4_(addr4) {}
+	InetSockAddress::InetSockAddress(const SockAddr4& addr4) : addr4_(addr4) {}
 
-	InetAddress::InetAddress(const SockAddr6& addr6) : addr6_(addr6) {}
+	InetSockAddress::InetSockAddress(const SockAddr6& addr6) : addr6_(addr6) {}
 
-	InetAddress::InetAddress(const char* ip, PortType port, bool ipv4)
+	InetSockAddress::InetSockAddress(const char* ip, PortType port, bool ipv4)
 	{
 		if (ipv4)
 		{
@@ -39,7 +39,7 @@ namespace nets::net
 		}
 	}
 
-	InetAddress::InetAddress(const InetAddress& addr)
+	InetSockAddress::InetSockAddress(const InetSockAddress& addr)
 	{
 		if (addr.ipFamily() == AF_INET)
 		{
@@ -53,7 +53,7 @@ namespace nets::net
 		}
 	}
 
-	InetAddress::InetAddress(InetAddress&& addr) noexcept
+	InetSockAddress::InetSockAddress(InetSockAddress&& addr) noexcept
 	{
 		if (addr.ipFamily() == AF_INET)
 		{
@@ -69,7 +69,7 @@ namespace nets::net
 		}
 	}
 
-	InetAddress&  InetAddress::operator=(const InetAddress& addr)
+	InetSockAddress& InetSockAddress::operator=(const InetSockAddress& addr)
 	{
 		if (this != &addr)
 		{
@@ -87,7 +87,7 @@ namespace nets::net
 		return *this;
 	}
 
-	InetAddress& InetAddress::operator=(InetAddress&& addr) noexcept
+	InetSockAddress& InetSockAddress::operator=(InetSockAddress&& addr) noexcept
 	{
 		if (this != &addr)
 		{
@@ -107,7 +107,7 @@ namespace nets::net
 		return *this;
 	}
 
-	InetAddress InetAddress::createAnyInetAddress(PortType port, bool ipv4)
+	InetSockAddress InetSockAddress::createAnySockAddress(PortType port, bool ipv4)
 	{
 		if (ipv4)
 		{
@@ -116,7 +116,7 @@ namespace nets::net
 			addr.sin_family = AF_INET;
 			addr.sin_port = htobe16(port);
 			addr.sin_addr.s_addr = INADDR_ANY;
-			return InetAddress(addr);
+			return InetSockAddress(addr);
 		}
 		else
 		{
@@ -125,11 +125,11 @@ namespace nets::net
 			addr.sin6_family = AF_INET6;
 			addr.sin6_port = htobe16(port);
 			addr.sin6_addr = in6addr_any;
-			return InetAddress(addr);
+			return InetSockAddress(addr);
 		}
 	}
 
-	InetAddress InetAddress::createLoopBackInetAddress(PortType port, bool ipv4)
+	InetSockAddress InetSockAddress::createLoopBackSockAddress(PortType port, bool ipv4)
 	{
 		if (ipv4)
 		{
@@ -138,7 +138,7 @@ namespace nets::net
 			addr.sin_family = AF_INET;
 			addr.sin_port = htobe16(port);
 			addr.sin_addr.s_addr = INADDR_LOOPBACK;
-			return InetAddress(addr);
+			return InetSockAddress(addr);
 		}
 		else
 		{
@@ -147,10 +147,10 @@ namespace nets::net
 			addr.sin6_family = AF_INET6;
 			addr.sin6_port = htobe16(port);
 			addr.sin6_addr = in6addr_loopback;
-			return InetAddress(addr);
+			return InetSockAddress(addr);
 		}
 	}
-	::std::string InetAddress::ip() const
+	::std::string InetSockAddress::ip() const
 	{
 		char buffer[64] = {0};
 		auto len = static_cast<SockLenType>(sizeof(buffer));
@@ -171,12 +171,12 @@ namespace nets::net
 		return buffer;
 	}
 
-	PortType InetAddress::port() const
+	InetSockAddress::PortType InetSockAddress::port() const
 	{
 		return be16toh(addr4_.sin_port);
 	}
 
-	::std::string InetAddress::toString() const
+	::std::string InetSockAddress::toString() const
 	{
 		char buffer[64] = {0};
 		auto len = static_cast<SockLenType>(sizeof(buffer));
@@ -194,7 +194,7 @@ namespace nets::net
 		{
 			// ipv6 + port address like: [2a01:198:603:0:396e]:8080
 			buffer[0] = '[';
-			if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer, len))
+			if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer + 1, len))
 			{
 				LOGS_FATAL << "inet_ntop AF_INET6";
 			}

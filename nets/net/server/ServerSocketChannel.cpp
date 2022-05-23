@@ -6,10 +6,20 @@
 
 namespace nets::net
 {
-	ServerSocketChannel::ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily) : Channel(::std::move(eventLoop))
+	ServerSocketChannel::ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily)
+		: Channel(eventLoop), sockFd_(socket::createTcpSocket(sockAddrFamily))
 	{
-		sockFd_ = util::createTcpNonBlockSocket(sockAddrFamily);
-		setAddrReuse();
-		setPortReuse();
+		socket::setSockAddrReuse(sockFd_, true);
+		socket::setSockPortReuse(sockFd_, true);
+	}
+
+	ServerSocketChannel::~ServerSocketChannel()
+	{
+		socket::closeSocket(sockFd_);
+	}
+
+	void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
+	{
+		socket::bind(sockFd_, sockAddress.cSockAddr());
 	}
 } // namespace nets::net

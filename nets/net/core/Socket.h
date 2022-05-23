@@ -13,30 +13,33 @@
 namespace nets::net
 {
 	using FdType = int32_t;
+	using OptValType = int32_t;
 	using SockLenType = ::socklen_t;
 	using SockAddr = struct sockaddr;
 	using SockAddrFamily = ::sa_family_t;
+	using SockLinger = struct linger;
 
 	namespace socket
 	{
-		FdType createTcpSocket(SockAddrFamily family);
-		FdType createTcpNonBlockSocket(SockAddrFamily family);
-		FdType createUdpSocket(SockAddrFamily family);
+		FdType createTcpSocket(SockAddrFamily family = AF_INET);
+		FdType createUdpSocket(SockAddrFamily family = AF_INET);
 		void closeSocket(FdType sockFd);
 
 		void bind(FdType sockFd, const SockAddr* sockAddr);
 		void listen(FdType sockFd);
 		FdType accept(FdType sockFd, SockAddr* sockAddr);
 
-		// usually, newer os all support dynamic sock buffer resizing
-		// dont require manual set
-		void setSockSendBuf(FdType sockFd, SockLenType sendBufLen);
-		void setSockRecvBuf(FdType sockFd, SockLenType recvBufLen);
-		void setSockAddrReuse(FdType sockFd, bool enable);
-		void setSockPortReuse(FdType sockFd, bool enable);
-		void setSockKeepAlive(FdType sockFd, bool enable);
-		void setIpTcpNoDelay(FdType sockFd, bool enable);
-		void setSockNonBlock(FdType sockFd, bool enable);
+		// usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
+		// SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x
+		void setSockSendBuf(FdType sockFd, OptValType sendBufLen = 16 * 1024);
+		// SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
+		void setSockRecvBuf(FdType sockFd, OptValType recvBufLen = 128 * 1024);
+		void setSockAddrReuse(FdType sockFd, bool enable = true);
+		void setSockPortReuse(FdType sockFd, bool enable = true);
+		void setSockKeepAlive(FdType sockFd, bool enable = true);
+		void setIpTcpNoDelay(FdType sockFd, bool enable = true);
+		void setSockNonBlock(FdType sockFd, bool enable = true);
+		void setSockLinger(FdType sockFd, const SockLinger& linger);
 	} // namespace socket
 } // namespace nets::net
 

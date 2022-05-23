@@ -23,16 +23,6 @@ namespace nets::net::socket
 		return sockFd;
 	}
 
-	FdType createTcpNonBlockSocket(SockAddrFamily family)
-	{
-		FdType sockFd = ::socket(family, SOCK_STREAM | O_NONBLOCK | FD_CLOEXEC, IPPROTO_TCP);
-		if (sockFd < 0)
-		{
-			LOGS_FATAL << "create tcp socket failed";
-		}
-		return sockFd;
-	}
-
 	FdType createUdpSocket(SockAddrFamily family)
 	{
 		FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
@@ -75,14 +65,14 @@ namespace nets::net::socket
 	{
 		auto len = static_cast<SockLenType>(sizeof(SockAddr));
 		FdType connFd = -1;
-		if ((connFd = ::accept4(sockFd, sockAddr, &len, O_NONBLOCK | SOCK_CLOEXEC)) < 0)
+		if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) < 0)
 		{
-			LOGS_FATAL << "accept socket failed";
+			LOGS_FATAL << "accept4 socket failed";
 		}
 		return connFd;
 	}
 
-	void setSockSendBuf(FdType sockFd, SockLenType sendBufLen)
+	void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
 	{
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sendBufLen)))
 		{
@@ -90,7 +80,7 @@ namespace nets::net::socket
 		}
 	}
 
-	void setSockRecvBuf(FdType sockFd, SockLenType recvBufLen)
+	void setSockRecvBuf(FdType sockFd, OptValType recvBufLen)
 	{
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(recvBufLen)))
 		{
@@ -100,7 +90,7 @@ namespace nets::net::socket
 
 	void setSockAddrReuse(FdType sockFd, bool enable)
 	{
-		SockLenType reuse = enable ? 1 : 0;
+		OptValType reuse = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(reuse))))
 		{
 			LOGS_ERROR << "setsockopt SO_REUSEADDR failed";
@@ -109,7 +99,7 @@ namespace nets::net::socket
 
 	void setSockPortReuse(FdType sockFd, bool enable)
 	{
-		SockLenType reuse = enable ? 1 : 0;
+		OptValType reuse = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(reuse))))
 		{
 			LOGS_ERROR << "setsockopt SO_REUSEPORT failed";
@@ -118,7 +108,7 @@ namespace nets::net::socket
 
 	void setSockKeepAlive(FdType sockFd, bool enable)
 	{
-		SockLenType keepAlive = enable ? 1 : 0;
+		OptValType keepAlive = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, static_cast<SockLenType>(sizeof(keepAlive))))
 		{
 			LOGS_ERROR << "setsockopt SO_KEEPALIVE failed";
@@ -127,10 +117,18 @@ namespace nets::net::socket
 
 	void setIpTcpNoDelay(FdType sockFd, bool enable)
 	{
-		SockLenType noDelay = enable ? 1 : 0;
+		OptValType noDelay = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(noDelay))))
 		{
 			LOGS_ERROR << "setsockopt TCP_NODELAY failed";
+		}
+	}
+
+	void setSockLinger(FdType sockFd, const SockLinger& linger)
+	{
+		if (0 != ::setsockopt(sockFd, IPPROTO_TCP, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
+		{
+			LOGS_ERROR << "setsockopt SO_LINGER failed";
 		}
 	}
 
@@ -155,5 +153,5 @@ namespace nets::net::socket
 		{
 			LOGS_ERROR << "fcntl FD_CLOEXEC failed";
 		}
-	} // namespace socket
+	}
 } // namespace nets::net::socket
