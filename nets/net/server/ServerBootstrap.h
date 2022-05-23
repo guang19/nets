@@ -10,7 +10,7 @@
 
 namespace nets::net
 {
-	class ServerBootstrap : base::Noncopyable
+	class ServerBootstrap : nets::base::Noncopyable
 	{
 	public:
 		using PortType = uint16_t;

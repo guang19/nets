@@ -8,11 +8,10 @@
 #include <memory>
 #include <sys/epoll.h>
 
-#include "nets/net/core/Socket.h"
+#include "nets/base/Noncopyable.h"
 
 namespace nets::net
 {
-
 	class EventLoop;
 
 	namespace
@@ -25,14 +24,16 @@ namespace nets::net
 		EventType ErrorEvent = EPOLLERR;
 	} // namespace
 
-	class Channel : public Socket, public ::std::enable_shared_from_this<Channel>
+	class Channel : nets::base::Noncopyable
 	{
 	public:
+		using IdType = uint32_t;
+		using FdType = int32_t;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 
 	public:
 		explicit Channel(EventLoopPtr eventLoop);
-		~Channel() override = default;
+		~Channel() = default;
 
 	public:
 		void registerTo();
@@ -40,6 +41,13 @@ namespace nets::net
 		void unregister();
 
 	public:
+		IdType uniqueId() const
+		{
+			return uniqueId_;
+		}
+
+		virtual FdType sockFd() const = 0;
+
 		void addReadEvent();
 		void removeReadEvent();
 		void addWriteEvent();
@@ -67,6 +75,16 @@ namespace nets::net
 			isRegistered_ = registered;
 		}
 
+		inline bool isReadable() const
+		{
+			return events_ & ReadEvent;
+		}
+
+		inline bool isWritable() const
+		{
+			return events_ & WriteEvent;
+		}
+
 		inline EventLoopPtr eventLoop() const
 		{
 			return eventLoop_;
@@ -77,6 +95,7 @@ namespace nets::net
 		void removeEvent(EventType event);
 
 	protected:
+		IdType uniqueId_ {0};
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};

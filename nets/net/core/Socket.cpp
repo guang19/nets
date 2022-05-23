@@ -6,6 +6,11 @@
 
 namespace nets::net
 {
+	namespace socket
+	{
+
+	}
+
 	Socket::Socket() : sockFd_(-1) {}
 
 	Socket::~Socket()

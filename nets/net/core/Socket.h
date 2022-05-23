@@ -12,16 +12,8 @@
 
 namespace nets::net
 {
-	class Socket : base::Noncopyable
+	namespace socket
 	{
-	public:
-		Socket();
-		virtual ~Socket();
-
-	public:
-		void bind(const InetAddress& addr);
-
-	public:
 		// usually, newer os all support dynamic sock buffer resizing
 		// dont require manual set
 		void setSendBuf(SockLenType sendBufLen = 64 * 1024);
@@ -32,15 +24,6 @@ namespace nets::net
 		void setKeepAlive(bool enable = true);
 		void setTcpNoDelay(bool enable = true);
 		void setNonBlock(bool enable = true);
-
-	public:
-		inline FdType sockFd() const
-		{
-			return sockFd_;
-		}
-
-	protected:
-		FdType sockFd_ {-1};
 	};
 } // namespace nets::net
 

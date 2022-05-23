@@ -56,7 +56,7 @@ namespace nets::net
 	{
 		for (int32_t i = 0; i< numOfReadyEvent; ++i)
 		{
-			auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
+			auto channel = static_cast<ChannelPtr>(events_[i].data.ptr);
 			channel->setReadyEvent(events_[i].events);
 		}
 	}
@@ -117,7 +117,7 @@ namespace nets::net
 		EpollEvent event {};
 		FdType fd = channel->sockFd();
 		event.data.fd = fd;
-		event.data.ptr = channel.get();
+		event.data.ptr = channel;
 		event.events = channel->events();
 		if (::epoll_ctl(epollFd_, opt, fd, &event) == 0)
 		{
