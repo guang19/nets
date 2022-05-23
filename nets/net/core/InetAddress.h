@@ -5,11 +5,20 @@
 #ifndef NETS_INETADDRESS_H
 #define NETS_INETADDRESS_H
 
-#include "nets/net/core/NetUtil.h"
+#include <string>
+#include <netinet/in.h>
+
 #include "nets/base/Copyable.h"
 
 namespace nets::net
 {
+	using SockLenType = ::socklen_t;
+	using PortType = uint16_t;
+	using SockAddr = struct sockaddr;
+	using SockAddr4 = struct sockaddr_in;
+	using SockAddr6 = struct sockaddr_in6;
+	using SockAddrFamily = ::sa_family_t;
+
 	class InetAddress : public base::Copyable
 	{
 	public:

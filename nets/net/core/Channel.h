@@ -33,12 +33,12 @@ namespace nets::net
 
 	public:
 		explicit Channel(EventLoopPtr eventLoop);
-		~Channel() = default;
+		virtual ~Channel() = default;
 
 	public:
 		void registerTo();
 		void modify();
-		void unregister();
+		void deregister();
 
 	public:
 		IdType uniqueId() const
@@ -46,14 +46,8 @@ namespace nets::net
 			return uniqueId_;
 		}
 
+		// return socket file descriptor
 		virtual FdType sockFd() const = 0;
-
-		void addReadEvent();
-		void removeReadEvent();
-		void addWriteEvent();
-		void removeWriteEvent();
-		void resetEvent();
-		void setReadyEvent(EventType event);
 
 		inline EventType events() const
 		{
@@ -90,11 +84,19 @@ namespace nets::net
 			return eventLoop_;
 		}
 
+		void addReadEvent();
+		void removeReadEvent();
+		void addWriteEvent();
+		void removeWriteEvent();
+		void resetEvent();
+		void setReadyEvent(EventType event);
+
 	private:
 		void addEvent(EventType event);
 		void removeEvent(EventType event);
 
 	protected:
+		// global unique identifier
 		IdType uniqueId_ {0};
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};

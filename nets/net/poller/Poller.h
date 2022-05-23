@@ -32,7 +32,7 @@ namespace nets::net
 		virtual void poll(int32_t timeoutMs, ChannelList activeChannels) = 0;
 		virtual void registerChannel(ChannelPtr channel) = 0;
 		virtual void modifyChannel(ChannelPtr channel) = 0;
-		virtual void unregisterChannel(ChannelPtr channel) = 0;
+		virtual void deregisterChannel(ChannelPtr channel) = 0;
 		bool hasChannel(ChannelPtr channel);
 
 		inline EventLoopPtr eventLoop() const

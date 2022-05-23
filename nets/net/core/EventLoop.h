@@ -40,7 +40,7 @@ namespace nets::net
 
 		void registerChannel(ChannelPtr channel);
 		void modifyChannel(ChannelPtr channel);
-		void unregisterChannel(ChannelPtr channel);
+		void deregisterChannel(ChannelPtr channel);
 		bool hasChannel(ChannelPtr channel);
 
 	private:

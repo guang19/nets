@@ -54,21 +54,21 @@ namespace nets::net
 
 	void EventLoop::registerChannel(ChannelPtr channel)
 	{
-		poller_->registerChannel(std::move(channel));
+		poller_->registerChannel(channel);
 	}
 
 	void EventLoop::modifyChannel(ChannelPtr channel)
 	{
-		poller_->modifyChannel(std::move(channel));
+		poller_->modifyChannel(channel);
 	}
 
-	void EventLoop::unregisterChannel(ChannelPtr channel)
+	void EventLoop::deregisterChannel(ChannelPtr channel)
 	{
-		poller_->unregisterChannel(std::move(channel));
+		poller_->deregisterChannel(channel);
 	}
 
 	bool EventLoop::hasChannel(ChannelPtr channel)
 	{
-		return poller_->hasChannel(std::move(channel));
+		return poller_->hasChannel(channel);
 	}
 } // namespace nets::net

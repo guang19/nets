@@ -27,7 +27,7 @@ namespace nets::net
 		void poll(int32_t timeoutMs, ChannelList activeChannels) override;
 		void registerChannel(ChannelPtr channel) override;
 		void modifyChannel(ChannelPtr channel) override;
-		void unregisterChannel(ChannelPtr channel) override;
+		void deregisterChannel(ChannelPtr channel) override;
 
 	private:
 		void prepareChannelEvents(int32_t numOfReadyEvent, ChannelList activeChannels);

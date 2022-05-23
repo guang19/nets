@@ -74,7 +74,7 @@ namespace nets::net
 		}
 		else
 		{
-			modifyChannel(::std::move(channel));
+			modifyChannel(channel);
 		}
 	}
 
@@ -98,11 +98,11 @@ namespace nets::net
 		}
 		else
 		{
-			registerChannel(::std::move(channel));
+			registerChannel(channel);
 		}
 	}
 
-	void EpollPoller::unregisterChannel(ChannelPtr channel)
+	void EpollPoller::deregisterChannel(ChannelPtr channel)
 	{
 		assert(hasChannel(channel));
 		assert(channel->isRegistered());
