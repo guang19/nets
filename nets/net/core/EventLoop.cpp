@@ -5,7 +5,6 @@
 #include "nets/net/core/EventLoop.h"
 
 #include <cassert>
-#include <utility>
 
 #include "nets/base/log/Logging.h"
 #include "nets/base/ThreadHelper.h"
@@ -44,7 +43,7 @@ namespace nets::net
 		return (this == CurrentThreadEventLoop);
 	}
 
-	EventLoop::EventLoopPtr EventLoop::currentThreadEventLoop() const
+	EventLoopPtr EventLoop::currentThreadEventLoop() const
 	{
 		assert(isInEventLoopThread());
 		return CurrentThreadEventLoop->shared_from_this();

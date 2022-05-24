@@ -5,25 +5,19 @@
 #ifndef NETS_POLLER_H
 #define NETS_POLLER_H
 
-#include <vector>
 #include <unordered_map>
+#include <vector>
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Channel.h"
 
 namespace nets::net
 {
-	class EventLoop;
-
 	class Poller : nets::base::Noncopyable
 	{
 	public:
-		using FdType = int32_t;
-		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
-		using ChannelRawPtr = Channel*;
-		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
-		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
+		using ChannelMap = ::std::unordered_map<Channel::IdType, ChannelPtr>;
 
 	public:
 		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(eventLoop) {}
@@ -48,7 +42,6 @@ namespace nets::net
 
 	class PollerFactory
 	{
-		using PollerPtr = ::std::unique_ptr<Poller>;
 	public:
 		static PollerPtr getPoller();
 	};

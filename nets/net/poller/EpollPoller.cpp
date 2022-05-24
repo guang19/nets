@@ -16,6 +16,8 @@ namespace nets::net
 	{
 		constexpr ::size_t InitEventSize = 12;
 		constexpr ::time_t Timeout = 1;
+		// per EventLoop thread
+		__thread Channel::IdType ChannelUniqueId = 0;
 	} // namespace
 
 	EpollPoller::EpollPoller(EventLoopPtr eventLoop)
@@ -68,7 +70,14 @@ namespace nets::net
 			assert(!hasChannel(channel));
 			if (epollCtl(EPOLL_CTL_ADD, channel))
 			{
-				channels_[channel->sockFd()] = channel;
+				++ChannelUniqueId;
+				assert(ChannelUniqueId > 0);
+				// IdType is unsigned size type, ChannelUniqueId equals 0 means that ChannelUniqueId has reached the maximum
+				if (ChannelUniqueId == 0)
+				{
+					++ChannelUniqueId;
+				}
+				channels_[ChannelUniqueId] = channel;
 				channel->setRegistered(true);
 			}
 		}

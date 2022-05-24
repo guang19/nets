@@ -16,15 +16,19 @@ namespace nets::net
 	class Channel;
 	class Poller;
 	class PollerFactory;
+	class EventLoop;
 
-	class EventLoop : nets::base::Noncopyable, public ::std::enable_shared_from_this<EventLoop>
+	namespace
 	{
-	public:
+		using ChannelRawPtr = Channel*;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
 		using PollerPtr = ::std::unique_ptr<Poller>;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
+	}
 
+	class EventLoop : nets::base::Noncopyable, public ::std::enable_shared_from_this<EventLoop>
+	{
 	public:
 		EventLoop();
 		~EventLoop();

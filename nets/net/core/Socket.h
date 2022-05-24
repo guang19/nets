@@ -7,17 +7,18 @@
 
 #include <netinet/in.h>
 
-#include "nets/base/Copyable.h"
-#include "nets/base/Noncopyable.h"
-
 namespace nets::net
 {
-	using FdType = int32_t;
-	using OptValType = int32_t;
-	using SockLenType = ::socklen_t;
-	using SockAddr = struct sockaddr;
-	using SockAddrFamily = ::sa_family_t;
-	using SockLinger = struct linger;
+	namespace
+	{
+		using FdType = int32_t;
+		using OptValType = int32_t;
+		using SockLenType = ::socklen_t;
+		using SockAddr = struct sockaddr;
+		using SockAddrFamily = ::sa_family_t;
+		using SockLinger = struct linger;
+
+	}
 
 	namespace socket
 	{

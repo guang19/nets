@@ -28,6 +28,6 @@ namespace nets::net
 		addReadEvent();
 		assert(isReadable());
 		registerToLoop();
-		assert(uniqueId() >= 0);
+		assert(uniqueId() > 0);
 	}
 } // namespace nets::net

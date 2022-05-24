@@ -9,24 +9,25 @@
 #include <sys/epoll.h>
 
 #include "nets/base/Noncopyable.h"
+#include "nets/net/core/EventLoop.h"
+#include "nets/net/core/Socket.h"
 
 namespace nets::net
 {
-	class EventLoop;
-
-	using EventType = uint32_t;
-	// event type
-	constexpr EventType NoneEvent = 0;
-	constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
-	constexpr EventType WriteEvent = EPOLLOUT;
-	constexpr EventType ErrorEvent = EPOLLERR;
+	namespace
+	{
+		using EventType = uint32_t;
+		// event type
+		constexpr EventType NoneEvent = 0;
+		constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
+		constexpr EventType WriteEvent = EPOLLOUT;
+		constexpr EventType ErrorEvent = EPOLLERR;
+	}
 
 	class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
-		using IdType = int32_t;
-		using FdType = int32_t;
-		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
+		using IdType = ::size_t;
 
 	public:
 		explicit Channel(EventLoopPtr eventLoop);
@@ -44,6 +45,11 @@ namespace nets::net
 		inline IdType uniqueId() const
 		{
 			return uniqueId_;
+		}
+
+		inline void setUniqueId(IdType uniqueId)
+		{
+			uniqueId_ = uniqueId;
 		}
 
 		inline EventType events() const
@@ -93,13 +99,13 @@ namespace nets::net
 		void removeEvent(EventType event);
 
 	protected:
-		// global unique identifier
+		// channel unique identifier per EventLoop thread
 		IdType uniqueId_ {InvalidUniqueId};
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
-		static constexpr IdType InvalidUniqueId = -1;
+		static constexpr IdType InvalidUniqueId = 0;
 	};
 } // namespace nets::net
 
