@@ -14,20 +14,17 @@ namespace nets::net
 {
 	class EventLoop;
 
-	namespace
-	{
-		using EventType = uint32_t;
-		// event type
-		EventType NoneEvent = 0;
-		EventType ReadEvent = EPOLLIN | EPOLLPRI;
-		EventType WriteEvent = EPOLLOUT;
-//		EventType ErrorEvent = EPOLLERR;
-	} // namespace
+	using EventType = uint32_t;
+	// event type
+	constexpr EventType NoneEvent = 0;
+	constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
+	constexpr EventType WriteEvent = EPOLLOUT;
+	constexpr EventType ErrorEvent = EPOLLERR;
 
 	class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
-		using IdType = uint32_t;
+		using IdType = int32_t;
 		using FdType = int32_t;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 
@@ -36,7 +33,7 @@ namespace nets::net
 		virtual ~Channel() = default;
 
 	public:
-		void registerTo();
+		void registerToLoop();
 		void modify();
 		void deregister();
 
@@ -97,11 +94,12 @@ namespace nets::net
 
 	protected:
 		// global unique identifier
-		IdType uniqueId_ {0};
+		IdType uniqueId_ {InvalidUniqueId};
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};
 		EventLoopPtr eventLoop_ {nullptr};
+		static constexpr IdType InvalidUniqueId = -1;
 	};
 } // namespace nets::net
 

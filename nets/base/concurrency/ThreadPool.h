@@ -140,8 +140,7 @@ namespace nets::base
 	private:
 		::std::string name_ {};
 		::std::atomic_bool running_ {false};
-		// the numbers of core threads, once created,
-		// will be destroyed as the life cycle of the thread pool ends
+		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
 		SizeType corePoolSize_ {0};
 		// the maximum numbers of threads that the thread pool can hold
 		SizeType maxPoolSize_ {0};

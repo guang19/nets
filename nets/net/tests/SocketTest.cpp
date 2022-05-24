@@ -13,10 +13,10 @@ TEST(SocketTest, BasicUse)
 {
 	FdType sockFd = -1;
 	ASSERT_GE((sockFd = socket::createTcpSocket(AF_INET)), 0);
-	socket::closeSocket(sockFd);
+	socket::closeFd(sockFd);
 	ASSERT_GE((sockFd = socket::createUdpSocket(AF_INET)), 0);
-	socket::closeSocket(sockFd);
-	socket::closeSocket(6);
+	socket::closeFd(sockFd);
+	socket::closeFd(6);
 }
 
 TEST(SocketTest, SocketDefaultOpt)

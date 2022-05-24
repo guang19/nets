@@ -18,13 +18,13 @@ namespace nets::base
 		constexpr ::size_t FileIOBufferSize = 1024 << 3;
 		constexpr uint32_t MaxFilePathLen = 256;
 
-		// if you need test DAILY_FILE LogWriter, you need to adjust this
+		// if you want to test DAILY_FILE LogWriter, you need to adjust this
 		// constant for short intervals, not for the whole day
 		constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
 		// Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
 		// constexpr ::time_t SecondsPerDay = 30;
 
-		// if you need test ROLLING_FILE LogWriter, you need to adjust this
+		// if you want to test ROLLING_FILE LogWriter, you need to adjust this
 		// constant  as small as possible
 		constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
 		// Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back

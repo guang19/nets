@@ -28,20 +28,38 @@ namespace nets::net::socket
 		FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
 		if (sockFd < 0)
 		{
-			LOGS_ERROR << "create udp socket failed";
+			LOGS_FATAL << "create udp socket failed";
 		}
 		return sockFd;
 	}
 
-	void closeSocket(FdType sockFd)
+	void closeFd(FdType fd)
 	{
-		if (sockFd >= 0)
+		if (fd >= 0)
 		{
-			if (0 != ::close(sockFd))
+			if (0 != ::close(fd))
 			{
 				LOGS_ERROR << "close socket failed";
 			}
 		}
+	}
+
+	FdType createIdleFd()
+	{
+		FdType idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
+		if (idleFd < 0)
+		{
+			LOGS_FATAL << "create idleFd failed";
+		}
+		return idleFd;
+	}
+
+	void dealwithEMFILE(FdType* idleFd, FdType sockFd)
+	{
+		closeFd(*idleFd);
+		*idleFd = ::accept(sockFd, nullptr, nullptr);
+		closeFd(*idleFd);
+		*idleFd = createIdleFd();
 	}
 
 	void bind(FdType sockFd, const SockAddr* sockAddr)
@@ -64,7 +82,7 @@ namespace nets::net::socket
 	FdType accept(FdType sockFd, SockAddr* sockAddr)
 	{
 		auto len = static_cast<SockLenType>(sizeof(SockAddr));
-		FdType connFd = -1;
+		FdType connFd = InvalidFd;
 		if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) < 0)
 		{
 			LOGS_FATAL << "accept4 socket failed";

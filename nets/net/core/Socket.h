@@ -21,9 +21,14 @@ namespace nets::net
 
 	namespace socket
 	{
+		constexpr FdType InvalidFd = -1;
+
 		FdType createTcpSocket(SockAddrFamily family = AF_INET);
 		FdType createUdpSocket(SockAddrFamily family = AF_INET);
-		void closeSocket(FdType sockFd);
+		void closeFd(FdType fd);
+		FdType createIdleFd();
+		// EMFILE: The per-process limit of open file descriptors has been reached
+		void dealwithEMFILE(FdType* idleFd, FdType sockFd);
 
 		void bind(FdType sockFd, const SockAddr* sockAddr);
 		void listen(FdType sockFd);
@@ -39,6 +44,7 @@ namespace nets::net
 		void setSockKeepAlive(FdType sockFd, bool enable = true);
 		void setIpTcpNoDelay(FdType sockFd, bool enable = true);
 		void setSockNonBlock(FdType sockFd, bool enable = true);
+		// set socket linger
 		void setSockLinger(FdType sockFd, const SockLinger& linger);
 	} // namespace socket
 } // namespace nets::net

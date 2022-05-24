@@ -9,11 +9,11 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopPtr eventLoop)
-		: uniqueId_(0), events_(NoneEvent), readyEvents_(NoneEvent), isRegistered_(false), eventLoop_(eventLoop)
+		: uniqueId_(InvalidUniqueId), events_(NoneEvent), readyEvents_(NoneEvent), isRegistered_(false), eventLoop_(eventLoop)
 	{
 	}
 
-	void Channel::registerTo()
+	void Channel::registerToLoop()
 	{
 		eventLoop_->registerChannel(shared_from_this());
 	}

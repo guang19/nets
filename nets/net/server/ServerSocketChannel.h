@@ -26,7 +26,8 @@ namespace nets::net
 		}
 
 	private:
-		int32_t sockFd_ {-1};
+		FdType sockFd_ {socket::InvalidFd};
+		FdType idleFd_ {socket::InvalidFd};
 	};
 } // namespace nets::net
 
