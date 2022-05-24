@@ -13,12 +13,15 @@ namespace nets::net
 	class ServerBootstrap : nets::base::Noncopyable
 	{
 	public:
-		using PortType = uint16_t;
+		using ThreadPoolPtr = ::std::unique_ptr<nets::base::ThreadPool>;
+
+	public:
+		EventLoopPtr eventLoop() const
+		{
+			return mainEventLoop_;
+		}
 
 	private:
-		using EventLoopPtr = ::std::unique_ptr<EventLoop>;
-		using ThreadPoolPtr = ::std::unique_ptr<base::ThreadPool>;
-
 		::std::atomic_bool running_ {false};
 		EventLoopPtr mainEventLoop_;
 		ThreadPoolPtr threadPool_;

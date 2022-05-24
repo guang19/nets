@@ -38,7 +38,7 @@ namespace nets::net
 		static InetSockAddress createLoopBackSockAddress(PortType port, bool ipv4 = true);
 
 	public:
-		inline sa_family_t ipFamily() const
+		inline SockAddrFamily ipFamily() const
 		{
 			return addr4_.sin_family;
 		}

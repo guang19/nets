@@ -10,11 +10,11 @@ namespace nets::net
 {
 	bool Poller::hasChannel(ChannelPtr channel)
 	{
-		const auto it = channels_.find(channel->sockFd());
+		const auto it = channels_.find(channel->uniqueId());
 		return it != channels_.end() && it->second == channel;
 	}
 
-	PollerFactory::PollerPtr PollerFactory::getPoller()
+	PollerPtr PollerFactory::getPoller()
 	{
 		return ::std::make_unique<EpollPoller>(nullptr);
 	}

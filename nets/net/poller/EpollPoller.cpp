@@ -7,7 +7,6 @@
 #include <cassert>
 #include <unistd.h>
 
-#include "nets/base/CommonMacro.h"
 #include "nets/base/log/Logging.h"
 
 namespace nets::net
@@ -16,7 +15,7 @@ namespace nets::net
 	{
 		constexpr ::size_t InitEventSize = 12;
 		constexpr ::time_t Timeout = 1;
-		// per EventLoop thread
+		// unique id per-thread
 		__thread Channel::IdType ChannelUniqueId = 0;
 	} // namespace
 
@@ -32,7 +31,7 @@ namespace nets::net
 
 	EpollPoller::~EpollPoller()
 	{
-		::close(epollFd_);
+		socket::closeFd(epollFd_);
 	}
 
 	void EpollPoller::poll(int32_t timeoutMs, ChannelList activeChannels)
@@ -72,7 +71,7 @@ namespace nets::net
 			{
 				++ChannelUniqueId;
 				assert(ChannelUniqueId > 0);
-				// IdType is unsigned size type, ChannelUniqueId equals 0 means that ChannelUniqueId has reached the maximum
+				// ChannelUniqueId is an unsigned type, ChannelUniqueId equals 0 means that ChannelUniqueId has reached the maximum
 				if (ChannelUniqueId == 0)
 				{
 					++ChannelUniqueId;
@@ -118,7 +117,7 @@ namespace nets::net
 		assert(channel->isNoneEvent());
 		epollCtl(EPOLL_CTL_DEL, channel);
 		channel->setRegistered(false);
-		channels_.erase(channel->sockFd());
+		channels_.erase(channel->uniqueId());
 	}
 
 	bool EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)

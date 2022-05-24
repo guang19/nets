@@ -6,7 +6,6 @@
 #define NETS_EPOLLSELECTOR_H
 
 #include <vector>
-#include <sys/epoll.h>
 
 #include "nets/net/poller/Poller.h"
 

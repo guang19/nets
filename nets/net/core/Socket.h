@@ -17,7 +17,6 @@ namespace nets::net
 		using SockAddr = struct sockaddr;
 		using SockAddrFamily = ::sa_family_t;
 		using SockLinger = struct linger;
-
 	}
 
 	namespace socket
@@ -27,6 +26,7 @@ namespace nets::net
 		FdType createTcpSocket(SockAddrFamily family = AF_INET);
 		FdType createUdpSocket(SockAddrFamily family = AF_INET);
 		void closeFd(FdType fd);
+
 		FdType createIdleFd();
 		// EMFILE: The per-process limit of open file descriptors has been reached
 		void dealwithEMFILE(FdType* idleFd, FdType sockFd);
