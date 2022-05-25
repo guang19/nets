@@ -6,5 +6,4 @@
 
 namespace nets::net
 {
-
 } // namespace nets::net

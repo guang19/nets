@@ -5,26 +5,30 @@
 #ifndef NETS_SERVERBOOTSTRAP_H
 #define NETS_SERVERBOOTSTRAP_H
 
-#include "nets/base/concurrency/ThreadPool.h"
-#include "nets/net/core/EventLoop.h"
+#include "nets/net/core/InetSockAddress.h"
+#include "nets/net/core/EventLoopGroup.h"
 
 namespace nets::net
 {
 	class ServerBootstrap : nets::base::Noncopyable
 	{
 	public:
-		using ThreadPoolPtr = ::std::unique_ptr<nets::base::ThreadPool>;
+		ServerBootstrap();
+		~ServerBootstrap();
 
 	public:
-		EventLoopPtr eventLoop() const
-		{
-			return mainEventLoop_;
-		}
+		// single reactor
+		ServerBootstrap& group(EventLoopGroup* worker);
+		// main reactor listens to the socket, sub reactor handles io
+		ServerBootstrap& group(EventLoopGroup* main, EventLoopGroup* sub);
+
+		ServerBootstrap& bind(const InetSockAddress& listenAddr);
+		ServerBootstrap& bind(const char* ip, PortType port);
+		ServerBootstrap& bind(PortType port);
+		void start();
 
 	private:
 		::std::atomic_bool running_ {false};
-		EventLoopPtr mainEventLoop_;
-		ThreadPoolPtr threadPool_;
 	};
 } // namespace nets::net
 

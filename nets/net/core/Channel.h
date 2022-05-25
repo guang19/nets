@@ -9,6 +9,7 @@
 #include <sys/epoll.h>
 
 #include "nets/base/Noncopyable.h"
+#include "nets/net/core/ChannelHandler.h"
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/core/Socket.h"
 
@@ -22,7 +23,7 @@ namespace nets::net
 		constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
 		constexpr EventType WriteEvent = EPOLLOUT;
 		constexpr EventType ErrorEvent = EPOLLERR;
-	}
+	} // namespace
 
 	class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{

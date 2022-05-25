@@ -12,16 +12,18 @@
 
 namespace nets::net
 {
-	class InetSockAddress : public base::Copyable
+	namespace
 	{
-	public:
 		using SockLenType = ::socklen_t;
 		using PortType = uint16_t;
 		using SockAddr = struct sockaddr;
 		using SockAddr4 = struct sockaddr_in;
 		using SockAddr6 = struct sockaddr_in6;
 		using SockAddrFamily = ::sa_family_t;
+	} // namespace
 
+	class InetSockAddress : public base::Copyable
+	{
 	public:
 		explicit InetSockAddress(const SockAddr4& addr4);
 		explicit InetSockAddress(const SockAddr6& addr6);

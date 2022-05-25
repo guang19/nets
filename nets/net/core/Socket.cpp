@@ -5,7 +5,6 @@
 #include "nets/net/core/Socket.h"
 
 #include <fcntl.h>
-#include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
 
