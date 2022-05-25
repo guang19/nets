@@ -22,14 +22,19 @@ namespace nets::base
 {
 	class ThreadPool : Noncopyable
 	{
+	private:
+		struct ThreadWrapper;
+		using ThreadWrapperRawPtr = ThreadWrapper*;
+		using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
+		using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
+
 	public:
-		using SizeType = ::size_t;
 		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
-		using MutexType = ::std::recursive_mutex;
+		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using ConditionVariableType = ::std::condition_variable_any;
+		using ConditionVariableType = ::std::condition_variable;
 		using BlockingQueueType = BoundedBlockingQueue<TaskType>;
 		using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
 		using ThreadPoolPtr = ThreadPool*;
@@ -50,32 +55,32 @@ namespace nets::base
 			ThreadPoolPtr threadPoolPtr_ {nullptr};
 		};
 
-		using ThreadWrapperRawPtr = ThreadWrapper*;
-		using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
-
 	public:
-		explicit ThreadPool(SizeType corePoolSize = DefaultCorePoolSize, SizeType maxPoolSize = DefaultMaxPoolSize,
-							TimeType keepAliveTime = DefaultIdleKeepAliveTime, SizeType maxQueueSize = DefaultMaxQueueSize,
+		explicit ThreadPool(uint32_t corePoolSize = DefaultCorePoolSize, uint32_t maxPoolSize = DefaultMaxPoolSize,
+							TimeType keepAliveTime = DefaultIdleKeepAliveTime, uint32_t maxQueueSize = DefaultMaxQueueSize,
 							const ::std::string& name = DefaultThreadPoolName);
 		~ThreadPool();
 
-		void init();
 		void shutdown();
 
 		inline bool isRunning() const
 		{
-			return running_;
+			return isRunning(ctl_);
+		}
+
+		inline bool isShutdown() const
+		{
+			return isShutdown(ctl_);
+		}
+
+		inline uint32_t numOfActiveThreads()
+		{
+			return numOfActiveThreads(ctl_);
 		}
 
 		inline const ::std::string& name() const
 		{
 			return name_;
-		}
-
-		inline SizeType poolSize()
-		{
-			LockGuardType lock(mutex_);
-			return threadPool_.size();
 		}
 
 		template <typename Fn, typename... Args>
@@ -100,28 +105,56 @@ namespace nets::base
 	private:
 		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
-		bool addThreadTask(const TaskType& task, bool isCore, SizeType threadSize);
+		bool addThreadTask(const TaskType& task, bool isCore);
+
+		inline bool isRunning(uint32_t ctl) const
+		{
+			return (ctl & ~Capacity) == Running;
+		}
+
+		inline bool isShutdown(uint32_t ctl) const
+		{
+			return (ctl & ~Capacity) == Shutdown;
+		}
+
+		inline uint32_t numOfActiveThreads(uint32_t ctl) const
+		{
+			return ctl & Capacity;
+		}
+
+	private:
+		static constexpr uint32_t Int32Bits = 32;
+		static constexpr uint32_t CountBits = Int32Bits - 2;
+		// maximum active thread size
+		// 00,111111111111111111111111111111
+		static constexpr uint32_t Capacity = (1 << CountBits) - 1;
+		// 01,000000000000000000000000000000
+		// 00,000000000000000000000000000000
+		static constexpr uint32_t Running = 1 << CountBits;
+		static constexpr uint32_t Shutdown = 0 << CountBits;
+
+		static const uint32_t DefaultCorePoolSize;
+		static const uint32_t DefaultMaxPoolSize;
+		static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
+		static constexpr uint32_t DefaultMaxQueueSize = 24;
+		static constexpr char const* DefaultThreadPoolName = "ThreadPool";
 
 	private:
 		::std::string name_ {};
-		::std::atomic_bool running_ {false};
+		// high 2bits represent threadpool status: 00 - shutdown; 01-running.
+		// low 30bits represent threadpool active thread size.
+		::std::atomic_uint32_t ctl_ {false};
 		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-		SizeType corePoolSize_ {0};
-		// the maximum numbers of threads that the thread pool can hold
-		SizeType maxPoolSize_ {0};
+		uint32_t corePoolSize_ {0};
+		// the maximum numbers of threads that the threadpool can hold
+		uint32_t maximumPoolSize_ {0};
 		// time that idle threads can survive, unit: ms
 		TimeType idleKeepAliveTime_ {0};
 		// task queue
 		BlockingQueuePtr taskQueue_ {nullptr};
-		::std::vector<ThreadWrapperPtr> threadPool_ {};
+		ThreadPoolType threadPool_ {};
 		MutexType mutex_ {};
 		ConditionVariableType poolCV_ {};
-
-		static const SizeType DefaultCorePoolSize;
-		static const SizeType DefaultMaxPoolSize;
-		static const TimeType DefaultIdleKeepAliveTime;
-		static const SizeType DefaultMaxQueueSize;
-		static const ::std::string DefaultThreadPoolName;
 	};
 
 	template <typename Fn, typename... Args>
@@ -133,12 +166,11 @@ namespace nets::base
 	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		assert(running_);
-		if (!running_)
+		assert(isRunning());
+		if (isShutdown())
 		{
-			LOGS_FATAL << "thread pool has not been initialized";
+			LOGS_FATAL << "threadpool [" << name_ << "] has not been initialized";
 		}
-		LockGuardType lock(mutex_);
 		using RetType = typename ::std::result_of<Fn(Args...)>::type;
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
@@ -146,22 +178,24 @@ namespace nets::base
 		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask<RetType>(promise, promiseTask);
 		assert(2 == promise.use_count());
-		SizeType threadSize = threadPool_.size();
-		// if still able to create core thread
-		if (threadSize < corePoolSize_)
+		uint32_t ctl = ctl_.load();
+		uint32_t n = numOfActiveThreads(ctl);
+		// if num of active threads less than num of corePoolSize
+		if (n < corePoolSize_)
 		{
-			addThreadTask(task, true, threadSize);
+			// add task to core thread failed, update ctl
+			if (!addThreadTask(task, true))
+			{
+				ctl = ctl_.load();
+			}
 		}
-		else
+		// if task queue is not full, try push task to task queue
+		if (isRunning(ctl))
 		{
-			// if task queue is not full, try push task to task queue
 			if (!taskQueue_->tryPush(task))
 			{
-				// the thread pool is full, create non-core thread to perform task
-				if (threadSize < maxPoolSize_)
-				{
-					addThreadTask(task, false, threadSize);
-				}
+				// the threadpool is full, create non-core thread to perform task
+				addThreadTask(task, false);
 			}
 		}
 		return future;
@@ -170,33 +204,34 @@ namespace nets::base
 	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		assert(running_);
-		if (!running_)
+		assert(isRunning());
+		if (isShutdown())
 		{
-			LOGS_FATAL << "thread pool has not been initialized";
+			LOGS_FATAL << "threadpool [" << name_ << "] has not been initialized";
 		}
-		LockGuardType lock(mutex_);
 		// value capture, ref count plus 1
 		auto promise = ::std::make_shared<::std::promise<void>>();
 		auto future = promise->get_future();
 		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask(promise, promiseTask);
-		SizeType threadSize = threadPool_.size();
-		// if still able to create core thread
-		if (threadSize < corePoolSize_)
+		uint32_t ctl = ctl_.load();
+		uint32_t n = numOfActiveThreads(ctl);
+		// if num of active threads less than num of corePoolSize
+		if (n < corePoolSize_)
 		{
-			addThreadTask(task, true, threadSize);
+			// add task to core thread failed, update ctl
+			if (!addThreadTask(task, true))
+			{
+				ctl = ctl_.load();
+			}
 		}
-		else
+		// if task queue is not full, try push task to task queue
+		if (isRunning(ctl))
 		{
-			// if task queue is not full, try push task to task queue
 			if (!taskQueue_->tryPush(task))
 			{
-				// the thread pool is full, create non-core thread to perform task
-				if (threadSize < maxPoolSize_)
-				{
-					addThreadTask(task, false, threadSize);
-				}
+				// the threadpool is full, create non-core thread to perform task
+				addThreadTask(task, false);
 			}
 		}
 		return future;
@@ -215,13 +250,13 @@ namespace nets::base
 			}
 			catch (const ::std::exception& exception)
 			{
-				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in threadpool ["
 						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
 				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << ']';
+						   << "] execution in threadpool [" << name_ << ']';
 			}
 		};
 		return task;
@@ -239,13 +274,13 @@ namespace nets::base
 			}
 			catch (const ::std::exception& exception)
 			{
-				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in threadpool ["
 						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
 				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << ']';
+						   << "] execution in threadpool [" << name_ << ']';
 			}
 		};
 		return task;

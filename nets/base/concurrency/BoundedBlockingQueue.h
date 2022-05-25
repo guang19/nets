@@ -23,10 +23,10 @@ namespace nets::base
 		using LReferenceType = ValueType&;
 		using RReferenceType = ValueType&&;
 		using ConstReferenceType = const ValueType&;
-		using MutexType = ::std::recursive_mutex;
+		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using ConditionVariableType = ::std::condition_variable_any;
+		using ConditionVariableType = ::std::condition_variable;
 		using TimeType = ::time_t;
 		using MillisTimeType = ::std::chrono::milliseconds;
 		using ContainerType = ::std::deque<ValueType>;
@@ -47,12 +47,6 @@ namespace nets::base
 		{
 			LockGuardType lock(mutex_);
 			return queue_.size();
-		}
-
-		void popFront()
-		{
-			LockGuardType lock(mutex_);
-			queue_.pop_front();
 		}
 
 		// notify blocking thread
@@ -338,7 +332,7 @@ namespace nets::base
 	bool BoundedBlockingQueue<T>::tryPop(LReferenceType el)
 	{
 		UniqueLockType lock(mutex_, ::std::try_to_lock);
-		if (lock.owns_lock() && !isEmpty())
+		if (lock.owns_lock() && !queue_.empty())
 		{
 			el = queue_.front();
 			queue_.pop_front();

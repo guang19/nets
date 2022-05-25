@@ -17,7 +17,6 @@ public:
 	{
 		// set parameters to be smaller, you can observe the result of execute more intuitively
 		threadPool = new ThreadPool();
-		threadPool->init();
 	}
 
 	// Tears down the test fixture.
