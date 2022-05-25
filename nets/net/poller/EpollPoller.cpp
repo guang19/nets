@@ -95,7 +95,7 @@ namespace nets::net
 			{
 				if (epollCtl(EPOLL_CTL_DEL, channel))
 				{
-					channels_.erase(channel->sockFd());
+					channels_.erase(channel->uniqueId());
 					channel->setRegistered(false);
 				}
 			}
