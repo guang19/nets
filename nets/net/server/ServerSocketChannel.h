@@ -12,7 +12,7 @@
 
 namespace nets::net
 {
-	class ServerSocketChannel : public Channel, public ChannelHandler
+	class ServerSocketChannel : public Channel
 	{
 	public:
 		explicit ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily);
