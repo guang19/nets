@@ -13,27 +13,10 @@
 #include <thread>
 #include <vector>
 
-#include "nets/base/CommonMacro.h"
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
-
-#ifndef CORE_POOL_SIZE
-#define CORE_POOL_SIZE (AVAILABLE_PROCESSOR << 1)
-#endif
-
-#ifndef MAX_POOL_SIZE
-#define MAX_POOL_SIZE CORE_POOL_SIZE
-#endif
-
-#ifndef IDLE_KEEP_ALIVE_TIME
-#define IDLE_KEEP_ALIVE_TIME 30000
-#endif
-
-#ifndef TASK_QUEUE_SIZE
-#define TASK_QUEUE_SIZE 24
-#endif
 
 namespace nets::base
 {
@@ -50,23 +33,6 @@ namespace nets::base
 		using BlockingQueueType = BoundedBlockingQueue<TaskType>;
 		using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
 		using ThreadPoolPtr = ThreadPool*;
-
-	public:
-		/**************************************************************************
-		 * When the thread pool is full and the task queue cannot continue accept
-		 * new tasks, the following rejection policy can be selected to deal with
-		 * new tasks
-		 **************************************************************************/
-		enum RejectionPolicy
-		{
-			// abandon new tasks and do nothing
-			DiscardPolicy = 0,
-			// abandon the task at the end of the task queue
-			// and try to add a new task to the end of task queue
-			DiscardOlderPolicy,
-			// the caller's thread runs the task directly
-			CallerRunsPolicy,
-		};
 
 	private:
 		struct ThreadWrapper : Noncopyable
@@ -88,9 +54,9 @@ namespace nets::base
 		using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
 
 	public:
-		explicit ThreadPool(SizeType corePoolSize = CORE_POOL_SIZE, SizeType maxPoolSize = MAX_POOL_SIZE,
-							TimeType keepAliveTime = IDLE_KEEP_ALIVE_TIME, SizeType maxQueueSize = TASK_QUEUE_SIZE,
-							enum RejectionPolicy rejectionPolicy = DiscardPolicy, const ::std::string& name = "ThreadPool");
+		explicit ThreadPool(SizeType corePoolSize = DefaultCorePoolSize, SizeType maxPoolSize = DefaultMaxPoolSize,
+							TimeType keepAliveTime = DefaultIdleKeepAliveTime, SizeType maxQueueSize = DefaultMaxQueueSize,
+							const ::std::string& name = DefaultThreadPoolName);
 		~ThreadPool();
 
 		void init();
@@ -135,7 +101,6 @@ namespace nets::base
 		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore, SizeType threadSize);
-		void reject(const TaskType& task);
 
 	private:
 		::std::string name_ {};
@@ -151,8 +116,12 @@ namespace nets::base
 		::std::vector<ThreadWrapperPtr> threadPool_ {};
 		MutexType mutex_ {};
 		ConditionVariableType poolCV_ {};
-		// rejection policy
-		RejectionPolicy rejectionPolicy_;
+
+		static const SizeType DefaultCorePoolSize;
+		static const SizeType DefaultMaxPoolSize;
+		static const TimeType DefaultIdleKeepAliveTime;
+		static const SizeType DefaultMaxQueueSize;
+		static const ::std::string DefaultThreadPoolName;
 	};
 
 	template <typename Fn, typename... Args>
@@ -193,11 +162,6 @@ namespace nets::base
 				{
 					addThreadTask(task, false, threadSize);
 				}
-				else
-				{
-					// handle task with rejection policy
-					reject(task);
-				}
 			}
 		}
 		return future;
@@ -232,11 +196,6 @@ namespace nets::base
 				if (threadSize < maxPoolSize_)
 				{
 					addThreadTask(task, false, threadSize);
-				}
-				else
-				{
-					// handle task with rejection policy
-					reject(task);
 				}
 			}
 		}

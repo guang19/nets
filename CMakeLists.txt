@@ -9,14 +9,6 @@ SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 ENABLE_TESTING()
 
 ################################################################################################
-# the numbers of core threads
-#ADD_DEFINITIONS(-DCORE_POOL_SIZE=16)
-# the maximum numbers of threads that the thread pool can hold
-#ADD_DEFINITIONS(-DMAX_POOL_SIZE=16)
-#  time that idle threads can survive, unit: ms
-ADD_DEFINITIONS(-DIDLE_KEEP_ALIVE_TIME=3000)
-# task queue size
-ADD_DEFINITIONS(-DTASK_QUEUE_SIZE=24)
 # log level,default DEBUG. option：
 # - 0：TRACE
 # - 1：DEBUG

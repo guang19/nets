@@ -6,8 +6,16 @@
 
 #include <utility>
 
+#include "nets/base/CommonMacro.h"
+
 namespace nets::base
 {
+	const ThreadPool::SizeType ThreadPool::DefaultCorePoolSize = (AVAILABLE_PROCESSOR << 1);
+	const ThreadPool::SizeType ThreadPool::DefaultMaxPoolSize = DefaultCorePoolSize;
+	const ThreadPool::TimeType ThreadPool::DefaultIdleKeepAliveTime = 30000;
+	const ThreadPool::SizeType ThreadPool::DefaultMaxQueueSize = 24;
+	const ::std::string ThreadPool::DefaultThreadPoolName = "ThreadPool";
+
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
 		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(&ThreadWrapper::start, this),
@@ -26,10 +34,9 @@ namespace nets::base
 	}
 
 	ThreadPool::ThreadPool(SizeType corePoolSize, SizeType maxPoolSize, TimeType idleKeepAliveTime, SizeType maxQueueSize,
-						   enum RejectionPolicy rejectionPolicy, const ::std::string& name)
+						   const ::std::string& name)
 		: name_(name), running_(false), corePoolSize_(corePoolSize), maxPoolSize_(maxPoolSize),
-		  idleKeepAliveTime_(idleKeepAliveTime), taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)),
-		  rejectionPolicy_(rejectionPolicy)
+		  idleKeepAliveTime_(idleKeepAliveTime), taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize))
 	{
 		if (corePoolSize_ <= 0 || corePoolSize_ > maxPoolSize_)
 		{
@@ -131,24 +138,5 @@ namespace nets::base
 		::snprintf(threadName, ThreadNameMaxLength, "Thread-%zu", threadSize);
 		threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
 		return true;
-	}
-
-	void ThreadPool::reject(const TaskType& task)
-	{
-		switch (rejectionPolicy_)
-		{
-			case RejectionPolicy::DiscardPolicy:
-				break;
-			case RejectionPolicy::DiscardOlderPolicy:
-			{
-				taskQueue_->popFront();
-				submit(task);
-				break;
-			}
-			case RejectionPolicy::CallerRunsPolicy:
-			{
-				task();
-			}
-		}
 	}
 } // namespace nets::base

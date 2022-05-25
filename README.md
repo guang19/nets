@@ -15,12 +15,6 @@ nets是一个基于Linux的非阻塞，事件驱动的多线程网络库，遵�
 ## 宏参数
 nets支持使用外部宏定义的方式调整一些关键的参数。
 
-### 线程池配置：
-- CORE_POOL_SIZE: 核心线程数，默认为可用CPU核心数的2倍，类型：size_t；
-- MAX_POOL_SIZE: 最大线程数，默认为可用CPU核心数的2倍，类型：size_t；
-- IDLE_KEEP_ALIVE_TIME：空闲线程可存活的最长时间，默认30000，单位：ms，类型：time_t；
-- TASK_QUEUE_SIZE: 任务队列大小，默认24，类型：size_t。
-
 ### 日志配置
 - LOG_LEVEL：日志等级，默认0（DEBUG）。可选：
     - 0：TRACE；
