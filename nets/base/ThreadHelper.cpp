@@ -5,7 +5,6 @@
 #include "nets/base/ThreadHelper.h"
 
 #include <sys/syscall.h>
-#include <unistd.h>
 
 #include "nets/base/CommonMacro.h"
 
@@ -58,28 +57,10 @@ namespace nets::base
 	// init main thread
 	ThreadInitializer threadInitializer {};
 
-	bool setPosixThreadName(::pthread_t threadId, const char* threadName)
-	{
-		return (0 == ::pthread_setname_np(threadId, threadName));
-	}
-
-	void setThreadName(::pthread_t threadId, const char* threadName)
-	{
-		if (setPosixThreadName(threadId, threadName))
-		{
-			MEMZERO(threadName_, ThreadNameMaxLength);
-			::memcpy(threadName_, threadName, strlen(threadName));
-		}
-	}
-
-	void getThreadName(::pthread_t threadId, char* threadName, int32_t len)
-	{
-		pthread_getname_np(threadId, threadName, len);
-	}
-
 	void setCurrentThreadName(const char* threadName)
 	{
-		setThreadName(pthread_self(), threadName);
+		MEMZERO(threadName_, ThreadNameMaxLength);
+		::memcpy(threadName_, threadName, strlen(threadName));
 	}
 
 	const char* currentThreadName()

@@ -11,9 +11,8 @@ using namespace nets::base;
 TEST(ThreadHelperTest, ThreadName)
 {
 	ASSERT_TRUE(0 == (::strcmp("Main", currentThreadName())));
-	setThreadName(pthread_self(), "MainThread");
-	char name[ThreadNameMaxLength] = {0};
-	getThreadName(pthread_self(), name, ThreadNameMaxLength);
+	setCurrentThreadName("MainThread");
+	const char* name = currentThreadName();
 	ASSERT_TRUE(0 == (::strcmp("MainThread", name)));
 	ASSERT_TRUE(0 == (::strcmp(name, currentThreadName())));
 }

@@ -32,6 +32,7 @@ protected:
 
 TEST_F(ThreadPoolTest, ConstructParameter)
 {
+	::printf("%d", INT32_MAX);
 	ThreadPool(1, 0);
 	ThreadPool(0, 0);
 }
@@ -69,7 +70,7 @@ TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 		threadPool->execute(
 			[&]()
 			{
-				for (int j = 0; j < 1000; ++j)
+				for (int j = 0; j < 10000; ++j)
 				{
 					::printf("your enter number is: %d, threadName:%s\n", j, currentThreadName());
 				}

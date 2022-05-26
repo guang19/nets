@@ -7,19 +7,18 @@
 
 #include <cstdint>
 #include <pthread.h>
+#include <limits>
 
 namespace nets::base
 {
 	namespace
 	{
-		constexpr int32_t ThreadNameMaxLength = 16;
+		//constexpr int32_t ThreadNameMaxLength = 16;
+		constexpr int32_t ThreadNameMaxLength = ::std::numeric_limits<uint64_t>::digits10 + 8;
 	}
 
 	::pid_t currentTid();
 	bool isMainThread();
-
-	void setThreadName(::pthread_t threadId, const char* threadName);
-	void getThreadName(::pthread_t threadId, char* threadName, int32_t len);
 
 	void setCurrentThreadName(const char* threadName);
 	const char* currentThreadName();
