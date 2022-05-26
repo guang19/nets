@@ -16,7 +16,7 @@ public:
 	void SetUp() override
 	{
 		// set parameters to be smaller, you can observe the result of execute more intuitively
-		threadPool = new ThreadPool();
+		threadPool = new ThreadPool(1, 2);
 	}
 
 	// Tears down the test fixture.
@@ -44,7 +44,6 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 		{
 			::printf("===%s\n", currentThreadName());
 		});
-
 	threadPool->execute(
 		[](int num) -> bool
 		{
@@ -61,16 +60,18 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 			throw "ExecuteTask";
 			return true;
 		});
+
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 {
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		threadPool->execute(
 			[&]()
 			{
-				for (int j = 0; j < 10000; ++j)
+				for (int j = 0; j < 1000; ++j)
 				{
 					::printf("your enter number is: %d, threadName:%s\n", j, currentThreadName());
 				}
@@ -85,11 +86,10 @@ TEST_F(ThreadPoolTest, SubmitHasRetval)
 		::printf("%s\n", currentThreadName());
 		return 5;
 	};
-
 	auto future1 = threadPool->submit(f);
 	future1.wait();
 	ASSERT_EQ(future1.get(), 5);
-	auto future2 = threadPool->submit(f);
+	auto future2 = threadPool->submit(::std::move(f));
 	future2.wait();
 	ASSERT_EQ(future2.get(), 5);
 }
@@ -103,7 +103,7 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 	auto future1 = threadPool->submit(f);
 	future1.wait();
 	future1.get();
-	auto future2 = threadPool->submit(f);
+	auto future2 = threadPool->submit(::std::move(f));
 	future2.wait();
 	future2.get();
 }

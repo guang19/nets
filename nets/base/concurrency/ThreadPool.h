@@ -166,11 +166,6 @@ namespace nets::base
 	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		assert(isRunning());
-		if (isShutdown())
-		{
-			LOGS_FATAL << "threadpool [" << name_ << "] has not been initialized";
-		}
 		using RetType = typename ::std::result_of<Fn(Args...)>::type;
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
@@ -179,22 +174,28 @@ namespace nets::base
 		TaskType task = makeTask<RetType>(promise, promiseTask);
 		assert(2 == promise.use_count());
 		uint32_t ctl = ctl_.load();
-		uint32_t n = numOfActiveThreads(ctl);
-		// if num of active threads less than num of corePoolSize
-		if (n < corePoolSize_)
+		assert(isRunning(ctl));
+		if (isShutdown(ctl))
 		{
-			// add task to core thread failed, update ctl
-			if (!addThreadTask(task, true))
+			LOGS_ERROR << "threadpool [" << name_ << "] has not been initialized";
+			return future;
+		}
+		// if num of active threads less than num of corePoolSize
+		if (numOfActiveThreads(ctl) < corePoolSize_)
+		{
+			if (addThreadTask(task, true))
 			{
-				ctl = ctl_.load();
+				return future;
 			}
 		}
-		// if task queue is not full, try push task to task queue
+		// add task to core thread failed, update ctl
+		ctl = ctl_.load();
 		if (isRunning(ctl))
 		{
+			// if task queue is not full, try push task to task queue
 			if (!taskQueue_->tryPush(task))
 			{
-				// the threadpool is full, create non-core thread to perform task
+				// threadpool is full, create non-core thread to perform task
 				addThreadTask(task, false);
 			}
 		}
@@ -204,33 +205,34 @@ namespace nets::base
 	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		assert(isRunning());
-		if (isShutdown())
-		{
-			LOGS_FATAL << "threadpool [" << name_ << "] has not been initialized";
-		}
 		// value capture, ref count plus 1
-		auto promise = ::std::make_shared<::std::promise<void>>();
+ 		auto promise = ::std::make_shared<::std::promise<void>>();
 		auto future = promise->get_future();
 		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask(promise, promiseTask);
 		uint32_t ctl = ctl_.load();
-		uint32_t n = numOfActiveThreads(ctl);
-		// if num of active threads less than num of corePoolSize
-		if (n < corePoolSize_)
+		assert(isRunning(ctl));
+		if (isShutdown(ctl))
 		{
-			// add task to core thread failed, update ctl
-			if (!addThreadTask(task, true))
+			LOGS_ERROR << "threadpool [" << name_ << "] has not been initialized";
+			return future;
+		}
+		// if num of active threads less than num of corePoolSize
+		if (numOfActiveThreads(ctl) < corePoolSize_)
+		{
+			if (addThreadTask(task, true))
 			{
-				ctl = ctl_.load();
+				return future;
 			}
 		}
-		// if task queue is not full, try push task to task queue
+		// add task to core thread failed, update ctl
+		ctl = ctl_.load();
 		if (isRunning(ctl))
 		{
+			// if task queue is not full, try push task to task queue
 			if (!taskQueue_->tryPush(task))
 			{
-				// the threadpool is full, create non-core thread to perform task
+				// threadpool is full, create non-core thread to perform task
 				addThreadTask(task, false);
 			}
 		}

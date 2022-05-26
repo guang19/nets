@@ -7,14 +7,14 @@
 
 #include <cstdint>
 #include <pthread.h>
-#include <limits>
 
 namespace nets::base
 {
 	namespace
 	{
+		// the max length that unix/linux posix thread name is 16, it‘s too short
 		//constexpr int32_t ThreadNameMaxLength = 16;
-		constexpr int32_t ThreadNameMaxLength = ::std::numeric_limits<uint64_t>::digits10 + 8;
+		constexpr uint32_t ThreadNameMaxLength = 64;
 	}
 
 	::pid_t currentTid();

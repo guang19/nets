@@ -75,6 +75,13 @@ namespace nets::base
 						 return numOfActiveThreads() == 0;
 					 });
 		assert(threadPool_.empty());
+		// if threadpool has no thread takes task from task queue, it needs to be deleted manually
+		TaskType tmpTask = nullptr;
+		while (!taskQueue_->isEmpty())
+		{
+			taskQueue_->tryPop(tmpTask);
+		}
+		assert(taskQueue_->isEmpty());
 		LOGS_INFO << "threadpool [" << name_ << "] shutdown success";
 	}
 
@@ -149,7 +156,7 @@ namespace nets::base
 				if (isRunning())
 				{
 					char threadName[ThreadNameMaxLength] = {0};
-					::snprintf(threadName, ThreadNameMaxLength, "Thread-%u", numOfActiveThreads(ctl + 1));
+					::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%u", name_.c_str(),numOfActiveThreads(ctl + 1));
 					threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
 					return true;
 				}
