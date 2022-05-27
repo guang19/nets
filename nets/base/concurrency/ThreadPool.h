@@ -83,6 +83,29 @@ namespace nets::base
 			return name_;
 		}
 
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Please note that if you need to use the returned future to get the result of the task execution, please use
+		// try
+		// {
+		//     future.get();
+		// }
+		// catch(::std::future_error& e)
+		// {
+		//		// The thread pool was closed before the task was executed or the task was discarded
+		// }
+		// catch(::std::exception& e)
+		// {
+		// 		// The task throws an exception when it executes
+		// }
+		// catch(...)
+		// {
+		//  	// The task throws an unknown exception when it executes
+		// }
+		// to catch possible exceptions. The exceptions are as follows:
+		// 1. An exception may occur when the submitted task is executed, and the promise sets the abnormal result;
+		// 2. After the task is submitted, the thread pool shuts down before the task is executed;
+		// 3. The thread pool is full and The task queue cannot receive new tasks, then the task will be discarded;
+
 		template <typename Fn, typename... Args>
 		void execute(Fn&& func, Args&&... args);
 
@@ -95,6 +118,7 @@ namespace nets::base
 				  typename HasRet =
 					  typename ::std::enable_if<::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
 		::std::future<void> submit(Fn&& func, Args&&... args);
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	private:
 		template <typename RetType>
@@ -190,15 +214,17 @@ namespace nets::base
 		}
 		// add task to core thread failed, update ctl
 		ctl = ctl_.load();
-		if (isRunning(ctl))
+		// if task queue is not full, try push task to task queue
+		if (isRunning(ctl) && taskQueue_->tryPush(task))
 		{
-			// if task queue is not full, try push task to task queue
-			if (!taskQueue_->tryPush(task))
-			{
-				// threadpool is full, create non-core thread to perform task
-				addThreadTask(task, false);
-			}
+			return future;
 		}
+		// task queue cannot receive new task, create non-core thread to execute task
+		if (addThreadTask(task, false))
+		{
+			return future;
+		}
+		promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
 		return future;
 	}
 
@@ -206,10 +232,11 @@ namespace nets::base
 	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
 		// value capture, ref count plus 1
- 		auto promise = ::std::make_shared<::std::promise<void>>();
+		auto promise = ::std::make_shared<::std::promise<void>>();
 		auto future = promise->get_future();
 		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask(promise, promiseTask);
+		assert(2 == promise.use_count());
 		uint32_t ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
@@ -227,15 +254,17 @@ namespace nets::base
 		}
 		// add task to core thread failed, update ctl
 		ctl = ctl_.load();
-		if (isRunning(ctl))
+		// if task queue is not full, try push task to task queue
+		if (isRunning(ctl) && taskQueue_->tryPush(task))
 		{
-			// if task queue is not full, try push task to task queue
-			if (!taskQueue_->tryPush(task))
-			{
-				// threadpool is full, create non-core thread to perform task
-				addThreadTask(task, false);
-			}
+			return future;
 		}
+		// task queue cannot receive new task, create non-core thread to execute task
+		if (addThreadTask(task, false))
+		{
+			return future;
+		}
+		promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
 		return future;
 	}
 
@@ -243,20 +272,23 @@ namespace nets::base
 	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<RetType>> promise,
 											  ::std::function<RetType()> promiseTask)
 	{
-		TaskType task = [this, promise, t = ::std::move(promiseTask)]()
+		TaskType task = [this, promise, f = ::std::move(promiseTask)]()
 		{
 			assert(promise.use_count() > 0);
 			try
 			{
-				promise->set_value(t());
+				RetType r = f();
+				promise->set_value(r);
 			}
 			catch (const ::std::exception& exception)
 			{
+				promise->set_exception(::std::make_exception_ptr(exception));
 				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in threadpool ["
 						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
+				promise->set_exception(::std::current_exception());
 				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
 						   << "] execution in threadpool [" << name_ << ']';
 			}
@@ -267,20 +299,22 @@ namespace nets::base
 	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<void>> promise,
 											  ::std::function<void()> promiseTask)
 	{
-		TaskType task = [this, promise, t = ::std::move(promiseTask)]()
+		TaskType task = [this, promise, f = ::std::move(promiseTask)]()
 		{
 			try
 			{
-				t();
+				f();
 				promise->set_value();
 			}
 			catch (const ::std::exception& exception)
 			{
+				promise->set_exception(::std::make_exception_ptr(exception));
 				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in threadpool ["
 						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
+				promise->set_exception(::std::current_exception());
 				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
 						   << "] execution in threadpool [" << name_ << ']';
 			}

@@ -156,13 +156,13 @@ namespace nets::base
 				if (isRunning())
 				{
 					char threadName[ThreadNameMaxLength] = {0};
-					::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%u", name_.c_str(),numOfActiveThreads(ctl + 1));
+					::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%u", name_.c_str(), numOfActiveThreads(ctl + 1));
 					threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
 					return true;
 				}
 				else
 				{
-					--ctl;
+					--ctl_;
 					poolCV_.notify_all();
 					return false;
 				}

@@ -16,7 +16,7 @@ public:
 	void SetUp() override
 	{
 		// set parameters to be smaller, you can observe the result of execute more intuitively
-		threadPool = new ThreadPool(1, 2);
+		threadPool = new ThreadPool(1, 1);
 	}
 
 	// Tears down the test fixture.
@@ -66,9 +66,10 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 {
+	::std::future<void> fa[100];
 	for (int i = 0; i < 100; ++i)
 	{
-		threadPool->execute(
+		fa[i] = threadPool->submit(
 			[&]()
 			{
 				for (int j = 0; j < 1000; ++j)
@@ -76,6 +77,18 @@ TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 					::printf("your enter number is: %d, threadName:%s\n", j, currentThreadName());
 				}
 			});
+	}
+	for (int i = 0; i < 100; ++i)
+	{
+		fa[i].wait();
+		try
+		{
+			fa[i].get();
+		}
+		catch (::std::future_error& e)
+		{
+			::printf("%s\n", e.what());
+		}
 	}
 }
 
@@ -110,18 +123,24 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 
 TEST_F(ThreadPoolTest, SubmitFutureThrow)
 {
-	::std::function<int32_t()> f = []() -> int32_t
+	::std::function<int32_t()> f1 = []() -> int32_t
 	{
 		::printf("%s\n", currentThreadName());
 		throw ::std::invalid_argument("123123123");
 		return 5;
 	};
-	auto future1 = threadPool->submit(f);
+
+	::std::function<void()> f2 = []()
+	{
+		::printf("%s\n", currentThreadName());
+		throw ::std::invalid_argument("123123123");
+	};
+	auto future1 = threadPool->submit(f1);
 	future1.wait();
-	ASSERT_THROW(future1.get(), ::std::future_error);
-	auto future2 = threadPool->submit(f);
+	ASSERT_THROW(future1.get(), ::std::exception);
+	auto future2 = threadPool->submit(f2);
 	future2.wait();
-	ASSERT_THROW(future2.get(), ::std::future_error);
+	ASSERT_THROW(future2.get(), ::std::exception);
 }
 
 int main(int argc, char** argv)
