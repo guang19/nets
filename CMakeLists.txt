@@ -46,7 +46,8 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g \
 -Wall \
 -Wextra \
 -Werror \
--Wno-unused-parameter")
+-Wno-unused-parameter \
+-fsized-deallocation")
 
 #set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 #set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)

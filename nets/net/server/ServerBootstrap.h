@@ -13,15 +13,15 @@ namespace nets::net
 	class ServerBootstrap : nets::base::Noncopyable
 	{
 	public:
+		using EventLoopGroupRawPtr = EventLoopGroup*;
+		using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
+
+	public:
 		ServerBootstrap();
 		~ServerBootstrap();
 
 	public:
-		// single reactor
-		ServerBootstrap& group(EventLoopGroup* worker);
-		// main reactor listens to the socket, sub reactor handles io
-		ServerBootstrap& group(EventLoopGroup* main, EventLoopGroup* sub);
-
+		ServerBootstrap& group(EventLoopGroupRawPtr subLoops);
 		ServerBootstrap& bind(const InetSockAddress& listenAddr);
 		ServerBootstrap& bind(const char* ip, PortType port);
 		ServerBootstrap& bind(PortType port);
@@ -29,6 +29,8 @@ namespace nets::net
 
 	private:
 		::std::atomic_bool running_ {false};
+		EventLoop mainLoop_ {};
+		EventLoopGroupPtr subLoops_ {};
 	};
 } // namespace nets::net
 

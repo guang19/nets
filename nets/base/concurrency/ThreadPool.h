@@ -29,6 +29,7 @@ namespace nets::base
 		using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
 	public:
+		using SizeType = ThreadPoolType::size_type;
 		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
 		using MutexType = ::std::mutex;
@@ -44,7 +45,7 @@ namespace nets::base
 		{
 		public:
 			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
-			~ThreadWrapper() = default;
+			~ThreadWrapper() {};
 
 			void start();
 
@@ -56,8 +57,9 @@ namespace nets::base
 		};
 
 	public:
-		explicit ThreadPool(uint32_t corePoolSize = DefaultCorePoolSize, uint32_t maxPoolSize = DefaultMaxPoolSize,
-							TimeType keepAliveTime = DefaultIdleKeepAliveTime, uint32_t maxQueueSize = DefaultMaxQueueSize,
+		explicit ThreadPool(SizeType corePoolSize = DefaultCorePoolSize, SizeType maxPoolSize = DefaultMaxPoolSize,
+							BlockingQueueType::SizeType maxQueueSize = DefaultMaxQueueSize,
+							TimeType keepAliveTime = DefaultIdleKeepAliveTime,
 							const ::std::string& name = DefaultThreadPoolName);
 		~ThreadPool();
 
@@ -73,7 +75,7 @@ namespace nets::base
 			return isShutdown(ctl_);
 		}
 
-		inline uint32_t numOfActiveThreads()
+		inline SizeType numOfActiveThreads()
 		{
 			return numOfActiveThreads(ctl_);
 		}
@@ -110,13 +112,13 @@ namespace nets::base
 		void execute(Fn&& func, Args&&... args);
 
 		template <typename Fn, typename... Args,
-				  typename HasRet =
-					  typename ::std::enable_if<!::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
-		::std::future<typename ::std::result_of<Fn(Args...)>::type> submit(Fn&& func, Args&&... args);
+				  typename HasRet = typename ::std::enable_if<
+					  !::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
+		::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> submit(Fn&& func, Args&&... args);
 
 		template <typename Fn, typename... Args,
-				  typename HasRet =
-					  typename ::std::enable_if<::std::is_void<typename ::std::result_of<Fn(Args...)>::type>::value>::type>
+				  typename HasRet = typename ::std::enable_if<
+					  ::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
 		::std::future<void> submit(Fn&& func, Args&&... args);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,52 +133,52 @@ namespace nets::base
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore);
 
-		inline bool isRunning(uint32_t ctl) const
+		inline bool isRunning(SizeType ctl) const
 		{
 			return (ctl & ~Capacity) == Running;
 		}
 
-		inline bool isShutdown(uint32_t ctl) const
+		inline bool isShutdown(SizeType ctl) const
 		{
 			return (ctl & ~Capacity) == Shutdown;
 		}
 
-		inline uint32_t numOfActiveThreads(uint32_t ctl) const
+		inline SizeType numOfActiveThreads(SizeType ctl) const
 		{
 			return ctl & Capacity;
 		}
 
 	private:
-		static constexpr uint32_t Int32Bits = 32;
-		static constexpr uint32_t CountBits = Int32Bits - 2;
+		static constexpr SizeType Int32Bits = 32;
+		static constexpr SizeType CountBits = Int32Bits - 2;
 		// maximum active thread size
 		// 00,111111111111111111111111111111
-		static constexpr uint32_t Capacity = (1 << CountBits) - 1;
+		static constexpr SizeType Capacity = (1 << CountBits) - 1;
 		// 01,000000000000000000000000000000
 		// 00,000000000000000000000000000000
-		static constexpr uint32_t Running = 1 << CountBits;
-		static constexpr uint32_t Shutdown = 0 << CountBits;
+		static constexpr SizeType Running = 1 << CountBits;
+		static constexpr SizeType Shutdown = 0 << CountBits;
 
-		static const uint32_t DefaultCorePoolSize;
-		static const uint32_t DefaultMaxPoolSize;
+		static const SizeType DefaultCorePoolSize;
+		static const SizeType DefaultMaxPoolSize;
 		static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
-		static constexpr uint32_t DefaultMaxQueueSize = 24;
+		static constexpr BlockingQueueType::SizeType DefaultMaxQueueSize = 0;
 		static constexpr char const* DefaultThreadPoolName = "ThreadPool";
 
 	private:
-		::std::string name_ {};
-		// high 2bits represent threadpool status: 00 - shutdown; 01-running.
-		// low 30bits represent threadpool active thread size.
-		::std::atomic_uint32_t ctl_ {false};
 		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-		uint32_t corePoolSize_ {0};
+		SizeType corePoolSize_ {0};
 		// the maximum numbers of threads that the threadpool can hold
-		uint32_t maximumPoolSize_ {0};
+		SizeType maximumPoolSize_ {0};
 		// time that idle threads can survive, unit: ms
 		TimeType idleKeepAliveTime_ {0};
 		// task queue
 		BlockingQueuePtr taskQueue_ {nullptr};
 		ThreadPoolType threadPool_ {};
+		::std::string name_ {};
+		// high 2bits represent threadpool status: 00 - shutdown; 01-running.
+		// low 30bits represent threadpool active thread size.
+		::std::atomic_size_t ctl_ {0};
 		MutexType mutex_ {};
 		ConditionVariableType poolCV_ {};
 	};
@@ -188,16 +190,16 @@ namespace nets::base
 	}
 
 	template <typename Fn, typename... Args, typename HasRet>
-	::std::future<typename ::std::result_of<Fn(Args...)>::type> ThreadPool::submit(Fn&& func, Args&&... args)
+	::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		using RetType = typename ::std::result_of<Fn(Args...)>::type;
+		using RetType = typename ::std::invoke_result<Fn&&, Args&&...>::type;
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
 		// value capture, ref count plus 1
 		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask<RetType>(promise, promiseTask);
 		assert(2 == promise.use_count());
-		uint32_t ctl = ctl_.load();
+		SizeType ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{
@@ -237,7 +239,7 @@ namespace nets::base
 		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask(promise, promiseTask);
 		assert(2 == promise.use_count());
-		uint32_t ctl = ctl_.load();
+		SizeType ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{

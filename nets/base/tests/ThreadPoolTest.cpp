@@ -16,26 +16,19 @@ public:
 	void SetUp() override
 	{
 		// set parameters to be smaller, you can observe the result of execute more intuitively
-		threadPool = new ThreadPool(1, 1);
+		threadPool = new ThreadPool(1, 1, 24 );
 	}
 
 	// Tears down the test fixture.
 	void TearDown() override
 	{
-		delete threadPool;
-		threadPool = nullptr;
+//		delete threadPool;
+//		threadPool = nullptr;
 	}
 
 protected:
 	ThreadPool* threadPool;
 };
-
-TEST_F(ThreadPoolTest, ConstructParameter)
-{
-	::printf("%d", INT32_MAX);
-	ThreadPool(1, 0);
-	ThreadPool(0, 0);
-}
 
 TEST_F(ThreadPoolTest, ExecuteTask)
 {

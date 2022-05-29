@@ -14,6 +14,20 @@ namespace nets::net
 	{
 	public:
 		using ThreadPoolPtr = ::std::unique_ptr<nets::base::ThreadPool>;
+		using EventLoopRawPtr = EventLoop*;
+		using EventLoopPtr = ::std::unique_ptr<EventLoop>;
+		using EventLoopList = ::std::vector<EventLoopPtr>;
+
+	public:
+		EventLoopGroup(nets::base::ThreadPool::SizeType numOfSubLoops);
+		~EventLoopGroup() = default;
+
+	public:
+		EventLoopRawPtr next();
+
+	private:
+		EventLoopList eventLoops_ {};
+		ThreadPoolPtr threadPool {nullptr};
 	};
 } // namespace nets::net
 
