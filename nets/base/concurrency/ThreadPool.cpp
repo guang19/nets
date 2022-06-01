@@ -15,18 +15,21 @@ namespace nets::base
 
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
-		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(&ThreadWrapper::start, this),
-		  threadPoolPtr_(threadPoolPtr)
+		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
+		  thread_(&ThreadWrapper::start, this), threadPoolPtr_(threadPoolPtr)
 	{
 		if (thread_.joinable())
 		{
-			thread_.detach();
+			thread_.join();
 		}
 	}
 
 	void ThreadPool::ThreadWrapper::start()
 	{
 		setCurrentThreadName(threadName_.c_str());
+		while (threadPoolPtr_ == nullptr)
+		{
+		}
 		threadPoolPtr_->runThread(this);
 	}
 
@@ -96,7 +99,7 @@ namespace nets::base
 		{
 			return isShutdown();
 		};
-		while (isRunning())
+		while (isRunning(ctl_))
 		{
 			// core thread blocked wait
 			if (threadWrapperRawPtr->isCoreThread_)

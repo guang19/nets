@@ -22,8 +22,8 @@ public:
 	// Tears down the test fixture.
 	void TearDown() override
 	{
-//		delete threadPool;
-//		threadPool = nullptr;
+		delete threadPool;
+		threadPool = nullptr;
 	}
 
 protected:
