@@ -13,23 +13,19 @@ namespace nets::base
 	const ThreadPool::SizeType ThreadPool::DefaultCorePoolSize = AVAILABLE_PROCESSOR << 1;
 	const ThreadPool::SizeType ThreadPool::DefaultMaxPoolSize = DefaultCorePoolSize;
 
-	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
-											 ThreadPoolPtr threadPoolPtr)
-		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
-		  thread_(&ThreadWrapper::start, this), threadPoolPtr_(threadPoolPtr)
+	ThreadPool::ThreadWrapper::ThreadWrapper(ThreadPoolPtr threadPoolPtr, bool isCoreThread, const char* threadName, TaskType task)
+		: threadPoolPtr_(threadPoolPtr), isCoreThread_(isCoreThread), threadName_(threadName), task_(std::move(task)),
+		  thread_(&ThreadWrapper::start, this)
 	{
 		if (thread_.joinable())
 		{
-			thread_.join();
+			thread_.detach();
 		}
 	}
 
 	void ThreadPool::ThreadWrapper::start()
 	{
 		setCurrentThreadName(threadName_.c_str());
-		while (threadPoolPtr_ == nullptr)
-		{
-		}
 		threadPoolPtr_->runThread(this);
 	}
 
@@ -160,7 +156,7 @@ namespace nets::base
 				{
 					char threadName[ThreadNameMaxLength] = {0};
 					::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%lu", name_.c_str(), numOfActiveThreads(ctl + 1));
-					threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
+					threadPool_.emplace_back(new ThreadWrapper(this, isCore, threadName, task));
 					return true;
 				}
 				else

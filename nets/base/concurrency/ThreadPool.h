@@ -44,16 +44,16 @@ namespace nets::base
 		struct ThreadWrapper : Noncopyable
 		{
 		public:
-			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
+			explicit ThreadWrapper(ThreadPoolPtr threadPoolPtr, bool isCoreThread, const char* threadName, TaskType task);
 			~ThreadWrapper() {};
 
 			void start();
 
-			::std::string threadName_ {};
+			ThreadPoolPtr threadPoolPtr_ {nullptr};
 			bool isCoreThread_ {false};
+			::std::string threadName_ {};
 			TaskType task_ {nullptr};
 			::std::thread thread_ {};
-			ThreadPoolPtr threadPoolPtr_ {nullptr};
 		};
 
 	public:
