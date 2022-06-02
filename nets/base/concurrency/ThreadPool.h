@@ -44,16 +44,16 @@ namespace nets::base
 		struct ThreadWrapper : Noncopyable
 		{
 		public:
-			explicit ThreadWrapper(ThreadPoolPtr threadPoolPtr, bool isCoreThread, const char* threadName, TaskType task);
+			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
 			~ThreadWrapper() {};
 
 			void start();
 
-			ThreadPoolPtr threadPoolPtr_ {nullptr};
-			bool isCoreThread_ {false};
 			::std::string threadName_ {};
+			bool isCoreThread_ {false};
 			TaskType task_ {nullptr};
 			::std::thread thread_ {};
+			ThreadPoolPtr threadPoolPtr_ {nullptr};
 		};
 
 	public:
@@ -155,8 +155,8 @@ namespace nets::base
 		// 00,111111111111111111111111111111
 		static constexpr SizeType Capacity = (1 << CountBits) - 1;
 		// 01,000000000000000000000000000000
-		// 00,000000000000000000000000000000
 		static constexpr SizeType Running = 1 << CountBits;
+		// 00,000000000000000000000000000000
 		static constexpr SizeType Shutdown = 0 << CountBits;
 
 		static const SizeType DefaultCorePoolSize;

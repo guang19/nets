@@ -78,7 +78,7 @@ namespace nets::base
 		bool tryPop(LReferenceType el);
 
 	private:
-		bool isFull() const
+		inline bool isFull() const
 		{
 			return queue_.size() >= maxQueueSize_;
 		}
@@ -121,7 +121,7 @@ namespace nets::base
 	void BoundedBlockingQueue<T>::take(LReferenceType el)
 	{
 		UniqueLockType lock(mutex_);
-		notFullCV_.wait(lock,
+		notEmptyCV_.wait(lock,
 						[this]() -> bool
 						{
 							return !queue_.empty();
@@ -171,7 +171,7 @@ namespace nets::base
 	bool BoundedBlockingQueue<T>::take(LReferenceType el, const PredicateType& p)
 	{
 		UniqueLockType lock(mutex_);
-		notFullCV_.wait(lock,
+		notEmptyCV_.wait(lock,
 						[&]() -> bool
 						{
 							return (!queue_.empty() || p());
@@ -224,7 +224,7 @@ namespace nets::base
 	bool BoundedBlockingQueue<T>::take(LReferenceType el, TimeType milliseconds)
 	{
 		UniqueLockType lock(mutex_);
-		if (notFullCV_.wait_for(lock, MillisTimeType(milliseconds),
+		if (notEmptyCV_.wait_for(lock, MillisTimeType(milliseconds),
 								[this]() -> bool
 								{
 									return !queue_.empty();
@@ -253,7 +253,7 @@ namespace nets::base
 				return false;
 			}
 			queue_.push_back(::std::forward<RReferenceType>(el));
-			notFullCV_.notify_one();
+			notEmptyCV_.notify_one();
 			return true;
 		}
 		return false;
@@ -274,7 +274,7 @@ namespace nets::base
 				return false;
 			}
 			queue_.push_back(el);
-			notFullCV_.notify_one();
+			notEmptyCV_.notify_one();
 			return true;
 		}
 		return false;

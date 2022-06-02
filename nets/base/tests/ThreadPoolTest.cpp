@@ -35,12 +35,12 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 	threadPool->execute(
 		[]() -> void
 		{
-			::printf("===%s\n", currentThreadName());
+			::printf("1===%s\n", currentThreadName());
 		});
 	threadPool->execute(
 		[](int num) -> bool
 		{
-			::printf("===%s\n", currentThreadName());
+			::printf("2===%s\n", currentThreadName());
 			throw ::std::invalid_argument("ExecuteTask");
 			return true;
 		},
@@ -49,7 +49,7 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 	threadPool->execute(
 		[]() -> bool
 		{
-			::printf("===%s\n", currentThreadName());
+			::printf("3===%s\n", currentThreadName());
 			throw "ExecuteTask";
 			return true;
 		});

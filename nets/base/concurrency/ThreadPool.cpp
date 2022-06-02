@@ -13,9 +13,9 @@ namespace nets::base
 	const ThreadPool::SizeType ThreadPool::DefaultCorePoolSize = AVAILABLE_PROCESSOR << 1;
 	const ThreadPool::SizeType ThreadPool::DefaultMaxPoolSize = DefaultCorePoolSize;
 
-	ThreadPool::ThreadWrapper::ThreadWrapper(ThreadPoolPtr threadPoolPtr, bool isCoreThread, const char* threadName, TaskType task)
-		: threadPoolPtr_(threadPoolPtr), isCoreThread_(isCoreThread), threadName_(threadName), task_(std::move(task)),
-		  thread_(&ThreadWrapper::start, this)
+	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr)
+		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(&ThreadWrapper::start, this),
+		  threadPoolPtr_(threadPoolPtr)
 	{
 		if (thread_.joinable())
 		{
@@ -50,7 +50,7 @@ namespace nets::base
 
 	void ThreadPool::shutdown()
 	{
-		if (isShutdown())
+		if (isShutdown(ctl_))
 		{
 			LOGS_DEBUG << "threadpool [" << name_ << "] has been shutdown";
 			return;
@@ -71,7 +71,7 @@ namespace nets::base
 		poolCV_.wait(lock,
 					 [this]() -> bool
 					 {
-						 return numOfActiveThreads() == 0;
+						 return numOfActiveThreads(ctl_) == 0;
 					 });
 		assert(threadPool_.empty());
 		// if threadpool has no thread takes task from task queue, it needs to be deleted manually
@@ -93,7 +93,7 @@ namespace nets::base
 		}
 		::std::function<bool()> shutdown = [this]() -> bool
 		{
-			return isShutdown();
+			return isShutdown(ctl_);
 		};
 		while (isRunning(ctl_))
 		{
@@ -152,11 +152,11 @@ namespace nets::base
 			if (ctl_.compare_exchange_strong(ctl, ctl + 1))
 			{
 				LockGuardType lock(mutex_);
-				if (isRunning())
+				if (isRunning(ctl_))
 				{
 					char threadName[ThreadNameMaxLength] = {0};
 					::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%lu", name_.c_str(), numOfActiveThreads(ctl + 1));
-					threadPool_.emplace_back(new ThreadWrapper(this, isCore, threadName, task));
+					threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
 					return true;
 				}
 				else
