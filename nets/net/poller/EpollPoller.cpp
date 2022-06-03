@@ -55,7 +55,7 @@ namespace nets::net
 
 	void EpollPoller::prepareChannelEvents(int32_t numOfReadyEvent, ChannelList activeChannels)
 	{
-		for (int32_t i = 0; i< numOfReadyEvent; ++i)
+		for (int32_t i = 0; i < numOfReadyEvent; ++i)
 		{
 			auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
 			channel->setReadyEvent(events_[i].events);
@@ -71,7 +71,8 @@ namespace nets::net
 			{
 				++ChannelUniqueId;
 				assert(ChannelUniqueId > 0);
-				// ChannelUniqueId is an unsigned type, ChannelUniqueId equals 0 means that ChannelUniqueId has reached the maximum
+				// ChannelUniqueId is an unsigned type, ChannelUniqueId equals 0 means that ChannelUniqueId has reached the
+				// maximum
 				if (ChannelUniqueId == 0)
 				{
 					++ChannelUniqueId;

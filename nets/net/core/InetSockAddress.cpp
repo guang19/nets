@@ -15,19 +15,9 @@ namespace nets::net
 
 	InetSockAddress::InetSockAddress(const SockAddr6& addr6) : addr6_(addr6) {}
 
-	InetSockAddress::InetSockAddress(const char* ip, PortType port, bool ipv4)
+	InetSockAddress::InetSockAddress(const char* ip, PortType port, bool ipv6)
 	{
-		if (ipv4)
-		{
-			MEMZERO(&addr4_, sizeof(SockAddr4));
-			addr4_.sin_family = AF_INET;
-			addr4_.sin_port = htobe16(port);
-			if (1 != ::inet_pton(AF_INET, ip, &(addr4_.sin_addr)))
-			{
-				LOGS_FATAL << "inet_pton AF_INET " << ip;
-			}
-		}
-		else
+		if (ipv6)
 		{
 			MEMZERO(&addr6_, sizeof(SockAddr6));
 			addr6_.sin6_family = AF_INET6;
@@ -35,6 +25,16 @@ namespace nets::net
 			if (1 != ::inet_pton(AF_INET6, ip, &addr6_.sin6_addr))
 			{
 				LOGS_FATAL << "inet_pton AF_INET6 " << ip;
+			}
+		}
+		else
+		{
+			MEMZERO(&addr4_, sizeof(SockAddr4));
+			addr4_.sin_family = AF_INET;
+			addr4_.sin_port = htobe16(port);
+			if (1 != ::inet_pton(AF_INET, ip, &(addr4_.sin_addr)))
+			{
+				LOGS_FATAL << "inet_pton AF_INET " << ip;
 			}
 		}
 	}
@@ -107,18 +107,9 @@ namespace nets::net
 		return *this;
 	}
 
-	InetSockAddress InetSockAddress::createAnySockAddress(PortType port, bool ipv4)
+	InetSockAddress InetSockAddress::createAnySockAddress(PortType port, bool ipv6)
 	{
-		if (ipv4)
-		{
-			SockAddr4 addr {};
-			MEMZERO(&addr, sizeof(SockAddr4));
-			addr.sin_family = AF_INET;
-			addr.sin_port = htobe16(port);
-			addr.sin_addr.s_addr = INADDR_ANY;
-			return InetSockAddress(addr);
-		}
-		else
+		if (ipv6)
 		{
 			SockAddr6 addr {};
 			MEMZERO(&addr, sizeof(SockAddr6));
@@ -127,26 +118,35 @@ namespace nets::net
 			addr.sin6_addr = in6addr_any;
 			return InetSockAddress(addr);
 		}
-	}
-
-	InetSockAddress InetSockAddress::createLoopBackSockAddress(PortType port, bool ipv4)
-	{
-		if (ipv4)
+		else
 		{
 			SockAddr4 addr {};
 			MEMZERO(&addr, sizeof(SockAddr4));
 			addr.sin_family = AF_INET;
 			addr.sin_port = htobe16(port);
-			addr.sin_addr.s_addr = INADDR_LOOPBACK;
+			addr.sin_addr.s_addr = INADDR_ANY;
 			return InetSockAddress(addr);
 		}
-		else
+	}
+
+	InetSockAddress InetSockAddress::createLoopBackSockAddress(PortType port, bool ipv6)
+	{
+		if (ipv6)
 		{
 			SockAddr6 addr {};
 			MEMZERO(&addr, sizeof(SockAddr6));
 			addr.sin6_family = AF_INET6;
 			addr.sin6_port = htobe16(port);
 			addr.sin6_addr = in6addr_loopback;
+			return InetSockAddress(addr);
+		}
+		else
+		{
+			SockAddr4 addr {};
+			MEMZERO(&addr, sizeof(SockAddr4));
+			addr.sin_family = AF_INET;
+			addr.sin_port = htobe16(port);
+			addr.sin_addr.s_addr = INADDR_LOOPBACK;
 			return InetSockAddress(addr);
 		}
 	}
@@ -171,7 +171,7 @@ namespace nets::net
 		return buffer;
 	}
 
-	InetSockAddress::PortType InetSockAddress::port() const
+	PortType InetSockAddress::port() const
 	{
 		return be16toh(addr4_.sin_port);
 	}

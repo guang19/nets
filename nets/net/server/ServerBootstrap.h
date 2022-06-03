@@ -5,8 +5,8 @@
 #ifndef NETS_SERVERBOOTSTRAP_H
 #define NETS_SERVERBOOTSTRAP_H
 
-#include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/EventLoopGroup.h"
+#include "nets/net/core/InetSockAddress.h"
 
 namespace nets::net
 {
