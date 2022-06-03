@@ -84,12 +84,12 @@ namespace nets::base
 		LOGS_INFO << "threadpool [" << name_ << "] shutdown success";
 	}
 
-	void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapperRawPtr)
+	void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapper)
 	{
-		if (threadWrapperRawPtr->task_ != nullptr)
+		if (threadWrapper->task_ != nullptr)
 		{
-			threadWrapperRawPtr->task_();
-			threadWrapperRawPtr->task_ = nullptr;
+			threadWrapper->task_();
+			threadWrapper->task_ = nullptr;
 		}
 		::std::function<bool()> shutdown = [this]() -> bool
 		{
@@ -98,33 +98,33 @@ namespace nets::base
 		while (isRunning(ctl_))
 		{
 			// core thread blocked wait
-			if (threadWrapperRawPtr->isCoreThread_)
+			if (threadWrapper->isCoreThread_)
 			{
-				taskQueue_->take(threadWrapperRawPtr->task_, shutdown);
+				taskQueue_->take(threadWrapper->task_, shutdown);
 			}
 			else
 			{
 				// non-core thread wait timeout
-				if (!taskQueue_->take(threadWrapperRawPtr->task_, idleKeepAliveTime_, shutdown))
+				if (!taskQueue_->take(threadWrapper->task_, idleKeepAliveTime_, shutdown))
 				{
 					break;
 				}
 			}
-			if (threadWrapperRawPtr->task_ != nullptr)
+			if (threadWrapper->task_ != nullptr)
 			{
-				threadWrapperRawPtr->task_();
-				threadWrapperRawPtr->task_ = nullptr;
+				threadWrapper->task_();
+				threadWrapper->task_ = nullptr;
 			}
 		}
-		releaseThread(threadWrapperRawPtr);
+		releaseThread(threadWrapper);
 	}
 
-	void ThreadPool::releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr)
+	void ThreadPool::releaseThread(ThreadWrapperRawPtr threadWrapper)
 	{
 		LockGuardType lock(mutex_);
 		for (auto it = threadPool_.begin(), end = threadPool_.end(); it != end; ++it)
 		{
-			if (it->get() == threadWrapperRawPtr)
+			if (it->get() == threadWrapper)
 			{
 				threadPool_.erase(it);
 				--ctl_;

@@ -851,8 +851,8 @@ inline bool AlwaysFalse() { return !AlwaysTrue(); }
 // Helper for suppressing false warning from Clang on a const char*
 // variable declared in a conditional expression always being NULL in
 // the else branch.
-struct GTEST_API_ ConstCharPtr {
-  ConstCharPtr(const char* str) : value(str) {}
+struct GTEST_API_ ConstCharArrayPtr {
+  ConstCharArrayPtr(const char* str) : value(str) {}
   operator bool() const { return true; }
   const char* value;
 };

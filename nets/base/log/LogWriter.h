@@ -49,7 +49,7 @@ namespace nets::base
 	public:
 		using SizeType = ::size_t;
 		using TimeType = ::time_t;
-		using CharPtr = ::std::unique_ptr<char[]>;
+		using CharArrayPtr = ::std::unique_ptr<char[]>;
 
 	public:
 		explicit LogFile(const char* file);
@@ -78,11 +78,11 @@ namespace nets::base
 
 	private:
 		FILE* fp_ {nullptr};
-		CharPtr dir_ {nullptr};
-		CharPtr file_ {nullptr};
+		CharArrayPtr dir_ {nullptr};
+		CharArrayPtr file_ {nullptr};
 		SizeType bytes_ {0};
 		TimeType lastRollTime_ {0};
-		CharPtr buffer_ {nullptr};
+		CharArrayPtr buffer_ {nullptr};
 	};
 
 	class IPersistentWriter
@@ -220,7 +220,9 @@ namespace nets::base
 		BufferPtr cacheBuffer_ {nullptr};
 		BufferPtr backupCacheBuffer_ {nullptr};
 		PersistentWriterPtr persistentWriter_ {nullptr};
+		// add persistent tasks to the task queue
 		::std::thread writerTaskProducer {};
+		// take the persistent task from the task queue and execute it
 		::std::thread writerTaskConsumer {};
 		MutexType mutex_ {};
 		ConditionVarType cv_ {};

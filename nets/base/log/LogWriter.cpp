@@ -371,9 +371,9 @@ namespace nets::base
 			::time(&currentTime);
 			auto writerTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
 			{
-				for (auto& tmpBuffer : *tmpBuffers)
+				for (auto& it : *tmpBuffers)
 				{
-					auto logBuffer = tmpBuffer.get();
+					auto logBuffer = it.get();
 					persistentWriter_->persist(logBuffer->buffer(), logBuffer->len(), currentTime);
 				}
 				persistentWriter_->flush();
@@ -395,9 +395,9 @@ namespace nets::base
 			::time(&currentTime);
 			auto writerTask = [this, tmpBuffers = buffers_.release(), currentTime]() mutable
 			{
-				for (auto it = tmpBuffers->begin(), end = tmpBuffers->end(); it != end; ++it)
+				for (auto & it : *tmpBuffers)
 				{
-					auto logBuffer = it->get();
+					auto logBuffer = it.get();
 					persistentWriter_->persist(logBuffer->buffer(), logBuffer->len(), currentTime);
 				}
 				persistentWriter_->flush();
