@@ -63,7 +63,7 @@ namespace nets::base
 
 		inline bool isRunning() const
 		{
-			return state(ctl_) == Running;
+			return isRunning(ctl_);
 		}
 
 		inline uint32_t numOfActiveThreads()
@@ -124,11 +124,6 @@ namespace nets::base
 		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore);
-
-		inline uint32_t state(uint32_t ctl) const
-		{
-			return ctl & ~CountMask;
-		}
 
 		inline bool isRunning(uint32_t ctl) const
 		{
