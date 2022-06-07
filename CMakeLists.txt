@@ -5,6 +5,8 @@ PROJECT(nets LANGUAGES C CXX)
 # C CXX Compiler
 SET(CMAKE_C_COMPILER "/usr/bin/gcc")
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
+#SET(CMAKE_C_COMPILER "/usr/bin/clang")
+#SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
 ENABLE_TESTING()
 

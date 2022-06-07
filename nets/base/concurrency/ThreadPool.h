@@ -23,13 +23,12 @@ namespace nets::base
 	class ThreadPool : Noncopyable
 	{
 	private:
-		struct ThreadWrapper;
+		class ThreadWrapper;
 		using ThreadWrapperRawPtr = ThreadWrapper*;
 		using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
 		using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
 	public:
-		using SizeType = ThreadPoolType::size_type;
 		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
 		using MutexType = ::std::mutex;
@@ -41,11 +40,11 @@ namespace nets::base
 		using ThreadPoolPtr = ThreadPool*;
 
 	private:
-		struct ThreadWrapper : Noncopyable
+		class ThreadWrapper : Noncopyable
 		{
 		public:
 			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
-			~ThreadWrapper() {};
+			~ThreadWrapper() = default;
 
 			void start();
 
@@ -57,25 +56,17 @@ namespace nets::base
 		};
 
 	public:
-		explicit ThreadPool(SizeType corePoolSize = DefaultCorePoolSize, SizeType maxPoolSize = DefaultMaxPoolSize,
-							BlockingQueueType::SizeType maxQueueSize = DefaultMaxQueueSize,
-							TimeType keepAliveTime = DefaultIdleKeepAliveTime,
+		explicit ThreadPool(uint32_t corePoolSize = DefaultCorePoolSize, uint32_t maxPoolSize = DefaultMaxPoolSize,
+							uint32_t maxQueueSize = DefaultMaxQueueSize, TimeType keepAliveTime = DefaultIdleKeepAliveTime,
 							const ::std::string& name = DefaultThreadPoolName);
 		~ThreadPool();
 
-		void shutdown();
-
 		inline bool isRunning() const
 		{
-			return isRunning(ctl_);
+			return state(ctl_) == Running;
 		}
 
-		inline bool isShutdown() const
-		{
-			return isShutdown(ctl_);
-		}
-
-		inline SizeType numOfActiveThreads()
+		inline uint32_t numOfActiveThreads()
 		{
 			return numOfActiveThreads(ctl_);
 		}
@@ -129,47 +120,53 @@ namespace nets::base
 		TaskType makeTask(::std::shared_ptr<::std::promise<void>> promise, ::std::function<void()> promiseTask);
 
 	private:
+		void tryShutdown();
 		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore);
 
-		inline bool isRunning(SizeType ctl) const
+		inline uint32_t state(uint32_t ctl) const
 		{
-			return (ctl & ~Capacity) == Running;
+			return ctl & ~CountMask;
 		}
 
-		inline bool isShutdown(SizeType ctl) const
+		inline bool isRunning(uint32_t ctl) const
 		{
-			return (ctl & ~Capacity) == Shutdown;
+			return (ctl & ~CountMask) == Running;
 		}
 
-		inline SizeType numOfActiveThreads(SizeType ctl) const
+		inline bool isShutdown(uint32_t ctl) const
 		{
-			return ctl & Capacity;
+			return (ctl & ~CountMask) == Shutdown;
+		}
+
+		inline uint32_t numOfActiveThreads(uint32_t ctl) const
+		{
+			return ctl & CountMask;
 		}
 
 	private:
-		static constexpr SizeType Int32Bits = 32;
-		static constexpr SizeType CountBits = Int32Bits - 2;
+		static constexpr uint32_t Int32Bits = 32;
+		static constexpr uint32_t CountBits = Int32Bits - 2;
 		// maximum active thread size
 		// 00,111111111111111111111111111111
-		static constexpr SizeType Capacity = (1 << CountBits) - 1;
+		static constexpr uint32_t CountMask = (1 << CountBits) - 1;
 		// 01,000000000000000000000000000000
-		static constexpr SizeType Running = 1 << CountBits;
+		static constexpr uint32_t Running = 1 << CountBits;
 		// 00,000000000000000000000000000000
-		static constexpr SizeType Shutdown = 0 << CountBits;
+		static constexpr uint32_t Shutdown = 0 << CountBits;
 
-		static const SizeType DefaultCorePoolSize;
-		static const SizeType DefaultMaxPoolSize;
+		static const uint32_t DefaultCorePoolSize;
+		static const uint32_t DefaultMaxPoolSize;
 		static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
-		static constexpr BlockingQueueType::SizeType DefaultMaxQueueSize = 0;
+		static constexpr uint32_t DefaultMaxQueueSize = 0;
 		static constexpr char const* DefaultThreadPoolName = "ThreadPool";
 
 	private:
 		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-		SizeType corePoolSize_ {0};
+		uint32_t corePoolSize_ {0};
 		// the maximum numbers of threads that the threadpool can hold
-		SizeType maximumPoolSize_ {0};
+		uint32_t maximumPoolSize_ {0};
 		// time that idle threads can survive, unit: ms
 		TimeType idleKeepAliveTime_ {0};
 		// task queue
@@ -178,7 +175,7 @@ namespace nets::base
 		::std::string name_ {};
 		// high 2bits represent threadpool status: 00 - shutdown; 01-running.
 		// low 30bits represent threadpool active thread size.
-		::std::atomic_size_t ctl_ {0};
+		::std::atomic_uint32_t ctl_ {0};
 		MutexType mutex_ {};
 		ConditionVariableType poolCV_ {};
 	};
@@ -199,7 +196,7 @@ namespace nets::base
 		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask<RetType>(promise, promiseTask);
 		assert(2 == promise.use_count());
-		SizeType ctl = ctl_.load();
+		uint32_t ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{
@@ -239,7 +236,7 @@ namespace nets::base
 		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask(promise, promiseTask);
 		assert(2 == promise.use_count());
-		SizeType ctl = ctl_.load();
+		uint32_t ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{

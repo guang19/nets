@@ -16,7 +16,7 @@ public:
 	void SetUp() override
 	{
 		// set parameters to be smaller, you can observe the result of execute more intuitively
-		threadPool = new ThreadPool(1, 1, 24 );
+		threadPool = new ThreadPool(1, 1, 24);
 	}
 
 	// Tears down the test fixture.
@@ -45,7 +45,6 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 			return true;
 		},
 		5);
-
 	threadPool->execute(
 		[]() -> bool
 		{
@@ -53,8 +52,7 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 			throw "ExecuteTask";
 			return true;
 		});
-
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
@@ -138,6 +136,6 @@ TEST_F(ThreadPoolTest, SubmitFutureThrow)
 
 int main(int argc, char** argv)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+		::testing::InitGoogleTest(&argc, argv);
+		return RUN_ALL_TESTS();
 }
