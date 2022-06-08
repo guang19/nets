@@ -12,7 +12,7 @@ namespace nets::base
 {
 	namespace
 	{
-		// the max length that unix/linux posix thread name is 16, it‘s too short
+		// it‘s too short that the max length that unix/linux posix thread name is 16
 		//constexpr int32_t ThreadNameMaxLength = 16;
 		constexpr uint32_t ThreadNameMaxLength = 64;
 	}

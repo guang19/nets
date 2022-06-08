@@ -43,16 +43,15 @@ namespace nets::base
 		class ThreadWrapper : Noncopyable
 		{
 		public:
-			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr);
+			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPool);
 			~ThreadWrapper() = default;
 
-			void start();
+			void start(ThreadPoolPtr threadPoolPtr);
 
 			::std::string threadName_ {};
 			bool isCoreThread_ {false};
 			TaskType task_ {nullptr};
 			::std::thread thread_ {};
-			ThreadPoolPtr threadPoolPtr_ {nullptr};
 		};
 
 	public:
@@ -66,7 +65,7 @@ namespace nets::base
 			return isRunning(ctl_);
 		}
 
-		inline uint32_t numOfActiveThreads()
+		inline uint32_t numOfActiveThreads() const
 		{
 			return numOfActiveThreads(ctl_);
 		}
@@ -115,9 +114,9 @@ namespace nets::base
 
 	private:
 		template <typename RetType>
-		TaskType makeTask(::std::shared_ptr<::std::promise<RetType>> promise, ::std::function<RetType()> promiseTask);
+		TaskType makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise, ::std::function<RetType()> promiseTask);
 
-		TaskType makeTask(::std::shared_ptr<::std::promise<void>> promise, ::std::function<void()> promiseTask);
+		TaskType makeTask(const ::std::shared_ptr<::std::promise<void>>& promise, ::std::function<void()> promiseTask);
 
 	private:
 		void tryShutdown();
@@ -160,7 +159,7 @@ namespace nets::base
 	private:
 		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
 		uint32_t corePoolSize_ {0};
-		// the maximum numbers of threads that the threadpool can hold
+		// the maximum numbers of threads that the thread pool can hold
 		uint32_t maximumPoolSize_ {0};
 		// time that idle threads can survive, unit: ms
 		TimeType idleKeepAliveTime_ {0};
@@ -168,8 +167,8 @@ namespace nets::base
 		BlockingQueuePtr taskQueue_ {nullptr};
 		ThreadPoolType threadPool_ {};
 		::std::string name_ {};
-		// high 2bits represent threadpool status: 00 - shutdown; 01-running.
-		// low 30bits represent threadpool active thread size.
+		// high 2bits represent thread pool status: 00 - shutdown; 01-running.
+		// low 30bits represent thread pool active thread size.
 		::std::atomic_uint32_t ctl_ {0};
 		MutexType mutex_ {};
 		ConditionVariableType poolCV_ {};
@@ -195,7 +194,8 @@ namespace nets::base
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{
-			LOGS_ERROR << "threadpool [" << name_ << "] has not been initialized";
+			LOGS_ERROR << "thread pool [" << name_ << "] has not been initialized";
+			promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
 			return future;
 		}
 		// if num of active threads less than num of corePoolSize
@@ -235,7 +235,8 @@ namespace nets::base
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{
-			LOGS_ERROR << "threadpool [" << name_ << "] has not been initialized";
+			LOGS_ERROR << "thread pool [" << name_ << "] has not been initialized";
+			promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
 			return future;
 		}
 		// if num of active threads less than num of corePoolSize
@@ -263,7 +264,7 @@ namespace nets::base
 	}
 
 	template <typename RetType>
-	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<RetType>> promise,
+	ThreadPool::TaskType ThreadPool::makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise,
 											  ::std::function<RetType()> promiseTask)
 	{
 		TaskType task = [this, promise, f = ::std::move(promiseTask)]()
@@ -277,20 +278,20 @@ namespace nets::base
 			catch (const ::std::exception& exception)
 			{
 				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in threadpool ["
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
 						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
 				promise->set_exception(::std::current_exception());
 				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
-						   << "] execution in threadpool [" << name_ << ']';
+						   << "] execution in thread pool [" << name_ << ']';
 			}
 		};
 		return task;
 	}
 
-	ThreadPool::TaskType ThreadPool::makeTask(::std::shared_ptr<::std::promise<void>> promise,
+	ThreadPool::TaskType ThreadPool::makeTask(const ::std::shared_ptr<::std::promise<void>>& promise,
 											  ::std::function<void()> promiseTask)
 	{
 		TaskType task = [this, promise, f = ::std::move(promiseTask)]()
@@ -303,14 +304,14 @@ namespace nets::base
 			catch (const ::std::exception& exception)
 			{
 				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in threadpool ["
+				LOGS_ERROR << "exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
 						   << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
 				promise->set_exception(::std::current_exception());
 				LOGS_ERROR << "unknown exception caught during thread [" << currentThreadName()
-						   << "] execution in threadpool [" << name_ << ']';
+						   << "] execution in thread pool [" << name_ << ']';
 			}
 		};
 		return task;

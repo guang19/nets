@@ -13,9 +13,10 @@ namespace nets::base
 	const uint32_t ThreadPool::DefaultCorePoolSize = AVAILABLE_PROCESSOR << 1;
 	const uint32_t ThreadPool::DefaultMaxPoolSize = DefaultCorePoolSize;
 
-	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPoolPtr)
-		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)), thread_(&ThreadWrapper::start, this),
-		  threadPoolPtr_(threadPoolPtr)
+	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
+											 ThreadPoolPtr threadPoolPtr)
+		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
+		  thread_(&ThreadWrapper::start, this, threadPoolPtr)
 	{
 		if (thread_.joinable())
 		{
@@ -23,11 +24,11 @@ namespace nets::base
 		}
 	}
 
-	void ThreadPool::ThreadWrapper::start()
+	void ThreadPool::ThreadWrapper::start(ThreadPoolPtr threadPool)
 	{
+		assert(threadPool != nullptr);
 		setCurrentThreadName(threadName_.c_str());
-		assert(threadPoolPtr_ != nullptr);
-		threadPoolPtr_->runThread(this);
+		threadPool->runThread(this);
 	}
 
 	ThreadPool::ThreadPool(uint32_t corePoolSize, uint32_t maximumPoolSize, uint32_t maxQueueSize,
@@ -41,7 +42,7 @@ namespace nets::base
 			LOGS_FATAL << "corePoolSize must be greater than 0 and maxPoolSize must be greater than maxPoolSize";
 		}
 		threadPool_.reserve(maximumPoolSize_);
-		LOGS_INFO << "threadpool [" << name_ << "] init success";
+		LOGS_INFO << "thread pool [" << name_ << "] init success";
 	}
 
 	ThreadPool::~ThreadPool()
@@ -54,21 +55,21 @@ namespace nets::base
 						 return numOfActiveThreads(ctl_) == 0;
 					 });
 		assert(threadPool_.empty());
-		// if threadpool has no thread takes task from task queue, it needs to be deleted manually
+		// if thread pool has no thread takes task from task queue, it needs to be deleted manually
 		TaskType tmpTask = nullptr;
 		while (!taskQueue_->isEmpty())
 		{
 			taskQueue_->tryPop(tmpTask);
 		}
 		assert(taskQueue_->isEmpty());
-		LOGS_INFO << "threadpool [" << name_ << "] shutdown success";
+		LOGS_INFO << "thread pool [" << name_ << "] shutdown success";
 	}
 
 	void ThreadPool::tryShutdown()
 	{
 		if (isShutdown(ctl_))
 		{
-			LOGS_DEBUG << "threadpool [" << name_ << "] has been shutdown";
+			LOGS_DEBUG << "thread pool [" << name_ << "] has been shutdown";
 			return;
 		}
 		// cas
@@ -154,6 +155,7 @@ namespace nets::base
 				LockGuardType lock(mutex_);
 				if (isRunning(ctl_))
 				{
+					// set thread name
 					char threadName[ThreadNameMaxLength] = {0};
 					::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%u", name_.c_str(), numOfActiveThreads(ctl_));
 					threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
