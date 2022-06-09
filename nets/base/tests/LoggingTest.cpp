@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
 #include <thread>
 
 #include "nets/base/log/Logging.h"
@@ -23,8 +24,8 @@ TEST(LoggingTest, BasicUse)
 			LOGS_DEBUG << "这是一条debug信息";
 		});
 	t1.join();
-//	LOGS_FATAL << "这是一条流式fatal信息";
-//	::std::this_thread::sleep_for(::std::chrono::milliseconds(500));
+	LOGS_FATAL << "这是一条流式fatal信息";
+	::std::this_thread::sleep_for(::std::chrono::milliseconds(500));
 }
 
 // change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
@@ -40,7 +41,7 @@ TEST(LoggingTest, SingleFile)
 
 // before execute:
 // change LOG_WRITER_TYPE to 2（DAILY_FILE）
-// and change the constant "SecondsPerDay(in LogWriter.cpp)" for short intervals
+// for testing,  you better change the constant "SecondsPerDay(in LogWriter.cpp)" for short intervals
 TEST(LoggingTest, DailyFile)
 {
 	LOGS_TRACE << "这是一条trance信息 stream";
@@ -53,7 +54,7 @@ TEST(LoggingTest, DailyFile)
 
 // before execute:
 // change LOG_WRITER_TYPE to 3（DLOG_FILE_ROLLING_SIZE）
-// and change constant "LogFileRollingSize(in LogWriter.cpp)" as small as possible
+// for testing,  you better change constant "LogFileRollingSize(in LogWriter.cpp)" as small as possible
 TEST(LoggingTest, RollingFile)
 {
 	LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"

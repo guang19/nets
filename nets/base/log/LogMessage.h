@@ -5,8 +5,7 @@
 #ifndef NETS_LOGMESSAGE_H
 #define NETS_LOGMESSAGE_H
 
-#include "nets/base/log/LogBuffer.h"
-#include "nets/base/Noncopyable.h"
+#include "nets/base/log/LogBufferStream.h"
 #include "nets/base/Timestamp.h"
 
 namespace nets::base
@@ -22,11 +21,11 @@ namespace nets::base
 		NUM_OF_LOG_LEVELS = 6
 	};
 
-	typedef struct LogMessage_ : Noncopyable
+	class LogMessage : Noncopyable
 	{
 	public:
-		explicit LogMessage_(LogLevel logLevel, const char* file, uint32_t line);
-		~LogMessage_() = default;
+		explicit LogMessage(LogLevel logLevel, const char* file, uint32_t line);
+		~LogMessage() = default;
 
 	public:
 		inline const Timestamp& getLogTime() const
@@ -49,7 +48,7 @@ namespace nets::base
 			return line_;
 		}
 
-		inline LogBuffer& getStream()
+		inline LogBufferStream& getStream()
 		{
 			return stream_;
 		}
@@ -59,8 +58,8 @@ namespace nets::base
 		LogLevel logLevel_ {};
 		const char* filename_ {nullptr};
 		uint32_t line_ {0};
-		LogBuffer stream_ {};
-	} LogMessage;
+		LogBufferStream stream_ {};
+	};
 } // namespace nets::base
 
 #endif // NETS_LOGMESSAGE_H

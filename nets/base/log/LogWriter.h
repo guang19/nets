@@ -7,17 +7,17 @@
 
 #include <atomic>
 #include <condition_variable>
-#include <ctime>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
 
-#include "nets/base/log/LogBuffer.h"
+#include "nets/base/concurrency/BoundedBlockingQueue.h"
+#include "nets/base/log/LogFile.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Singleton.h"
-#include "nets/base/concurrency/BoundedBlockingQueue.h"
+#include "nets/base/StackBuffer.h"
 
 #ifndef LOG_WRITER_TYPE
 #define LOG_WRITER_TYPE STDOUT
@@ -41,49 +41,11 @@ namespace nets::base
 		RollingFile
 	};
 
-	/**
-	 *  not thread-safe
-	 */
-	class LogFile : Noncopyable
+	namespace
 	{
-	public:
-		using SizeType = ::size_t;
-		using TimeType = ::time_t;
-		using CharArrayPtr = ::std::unique_ptr<char[]>;
-
-	public:
-		explicit LogFile(const char* file);
-		~LogFile();
-
-	public:
-		void append(const char* data, SizeType len);
-		void flush();
-
-		void renameByNowTime(TimeType now);
-
-		void mkdirR(const char* multiLevelDir);
-
-		inline SizeType size() const
-		{
-			return bytes_;
-		}
-
-		inline TimeType lastRollTime() const
-		{
-			return lastRollTime_;
-		}
-
-	private:
-		void getFileInfo(uint64_t* fileSize, ::time_t* createTime);
-
-	private:
-		FILE* fp_ {nullptr};
-		CharArrayPtr dir_ {nullptr};
-		CharArrayPtr file_ {nullptr};
-		SizeType bytes_ {0};
-		TimeType lastRollTime_ {0};
-		CharArrayPtr buffer_ {nullptr};
-	};
+		// Log buffer cache 2M
+		constexpr ::size_t LogBufferPieceSize = 1024 * 1024 << 1;
+	} // namespace
 
 	class IPersistentWriter
 	{
@@ -185,7 +147,7 @@ namespace nets::base
 		DEFINE_SINGLETON(AsyncLogWriter);
 
 	private:
-		using BufferType = LogBuffer;
+		using BufferType = StackBuffer<LogBufferPieceSize>;
 		using BufferPtr = ::std::unique_ptr<BufferType>;
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;

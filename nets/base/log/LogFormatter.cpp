@@ -22,7 +22,7 @@ namespace nets::base
 		__thread Timestamp::TimeType CacheSeconds {0};
 	} // namespace
 
-	void DefaultLogFormatter::formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage)
+	void DefaultLogFormatter::formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream)
 	{
 		struct tm tmS {};
 		const Timestamp& logTime = logMessage.getLogTime();
@@ -42,13 +42,15 @@ namespace nets::base
 		}
 		char timeBuf[32] = {0};
 		// check return value to circumvent [-Werror=format-truncation]
-		::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1, tmS.tm_mday,
-			tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp()) < 0 ? exit(1) : ((void) 0);
-		logBuffer << timeBuf;
-		logBuffer << " [" << currentTid() << "] ";
-		logBuffer << LogLevelName[logMessage.getLogLevel()] << ' ';
-		logBuffer << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
-		logBuffer << logMessage.getStream();
+		::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1,
+				   tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp()) < 0
+			? exit(1)
+			: ((void) 0);
+		logBufferStream << timeBuf;
+		logBufferStream << " [" << currentTid() << "] ";
+		logBufferStream << LogLevelName[logMessage.getLogLevel()] << ' ';
+		logBufferStream << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
+		logBufferStream << logMessage.getStream();
 	}
 
 	::std::shared_ptr<ILogFormatter> LogFormatterFactory::getLogFormatter()

@@ -13,14 +13,14 @@
 
 namespace nets::base
 {
-	class LogMessageStream : public LogBuffer
+	class LogMessageStream
 	{
 	public:
 		explicit LogMessageStream(LogLevel logLevel, const char* file, uint32_t line);
-		~LogMessageStream() override;
+		~LogMessageStream();
 
 	public:
-		inline LogBuffer& stream()
+		inline LogBufferStream& stream()
 		{
 			return logMessage_.getStream();
 		}

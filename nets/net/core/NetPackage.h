@@ -9,7 +9,7 @@
 
 namespace nets::net
 {
-	class NetPackage : public base::ByteBuffer
+	class NetPackage : public nets::base::ByteBuffer
 	{
 	public:
 		NetPackage();

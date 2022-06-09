@@ -16,7 +16,7 @@ namespace nets::base
 		virtual ~ILogFormatter() = default;
 
 	public:
-		virtual void formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage) = 0;
+		virtual void formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream) = 0;
 	};
 
 	DECLARE_SINGLETON_CLASS(DefaultLogFormatter), public ILogFormatter
@@ -24,7 +24,7 @@ namespace nets::base
 		DEFINE_SINGLETON(DefaultLogFormatter);
 
 	public:
-		void formatLogMessage(LogBuffer& logBuffer, LogMessage& logMessage) override;
+		void formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream) override;
 	};
 
 	class LogFormatterFactory

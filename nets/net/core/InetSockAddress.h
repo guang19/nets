@@ -22,7 +22,7 @@ namespace nets::net
 		using SockAddrFamily = ::sa_family_t;
 	} // namespace
 
-	class InetSockAddress : public base::Copyable
+	class InetSockAddress : public nets::base::Copyable
 	{
 	public:
 		explicit InetSockAddress(const SockAddr4& addr4);

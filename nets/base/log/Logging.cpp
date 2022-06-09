@@ -17,8 +17,9 @@ namespace nets::base
 	LogMessageStream::~LogMessageStream()
 	{
 		logMessage_.getStream() << '\n';
-		LOG_FORMATTER->formatLogMessage(*this, logMessage_);
-		LOG_WRITER->write(buffer(), writerIndex());
+		LogBufferStream logBufferStream {};
+		LOG_FORMATTER->formatLogMessage(logMessage_, logBufferStream);
+		LOG_WRITER->write(logBufferStream.cbuffer().carray(), logBufferStream.cbuffer().len());
 		if (logMessage_.getLogLevel() == LogLevel::FATAL)
 		{
 			// if exit directly, log buffer in memory probably will lost

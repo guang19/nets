@@ -29,7 +29,7 @@ namespace nets::net
 		{
 			CurrentThreadEventLoop = this;
 		}
-		LOGS_INFO << "one loop is created in thread" << base::currentTid();
+		LOGS_INFO << "one loop is created in thread" << nets::base::currentTid();
 	}
 
 	EventLoop::~EventLoop() {}

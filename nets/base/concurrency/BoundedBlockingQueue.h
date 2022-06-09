@@ -124,10 +124,10 @@ namespace nets::base
 	{
 		UniqueLockType lock(mutex_);
 		notEmptyCV_.wait(lock,
-						[this]() -> bool
-						{
-							return !queue_.empty();
-						});
+						 [this]() -> bool
+						 {
+							 return !queue_.empty();
+						 });
 		el = queue_.front();
 		queue_.pop_front();
 		notFullCV_.notify_one();
@@ -174,10 +174,10 @@ namespace nets::base
 	{
 		UniqueLockType lock(mutex_);
 		notEmptyCV_.wait(lock,
-						[&]() -> bool
-						{
-							return (!queue_.empty() || p());
-						});
+						 [&]() -> bool
+						 {
+							 return (!queue_.empty() || p());
+						 });
 		if (p())
 		{
 			return false;
@@ -227,10 +227,10 @@ namespace nets::base
 	{
 		UniqueLockType lock(mutex_);
 		if (notEmptyCV_.wait_for(lock, MillisTimeType(milliseconds),
-								[this]() -> bool
-								{
-									return !queue_.empty();
-								}))
+								 [this]() -> bool
+								 {
+									 return !queue_.empty();
+								 }))
 		{
 			el = queue_.front();
 			queue_.pop_front();

@@ -4,8 +4,6 @@
 
 #include "nets/base/concurrency/ThreadPool.h"
 
-#include <utility>
-
 #include "nets/base/CommonMacro.h"
 
 namespace nets::base
