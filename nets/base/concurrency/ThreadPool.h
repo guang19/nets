@@ -120,7 +120,7 @@ namespace nets::base
 
 	private:
 		void tryShutdown();
-		void runThread(ThreadWrapperRawPtr threadWrapperRawPtr);
+		void runThread(ThreadWrapperRawPtr threadWrapper);
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore);
 
