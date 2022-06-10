@@ -74,14 +74,10 @@ namespace nets::base
 			uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
 			if (n != remain)
 			{
-				int32_t err = ferror(fp_);
+				int32_t err = ::ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(stderr,
-							  "Error:log file append error "
-							  "\"%s\""
-							  "\n",
-							  ::strerror(err));
+					::fprintf(stderr, "Error:log file append error ""\"%s\"""\n", ::strerror(err));
 					break;
 				}
 			}
@@ -131,7 +127,7 @@ namespace nets::base
 
 	void LogFile::mkdirR(const char* multiLevelDir)
 	{
-		if (0 == access(multiLevelDir, F_OK))
+		if (0 == ::access(multiLevelDir, F_OK))
 		{
 			return;
 		}
@@ -143,13 +139,13 @@ namespace nets::base
 		MEMZERO(dir2, MaxFilePathLen);
 		::strncat(dir1, multiLevelDir, len);
 		char* spStr = nullptr;
-		while (nullptr != (spStr = strsep(&dirptr, "/")))
+		while (nullptr != (spStr = ::strsep(&dirptr, "/")))
 		{
 			if (::strlen(spStr) > 0)
 			{
 				::strcat(dir2, "/");
 				::strcat(dir2, spStr);
-				if (0 != access(dir2, F_OK))
+				if (0 != ::access(dir2, F_OK))
 				{
 					if (0 != ::mkdir(dir2, 0775))
 					{

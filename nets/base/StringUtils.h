@@ -42,6 +42,7 @@ namespace nets::base
 			return tmp - buffer;
 		}
 
+		// Convert the float to a string and add it to the buffer, and return the length of the converted string
 		template <typename Float>
 		uint32_t fromFloat(char* buffer, Float f)
 		{
