@@ -10,11 +10,12 @@
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/ChannelHandler.h"
-#include "nets/net/core/EventLoop.h"
 #include "nets/net/core/Socket.h"
 
 namespace nets::net
 {
+	class EventLoop;
+
 	namespace
 	{
 		using EventType = uint32_t;
@@ -29,6 +30,7 @@ namespace nets::net
 	{
 	public:
 		using IdType = ::size_t;
+		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 
 	public:
 		explicit Channel(EventLoopPtr eventLoop);

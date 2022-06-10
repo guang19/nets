@@ -41,31 +41,31 @@ namespace nets::net
 
 	InetSockAddress::InetSockAddress(const InetSockAddress& addr)
 	{
-		if (addr.ipFamily() == AF_INET)
-		{
-			MEMZERO(&addr4_, sizeof(SockAddr4));
-			addr4_ = addr.addr4_;
-		}
-		else
+		if (AF_INET6 == addr.ipFamily())
 		{
 			MEMZERO(&addr6_, sizeof(SockAddr6));
 			addr6_ = addr.addr6_;
+		}
+		else if (AF_INET == addr.ipFamily())
+		{
+			MEMZERO(&addr4_, sizeof(SockAddr4));
+			addr4_ = addr.addr4_;
 		}
 	}
 
 	InetSockAddress::InetSockAddress(InetSockAddress&& addr) noexcept
 	{
-		if (addr.ipFamily() == AF_INET)
-		{
-			MEMZERO(&addr4_, sizeof(SockAddr4));
-			addr4_ = addr.addr4_;
-			MEMZERO(&addr.addr4_, sizeof(SockAddr4));
-		}
-		else
+		if (AF_INET6 == addr.ipFamily())
 		{
 			MEMZERO(&addr6_, sizeof(SockAddr6));
 			addr6_ = addr.addr6_;
 			MEMZERO(&addr.addr6_, sizeof(SockAddr6));
+		}
+		else if (AF_INET == addr.ipFamily())
+		{
+			MEMZERO(&addr4_, sizeof(SockAddr4));
+			addr4_ = addr.addr4_;
+			MEMZERO(&addr.addr4_, sizeof(SockAddr4));
 		}
 	}
 
@@ -73,15 +73,15 @@ namespace nets::net
 	{
 		if (this != &addr)
 		{
-			if (addr.ipFamily() == AF_INET)
-			{
-				MEMZERO(&addr4_, sizeof(SockAddr4));
-				addr4_ = addr.addr4_;
-			}
-			else
+			if (AF_INET6 == addr.ipFamily())
 			{
 				MEMZERO(&addr6_, sizeof(SockAddr6));
 				addr6_ = addr.addr6_;
+			}
+			else if (AF_INET == addr.ipFamily())
+			{
+				MEMZERO(&addr4_, sizeof(SockAddr4));
+				addr4_ = addr.addr4_;
 			}
 		}
 		return *this;
@@ -91,17 +91,17 @@ namespace nets::net
 	{
 		if (this != &addr)
 		{
-			if (addr.ipFamily() == AF_INET)
-			{
-				MEMZERO(&addr4_, sizeof(SockAddr4));
-				addr4_ = addr.addr4_;
-				MEMZERO(&addr.addr4_, sizeof(SockAddr4));
-			}
-			else
+			if (AF_INET6 == addr.ipFamily())
 			{
 				MEMZERO(&addr6_, sizeof(SockAddr6));
 				addr6_ = addr.addr6_;
 				MEMZERO(&addr.addr6_, sizeof(SockAddr6));
+			}
+			else if (AF_INET == addr.ipFamily())
+			{
+				MEMZERO(&addr4_, sizeof(SockAddr4));
+				addr4_ = addr.addr4_;
+				MEMZERO(&addr.addr4_, sizeof(SockAddr4));
 			}
 		}
 		return *this;
@@ -154,18 +154,18 @@ namespace nets::net
 	{
 		char buffer[64] = {0};
 		auto len = static_cast<SockLenType>(sizeof(buffer));
-		if (AF_INET == addr_.sa_family)
-		{
-			if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
-			{
-				LOGS_FATAL << "inet_ntop AF_INET";
-			}
-		}
-		else if (AF_INET6 == addr_.sa_family)
+		if (AF_INET6 == addr_.sa_family)
 		{
 			if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer, len))
 			{
 				LOGS_FATAL << "inet_ntop AF_INET6";
+			}
+		}
+		else if (AF_INET == addr_.sa_family)
+		{
+			if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
+			{
+				LOGS_FATAL << "inet_ntop AF_INET";
 			}
 		}
 		return buffer;
@@ -180,17 +180,7 @@ namespace nets::net
 	{
 		char buffer[64] = {0};
 		auto len = static_cast<SockLenType>(sizeof(buffer));
-		if (AF_INET == addr_.sa_family)
-		{
-			if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
-			{
-				LOGS_FATAL << "inet_ntop AF_INET";
-			}
-			SockLenType ipLen = ::strlen(buffer);
-			PortType port = be16toh(addr4_.sin_port);
-			::snprintf(buffer + ipLen, len - ipLen, ":%u", port);
-		}
-		else if (AF_INET6 == addr_.sa_family)
+		if (AF_INET6 == addr_.sa_family)
 		{
 			// ipv6 + port address like: [2a01:198:603:0:396e]:8080
 			buffer[0] = '[';
@@ -201,6 +191,16 @@ namespace nets::net
 			SockLenType ipLen = ::strlen(buffer);
 			PortType port = be16toh(addr6_.sin6_port);
 			::snprintf(buffer + ipLen, len - ipLen, "]:%u", port);
+		}
+		else if (AF_INET == addr_.sa_family)
+		{
+			if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
+			{
+				LOGS_FATAL << "inet_ntop AF_INET";
+			}
+			SockLenType ipLen = ::strlen(buffer);
+			PortType port = be16toh(addr4_.sin_port);
+			::snprintf(buffer + ipLen, len - ipLen, ":%u", port);
 		}
 		return buffer;
 	}

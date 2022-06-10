@@ -14,7 +14,7 @@ namespace nets::net
 		return it != channels_.end() && it->second == channel;
 	}
 
-	PollerPtr PollerFactory::getPoller()
+	PollerFactory::PollerPtr PollerFactory::getPoller()
 	{
 		return ::std::make_unique<EpollPoller>(nullptr);
 	}

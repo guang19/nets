@@ -14,6 +14,7 @@ namespace nets::net
 	class EpollPoller : public Poller
 	{
 	public:
+		using ChannelRawPtr = Channel*;
 		using EpollEvent = struct epoll_event;
 		using EventList = ::std::vector<EpollEvent>;
 		using SizeType = EventList::size_type;

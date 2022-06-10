@@ -15,7 +15,7 @@ FILE(GLOB NetSrcs ${PROJECT_SOURCE_DIR}/nets/net/core/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/net/server/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/net/client/*.cpp)
 
-ADD_LIBRARY(nets_net SHARED ${NetSrcs})
+ADD_LIBRARY(nets_net STATIC ${NetSrcs})
 TARGET_LINK_LIBRARIES(nets_net nets_base)
 
 INSTALL(TARGETS nets_net DESTINATION ${PROJECT_BINARY_DIR}/lib)

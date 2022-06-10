@@ -4,13 +4,8 @@
 
 #include "nets/base/concurrency/ThreadPool.h"
 
-#include "nets/base/CommonMacro.h"
-
 namespace nets::base
 {
-	const uint32_t ThreadPool::DefaultCorePoolSize = AVAILABLE_PROCESSOR << 1;
-	const uint32_t ThreadPool::DefaultMaxPoolSize = DefaultCorePoolSize;
-
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
 											 ThreadPoolPtr threadPoolPtr)
 		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
@@ -29,7 +24,7 @@ namespace nets::base
 		threadPool->runThread(this);
 	}
 
-	ThreadPool::ThreadPool(uint32_t corePoolSize, uint32_t maximumPoolSize, uint32_t maxQueueSize,
+	ThreadPool::ThreadPool(NType corePoolSize, NType maximumPoolSize, NType maxQueueSize,
 						   TimeType idleKeepAliveTime, const ::std::string& name)
 		: corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize), idleKeepAliveTime_(idleKeepAliveTime),
 		  taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
@@ -73,7 +68,7 @@ namespace nets::base
 		// cas
 		while (true)
 		{
-			uint32_t ctl = ctl_.load();
+			NType ctl = ctl_.load();
 			// set state to shutdown
 			if (ctl_.compare_exchange_strong(ctl, (Shutdown | (ctl & CountMask))))
 			{
@@ -139,7 +134,7 @@ namespace nets::base
 		// cas
 		while (true)
 		{
-			uint32_t ctl = ctl_.load();
+			NType ctl = ctl_.load();
 			if (isShutdown(ctl))
 			{
 				return false;

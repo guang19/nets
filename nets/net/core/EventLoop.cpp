@@ -43,7 +43,7 @@ namespace nets::net
 		return (this == CurrentThreadEventLoop);
 	}
 
-	EventLoopPtr EventLoop::currentThreadEventLoop() const
+	EventLoop::EventLoopPtr EventLoop::currentThreadEventLoop() const
 	{
 		assert(isInEventLoopThread());
 		return CurrentThreadEventLoop->shared_from_this();

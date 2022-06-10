@@ -13,10 +13,14 @@
 
 namespace nets::net
 {
+	class Channel;
+
 	class Poller : nets::base::Noncopyable
 	{
 	public:
+		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
+		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 		using ChannelMap = ::std::unordered_map<Channel::IdType, ChannelPtr>;
 
 	public:
@@ -42,6 +46,9 @@ namespace nets::net
 
 	class PollerFactory
 	{
+	public:
+		using PollerPtr = ::std::unique_ptr<Poller>;
+
 	public:
 		static PollerPtr getPoller();
 	};

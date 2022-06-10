@@ -11,7 +11,7 @@ FILE(GLOB BaseSrcs ${PROJECT_SOURCE_DIR}/nets/base/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/concurrency/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/log/*.cpp)
 
-ADD_LIBRARY(nets_base SHARED ${BaseSrcs})
+ADD_LIBRARY(nets_base STATIC ${BaseSrcs})
 
 TARGET_LINK_LIBRARIES(nets_base pthread)
 INSTALL(TARGETS nets_base DESTINATION ${PROJECT_BINARY_DIR}/lib)

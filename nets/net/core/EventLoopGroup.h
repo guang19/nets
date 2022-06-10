@@ -19,7 +19,7 @@ namespace nets::net
 		using EventLoopList = ::std::vector<EventLoopPtr>;
 
 	public:
-		EventLoopGroup(nets::base::ThreadPool::SizeType numOfSubLoops);
+		explicit EventLoopGroup(nets::base::ThreadPool::NType numOfSubLoops);
 		~EventLoopGroup() = default;
 
 	public:
@@ -27,7 +27,7 @@ namespace nets::net
 
 	private:
 		EventLoopList eventLoops_ {};
-		ThreadPoolPtr threadPool {nullptr};
+		ThreadPoolPtr eventLoopThreadPool_ {nullptr};
 	};
 } // namespace nets::net
 

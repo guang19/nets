@@ -4,6 +4,8 @@
 
 #include "nets/net/core/Channel.h"
 
+#include "nets/net/core/EventLoop.h"
+
 namespace nets::net
 {
 	Channel::Channel(EventLoopPtr eventLoop)

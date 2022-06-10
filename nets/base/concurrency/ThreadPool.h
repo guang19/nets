@@ -29,6 +29,7 @@ namespace nets::base
 		using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
 	public:
+		using NType = uint32_t;
 		using TimeType = ::time_t;
 		using TaskType = ::std::function<void()>;
 		using MutexType = ::std::mutex;
@@ -55,8 +56,8 @@ namespace nets::base
 		};
 
 	public:
-		explicit ThreadPool(uint32_t corePoolSize = DefaultCorePoolSize, uint32_t maxPoolSize = DefaultMaxPoolSize,
-							uint32_t maxQueueSize = DefaultMaxQueueSize, TimeType keepAliveTime = DefaultIdleKeepAliveTime,
+		explicit ThreadPool(NType corePoolSize, NType maxPoolSize, NType maxQueueSize,
+							TimeType keepAliveTime = DefaultIdleKeepAliveTime,
 							const ::std::string& name = DefaultThreadPoolName);
 		~ThreadPool();
 
@@ -65,7 +66,7 @@ namespace nets::base
 			return isRunning(ctl_);
 		}
 
-		inline uint32_t numOfActiveThreads() const
+		inline NType numOfActiveThreads() const
 		{
 			return numOfActiveThreads(ctl_);
 		}
@@ -124,43 +125,40 @@ namespace nets::base
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore);
 
-		inline bool isRunning(uint32_t ctl) const
+		inline bool isRunning(NType ctl) const
 		{
 			return (ctl & ~CountMask) == Running;
 		}
 
-		inline bool isShutdown(uint32_t ctl) const
+		inline bool isShutdown(NType ctl) const
 		{
 			return (ctl & ~CountMask) == Shutdown;
 		}
 
-		inline uint32_t numOfActiveThreads(uint32_t ctl) const
+		inline NType numOfActiveThreads(NType ctl) const
 		{
 			return ctl & CountMask;
 		}
 
 	private:
-		static constexpr uint32_t Int32Bits = 32;
-		static constexpr uint32_t CountBits = Int32Bits - 2;
+		static constexpr NType Int32Bits = 32;
+		static constexpr NType CountBits = Int32Bits - 2;
 		// maximum active thread size
 		// 00,111111111111111111111111111111
-		static constexpr uint32_t CountMask = (1 << CountBits) - 1;
+		static constexpr NType CountMask = (1 << CountBits) - 1;
 		// 01,000000000000000000000000000000
-		static constexpr uint32_t Running = 1 << CountBits;
+		static constexpr NType Running = 1 << CountBits;
 		// 00,000000000000000000000000000000
-		static constexpr uint32_t Shutdown = 0 << CountBits;
+		static constexpr NType Shutdown = 0 << CountBits;
 
-		static const uint32_t DefaultCorePoolSize;
-		static const uint32_t DefaultMaxPoolSize;
 		static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
-		static constexpr uint32_t DefaultMaxQueueSize = 0;
-		static constexpr char const* DefaultThreadPoolName = "ThreadPool";
+		static constexpr char const* DefaultThreadPoolName = "NetsThreadPool";
 
 	private:
 		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-		uint32_t corePoolSize_ {0};
+		NType corePoolSize_ {0};
 		// the maximum numbers of threads that the thread pool can hold
-		uint32_t maximumPoolSize_ {0};
+		NType maximumPoolSize_ {0};
 		// time that idle threads can survive, unit: ms
 		TimeType idleKeepAliveTime_ {0};
 		// task queue
@@ -186,11 +184,10 @@ namespace nets::base
 		using RetType = typename ::std::invoke_result<Fn&&, Args&&...>::type;
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
-		// value capture, ref count plus 1
 		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask<RetType>(promise, promiseTask);
 		assert(2 == promise.use_count());
-		uint32_t ctl = ctl_.load();
+		NType ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{
@@ -225,13 +222,12 @@ namespace nets::base
 	template <typename Fn, typename... Args, typename HasRet>
 	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		// value capture, ref count plus 1
 		auto promise = ::std::make_shared<::std::promise<void>>();
 		auto future = promise->get_future();
 		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType task = makeTask(promise, promiseTask);
 		assert(2 == promise.use_count());
-		uint32_t ctl = ctl_.load();
+		NType ctl = ctl_.load();
 		assert(isRunning(ctl));
 		if (isShutdown(ctl))
 		{
