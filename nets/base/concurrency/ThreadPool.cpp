@@ -24,13 +24,13 @@ namespace nets::base
 		threadPool->runThread(this);
 	}
 
-	ThreadPool::ThreadPool(NType corePoolSize, NType maximumPoolSize, NType maxQueueSize,
-						   TimeType idleKeepAliveTime, const ::std::string& name)
+	ThreadPool::ThreadPool(NType corePoolSize, NType maximumPoolSize, NType maxQueueSize, TimeType idleKeepAliveTime,
+						   const ::std::string& name)
 		: corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize), idleKeepAliveTime_(idleKeepAliveTime),
 		  taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
 		  mutex_(), poolCV_()
 	{
-		if (corePoolSize_ <= 0 || corePoolSize_ > maximumPoolSize_)
+		if (corePoolSize_ == 0 || corePoolSize_ > maximumPoolSize_)
 		{
 			LOGS_FATAL << "corePoolSize must be greater than 0 and maxPoolSize must be greater than maxPoolSize";
 		}
@@ -40,25 +40,10 @@ namespace nets::base
 
 	ThreadPool::~ThreadPool()
 	{
-		tryShutdown();
-		UniqueLockType lock(mutex_);
-		poolCV_.wait(lock,
-					 [this]() -> bool
-					 {
-						 return numOfActiveThreads(ctl_) == 0;
-					 });
-		assert(threadPool_.empty());
-		// if thread pool has no thread takes task from task queue, it needs to be deleted manually
-		TaskType tmpTask = nullptr;
-		while (!taskQueue_->isEmpty())
-		{
-			taskQueue_->tryPop(tmpTask);
-		}
-		assert(taskQueue_->isEmpty());
-		LOGS_INFO << "thread pool [" << name_ << "] shutdown success";
+		shutdown();
 	}
 
-	void ThreadPool::tryShutdown()
+	void ThreadPool::shutdown()
 	{
 		if (isShutdown(ctl_))
 		{
@@ -77,6 +62,21 @@ namespace nets::base
 		}
 		// notify blocking thread
 		taskQueue_->notifyBlockingThread();
+		UniqueLockType lock(mutex_);
+		poolCV_.wait(lock,
+					 [this]() -> bool
+					 {
+						 return numOfActiveThreads(ctl_) == 0;
+					 });
+		assert(threadPool_.empty());
+		// if thread pool has no thread takes task from task queue, it needs to be deleted manually
+		TaskType tmpTask = nullptr;
+		while (!taskQueue_->isEmpty())
+		{
+			taskQueue_->tryPop(tmpTask);
+		}
+		assert(taskQueue_->isEmpty());
+		LOGS_INFO << "thread pool [" << name_ << "] shutdown success";
 	}
 
 	void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapper)

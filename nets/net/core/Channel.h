@@ -30,10 +30,10 @@ namespace nets::net
 	{
 	public:
 		using IdType = ::size_t;
-		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
+		using EventLoopRawPtr = ::std::shared_ptr<EventLoop>;
 
 	public:
-		explicit Channel(EventLoopPtr eventLoop);
+		explicit Channel(EventLoopRawPtr eventLoop);
 		virtual ~Channel() = default;
 
 	public:
@@ -85,7 +85,7 @@ namespace nets::net
 			return events_ & WriteEvent;
 		}
 
-		inline EventLoopPtr eventLoop() const
+		inline EventLoopRawPtr eventLoop() const
 		{
 			return eventLoop_;
 		}
@@ -107,7 +107,7 @@ namespace nets::net
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};
-		EventLoopPtr eventLoop_ {nullptr};
+		EventLoopRawPtr eventLoop_ {nullptr};
 		static constexpr IdType InvalidUniqueId = 0;
 	};
 } // namespace nets::net

@@ -17,16 +17,21 @@ namespace nets::net
 		using EventLoopRawPtr = EventLoop*;
 		using EventLoopPtr = ::std::unique_ptr<EventLoop>;
 		using EventLoopList = ::std::vector<EventLoopPtr>;
+		using SizeType = typename EventLoopList::size_type;
 
 	public:
+		EventLoopGroup();
 		explicit EventLoopGroup(nets::base::ThreadPool::NType numOfSubLoops);
 		~EventLoopGroup() = default;
 
 	public:
+		EventLoopRawPtr mainLoop();
 		EventLoopRawPtr next();
 
 	private:
-		EventLoopList eventLoops_ {};
+		uint32_t nextLoop_ {0};
+		EventLoopPtr mainLoop_ {nullptr};
+		EventLoopList subLoops_ {};
 		ThreadPoolPtr eventLoopThreadPool_ {nullptr};
 	};
 } // namespace nets::net

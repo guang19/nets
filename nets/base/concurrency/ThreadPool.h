@@ -61,6 +61,8 @@ namespace nets::base
 							const ::std::string& name = DefaultThreadPoolName);
 		~ThreadPool();
 
+		void shutdown();
+
 		inline bool isRunning() const
 		{
 			return isRunning(ctl_);
@@ -120,7 +122,6 @@ namespace nets::base
 		TaskType makeTask(const ::std::shared_ptr<::std::promise<void>>& promise, ::std::function<void()> promiseTask);
 
 	private:
-		void tryShutdown();
 		void runThread(ThreadWrapperRawPtr threadWrapper);
 		void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
 		bool addThreadTask(const TaskType& task, bool isCore);

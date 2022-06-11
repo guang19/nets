@@ -12,6 +12,8 @@
 
 #define MEMZERO(p, len) (::memset((p), 0, (len)))
 
+#define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
+
 #define CHECK_CLASS_COMPLETE_TYPE(CLASS)                                                                                    \
 	do                                                                                                                      \
 	{                                                                                                                       \
@@ -19,7 +21,5 @@
 		CLASS_MUST_BE_COMPLETE_TYPE jugg;                                                                                   \
 		UNUSED(jugg);                                                                                                       \
 	} while (0)
-
-#define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
 
 #endif // NETS_COMMONMACRO_H

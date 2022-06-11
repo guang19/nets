@@ -6,5 +6,5 @@
 
 namespace nets::net
 {
-	SocketChannel::SocketChannel(EventLoopPtr eventLoop) : Channel(eventLoop) {}
+	SocketChannel::SocketChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop) {}
 } // namespace nets::net

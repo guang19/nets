@@ -8,7 +8,6 @@ namespace nets::net
 {
 	ServerBootstrap& ServerBootstrap::group(EventLoopGroupRawPtr subLoops)
 	{
-		subLoops_.reset(subLoops);
 		return *this;
 	}
 } // namespace nets::net

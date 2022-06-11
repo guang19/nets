@@ -8,20 +8,28 @@
 
 namespace nets::net
 {
-	namespace
-	{
-		const uint32_t DefaultEventLoopThreads = AVAILABLE_PROCESSOR << 1;
-	}
+	EventLoopGroup::EventLoopGroup() : EventLoopGroup(0) {}
 
 	EventLoopGroup::EventLoopGroup(nets::base::ThreadPool::NType numOfSubLoops)
 	{
-		numOfSubLoops = numOfSubLoops <= 0 ? AVAILABLE_PROCESSOR : numOfSubLoops;
-		eventLoops_.reserve(numOfSubLoops);
-		eventLoopThreadPool_ = ::std::make_unique<nets::base::ThreadPool>(numOfSubLoops, numOfSubLoops, 0);
+		if (numOfSubLoops > 0)
+		{
+			subLoops_.reserve(numOfSubLoops);
+			eventLoopThreadPool_ = ::std::make_unique<nets::base::ThreadPool>(numOfSubLoops, numOfSubLoops, 0);
+		}
 	}
 
 	EventLoopGroup::EventLoopRawPtr EventLoopGroup::next()
 	{
-		return nullptr;
+		EventLoopRawPtr eventLoop = mainLoop_.get();
+		if (!subLoops_.empty())
+		{
+			eventLoop = subLoops_[nextLoop_++].get();
+			if (static_cast<SizeType>(nextLoop_) >= subLoops_.size())
+			{
+				nextLoop_ = 0;
+			}
+		}
+		return eventLoop;
 	}
-}
+} // namespace nets::net

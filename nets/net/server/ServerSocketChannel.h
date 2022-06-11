@@ -14,7 +14,7 @@ namespace nets::net
 	class ServerSocketChannel : public Channel
 	{
 	public:
-		explicit ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily);
+		explicit ServerSocketChannel(EventLoopRawPtr eventLoop, SockAddrFamily sockAddrFamily);
 		~ServerSocketChannel() override;
 
 	public:

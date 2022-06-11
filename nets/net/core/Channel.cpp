@@ -8,7 +8,7 @@
 
 namespace nets::net
 {
-	Channel::Channel(EventLoopPtr eventLoop)
+	Channel::Channel(EventLoopRawPtr eventLoop)
 		: uniqueId_(InvalidUniqueId), events_(NoneEvent), readyEvents_(NoneEvent), isRegistered_(false),
 		  eventLoop_(eventLoop)
 	{

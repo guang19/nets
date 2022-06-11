@@ -8,7 +8,7 @@
 
 namespace nets::net
 {
-	ServerSocketChannel::ServerSocketChannel(EventLoopPtr eventLoop, SockAddrFamily sockAddrFamily)
+	ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop, SockAddrFamily sockAddrFamily)
 		: Channel(eventLoop), sockFd_(socket::createTcpSocket(sockAddrFamily)), idleFd_(socket::createIdleFd())
 	{
 		socket::setSockAddrReuse(sockFd_, true);

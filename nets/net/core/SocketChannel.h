@@ -12,7 +12,7 @@ namespace nets::net
 	class SocketChannel : public Channel
 	{
 	public:
-		explicit SocketChannel(EventLoopPtr eventLoop);
+		explicit SocketChannel(EventLoopRawPtr eventLoop);
 		~SocketChannel() override = default;
 	};
 } // namespace nets::net

@@ -25,12 +25,10 @@ namespace nets::net
 		ServerBootstrap& bind(const InetSockAddress& listenAddr);
 		ServerBootstrap& bind(const char* ip, PortType port);
 		ServerBootstrap& bind(PortType port);
-		void start();
 
 	private:
 		::std::atomic_bool running_ {false};
-		EventLoop mainLoop_ {};
-		EventLoopGroupPtr subLoops_ {};
+		EventLoopGroupPtr eventLoopGroup_ {};
 	};
 } // namespace nets::net
 
