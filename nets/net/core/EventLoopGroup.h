@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/5/25.
 //
 
-#ifndef NETS_EVENTLOOPGROUP_H
-#define NETS_EVENTLOOPGROUP_H
+#ifndef NETS_NET_EVENT_LOOP_GROUP_H
+#define NETS_NET_EVENT_LOOP_GROUP_H
 
 #include "nets/base/concurrency/ThreadPool.h"
 #include "nets/net/core/EventLoop.h"
@@ -13,27 +13,31 @@ namespace nets::net
 	class EventLoopGroup
 	{
 	public:
-		using ThreadPoolPtr = ::std::unique_ptr<nets::base::ThreadPool>;
+		using ThreadPoolType = nets::base::ThreadPool;
+		using ThreadPoolPtr = ::std::unique_ptr<ThreadPoolType>;
 		using EventLoopRawPtr = EventLoop*;
 		using EventLoopPtr = ::std::unique_ptr<EventLoop>;
 		using EventLoopList = ::std::vector<EventLoopPtr>;
 		using SizeType = typename EventLoopList::size_type;
+		using MutexType = ::std::mutex;
+		using LockGuardType = ::std::lock_guard<MutexType>;
 
 	public:
-		EventLoopGroup();
-		explicit EventLoopGroup(nets::base::ThreadPool::NType numOfSubLoops);
+		explicit EventLoopGroup(nets::base::ThreadPool::NType numOfEventLoops);
 		~EventLoopGroup() = default;
 
 	public:
-		EventLoopRawPtr mainLoop();
+		void loopEach();
 		EventLoopRawPtr next();
 
 	private:
+		::std::atomic_bool started_ {false};
 		uint32_t nextLoop_ {0};
-		EventLoopPtr mainLoop_ {nullptr};
-		EventLoopList subLoops_ {};
+		uint32_t numOfEventLoops_ {0};
+		EventLoopList eventLoops_ {};
 		ThreadPoolPtr eventLoopThreadPool_ {nullptr};
+		MutexType mutex_ {};
 	};
 } // namespace nets::net
 
-#endif // NETS_EVENTLOOPGROUP_H
+#endif // NETS_NET_EVENT_LOOP_GROUP_H

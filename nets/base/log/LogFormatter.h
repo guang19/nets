@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/4/21.
 //
 
-#ifndef NETS_LOGFORMATTER_H
-#define NETS_LOGFORMATTER_H
+#ifndef NETS_BASE_LOG_FORMATTER_H
+#define NETS_BASE_LOG_FORMATTER_H
 
 #include "nets/base/log/LogMessage.h"
 #include "nets/base/Singleton.h"
@@ -36,4 +36,4 @@ namespace nets::base
 
 #define LOG_FORMATTER (nets::base::LogFormatterFactory::getLogFormatter())
 
-#endif // NETS_LOGFORMATTER_H
+#endif // NETS_BASE_LOG_FORMATTER_H

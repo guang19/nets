@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/4/1.
 //
 
-#ifndef NETS_LOGGING_H
-#define NETS_LOGGING_H
+#ifndef NETS_BASE_LOGGING_H
+#define NETS_BASE_LOGGING_H
 
 #include "nets/base/log/LogMessage.h"
 
@@ -51,4 +51,4 @@ namespace nets::base
 
 #define LOGS_FATAL nets::base::LogMessageStream(nets::base::LogLevel::FATAL, __FILE__, __LINE__).stream()
 
-#endif // NETS_LOGGING_H
+#endif // NETS_BASE_LOGGING_H

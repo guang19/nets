@@ -2,8 +2,8 @@
 // Created by n021949 on 2022/5/7.
 //
 
-#ifndef NETS_BYTEBUFFER_H
-#define NETS_BYTEBUFFER_H
+#ifndef NETS_BASE_BYTEBUFFER_H
+#define NETS_BASE_BYTEBUFFER_H
 
 #include <cstdint>
 #include <cstring>
@@ -92,4 +92,4 @@ namespace nets::base
 	};
 } // namespace nets::base
 
-#endif // NETS_BYTEBUFFER_H
+#endif // NETS_BASE_BYTEBUFFER_H

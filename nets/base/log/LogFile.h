@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/6/10.
 //
 
-#ifndef NETS_LOGFILE_H
-#define NETS_LOGFILE_H
+#ifndef NETS_BASE_LOG_FILE_H
+#define NETS_BASE_LOG_FILE_H
 
 #include <ctime>
 #include <memory>
@@ -56,4 +56,4 @@ namespace nets::base
 
 } // namespace nets::base
 
-#endif // NETS_LOGFILE_H
+#endif // NETS_BASE_LOG_FILE_H

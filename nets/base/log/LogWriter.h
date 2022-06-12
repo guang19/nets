@@ -2,20 +2,16 @@
 // Created by YangGuang on 2022/4/17.
 //
 
-#ifndef NETS_LOGWRITER_H
-#define NETS_LOGWRITER_H
+#ifndef NETS_BASE_LOG_WRITER_H
+#define NETS_BASE_LOG_WRITER_H
 
 #include <atomic>
-#include <condition_variable>
-#include <functional>
 #include <memory>
-#include <mutex>
 #include <thread>
 #include <vector>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/LogFile.h"
-#include "nets/base/Noncopyable.h"
 #include "nets/base/Singleton.h"
 #include "nets/base/StackBuffer.h"
 
@@ -195,4 +191,4 @@ namespace nets::base
 
 #define LOG_WRITER (nets::base::AsyncLogWriter::getInstance())
 
-#endif // NETS_LOGWRITER_H
+#endif // NETS_BASE_LOG_WRITER_H

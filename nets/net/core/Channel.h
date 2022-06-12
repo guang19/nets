@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/5/15.
 //
 
-#ifndef NETS_CHANNEL_H
-#define NETS_CHANNEL_H
+#ifndef NETS_NET_CHANNEL_H
+#define NETS_NET_CHANNEL_H
 
 #include <memory>
 #include <sys/epoll.h>
@@ -30,7 +30,7 @@ namespace nets::net
 	{
 	public:
 		using IdType = ::size_t;
-		using EventLoopRawPtr = ::std::shared_ptr<EventLoop>;
+		using EventLoopRawPtr = EventLoop*;
 
 	public:
 		explicit Channel(EventLoopRawPtr eventLoop);
@@ -112,4 +112,4 @@ namespace nets::net
 	};
 } // namespace nets::net
 
-#endif // NETS_CHANNEL_H
+#endif // NETS_NET_CHANNEL_H

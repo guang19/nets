@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/5/8.
 //
 
-#ifndef NETS_NETPACKAGE_H
-#define NETS_NETPACKAGE_H
+#ifndef NETS_NET_NET_PACKAGE_H
+#define NETS_NET_NET_PACKAGE_H
 
 #include "nets/base/ByteBuffer.h"
 
@@ -18,4 +18,4 @@ namespace nets::net
 	};
 } // namespace nets::net
 
-#endif // NETS_NETPACKAGE_H
+#endif // NETS_NET_NET_PACKAGE_H

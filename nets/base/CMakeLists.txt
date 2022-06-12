@@ -11,10 +11,14 @@ FILE(GLOB BaseSrcs ${PROJECT_SOURCE_DIR}/nets/base/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/concurrency/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/log/*.cpp)
 
-ADD_LIBRARY(nets_base STATIC ${BaseSrcs})
+ADD_LIBRARY(nets_base_shared SHARED ${BaseSrcs})
+ADD_LIBRARY(nets_base_static STATIC ${BaseSrcs})
 
-TARGET_LINK_LIBRARIES(nets_base pthread)
-INSTALL(TARGETS nets_base DESTINATION ${PROJECT_BINARY_DIR}/lib)
+TARGET_LINK_LIBRARIES(nets_base_shared pthread)
+TARGET_LINK_LIBRARIES(nets_base_static pthread)
+
+INSTALL(TARGETS nets_base_shared DESTINATION ${PROJECT_BINARY_DIR}/lib)
+INSTALL(TARGETS nets_base_static DESTINATION ${PROJECT_BINARY_DIR}/lib)
 
 IF(BUILD_NETS_TESTS)
     ADD_SUBDIRECTORY(tests)

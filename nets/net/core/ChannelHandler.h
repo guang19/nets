@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/5/23.
 //
 
-#ifndef NETS_CHANNELHANDLER_H
-#define NETS_CHANNELHANDLER_H
+#ifndef NETS_NET_CHANNEL_HANDLER_H
+#define NETS_NET_CHANNEL_HANDLER_H
 
 #include "nets/base/Noncopyable.h"
 
@@ -22,4 +22,4 @@ namespace nets::net
 	};
 } // namespace nets::net
 
-#endif // NETS_CHANNELHANDLER_H
+#endif // NETS_NET_CHANNEL_HANDLER_H

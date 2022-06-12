@@ -9,7 +9,7 @@
 #include <ctime>
 #include <deque>
 #include <functional>
-#include <mutex>
+#include <shared_mutex>
 
 #include "nets/base/Noncopyable.h"
 
@@ -23,10 +23,10 @@ namespace nets::base
 		using LReferenceType = ValueType&;
 		using RReferenceType = ValueType&&;
 		using ConstReferenceType = const ValueType&;
-		using MutexType = ::std::mutex;
-		using LockGuardType = ::std::lock_guard<MutexType>;
+		using MutexType = ::std::shared_mutex;
+		using SharedLockType = ::std::shared_lock<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;
-		using ConditionVariableType = ::std::condition_variable;
+		using ConditionVariableType = ::std::condition_variable_any;
 		using TimeType = ::time_t;
 		using MillisTimeType = ::std::chrono::milliseconds;
 		using ContainerType = ::std::deque<ValueType>;
@@ -39,20 +39,20 @@ namespace nets::base
 
 		bool isEmpty()
 		{
-			LockGuardType lock(mutex_);
+			SharedLockType lock(mutex_);
 			return queue_.empty();
 		}
 
 		SizeType size()
 		{
-			LockGuardType lock(mutex_);
+			SharedLockType lock(mutex_);
 			return queue_.size();
 		}
 
 		// notify blocking thread
 		void notifyBlockingThread()
 		{
-			LockGuardType lock(mutex_);
+			UniqueLockType lock(mutex_);
 			notFullCV_.notify_all();
 			notEmptyCV_.notify_all();
 		}

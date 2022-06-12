@@ -2,8 +2,8 @@
 // Created by n021949 on 2022/5/16.
 //
 
-#ifndef NETS_EPOLLSELECTOR_H
-#define NETS_EPOLLSELECTOR_H
+#ifndef NETS_NET_EPOLL_POLLER_H
+#define NETS_NET_EPOLL_POLLER_H
 
 #include <vector>
 
@@ -41,4 +41,4 @@ namespace nets::net
 	};
 }; // namespace nets::net
 
-#endif // NETS_EPOLLSELECTOR_H
+#endif // NETS_NET_EPOLL_POLLER_H

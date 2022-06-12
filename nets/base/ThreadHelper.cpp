@@ -13,8 +13,8 @@ namespace nets::base
 	namespace
 	{
 		constexpr const char* const MainThreadName = "Main";
-		__thread ::pid_t cacheTid_ = 0;
-		__thread char threadName_[ThreadNameMaxLength] = "unnamed";
+		__thread ::pid_t CacheTid = 0;
+		__thread char ThreadName[ThreadNameMaxLength] = "unnamed";
 	}
 
 	::pid_t getTid()
@@ -24,11 +24,11 @@ namespace nets::base
 
 	::pid_t currentTid()
 	{
-		if (cacheTid_ <= 0)
+		if (CacheTid <= 0)
 		{
-			cacheTid_ = getTid();
+			CacheTid = getTid();
 		}
-		return cacheTid_;
+		return CacheTid;
 	}
 
 	bool isMainThread()
@@ -38,9 +38,9 @@ namespace nets::base
 
 	void afterFork()
 	{
-		cacheTid_ = 0;
-		MEMZERO(threadName_, ThreadNameMaxLength);
-		::memcpy(threadName_, MainThreadName, strlen(MainThreadName));
+		CacheTid = 0;
+		MEMZERO(ThreadName, ThreadNameMaxLength);
+		::memcpy(ThreadName, MainThreadName, strlen(MainThreadName));
 	}
 
 	struct ThreadInitializer
@@ -48,8 +48,8 @@ namespace nets::base
 		ThreadInitializer()
 		{
 			currentTid();
-			MEMZERO(threadName_, ThreadNameMaxLength);
-			::memcpy(threadName_, MainThreadName, strlen(MainThreadName));
+			MEMZERO(ThreadName, ThreadNameMaxLength);
+			::memcpy(ThreadName, MainThreadName, strlen(MainThreadName));
 			::pthread_atfork(nullptr, nullptr, &afterFork);
 		}
 	};
@@ -59,12 +59,12 @@ namespace nets::base
 
 	void setCurrentThreadName(const char* threadName)
 	{
-		MEMZERO(threadName_, ThreadNameMaxLength);
-		::memcpy(threadName_, threadName, strlen(threadName));
+		MEMZERO(ThreadName, ThreadNameMaxLength);
+		::memcpy(ThreadName, threadName, strlen(threadName));
 	}
 
 	const char* currentThreadName()
 	{
-		return threadName_;
+		return ThreadName;
 	}
 } // namespace nets::base

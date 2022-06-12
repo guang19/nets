@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/4/9.
 //
 
-#ifndef NETS_THREADHELPER_H
-#define NETS_THREADHELPER_H
+#ifndef NETS_BASE_THREAD_HELPER_H
+#define NETS_BASE_THREAD_HELPER_H
 
 #include <cstdint>
 #include <pthread.h>
@@ -24,4 +24,4 @@ namespace nets::base
 	const char* currentThreadName();
 } // namespace nets::base
 
-#endif // NETS_THREADHELPER_H
+#endif // NETS_BASE_THREAD_HELPER_H

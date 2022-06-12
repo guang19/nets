@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/4/3.
 //
 
-#ifndef NETS_LOGBUFFERSTREAM_H
-#define NETS_LOGBUFFERSTREAM_H
+#ifndef NETS_BASE_LOG_BUFFER_STREAM_H
+#define NETS_BASE_LOG_BUFFER_STREAM_H
 
 #include <string>
 
@@ -54,4 +54,4 @@ namespace nets::base
 	};
 } // namespace nets::base
 
-#endif // NETS_LOGBUFFERSTREAM_H
+#endif // NETS_BASE_LOG_BUFFER_STREAM_H

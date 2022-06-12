@@ -2,8 +2,8 @@
 // Created by n021949 on 2022/5/13.
 //
 
-#ifndef NETS_SOCKET_H
-#define NETS_SOCKET_H
+#ifndef NETS_NET_SOCKET_H
+#define NETS_NET_SOCKET_H
 
 #include "nets/net/core/InetSockAddress.h"
 
@@ -20,8 +20,8 @@ namespace nets::net
 	{
 		constexpr FdType InvalidFd = -1;
 
-		FdType createTcpSocket(SockAddrFamily family = AF_INET);
-		FdType createUdpSocket(SockAddrFamily family = AF_INET);
+		FdType createTcpSocket(SockAddrFamily family = AF_INET6);
+		FdType createUdpSocket(SockAddrFamily family = AF_INET6);
 		void closeFd(FdType fd);
 
 		FdType createIdleFd();
@@ -47,4 +47,4 @@ namespace nets::net
 	} // namespace socket
 } // namespace nets::net
 
-#endif // NETS_SOCKET_H
+#endif // NETS_NET_SOCKET_H

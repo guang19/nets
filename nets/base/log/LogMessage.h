@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/5/7.
 //
 
-#ifndef NETS_LOGMESSAGE_H
-#define NETS_LOGMESSAGE_H
+#ifndef NETS_BASE_LOG_MESSAGE_H
+#define NETS_BASE_LOG_MESSAGE_H
 
 #include "nets/base/log/LogBufferStream.h"
 #include "nets/base/Timestamp.h"
@@ -62,4 +62,4 @@ namespace nets::base
 	};
 } // namespace nets::base
 
-#endif // NETS_LOGMESSAGE_H
+#endif // NETS_BASE_LOG_MESSAGE_H

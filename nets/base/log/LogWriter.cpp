@@ -169,8 +169,8 @@ namespace nets::base
 	{
 		auto buffers = ::std::make_unique<BufferVectorType>();
 		buffers->reserve(LOG_FILE_ROLLING_SIZE >> 1);
-		BufferPtr tmpBuffer1 = ::std::make_unique<BufferType>();
-		BufferPtr tmpBuffer2 = ::std::make_unique<BufferType>();
+		auto tmpBuffer1 = ::std::make_unique<BufferType>();
+		auto tmpBuffer2 = ::std::make_unique<BufferType>();
 		TimeType currentTime = 0;
 		while (running_)
 		{
@@ -216,7 +216,7 @@ namespace nets::base
 		}
 		// last check
 		assert(!running_);
-		if (!buffers_->empty() || (0 < cacheBuffer_->len()))
+		if (!buffers_->empty() || (cacheBuffer_->len() > 0))
 		{
 			buffers_->push_back(::std::move(cacheBuffer_));
 			::time(&currentTime);

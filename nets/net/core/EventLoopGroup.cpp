@@ -4,32 +4,42 @@
 
 #include "nets/net/core/EventLoopGroup.h"
 
-#include "nets/base/CommonMacro.h"
-
 namespace nets::net
 {
-	EventLoopGroup::EventLoopGroup() : EventLoopGroup(0) {}
-
-	EventLoopGroup::EventLoopGroup(nets::base::ThreadPool::NType numOfSubLoops)
+	EventLoopGroup::EventLoopGroup(nets::base::ThreadPool::NType numOfEventLoops)
+		: started_(false)
 	{
-		if (numOfSubLoops > 0)
+		if (numOfEventLoops <= 0)
 		{
-			subLoops_.reserve(numOfSubLoops);
-			eventLoopThreadPool_ = ::std::make_unique<nets::base::ThreadPool>(numOfSubLoops, numOfSubLoops, 0);
+			throw ::std::invalid_argument("numOfEventLoops must be greater than 0");
+		}
+		numOfEventLoops_ = numOfEventLoops;
+		eventLoops_.reserve(numOfEventLoops_);
+	}
+
+	void EventLoopGroup::loopEach()
+	{
+		LockGuardType lock(mutex_);
+		started_ = true;
+		eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, numOfEventLoops_);
+		for (uint32_t i = 0; i < numOfEventLoops_; ++i)
+		{
+			auto eventLoop = new EventLoop();
+			eventLoops_.emplace_back(eventLoop);
+			eventLoopThreadPool_->execute([&eventLoop]()
+										  {
+											 eventLoop->loop();
+										  });
 		}
 	}
 
 	EventLoopGroup::EventLoopRawPtr EventLoopGroup::next()
 	{
-		EventLoopRawPtr eventLoop = mainLoop_.get();
-		if (!subLoops_.empty())
+		EventLoopRawPtr nextEventLoop = eventLoops_[nextLoop_++].get();
+		if (static_cast<SizeType>(nextLoop_) >= eventLoops_.size())
 		{
-			eventLoop = subLoops_[nextLoop_++].get();
-			if (static_cast<SizeType>(nextLoop_) >= subLoops_.size())
-			{
-				nextLoop_ = 0;
-			}
+			nextLoop_ = 0;
 		}
-		return eventLoop;
+		return nextEventLoop;
 	}
 } // namespace nets::net

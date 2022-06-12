@@ -2,8 +2,8 @@
 // Created by YangGuang on 2022/5/2.
 //
 
-#ifndef NETS_TIMESTAMP_H
-#define NETS_TIMESTAMP_H
+#ifndef NETS_BASE_TIMESTAMP_H
+#define NETS_BASE_TIMESTAMP_H
 
 #include <cstdint>
 #include <ctime>
@@ -58,4 +58,4 @@ namespace nets::base
 	};
 } // namespace nets::base
 
-#endif // NETS_TIMESTAMP_H
+#endif // NETS_BASE_TIMESTAMP_H

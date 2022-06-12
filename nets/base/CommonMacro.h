@@ -2,9 +2,11 @@
 // Created by n021949 on 2022/4/28.
 //
 
-#ifndef NETS_COMMONMACRO_H
-#define NETS_COMMONMACRO_H
+#ifndef NETS_BASE_COMMONMACRO_H
+#define NETS_BASE_COMMONMACRO_H
 
+#include <cstdarg>
+#include <cstdio>
 #include <cstring>
 #include <unistd.h>
 
@@ -22,4 +24,17 @@
 		UNUSED(jugg);                                                                                                       \
 	} while (0)
 
-#endif // NETS_COMMONMACRO_H
+template <class E>
+void throwFmt(const char* fmt, ...)
+{
+	char msgBuf[255] = {0};
+	va_list vl;
+	va_start(vl, fmt);
+	::vsnprintf(msgBuf, sizeof(msgBuf), fmt, vl);
+	va_end(vl);
+	throw E(msgBuf);
+}
+
+#define THROW_FMT(EXCEPTION, fmt, ...) (throwFmt<EXCEPTION>(fmt"\n", ##__VA_ARGS__))
+
+#endif // NETS_BASE_COMMONMACRO_H

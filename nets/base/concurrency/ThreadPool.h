@@ -7,15 +7,14 @@
 
 #include <atomic>
 #include <cassert>
-#include <functional>
 #include <future>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/Logging.h"
-#include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
 
 namespace nets::base

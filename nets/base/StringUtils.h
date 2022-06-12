@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/6/9.
 //
 
-#ifndef NETS_STRINGUTILS_H
-#define NETS_STRINGUTILS_H
+#ifndef NETS_BASE_STRING_UTILS_H
+#define NETS_BASE_STRING_UTILS_H
 
 #include <algorithm>
 #include <cmath>
@@ -83,4 +83,4 @@ namespace nets::base
 	} // namespace utils
 } // namespace nets::base
 
-#endif // NETS_STRINGUTILS_H
+#endif // NETS_BASE_STRING_UTILS_H

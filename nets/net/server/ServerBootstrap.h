@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/5/18.
 //
 
-#ifndef NETS_SERVERBOOTSTRAP_H
-#define NETS_SERVERBOOTSTRAP_H
+#ifndef NETS_NET_SERVER_BOOTSTRAP_H
+#define NETS_NET_SERVER_BOOTSTRAP_H
 
 #include "nets/net/core/EventLoopGroup.h"
 #include "nets/net/core/InetSockAddress.h"
@@ -21,15 +21,18 @@ namespace nets::net
 		~ServerBootstrap();
 
 	public:
-		ServerBootstrap& group(EventLoopGroupRawPtr subLoops);
+		ServerBootstrap& group(EventLoopGroupRawPtr group);
+		ServerBootstrap& group(EventLoopGroupRawPtr mainGroup, EventLoopGroupRawPtr subGroup);
 		ServerBootstrap& bind(const InetSockAddress& listenAddr);
 		ServerBootstrap& bind(const char* ip, PortType port);
 		ServerBootstrap& bind(PortType port);
+		void startUp();
 
 	private:
 		::std::atomic_bool running_ {false};
-		EventLoopGroupPtr eventLoopGroup_ {};
+		EventLoopGroupRawPtr mainLoopGroup_ {nullptr};
+		EventLoopGroupRawPtr subLoopGroup_ {nullptr};
 	};
 } // namespace nets::net
 
-#endif // NETS_SERVERBOOTSTRAP_H
+#endif // NETS_NET_SERVER_BOOTSTRAP_H

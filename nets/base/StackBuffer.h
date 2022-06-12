@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/6/9.
 //
 
-#ifndef NETS_STACKBUFFER_H
-#define NETS_STACKBUFFER_H
+#ifndef NETS_BASE_STACK_BUFFER_H
+#define NETS_BASE_STACK_BUFFER_H
 
 #include <cstdint>
 
@@ -102,4 +102,4 @@ namespace nets::base
 	}
 } // namespace nets::base
 
-#endif // NETS_STACKBUFFER_H
+#endif // NETS_BASE_STACK_BUFFER_H

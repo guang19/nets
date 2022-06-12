@@ -15,10 +15,14 @@ FILE(GLOB NetSrcs ${PROJECT_SOURCE_DIR}/nets/net/core/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/net/server/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/net/client/*.cpp)
 
-ADD_LIBRARY(nets_net STATIC ${NetSrcs})
-TARGET_LINK_LIBRARIES(nets_net nets_base)
+ADD_LIBRARY(nets_net_shared SHARED ${NetSrcs})
+ADD_LIBRARY(nets_net_static STATIC ${NetSrcs})
 
-INSTALL(TARGETS nets_net DESTINATION ${PROJECT_BINARY_DIR}/lib)
+TARGET_LINK_LIBRARIES(nets_net_shared nets_base_static)
+TARGET_LINK_LIBRARIES(nets_net_static nets_base_static)
+
+INSTALL(TARGETS nets_net_shared DESTINATION ${PROJECT_BINARY_DIR}/lib)
+INSTALL(TARGETS nets_net_static DESTINATION ${PROJECT_BINARY_DIR}/lib)
 
 IF(BUILD_NETS_TESTS)
     ADD_SUBDIRECTORY(tests)
