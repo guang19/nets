@@ -30,6 +30,22 @@ namespace nets::net
 		return *this;
 	}
 
+	ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& listenAddr)
+	{
+
+		return *this;
+	}
+
+	ServerBootstrap& ServerBootstrap::bind(const char* ip, PortType port)
+	{
+		return *this;
+	}
+
+	ServerBootstrap& ServerBootstrap::bind(PortType port)
+	{
+		return *this;
+	}
+
 	void ServerBootstrap::startUp()
 	{
 		if (running_)

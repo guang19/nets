@@ -17,7 +17,6 @@ ADD_LIBRARY(nets_base_static STATIC ${BaseSrcs})
 TARGET_LINK_LIBRARIES(nets_base_shared pthread)
 TARGET_LINK_LIBRARIES(nets_base_static pthread)
 
-INSTALL(TARGETS nets_base_shared DESTINATION ${PROJECT_BINARY_DIR}/lib)
 INSTALL(TARGETS nets_base_static DESTINATION ${PROJECT_BINARY_DIR}/lib)
 
 IF(BUILD_NETS_TESTS)

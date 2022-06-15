@@ -37,7 +37,7 @@ namespace nets::net
 		virtual ~Channel() = default;
 
 	public:
-		void registerToLoop();
+		void registerTo();
 		void modify();
 		void deregister();
 

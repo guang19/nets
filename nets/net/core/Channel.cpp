@@ -14,7 +14,7 @@ namespace nets::net
 	{
 	}
 
-	void Channel::registerToLoop()
+	void Channel::registerTo()
 	{
 		eventLoop_->registerChannel(shared_from_this());
 	}

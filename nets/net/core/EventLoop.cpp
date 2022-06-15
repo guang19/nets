@@ -7,7 +7,6 @@
 #include <cassert>
 
 #include "nets/base/log/Logging.h"
-#include "nets/base/ThreadHelper.h"
 #include "nets/net/poller/Poller.h"
 
 namespace nets::net
@@ -17,7 +16,7 @@ namespace nets::net
 		__thread EventLoop* CurrentThreadEventLoop = nullptr;
 	}
 
-	EventLoop::EventLoop() : running_(false), poller_(PollerFactory::getPoller())
+	EventLoop::EventLoop() : running_(false), threadId_(nets::base::currentTid()), poller_(PollerFactory::getPoller())
 	{
 		assert(CurrentThreadEventLoop == nullptr);
 		// one loop per thread
@@ -29,7 +28,7 @@ namespace nets::net
 		{
 			CurrentThreadEventLoop = this;
 		}
-		LOGS_INFO << "one loop is created in thread" << nets::base::currentTid();
+		LOGS_INFO << "one loop is created in thread" << threadId_;
 	}
 
 	EventLoop::~EventLoop() {}
@@ -38,15 +37,15 @@ namespace nets::net
 
 	void EventLoop::shutdown() {}
 
-	bool EventLoop::isInEventLoopThread() const
+	bool EventLoop::isInCurrentEventLoop() const
 	{
 		return (this == CurrentThreadEventLoop);
 	}
 
-	EventLoop::EventLoopPtr EventLoop::currentThreadEventLoop() const
+	EventLoop::EventLoopRawPtr EventLoop::currentThreadEventLoop() const
 	{
-		assert(isInEventLoopThread());
-		return CurrentThreadEventLoop->shared_from_this();
+		assert(isInCurrentEventLoop());
+		return CurrentThreadEventLoop;
 	}
 
 	void EventLoop::notify() {}

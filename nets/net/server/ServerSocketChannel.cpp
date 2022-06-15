@@ -29,7 +29,7 @@ namespace nets::net
 		socket::bind(sockFd_, sockAddress.cSockAddr());
 		socket::listen(sockFd_);
 		addReadEvent();
-		registerToLoop();
+		registerTo();
 		assert(isReadable());
 		assert(uniqueId() > 0);
 	}

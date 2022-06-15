@@ -263,7 +263,7 @@ namespace nets::base
 	ThreadPool::TaskType ThreadPool::makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise,
 											  ::std::function<RetType()> promiseTask)
 	{
-		TaskType task = [this, promise, f = ::std::move(promiseTask)]()
+		TaskType task = [this, promise, f = ::std::move(promiseTask)]() mutable
 		{
 			assert(promise.use_count() > 0);
 			try
@@ -290,7 +290,7 @@ namespace nets::base
 	ThreadPool::TaskType ThreadPool::makeTask(const ::std::shared_ptr<::std::promise<void>>& promise,
 											  ::std::function<void()> promiseTask)
 	{
-		TaskType task = [this, promise, f = ::std::move(promiseTask)]()
+		TaskType task = [this, promise, f = ::std::move(promiseTask)]() mutable
 		{
 			try
 			{
