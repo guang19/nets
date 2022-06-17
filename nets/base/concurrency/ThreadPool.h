@@ -77,6 +77,9 @@ namespace nets::base
 			return name_;
 		}
 
+		template <typename Fn, typename... Args>
+		bool execute(Fn&& func, Args&&... args);
+
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Please note that if you need to use the returned future to get the result of the task execution, please use
 		// try
@@ -97,12 +100,8 @@ namespace nets::base
 		// }
 		// to catch possible exceptions. The exceptions are as follows:
 		// 1. An exception may occur when the submitted task is executed, and the promise sets the abnormal result;
-		// 2. After the task is submitted, the thread pool shuts down before the task is executed;
+		// 2. After the task is submitted, the thread pool shutsdown before the task is executed;
 		// 3. The thread pool is full and The task queue cannot receive new tasks, then the task will be discarded;
-
-		template <typename Fn, typename... Args>
-		void execute(Fn&& func, Args&&... args);
-
 		template <typename Fn, typename... Args,
 				  typename HasRet = typename ::std::enable_if<
 					  !::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
@@ -113,12 +112,6 @@ namespace nets::base
 					  ::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
 		::std::future<void> submit(Fn&& func, Args&&... args);
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	private:
-		template <typename RetType>
-		TaskType makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise, ::std::function<RetType()> promiseTask);
-
-		TaskType makeTask(const ::std::shared_ptr<::std::promise<void>>& promise, ::std::function<void()> promiseTask);
 
 	private:
 		void runThread(ThreadWrapperRawPtr threadWrapper);
@@ -173,9 +166,37 @@ namespace nets::base
 	};
 
 	template <typename Fn, typename... Args>
-	void ThreadPool::execute(Fn&& func, Args&&... args)
+	bool ThreadPool::execute(Fn&& func, Args&&... args)
 	{
-		submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		NType ctl = ctl_.load();
+		assert(isRunning(ctl));
+		if (isShutdown(ctl))
+		{
+			LOGS_ERROR << "thread pool [" << name_ << "] is shutdown";
+			return false;
+		}
+		// if num of active threads less than num of corePoolSize
+		if (numOfActiveThreads(ctl) < corePoolSize_)
+		{
+			if (addThreadTask(task, true))
+			{
+				return true;
+			}
+			// add task to core thread failed, update ctl
+			ctl = ctl_.load();
+		}
+		// if task queue is not full, try push task to task queue
+		if (isRunning(ctl) && taskQueue_->tryPush(task))
+		{
+			return true;
+		}
+		// task queue cannot receive new task, create non-core thread to execute task
+		if (addThreadTask(task, false))
+		{
+			return true;
+		}
+		return false;
 	}
 
 	template <typename Fn, typename... Args, typename HasRet>
@@ -184,92 +205,14 @@ namespace nets::base
 		using RetType = typename ::std::invoke_result<Fn&&, Args&&...>::type;
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
-		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		TaskType task = makeTask<RetType>(promise, promiseTask);
-		assert(2 == promise.use_count());
-		NType ctl = ctl_.load();
-		assert(isRunning(ctl));
-		if (isShutdown(ctl))
-		{
-			LOGS_ERROR << "thread pool [" << name_ << "] has not been initialized";
-			promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
-			return future;
-		}
-		// if num of active threads less than num of corePoolSize
-		if (numOfActiveThreads(ctl) < corePoolSize_)
-		{
-			if (addThreadTask(task, true))
-			{
-				return future;
-			}
-		}
-		// add task to core thread failed, update ctl
-		ctl = ctl_.load();
-		// if task queue is not full, try push task to task queue
-		if (isRunning(ctl) && taskQueue_->tryPush(task))
-		{
-			return future;
-		}
-		// task queue cannot receive new task, create non-core thread to execute task
-		if (addThreadTask(task, false))
-		{
-			return future;
-		}
-		promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
-		return future;
-	}
-
-	template <typename Fn, typename... Args, typename HasRet>
-	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
-	{
-		auto promise = ::std::make_shared<::std::promise<void>>();
-		auto future = promise->get_future();
-		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		TaskType task = makeTask(promise, promiseTask);
-		assert(2 == promise.use_count());
-		NType ctl = ctl_.load();
-		assert(isRunning(ctl));
-		if (isShutdown(ctl))
-		{
-			LOGS_ERROR << "thread pool [" << name_ << "] has not been initialized";
-			promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
-			return future;
-		}
-		// if num of active threads less than num of corePoolSize
-		if (numOfActiveThreads(ctl) < corePoolSize_)
-		{
-			if (addThreadTask(task, true))
-			{
-				return future;
-			}
-		}
-		// add task to core thread failed, update ctl
-		ctl = ctl_.load();
-		// if task queue is not full, try push task to task queue
-		if (isRunning(ctl) && taskQueue_->tryPush(task))
-		{
-			return future;
-		}
-		// task queue cannot receive new task, create non-core thread to execute task
-		if (addThreadTask(task, false))
-		{
-			return future;
-		}
-		promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
-		return future;
-	}
-
-	template <typename RetType>
-	ThreadPool::TaskType ThreadPool::makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise,
-											  ::std::function<RetType()> promiseTask)
-	{
-		TaskType task = [this, promise, f = ::std::move(promiseTask)]() mutable
+		::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
 		{
 			assert(promise.use_count() > 0);
 			try
 			{
-				RetType r = f();
-				promise->set_value(r);
+				RetType result = f();
+				promise->set_value(result);
 			}
 			catch (const ::std::exception& exception)
 			{
@@ -284,13 +227,21 @@ namespace nets::base
 						   << "] execution in thread pool [" << name_ << ']';
 			}
 		};
-		return task;
+		assert(2 == promise.use_count());
+		if (!execute(::std::move(promiseTask)))
+		{
+			promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
+		}
+		return future;
 	}
 
-	ThreadPool::TaskType ThreadPool::makeTask(const ::std::shared_ptr<::std::promise<void>>& promise,
-											  ::std::function<void()> promiseTask)
+	template <typename Fn, typename... Args, typename HasRet>
+	::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
 	{
-		TaskType task = [this, promise, f = ::std::move(promiseTask)]() mutable
+		auto promise = ::std::make_shared<::std::promise<void>>();
+		auto future = promise->get_future();
+		TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
 		{
 			try
 			{
@@ -310,7 +261,12 @@ namespace nets::base
 						   << "] execution in thread pool [" << name_ << ']';
 			}
 		};
-		return task;
+		assert(2 == promise.use_count());
+		if (!execute(::std::move(promiseTask)))
+		{
+			promise->set_exception(::std::make_exception_ptr(::std::future_error(::std::future_errc::no_state)));
+		}
+		return future;
 	}
 } // namespace nets::base
 

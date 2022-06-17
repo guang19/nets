@@ -8,8 +8,6 @@ SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 #SET(CMAKE_C_COMPILER "/usr/bin/clang")
 #SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 
-ENABLE_TESTING()
-
 ################################################################################################
 # log level,default DEBUG. option：
 # - 0：TRACE
@@ -40,6 +38,7 @@ IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
 ELSE()
     OPTION(BUILD_NETS_TESTS "Build nets tests" ON)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+    ENABLE_TESTING()
     SET(GOOGLE_TEST_INC_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/include)
     SET(GOOGLE_TEST_LIB_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/lib)
 ENDIF()

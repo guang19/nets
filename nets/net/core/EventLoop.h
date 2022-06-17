@@ -67,13 +67,6 @@ namespace nets::net
 		::std::future<void> submit(Fn&& func, Args&&... args);
 
 	private:
-		template <typename RetType>
-		FunctorType makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise,
-							 ::std::function<RetType()> promiseTask);
-
-		FunctorType makeTask(const ::std::shared_ptr<::std::promise<void>>& promise, ::std::function<void()> promiseTask);
-
-	private:
 		::std::atomic_bool running_ {false};
 		const ::pid_t threadId_ {0};
 		PollerPtr poller_ {nullptr};
@@ -86,7 +79,18 @@ namespace nets::net
 	template <typename Fn, typename... Args>
 	void EventLoop::execute(Fn&& func, Args&&... args)
 	{
-		submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		FunctorType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		if (isInCurrentEventLoop())
+		{
+			task();
+		}
+		else
+		{
+			{
+				LockGuardType lock(mutex_);
+				pendingFunctors_.push_back(::std::move(task));
+			}
+		}
 	}
 
 	template <typename Fn, typename... Args, typename HasRet>
@@ -95,52 +99,8 @@ namespace nets::net
 		using RetType = typename ::std::invoke_result<Fn&&, Args&&...>::type;
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
-		::std::function<RetType()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		FunctorType task = makeTask<RetType>(promise, promiseTask);
-		assert(2 == promise.use_count());
-		if (isInCurrentEventLoop())
-		{
-			task();
-		}
-		else
-		{
-			{
-				LockGuardType lock(mutex_);
-				pendingFunctors_.push_back(::std::move(task));
-			}
-
-		}
-		return future;
-	}
-
-	template <typename Fn, typename... Args, typename HasRet>
-	::std::future<void> EventLoop::submit(Fn&& func, Args&&... args)
-	{
-		auto promise = ::std::make_shared<::std::promise<void>>();
-		auto future = promise->get_future();
-		::std::function<void()> promiseTask = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		FunctorType task = makeTask(promise, promiseTask);
-		assert(2 == promise.use_count());
-		if (isInCurrentEventLoop())
-		{
-			task();
-		}
-		else
-		{
-			{
-				LockGuardType lock(mutex_);
-				pendingFunctors_.push_back(::std::move(task));
-			}
-
-		}
-		return future;
-	}
-
-	template <typename RetType>
-	EventLoop::FunctorType EventLoop::makeTask(const ::std::shared_ptr<::std::promise<RetType>>& promise,
-											   ::std::function<RetType()> promiseTask)
-	{
-		FunctorType task = [this, promise, f = ::std::move(promiseTask)]() mutable
+		::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		FunctorType promiseTask = [this, promise, f = ::std::move(task)]() mutable
 		{
 			assert(promise.use_count() > 0);
 			try
@@ -161,14 +121,20 @@ namespace nets::net
 						   << "] execution in event loop thread [" << threadId_ << "]";
 			}
 		};
-		return task;
+		assert(2 == promise.use_count());
+		execute(::std::move(promiseTask));
+		return future;
 	}
 
-	EventLoop::FunctorType EventLoop::makeTask(const ::std::shared_ptr<::std::promise<void>>& promise,
-											   ::std::function<void()> promiseTask)
+	template <typename Fn, typename... Args, typename HasRet>
+	::std::future<void> EventLoop::submit(Fn&& func, Args&&... args)
 	{
-		FunctorType task = [this, promise, f = ::std::move(promiseTask)]() mutable
+		auto promise = ::std::make_shared<::std::promise<void>>();
+		auto future = promise->get_future();
+		::std::function<void()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		FunctorType promiseTask = [this, promise, f = ::std::move(task)]() mutable
 		{
+			assert(promise.use_count() > 0);
 			try
 			{
 				f();
@@ -187,7 +153,9 @@ namespace nets::net
 						   << "] execution in event loop thread [" << threadId_ << "]";
 			}
 		};
-		return task;
+		assert(2 == promise.use_count());
+		execute(::std::move(promiseTask));
+		return future;
 	}
 } // namespace nets::net
 

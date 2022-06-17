@@ -32,6 +32,7 @@ protected:
 
 TEST_F(ThreadPoolTest, ExecuteTask)
 {
+	threadPool->shutdown();
 	threadPool->execute(
 		[]() -> void
 		{
@@ -40,19 +41,40 @@ TEST_F(ThreadPoolTest, ExecuteTask)
 	threadPool->execute(
 		[](int num) -> bool
 		{
-			::printf("2===%s\n", currentThreadName());
-			throw ::std::invalid_argument("ExecuteTask");
+			try
+			{
+				::printf("2===%s\n", currentThreadName());
+				throw ::std::invalid_argument("ExecuteTask");
+			}
+			catch (...)
+			{
+			}
 			return true;
-		},
-		5);
+		}, 5);
 	threadPool->execute(
 		[]() -> bool
 		{
-			::printf("3===%s\n", currentThreadName());
-			throw "ExecuteTask";
+			try
+			{
+				::printf("3===%s\n", currentThreadName());
+				throw "ExecuteTask";
+			}
+			catch (...)
+			{
+			}
 			return true;
 		});
 	::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
+}
+
+TEST_F(ThreadPoolTest, ExecuteTaskThrow)
+{
+	threadPool->execute(
+		[](int num) -> bool
+		{
+			::printf("1===%s\n", currentThreadName());
+			throw ::std::invalid_argument("ExecuteTask");
+		}, 5);
 }
 
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
@@ -136,6 +158,6 @@ TEST_F(ThreadPoolTest, SubmitFutureThrow)
 
 int main(int argc, char** argv)
 {
-		::testing::InitGoogleTest(&argc, argv);
-		return RUN_ALL_TESTS();
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
