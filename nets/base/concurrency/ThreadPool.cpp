@@ -32,10 +32,10 @@ namespace nets::base
 	{
 		if (corePoolSize_ == 0 || corePoolSize_ > maximumPoolSize_)
 		{
-			LOGS_FATAL << "corePoolSize must be greater than 0 and maxPoolSize must be greater than maxPoolSize";
+			LOGS_FATAL << "ThreadPool::ThreadPool corePoolSize must be greater than 0 and maxPoolSize must be greater than maxPoolSize";
 		}
 		threadPool_.reserve(maximumPoolSize_);
-		LOGS_INFO << "thread pool [" << name_ << "] init success";
+		LOGS_INFO << "ThreadPool::ThreadPool thread pool [" << name_ << "] init success";
 	}
 
 	ThreadPool::~ThreadPool()
@@ -47,7 +47,7 @@ namespace nets::base
 	{
 		if (isShutdown(ctl_))
 		{
-			LOGS_DEBUG << "thread pool [" << name_ << "] has been shutdown";
+			LOGS_DEBUG << "ThreadPool::shutdown thread pool [" << name_ << "] has been shutdown";
 			return;
 		}
 		// cas
@@ -76,7 +76,7 @@ namespace nets::base
 			taskQueue_->tryPop(tmpTask);
 		}
 		assert(taskQueue_->isEmpty());
-		LOGS_INFO << "thread pool [" << name_ << "] shutdown success";
+		LOGS_INFO << "ThreadPool::shutdown thread pool [" << name_ << "] shutdown success";
 	}
 
 	void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapper)

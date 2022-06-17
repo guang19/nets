@@ -15,8 +15,6 @@ namespace nets::net
 	{
 		constexpr ::size_t InitEventSize = 12;
 		constexpr ::time_t Timeout = 1;
-		// unique id per-thread
-		__thread Channel::IdType ChannelUniqueId = 0;
 	} // namespace
 
 	EpollPoller::EpollPoller(EventLoopPtr eventLoop)
@@ -25,7 +23,7 @@ namespace nets::net
 		assert(epollFd_ >= 0);
 		if (epollFd_ < 0)
 		{
-			LOGS_FATAL << "epoll create1 failed with result epollFd < 0";
+			LOGS_FATAL << "EpollPoller::EpollPoller epoll create1 failed with result epollFd < 0";
 		}
 	}
 
@@ -40,7 +38,7 @@ namespace nets::net
 		int32_t numOfReadyEvent = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
 		if (numOfReadyEvent > 0)
 		{
-			LOGS_DEBUG << "epoll wait:" << numOfReadyEvent << " events";
+			LOGS_DEBUG << "EpollPoller::epoll wait:" << numOfReadyEvent << " events";
 			prepareChannelEvents(numOfReadyEvent, activeChannels);
 			if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
 			{
@@ -49,7 +47,7 @@ namespace nets::net
 		}
 		else if (numOfReadyEvent < 0)
 		{
-			LOGS_ERROR << "epoll error";
+			LOGS_ERROR << "EpollPoller::epoll failed";
 		}
 	}
 
@@ -69,15 +67,7 @@ namespace nets::net
 			assert(!hasChannel(channel));
 			if (epollCtl(EPOLL_CTL_ADD, channel))
 			{
-				++ChannelUniqueId;
-				assert(ChannelUniqueId > 0);
-				// ChannelUniqueId is an unsigned type, ChannelUniqueId equals 0 means that ChannelUniqueId has reached the
-				// maximum
-				if (ChannelUniqueId == 0)
-				{
-					++ChannelUniqueId;
-				}
-				channels_[ChannelUniqueId] = channel;
+				channels_[channel->sockFd()] = channel;
 				channel->setRegistered(true);
 			}
 		}
@@ -96,7 +86,7 @@ namespace nets::net
 			{
 				if (epollCtl(EPOLL_CTL_DEL, channel))
 				{
-					channels_.erase(channel->uniqueId());
+					channels_.erase(channel->sockFd());
 					channel->setRegistered(false);
 				}
 			}
@@ -118,7 +108,7 @@ namespace nets::net
 		assert(channel->isNoneEvent());
 		epollCtl(EPOLL_CTL_DEL, channel);
 		channel->setRegistered(false);
-		channels_.erase(channel->uniqueId());
+		channels_.erase(channel->sockFd());
 	}
 
 	bool EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)
@@ -128,7 +118,7 @@ namespace nets::net
 		event.data.fd = fd;
 		event.data.ptr = channel.get();
 		event.events = channel->events();
-		if (::epoll_ctl(epollFd_, opt, fd, &event) == 0)
+		if (0 == ::epoll_ctl(epollFd_, opt, fd, &event))
 		{
 			return true;
 		}

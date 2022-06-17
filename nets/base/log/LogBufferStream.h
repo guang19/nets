@@ -15,9 +15,8 @@ namespace nets::base
 	{
 		// log length limit: 2K
 		constexpr uint32_t DefaultLogBufferLength = (1024 << 1);
+		using LogBuffer = StackBuffer<DefaultLogBufferLength>;
 	} // namespace
-
-	using LogBuffer = StackBuffer<DefaultLogBufferLength>;
 
 	class LogBufferStream : Noncopyable
 	{

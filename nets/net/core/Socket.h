@@ -32,6 +32,9 @@ namespace nets::net
 		void listen(FdType sockFd);
 		FdType accept(FdType sockFd, SockAddr* sockAddr);
 
+		::ssize_t read(FdType fd, void* buf, ::size_t n);
+		::ssize_t write(FdType fd, const void* buf, ::size_t n);
+
 		// usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
 		// SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x
 		void setSockSendBuf(FdType sockFd, OptValType sendBufLen = 16 * 1024);

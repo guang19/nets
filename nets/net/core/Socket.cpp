@@ -17,7 +17,7 @@ namespace nets::net::socket
 		FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
 		if (sockFd < 0)
 		{
-			LOGS_FATAL << "create tcp socket failed";
+			LOGS_FATAL << "socket::createTcpSocket failed";
 		}
 		return sockFd;
 	}
@@ -27,7 +27,7 @@ namespace nets::net::socket
 		FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
 		if (sockFd < 0)
 		{
-			LOGS_FATAL << "create udp socket failed";
+			LOGS_FATAL << "socket::createUdpSocket failed";
 		}
 		return sockFd;
 	}
@@ -38,7 +38,7 @@ namespace nets::net::socket
 		{
 			if (0 != ::close(fd))
 			{
-				LOGS_ERROR << "close socket failed";
+				LOGS_ERROR << "socket::closeFd failed";
 			}
 		}
 	}
@@ -48,7 +48,7 @@ namespace nets::net::socket
 		FdType idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
 		if (idleFd < 0)
 		{
-			LOGS_FATAL << "create idleFd failed";
+			LOGS_FATAL << "socket::createIdleFd failed";
 		}
 		return idleFd;
 	}
@@ -66,7 +66,7 @@ namespace nets::net::socket
 		auto len = static_cast<SockLenType>(sizeof(SockAddr));
 		if (0 != ::bind(sockFd, sockAddr, len))
 		{
-			LOGS_FATAL << "bind socket failed";
+			LOGS_FATAL << "socket::bind failed";
 		}
 	}
 
@@ -74,7 +74,7 @@ namespace nets::net::socket
 	{
 		if (0 != ::listen(sockFd, SOMAXCONN))
 		{
-			LOGS_FATAL << "listen socket failed";
+			LOGS_FATAL << "socket::listen failed";
 		}
 	}
 
@@ -84,16 +84,26 @@ namespace nets::net::socket
 		FdType connFd = InvalidFd;
 		if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) < 0)
 		{
-			LOGS_FATAL << "accept4 socket failed";
+			LOGS_FATAL << "socket::accept failed";
 		}
 		return connFd;
+	}
+
+	::ssize_t read(FdType fd, void* buf, ::size_t n)
+	{
+		return ::read(fd, buf, n);
+	}
+
+	::ssize_t write(FdType fd, const void* buf, ::size_t n)
+	{
+		return ::write(fd, buf, n);
 	}
 
 	void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
 	{
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sendBufLen)))
 		{
-			LOGS_ERROR << "setsockopt SO_SNDBUF failed";
+			LOGS_ERROR << "socket::setSockSendBuf failed";
 		}
 	}
 
@@ -101,7 +111,7 @@ namespace nets::net::socket
 	{
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(recvBufLen)))
 		{
-			LOGS_ERROR << "setsockopt SO_RCVBUF failed";
+			LOGS_ERROR << "socket::setSockRecvBuf failed";
 		}
 	}
 
@@ -110,7 +120,7 @@ namespace nets::net::socket
 		OptValType reuse = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(reuse))))
 		{
-			LOGS_ERROR << "setsockopt SO_REUSEADDR failed";
+			LOGS_ERROR << "socket::setSockAddrReuse failed";
 		}
 	}
 
@@ -119,7 +129,7 @@ namespace nets::net::socket
 		OptValType reuse = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(reuse))))
 		{
-			LOGS_ERROR << "setsockopt SO_REUSEPORT failed";
+			LOGS_ERROR << "socket::setSockPortReuse failed";
 		}
 	}
 
@@ -128,7 +138,7 @@ namespace nets::net::socket
 		OptValType keepAlive = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, static_cast<SockLenType>(sizeof(keepAlive))))
 		{
-			LOGS_ERROR << "setsockopt SO_KEEPALIVE failed";
+			LOGS_ERROR << "socket::setSockKeepAlive failed";
 		}
 	}
 
@@ -137,7 +147,7 @@ namespace nets::net::socket
 		OptValType noDelay = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(noDelay))))
 		{
-			LOGS_ERROR << "setsockopt TCP_NODELAY failed";
+			LOGS_ERROR << "socket::setIpTcpNoDelay failed";
 		}
 	}
 
@@ -145,7 +155,7 @@ namespace nets::net::socket
 	{
 		if (0 != ::setsockopt(sockFd, IPPROTO_TCP, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
 		{
-			LOGS_ERROR << "setsockopt SO_LINGER failed";
+			LOGS_ERROR << "socket::setSockLinger failed";
 		}
 	}
 
@@ -162,13 +172,13 @@ namespace nets::net::socket
 		}
 		if (-1 == ::fcntl(sockFd, F_SETFL, flags))
 		{
-			LOGS_ERROR << "fcntl O_NONBLOCK failed";
+			LOGS_ERROR << "socket::setSockNonBlock failed";
 		}
 		flags = ::fcntl(sockFd, F_GETFD, 0);
 		flags |= FD_CLOEXEC;
 		if (-1 == ::fcntl(sockFd, F_SETFD, flags))
 		{
-			LOGS_ERROR << "fcntl FD_CLOEXEC failed";
+			LOGS_ERROR << "socket::setSockNonBlock failed";
 		}
 	}
 } // namespace nets::net::socket

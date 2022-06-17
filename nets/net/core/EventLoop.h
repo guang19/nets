@@ -15,6 +15,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
+#include "nets/net/core/NotifyChannel.h"
 
 namespace nets::net
 {
@@ -32,6 +33,7 @@ namespace nets::net
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
+		using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
 		using PollerPtr = ::std::unique_ptr<Poller>;
 		using EventLoopRawPtr = EventLoop*;
 
@@ -71,7 +73,7 @@ namespace nets::net
 		const ::pid_t threadId_ {0};
 		PollerPtr poller_ {nullptr};
 		ChannelList activeChannels_ {nullptr};
-		ChannelPtr notifier_ {nullptr};
+		NotifyChannelPtr notifier_ {nullptr};
 		FunctorList pendingFunctors_ {};
 		MutexType mutex_ {};
 	};
@@ -105,19 +107,19 @@ namespace nets::net
 			assert(promise.use_count() > 0);
 			try
 			{
-				RetType r = f();
-				promise->set_value(r);
+				RetType result = f();
+				promise->set_value(result);
 			}
 			catch (const ::std::exception& exception)
 			{
 				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "exception caught during thread [" << nets::base::currentTid()
+				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
 						   << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
 				promise->set_exception(::std::current_exception());
-				LOGS_ERROR << "exception caught during thread [" << nets::base::currentTid()
+				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
 						   << "] execution in event loop thread [" << threadId_ << "]";
 			}
 		};
@@ -143,13 +145,13 @@ namespace nets::net
 			catch (const ::std::exception& exception)
 			{
 				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "exception caught during thread [" << nets::base::currentTid()
+				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
 						   << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
 				promise->set_exception(::std::current_exception());
-				LOGS_ERROR << "exception caught during thread [" << nets::base::currentTid()
+				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
 						   << "] execution in event loop thread [" << threadId_ << "]";
 			}
 		};

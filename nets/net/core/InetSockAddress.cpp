@@ -24,7 +24,7 @@ namespace nets::net
 			addr6_.sin6_port = htobe16(port);
 			if (1 != ::inet_pton(AF_INET6, ip, &addr6_.sin6_addr))
 			{
-				LOGS_FATAL << "inet_pton AF_INET6 " << ip;
+				LOGS_FATAL << "InetSockAddress::InetSockAddress inet_pton AF_INET6 " << ip;
 			}
 		}
 		else
@@ -34,7 +34,7 @@ namespace nets::net
 			addr4_.sin_port = htobe16(port);
 			if (1 != ::inet_pton(AF_INET, ip, &(addr4_.sin_addr)))
 			{
-				LOGS_FATAL << "inet_pton AF_INET " << ip;
+				LOGS_FATAL << "InetSockAddress::InetSockAddress inet_pton AF_INET " << ip;
 			}
 		}
 	}
@@ -158,14 +158,14 @@ namespace nets::net
 		{
 			if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer, len))
 			{
-				LOGS_FATAL << "inet_ntop AF_INET6";
+				LOGS_FATAL << "InetSockAddress::ip inet_ntop AF_INET6 failed";
 			}
 		}
 		else if (AF_INET == addr_.sa_family)
 		{
 			if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
 			{
-				LOGS_FATAL << "inet_ntop AF_INET";
+				LOGS_FATAL << "InetSockAddress::ip inet_ntop AF_INET failed";
 			}
 		}
 		return buffer;
@@ -186,7 +186,7 @@ namespace nets::net
 			buffer[0] = '[';
 			if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer + 1, len))
 			{
-				LOGS_FATAL << "inet_ntop AF_INET6";
+				LOGS_FATAL << "InetSockAddress::toString inet_ntop AF_INET6 failed";
 			}
 			SockLenType ipLen = ::strlen(buffer);
 			PortType port = be16toh(addr6_.sin6_port);
@@ -196,7 +196,7 @@ namespace nets::net
 		{
 			if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
 			{
-				LOGS_FATAL << "inet_ntop AF_INET";
+				LOGS_FATAL << "InetSockAddress::toString inet_ntop AF_INET failed";
 			}
 			SockLenType ipLen = ::strlen(buffer);
 			PortType port = be16toh(addr4_.sin_port);

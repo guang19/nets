@@ -32,7 +32,6 @@ protected:
 
 TEST_F(ThreadPoolTest, ExecuteTask)
 {
-	threadPool->shutdown();
 	threadPool->execute(
 		[]() -> void
 		{

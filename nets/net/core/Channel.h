@@ -29,7 +29,6 @@ namespace nets::net
 	class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
 	{
 	public:
-		using IdType = ::size_t;
 		using EventLoopRawPtr = EventLoop*;
 
 	public:
@@ -44,16 +43,6 @@ namespace nets::net
 	public:
 		// return socket file descriptor
 		virtual FdType sockFd() const = 0;
-
-		inline IdType uniqueId() const
-		{
-			return uniqueId_;
-		}
-
-		inline void setUniqueId(IdType uniqueId)
-		{
-			uniqueId_ = uniqueId;
-		}
 
 		inline EventType events() const
 		{
@@ -103,12 +92,10 @@ namespace nets::net
 
 	protected:
 		// channel unique identifier per EventLoop thread
-		IdType uniqueId_ {InvalidUniqueId};
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};
 		EventLoopRawPtr eventLoop_ {nullptr};
-		static constexpr IdType InvalidUniqueId = 0;
 	};
 } // namespace nets::net
 

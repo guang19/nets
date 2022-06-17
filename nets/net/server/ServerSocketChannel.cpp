@@ -31,6 +31,6 @@ namespace nets::net
 		addReadEvent();
 		registerTo();
 		assert(isReadable());
-		assert(uniqueId() > 0);
+		assert(sockFd_ > 0);
 	}
 } // namespace nets::net

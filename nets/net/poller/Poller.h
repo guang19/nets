@@ -21,7 +21,7 @@ namespace nets::net
 		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
-		using ChannelMap = ::std::unordered_map<Channel::IdType, ChannelPtr>;
+		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
 
 	public:
 		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(eventLoop) {}

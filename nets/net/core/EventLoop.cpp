@@ -22,13 +22,13 @@ namespace nets::net
 		// one loop per thread
 		if (CurrentThreadEventLoop != nullptr)
 		{
-			LOGS_FATAL << "there must be only one loop per thread";
+			LOGS_FATAL << "EventLoop::EventLoop there must be only one loop per thread";
 		}
 		else
 		{
 			CurrentThreadEventLoop = this;
 		}
-		LOGS_INFO << "one loop is created in thread" << threadId_;
+		LOGS_INFO << "EventLoop::EventLoop one loop is created in thread" << threadId_;
 	}
 
 	EventLoop::~EventLoop() {}

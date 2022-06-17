@@ -26,39 +26,41 @@ namespace nets::base
 		constexpr ::time_t LogBufferFlushInterval = 1000;
 	} // namespace
 
-	INIT_SINGLETON(StdoutPersistentWriter);
-	INIT_SINGLETON(SingleLogFilePersistentWriter);
-	INIT_SINGLETON(DailyLogFilePersistentWriter);
-	INIT_SINGLETON(RollingLogFilePersistentWriter);
+	INIT_SINGLETON(StdoutSynchronizer);
+	INIT_SINGLETON(SingleLogFileSynchronizer);
+	INIT_SINGLETON(DailyLogFileSynchronizer);
+	INIT_SINGLETON(RollingLogFileSynchronizer);
 	INIT_SINGLETON(AsyncLogWriter);
 
-	void StdoutPersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	void StdoutSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
 	{
 		UNUSED(persistTime);
 		::fwrite(data, 1, len, stdout);
 	}
 
-	void StdoutPersistentWriter::flush()
+	void StdoutSynchronizer::flush()
 	{
 		::fflush(stdout);
 	}
 
-	SingleLogFilePersistentWriter::SingleLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
+	LogFileSynchronizer::LogFileSynchronizer(const char* logFile) : logFile_(::std::make_unique<FileType>(logFile)) {}
 
-	void SingleLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	SingleLogFileSynchronizer::SingleLogFileSynchronizer(const char* logFile) : LogFileSynchronizer(logFile) {}
+
+	void SingleLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
 	{
 		UNUSED(persistTime);
 		logFile_->append(data, len);
 	}
 
-	void SingleLogFilePersistentWriter::flush()
+	void SingleLogFileSynchronizer::flush()
 	{
 		logFile_->flush();
 	}
 
-	DailyLogFilePersistentWriter::DailyLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
+	DailyLogFileSynchronizer::DailyLogFileSynchronizer(const char* logFile) : LogFileSynchronizer(logFile) {}
 
-	void DailyLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	void DailyLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
 	{
 		if (persistTime - logFile_->lastRollTime() >= SecondsPerDay)
 		{
@@ -67,14 +69,14 @@ namespace nets::base
 		logFile_->append(data, len);
 	}
 
-	void DailyLogFilePersistentWriter::flush()
+	void DailyLogFileSynchronizer::flush()
 	{
 		logFile_->flush();
 	}
 
-	RollingLogFilePersistentWriter::RollingLogFilePersistentWriter() : logFile_(::std::make_unique<FileType>(LOG_FILE)) {}
+	RollingLogFileSynchronizer::RollingLogFileSynchronizer(const char* logFile) : LogFileSynchronizer(logFile) {}
 
-	void RollingLogFilePersistentWriter::persist(const char* data, SizeType len, TimeType persistTime)
+	void RollingLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
 	{
 		if (logFile_->size() + len > LogFileRollingSize)
 		{
@@ -83,33 +85,33 @@ namespace nets::base
 		logFile_->append(data, len);
 	}
 
-	void RollingLogFilePersistentWriter::flush()
+	void RollingLogFileSynchronizer::flush()
 	{
 		logFile_->flush();
 	}
 
-	::std::shared_ptr<IPersistentWriter> PersistentWriterFactory::getPersistentWriter()
+	::std::shared_ptr<Synchronizer> SynchronizerFactory::getSynchronizer()
 	{
 		switch (LOG_WRITER_TYPE)
 		{
 			case LogWriterType::Stdout:
-				return StdoutPersistentWriter::getInstance();
+				return StdoutSynchronizer::getInstance();
 			case LogWriterType::SingFile:
-				return SingleLogFilePersistentWriter::getInstance();
+				return SingleLogFileSynchronizer::getInstance(LOG_FILE);
 			case LogWriterType::DailyFile:
-				return DailyLogFilePersistentWriter::getInstance();
+				return DailyLogFileSynchronizer::getInstance(LOG_FILE);
 			case LogWriterType::RollingFile:
-				return RollingLogFilePersistentWriter::getInstance();
+				return RollingLogFileSynchronizer::getInstance(LOG_FILE);
 			default:
-				return StdoutPersistentWriter::getInstance();
+				return StdoutSynchronizer::getInstance();
 		}
 	}
 
 	AsyncLogWriter::AsyncLogWriter()
 		: running_(false), cacheBuffer_(::std::make_unique<BufferType>()),
-		  backupCacheBuffer_(::std::make_unique<BufferType>()),
-		  persistentWriter_(PersistentWriterFactory::getPersistentWriter()), mutex_(), cv_(),
-		  buffers_(::std::make_unique<BufferVectorType>()), writerTaskQueue_(::std::make_unique<BlockingQueueType>())
+		  backupCacheBuffer_(::std::make_unique<BufferType>()), synchronizer_(SynchronizerFactory::getSynchronizer()),
+		  mutex_(), cv_(), buffers_(::std::make_unique<BufferVectorType>()),
+		  writerTaskQueue_(::std::make_unique<BlockingQueueType>())
 	{
 		buffers_->reserve(LOG_FILE_ROLLING_SIZE >> 1);
 	}
@@ -129,6 +131,17 @@ namespace nets::base
 				writerTaskConsumer.join();
 			}
 		}
+	}
+
+	void AsyncLogWriter::start()
+	{
+		if (running_)
+		{
+			return;
+		}
+		running_ = true;
+		writerTaskProducer = ::std::thread(&AsyncLogWriter::swap, this);
+		writerTaskConsumer = ::std::thread(&AsyncLogWriter::synchronize, this);
 	}
 
 	void AsyncLogWriter::write(const char* data, SizeType len)
@@ -154,18 +167,7 @@ namespace nets::base
 		}
 	}
 
-	void AsyncLogWriter::start()
-	{
-		if (running_)
-		{
-			return;
-		}
-		running_ = true;
-		writerTaskProducer = ::std::thread(&AsyncLogWriter::asyncWrite, this);
-		writerTaskConsumer = ::std::thread(&AsyncLogWriter::asyncPersist, this);
-	}
-
-	void AsyncLogWriter::asyncWrite()
+	void AsyncLogWriter::swap()
 	{
 		auto buffers = ::std::make_unique<BufferVectorType>();
 		buffers->reserve(LOG_FILE_ROLLING_SIZE >> 1);
@@ -196,17 +198,17 @@ namespace nets::base
 				}
 			}
 			::time(&currentTime);
-			auto writerTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
+			auto synchronizeTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
 			{
 				for (auto& it: *tmpBuffers)
 				{
 					auto logBuffer = it.get();
-					persistentWriter_->persist(logBuffer->carray(), logBuffer->len(), currentTime);
+					synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
 				}
-				persistentWriter_->flush();
+				synchronizer_->flush();
 			};
 			// if not running, the writer task that is not added to the queue will be discarded
-			writerTaskQueue_->put(::std::move(writerTask));
+			writerTaskQueue_->put(::std::move(synchronizeTask));
 			buffers = ::std::make_unique<BufferVectorType>();
 			tmpBuffer1 = std::make_unique<BufferType>();
 			if (nullptr == tmpBuffer2)
@@ -225,31 +227,31 @@ namespace nets::base
 				for (auto& it: *tmpBuffers)
 				{
 					auto logBuffer = it.get();
-					persistentWriter_->persist(logBuffer->carray(), logBuffer->len(), currentTime);
+					synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
 				}
-				persistentWriter_->flush();
+				synchronizer_->flush();
 			};
 			writerTaskQueue_->put(::std::move(writerTask));
 		}
 	}
 
-	void AsyncLogWriter::asyncPersist()
+	void AsyncLogWriter::synchronize()
 	{
-		WriterTaskType writerTask = nullptr;
+		SynchronizeTaskType synchronizeTask = nullptr;
 		while (running_)
 		{
-			if (writerTaskQueue_->take(writerTask, LogBufferFlushInterval >> 1))
+			if (writerTaskQueue_->take(synchronizeTask, LogBufferFlushInterval >> 1))
 			{
-				writerTask();
-				writerTask = nullptr;
+				synchronizeTask();
+				synchronizeTask = nullptr;
 			}
 		}
 		// last check
 		assert(!running_);
-		if (writerTaskQueue_->take(writerTask, LogBufferFlushInterval))
+		if (writerTaskQueue_->take(synchronizeTask, LogBufferFlushInterval))
 		{
-			writerTask();
-			writerTask = nullptr;
+			synchronizeTask();
+			synchronizeTask = nullptr;
 		}
 	}
 } // namespace nets::base
