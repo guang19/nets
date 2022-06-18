@@ -17,7 +17,7 @@ namespace nets::net
 
 	public:
 		void notify() const;
-		FdType sockFd() const override;
+		FdType fd() const override;
 
 	private:
 		FdType eventFd_ {socket::InvalidFd};

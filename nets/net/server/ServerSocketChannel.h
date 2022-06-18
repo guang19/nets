@@ -19,7 +19,7 @@ namespace nets::net
 	public:
 		void bind(const InetSockAddress& sockAddress);
 
-		inline FdType sockFd() const override
+		inline FdType fd() const override
 		{
 			return sockFd_;
 		}

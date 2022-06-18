@@ -71,9 +71,9 @@ namespace nets::net
 	private:
 		::std::atomic_bool running_ {false};
 		const ::pid_t threadId_ {0};
-		PollerPtr poller_ {nullptr};
-		ChannelList activeChannels_ {nullptr};
 		NotifyChannelPtr notifier_ {nullptr};
+		ChannelList activeChannels_ {nullptr};
+		PollerPtr poller_ {nullptr};
 		FunctorList pendingFunctors_ {};
 		MutexType mutex_ {};
 	};
@@ -92,6 +92,7 @@ namespace nets::net
 				LockGuardType lock(mutex_);
 				pendingFunctors_.push_back(::std::move(task));
 			}
+			notifier_->notify();
 		}
 	}
 

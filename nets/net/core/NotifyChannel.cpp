@@ -34,7 +34,7 @@ namespace nets::net
 		}
 	}
 
-	FdType NotifyChannel::sockFd() const
+	FdType NotifyChannel::fd() const
 	{
 		return eventFd_;
 	}

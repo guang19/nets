@@ -10,9 +10,9 @@
 #include <cstring>
 #include <unistd.h>
 
-#define UNUSED(x) ((void) (x))
+#define UNUSED(X) ((void) (X))
 
-#define MEMZERO(p, len) (::memset((p), 0, (len)))
+#define MEMZERO(P, LEN) (::memset((P), 0, (LEN)))
 
 #define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
 
@@ -35,6 +35,6 @@ void throwFmt(const char* fmt, ...)
 	throw E(msgBuf);
 }
 
-#define THROW_FMT(EXCEPTION, fmt, ...) (throwFmt<EXCEPTION>(fmt"\n", ##__VA_ARGS__))
+#define THROW_FMT(EXCEPTION, FMT, ...) (throwFmt<EXCEPTION>(FMT"\n", ##__VA_ARGS__))
 
 #endif // NETS_BASE_COMMONMACRO_H

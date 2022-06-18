@@ -15,8 +15,9 @@ namespace nets::base
 {
 	namespace
 	{
-		constexpr ::size_t FileIoBufferSize = 1024 << 3;
 		constexpr uint32_t MaxFilePathLen = 256;
+		const char* const LogFileNamePattern = "%Y-%m-%d_%H-%M-%S";
+		const char* const LogFileSuffix = ".log";
 	} // namespace
 
 	LogFile::LogFile(const char* file)
@@ -29,15 +30,15 @@ namespace nets::base
 		}
 		file_ = ::std::make_unique<char[]>(filePathLen);
 		MEMZERO(file_.get(), filePathLen);
-		::strncat(file_.get(), file, filePathLen);
+		::memcpy(file_.get(), file, filePathLen);
 		// <dirname> will modifies input str, so reallocate an array
 		char tmpFile[MaxFilePathLen] = {0};
-		::strncat(tmpFile, file, filePathLen);
+		::memcpy(tmpFile, file, filePathLen);
 		const char* dir = ::dirname(tmpFile);
 		uint32_t dirLen = ::strlen(dir);
 		dir_ = ::std::make_unique<char[]>(dirLen);
 		MEMZERO(dir_.get(), dirLen);
-		::strncat(dir_.get(), dir, dirLen);
+		::memcpy(dir_.get(), dir, dirLen);
 		// log file has parent directory
 		if (0 != ::strcmp(dir, "."))
 		{
@@ -50,9 +51,7 @@ namespace nets::base
 			::exit(1);
 		}
 		getFileInfo(&bytes_, &lastRollTime_);
-		buffer_ = ::std::make_unique<char[]>(FileIoBufferSize);
-		MEMZERO(buffer_.get(), FileIoBufferSize);
-		::setbuffer(fp_, buffer_.get(), FileIoBufferSize);
+		::setbuffer(fp_, buffer_, FileIoBufferSize);
 	}
 
 	LogFile::~LogFile()
@@ -102,8 +101,8 @@ namespace nets::base
 		::localtime_r(&now, &tmS);
 		char newFilename[26] = {0};
 		MEMZERO(newFilename, sizeof(newFilename));
-		::strftime(newFilename, sizeof(newFilename), "%Y-%m-%d_%H-%M-%S", &tmS);
-		::strcat(newFilename, ".log");
+		::strftime(newFilename, sizeof(newFilename), LogFileNamePattern, &tmS);
+		::strcat(newFilename, LogFileSuffix);
 		if (::strcmp(dir_.get(), ".") != 0)
 		{
 			char tmpFile[MaxFilePathLen] = {0};
@@ -137,7 +136,7 @@ namespace nets::base
 		char dir2[MaxFilePathLen] = {0};
 		MEMZERO(dir1, MaxFilePathLen);
 		MEMZERO(dir2, MaxFilePathLen);
-		::strncat(dir1, multiLevelDir, len);
+		::memcpy(dir1, multiLevelDir, len);
 		char* spStr = nullptr;
 		while (nullptr != (spStr = ::strsep(&dirptr, "/")))
 		{

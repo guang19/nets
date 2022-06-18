@@ -13,13 +13,13 @@
 
 namespace nets::base
 {
-	template <uint32_t Size>
+	template <uint32_t SIZE>
 	class StackBuffer : Noncopyable
 	{
 	public:
-		StackBuffer() : writerIndex_(0), capacity_(Size)
+		StackBuffer() : writerIndex_(0), capacity_(SIZE)
 		{
-			MEMZERO(buffer_, Size);
+			MEMZERO(buffer_, SIZE);
 		}
 
 		~StackBuffer() = default;
@@ -56,14 +56,14 @@ namespace nets::base
 		void appendFloat(Float f);
 
 	private:
-		char buffer_[Size] {0};
+		char buffer_[SIZE] {0};
 		// writer pointer
 		uint32_t writerIndex_ {0};
-		uint32_t capacity_ {Size};
+		uint32_t capacity_ {SIZE};
 	};
 
-	template <uint32_t Size>
-	void StackBuffer<Size>::append(const char* data, uint32_t len)
+	template <uint32_t SIZE>
+	void StackBuffer<SIZE>::append(const char* data, uint32_t len)
 	{
 		if (writeableBytes() > len)
 		{
@@ -72,8 +72,8 @@ namespace nets::base
 		}
 	}
 
-	template <uint32_t Size>
-	void StackBuffer<Size>::appendPointer(const void* ptr)
+	template <uint32_t SIZE>
+	void StackBuffer<SIZE>::appendPointer(const void* ptr)
 	{
 		if (writeableBytes() > MaxNumLen)
 		{
@@ -81,9 +81,9 @@ namespace nets::base
 		}
 	}
 
-	template <uint32_t Size>
+	template <uint32_t SIZE>
 	template <typename Number>
-	void StackBuffer<Size>::appendInteger(Number n)
+	void StackBuffer<SIZE>::appendInteger(Number n)
 	{
 		if (writeableBytes() > MaxNumLen)
 		{
@@ -91,9 +91,9 @@ namespace nets::base
 		}
 	}
 
-	template <uint32_t Size>
+	template <uint32_t SIZE>
 	template <typename Float>
-	void StackBuffer<Size>::appendFloat(Float f)
+	void StackBuffer<SIZE>::appendFloat(Float f)
 	{
 		if (writeableBytes() > MaxFloatLen)
 		{

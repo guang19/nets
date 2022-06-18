@@ -41,8 +41,7 @@ namespace nets::net
 		void deregister();
 
 	public:
-		// return socket file descriptor
-		virtual FdType sockFd() const = 0;
+		virtual FdType fd() const = 0;
 
 		inline EventType events() const
 		{

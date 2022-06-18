@@ -21,7 +21,7 @@ namespace nets::base
 
 	namespace utils
 	{
-		// Convert the integer to a string and add it to the buffer, and return the length of the converted string
+		// Convert the integer to a string and add it to the buffer and return the length of the converted string
 		template <typename Int>
 		uint32_t fromInt(char* buffer, Int n)
 		{
