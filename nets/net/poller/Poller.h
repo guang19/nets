@@ -19,7 +19,7 @@ namespace nets::net
 	{
 	public:
 		using ChannelPtr = ::std::shared_ptr<Channel>;
-		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
+		using ChannelList = ::std::vector<ChannelPtr>;
 		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
 		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
 
@@ -28,7 +28,7 @@ namespace nets::net
 		virtual ~Poller() = default;
 
 	public:
-		virtual void poll(int32_t timeoutMs, ChannelList activeChannels) = 0;
+		virtual void poll(int32_t timeoutMs, ChannelList& activeChannels) = 0;
 		virtual void registerChannel(ChannelPtr channel) = 0;
 		virtual void modifyChannel(ChannelPtr channel) = 0;
 		virtual void deregisterChannel(ChannelPtr channel) = 0;

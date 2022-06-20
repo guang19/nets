@@ -13,6 +13,8 @@ namespace nets::net
 {
 	namespace
 	{
+		using TimeType = ::time_t;
+		constexpr TimeType PollTimeoutMs = 30000;
 		__thread EventLoop* CurrentThreadEventLoop = nullptr;
 	}
 
@@ -40,10 +42,30 @@ namespace nets::net
 	void EventLoop::loop()
 	{
 		assert(!running_);
-
 		running_ = true;
 		while (running_)
 		{
+			activeChannels_.clear();
+			poller_->poll(PollTimeoutMs, activeChannels_);
+			for (auto& channel : activeChannels_)
+			{
+//				channel
+			}
+			executePendingTasks();
+		}
+		assert(!running_);
+	}
+
+	void EventLoop::executePendingTasks()
+	{
+		TaskList tmpTasks {};
+		{
+			LockGuardType lock(mutex_);
+			tmpTasks.swap(pendingTasks_);
+		}
+		for (const auto& t : tmpTasks)
+		{
+			t();
 		}
 	}
 

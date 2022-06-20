@@ -32,7 +32,7 @@ namespace nets::net
 		socket::closeFd(epollFd_);
 	}
 
-	void EpollPoller::poll(int32_t timeoutMs, ChannelList activeChannels)
+	void EpollPoller::poll(int32_t timeoutMs, ChannelList& activeChannels)
 	{
 		SizeType size = events_.size();
 		int32_t numOfReadyEvent = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
@@ -51,12 +51,13 @@ namespace nets::net
 		}
 	}
 
-	void EpollPoller::prepareChannelEvents(int32_t numOfReadyEvent, ChannelList activeChannels)
+	void EpollPoller::prepareChannelEvents(int32_t numOfReadyEvent, ChannelList& activeChannels)
 	{
 		for (int32_t i = 0; i < numOfReadyEvent; ++i)
 		{
 			auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
 			channel->setReadyEvent(events_[i].events);
+			activeChannels.push_back(channel->shared_from_this());
 		}
 	}
 

@@ -27,12 +27,12 @@ namespace nets::net
 	class EventLoop : nets::base::Noncopyable
 	{
 	public:
-		using FunctorType = ::std::function<void()>;
-		using FunctorList = ::std::vector<FunctorType>;
+		using TaskType = ::std::function<void()>;
+		using TaskList = ::std::vector<TaskType>;
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
-		using ChannelList = ::std::shared_ptr<::std::vector<ChannelPtr>>;
+		using ChannelList = ::std::vector<ChannelPtr>;
 		using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
 		using PollerPtr = ::std::unique_ptr<Poller>;
 		using EventLoopRawPtr = EventLoop*;
@@ -69,19 +69,22 @@ namespace nets::net
 		::std::future<void> submit(Fn&& func, Args&&... args);
 
 	private:
+		void executePendingTasks();
+
+	private:
 		::std::atomic_bool running_ {false};
 		const ::pid_t threadId_ {0};
 		NotifyChannelPtr notifier_ {nullptr};
 		ChannelList activeChannels_ {nullptr};
 		PollerPtr poller_ {nullptr};
-		FunctorList pendingFunctors_ {};
+		TaskList pendingTasks_ {};
 		MutexType mutex_ {};
 	};
 
 	template <typename Fn, typename... Args>
 	void EventLoop::execute(Fn&& func, Args&&... args)
 	{
-		FunctorType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		if (isInCurrentEventLoop())
 		{
 			task();
@@ -90,7 +93,7 @@ namespace nets::net
 		{
 			{
 				LockGuardType lock(mutex_);
-				pendingFunctors_.push_back(::std::move(task));
+				pendingTasks_.push_back(::std::move(task));
 			}
 			notifier_->notify();
 		}
@@ -103,7 +106,7 @@ namespace nets::net
 		auto promise = ::std::make_shared<::std::promise<RetType>>();
 		auto future = promise->get_future();
 		::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		FunctorType promiseTask = [this, promise, f = ::std::move(task)]() mutable
+		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
 		{
 			assert(promise.use_count() > 0);
 			try
@@ -135,7 +138,7 @@ namespace nets::net
 		auto promise = ::std::make_shared<::std::promise<void>>();
 		auto future = promise->get_future();
 		::std::function<void()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		FunctorType promiseTask = [this, promise, f = ::std::move(task)]() mutable
+		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
 		{
 			assert(promise.use_count() > 0);
 			try
