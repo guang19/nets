@@ -33,4 +33,7 @@ namespace nets::net
 		assert(isReadable());
 		assert(sockFd_ > 0);
 	}
+	void ServerSocketChannel::handleReadEvent() {}
+	void ServerSocketChannel::handleWriteEvent() {}
+	void ServerSocketChannel::handleErrorEvent() {}
 } // namespace nets::net

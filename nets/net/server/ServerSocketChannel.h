@@ -24,6 +24,10 @@ namespace nets::net
 			return sockFd_;
 		}
 
+		void handleReadEvent() override;
+		void handleWriteEvent() override;
+		void handleErrorEvent() override;
+
 	private:
 		FdType sockFd_ {socket::InvalidFd};
 		FdType idleFd_ {socket::InvalidFd};

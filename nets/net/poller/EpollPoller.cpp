@@ -63,9 +63,9 @@ namespace nets::net
 
 	void EpollPoller::registerChannel(ChannelPtr channel)
 	{
+		assert(!hasChannel(channel));
 		if (!channel->isRegistered())
 		{
-			assert(!hasChannel(channel));
 			if (epollCtl(EPOLL_CTL_ADD, channel))
 			{
 				channels_[channel->fd()] = channel;
@@ -80,9 +80,9 @@ namespace nets::net
 
 	void EpollPoller::modifyChannel(ChannelPtr channel)
 	{
+		assert(hasChannel(channel));
 		if (channel->isRegistered())
 		{
-			assert(hasChannel(channel));
 			if (channel->isNoneEvent())
 			{
 				if (epollCtl(EPOLL_CTL_DEL, channel))

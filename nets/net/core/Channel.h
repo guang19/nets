@@ -21,7 +21,7 @@ namespace nets::net
 		using EventType = uint32_t;
 		// event type
 		constexpr EventType NoneEvent = 0;
-		constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
+		constexpr EventType ReadEvent = EPOLLIN;
 		constexpr EventType WriteEvent = EPOLLOUT;
 		constexpr EventType ErrorEvent = EPOLLERR;
 	} // namespace
@@ -78,12 +78,41 @@ namespace nets::net
 			return eventLoop_;
 		}
 
-		void addReadEvent();
-		void removeReadEvent();
-		void addWriteEvent();
-		void removeWriteEvent();
-		void resetEvent();
-		void setReadyEvent(EventType event);
+		inline void addReadEvent()
+		{
+			addEvent(ReadEvent);
+		}
+
+		inline void removeReadEvent()
+		{
+			removeEvent(ReadEvent);
+		}
+
+		inline void addWriteEvent()
+		{
+			addEvent(WriteEvent);
+		}
+
+		inline void removeWriteEvent()
+		{
+			removeEvent(WriteEvent);
+		}
+
+		inline void resetEvent()
+		{
+			events_ = NoneEvent;
+		}
+
+		inline void setReadyEvent(EventType event)
+		{
+			readyEvents_ = event;
+		}
+
+	public:
+		void handleEvent();
+		virtual void handleReadEvent() = 0;
+		virtual void handleWriteEvent() = 0;
+		virtual void handleErrorEvent() = 0;
 
 	private:
 		void addEvent(EventType event);

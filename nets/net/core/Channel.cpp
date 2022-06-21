@@ -29,36 +29,6 @@ namespace nets::net
 		eventLoop_->deregisterChannel(shared_from_this());
 	}
 
-	void Channel::addReadEvent()
-	{
-		addEvent(ReadEvent);
-	}
-
-	void Channel::removeReadEvent()
-	{
-		removeEvent(ReadEvent);
-	}
-
-	void Channel::addWriteEvent()
-	{
-		addEvent(WriteEvent);
-	}
-
-	void Channel::removeWriteEvent()
-	{
-		removeEvent(WriteEvent);
-	}
-
-	void Channel::resetEvent()
-	{
-		events_ = NoneEvent;
-	}
-
-	void Channel::setReadyEvent(EventType event)
-	{
-		readyEvents_ = event;
-	}
-
 	void Channel::addEvent(EventType event)
 	{
 		events_ |= event;
@@ -67,5 +37,10 @@ namespace nets::net
 	void Channel::removeEvent(EventType event)
 	{
 		events_ &= ~event;
+	}
+
+	void Channel::handleEvent()
+	{
+
 	}
 } // namespace nets::net
