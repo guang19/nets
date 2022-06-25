@@ -28,7 +28,7 @@ namespace nets::net
 			eventLoops_.emplace_back(eventLoop);
 			eventLoopThreadPool_->execute([&eventLoop]()
 										  {
-											 eventLoop->loop();
+											 eventLoop->run();
 										  });
 		}
 	}

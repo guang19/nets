@@ -14,6 +14,15 @@ namespace nets::net
 	public:
 		explicit SocketChannel(EventLoopRawPtr eventLoop);
 		~SocketChannel() override = default;
+
+	public:
+		FdType fd() const override;
+		void handleReadEvent() override;
+		void handleWriteEvent() override;
+		void handleErrorEvent() override;
+
+	private:
+		FdType fd_ {socket::InvalidFd};
 	};
 } // namespace nets::net
 

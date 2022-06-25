@@ -13,12 +13,12 @@ namespace nets::net
 {
 	namespace
 	{
-		constexpr ::size_t InitEventSize = 12;
+		constexpr ::size_t InitEpollEventSize = 12;
 		constexpr ::time_t Timeout = 1;
 	} // namespace
 
 	EpollPoller::EpollPoller(EventLoopPtr eventLoop)
-		: Poller(eventLoop), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEventSize)
+		: Poller(eventLoop), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEpollEventSize)
 	{
 		assert(epollFd_ >= 0);
 		if (epollFd_ < 0)
@@ -42,8 +42,13 @@ namespace nets::net
 			prepareChannelEvents(numOfReadyEvent, activeChannels);
 			if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
 			{
-				events_.resize(size + (size >> 1));
+				size = size + (size >> 1);
+				if (size >= INT32_MAX)
+				{
+					size = INT32_MAX - 1;
+				}
 			}
+			events_.resize(size);
 		}
 		else if (numOfReadyEvent < 0)
 		{

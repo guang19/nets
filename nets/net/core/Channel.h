@@ -9,7 +9,7 @@
 #include <sys/epoll.h>
 
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/ChannelHandler.h"
+#include "nets/net/core/ChannelHandlerPipeline.h"
 #include "nets/net/core/Socket.h"
 
 namespace nets::net
@@ -21,7 +21,7 @@ namespace nets::net
 		using EventType = uint32_t;
 		// event type
 		constexpr EventType NoneEvent = 0;
-		constexpr EventType ReadEvent = EPOLLIN;
+		constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
 		constexpr EventType WriteEvent = EPOLLOUT;
 		constexpr EventType ErrorEvent = EPOLLERR;
 	} // namespace
@@ -109,6 +109,12 @@ namespace nets::net
 		}
 
 	public:
+		ChannelHandlerPipeline& pipeline()
+		{
+			return channelHandlerPipeline_;
+		}
+
+	public:
 		void handleEvent();
 		virtual void handleReadEvent() = 0;
 		virtual void handleWriteEvent() = 0;
@@ -123,6 +129,7 @@ namespace nets::net
 		EventType events_ {NoneEvent};
 		EventType readyEvents_ {NoneEvent};
 		bool isRegistered_ {false};
+		ChannelHandlerPipeline channelHandlerPipeline_ {};
 		EventLoopRawPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

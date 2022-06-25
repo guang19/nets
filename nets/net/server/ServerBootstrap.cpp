@@ -4,6 +4,8 @@
 
 #include "nets/net/server/ServerBootstrap.h"
 
+#include "nets/net/server/Acceptor.h"
+
 namespace nets::net
 {
 	ServerBootstrap::ServerBootstrap() : running_(false), mainLoopGroup_(nullptr), subLoopGroup_(nullptr) {}

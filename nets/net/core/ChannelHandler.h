@@ -14,11 +14,6 @@ namespace nets::net
 	public:
 		ChannelHandler() = default;
 		~ChannelHandler() = default;
-
-	public:
-		virtual void handleReadEvent() = 0;
-		virtual void handleWriteEvent() = 0;
-		virtual void handleErrorEvent() = 0;
 	};
 } // namespace nets::net
 

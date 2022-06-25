@@ -7,4 +7,11 @@
 namespace nets::net
 {
 	SocketChannel::SocketChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop) {}
+	FdType SocketChannel::fd() const
+	{
+		return 0;
+	}
+	void SocketChannel::handleReadEvent() {}
+	void SocketChannel::handleWriteEvent() {}
+	void SocketChannel::handleErrorEvent() {}
 } // namespace nets::net

@@ -14,6 +14,7 @@ namespace nets::net
 		using FdType = int32_t;
 		using OptValType = int32_t;
 		using SockLinger = struct linger;
+		using IoVec = struct iovec;
 	}
 
 	namespace socket
@@ -29,11 +30,15 @@ namespace nets::net
 		void dealwithEMFILE(FdType* idleFd, FdType sockFd);
 
 		void bind(FdType sockFd, const SockAddr* sockAddr);
+		void connect(FdType sockFd, const SockAddr* sockAddr);
+
 		void listen(FdType sockFd);
 		FdType accept(FdType sockFd, SockAddr* sockAddr);
 
 		::ssize_t read(FdType fd, void* buf, ::size_t n);
 		::ssize_t write(FdType fd, const void* buf, ::size_t n);
+
+		::ssize_t readv(FdType fd, const IoVec* vec, int32_t iovcnt);
 
 		// usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
 		// SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x

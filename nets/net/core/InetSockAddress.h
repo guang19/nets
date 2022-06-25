@@ -25,6 +25,7 @@ namespace nets::net
 	class InetSockAddress : public nets::base::Copyable
 	{
 	public:
+		InetSockAddress();
 		explicit InetSockAddress(const SockAddr4& addr4);
 		explicit InetSockAddress(const SockAddr6& addr6);
 		explicit InetSockAddress(const char* ip, PortType port, bool ipv6 = true);
@@ -45,7 +46,7 @@ namespace nets::net
 			return addr4_.sin_family;
 		}
 
-		inline const SockAddr* cSockAddr() const
+		inline const SockAddr* csockAddr() const
 		{
 			return &addr_;
 		}

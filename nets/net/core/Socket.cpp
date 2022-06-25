@@ -6,6 +6,7 @@
 
 #include <fcntl.h>
 #include <netinet/tcp.h>
+#include <sys/uio.h>
 #include <unistd.h>
 
 #include "nets/base/log/Logging.h"
@@ -70,6 +71,15 @@ namespace nets::net::socket
 		}
 	}
 
+	void connect(FdType sockFd, const SockAddr* sockAddr)
+	{
+		auto len = static_cast<SockLenType>(sizeof(SockAddr));
+		if (0 != connect(sockFd, sockAddr, len))
+		{
+			LOGS_FATAL << "socket::connect failed";
+		}
+	}
+
 	void listen(FdType sockFd)
 	{
 		if (0 != ::listen(sockFd, SOMAXCONN))
@@ -92,6 +102,11 @@ namespace nets::net::socket
 	::ssize_t read(FdType fd, void* buf, ::size_t n)
 	{
 		return ::read(fd, buf, n);
+	}
+
+	::ssize_t readv(FdType fd, const IoVec* vec, int32_t iovcnt)
+	{
+		return ::readv(fd, vec, iovcnt);
 	}
 
 	::ssize_t write(FdType fd, const void* buf, ::size_t n)

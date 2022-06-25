@@ -10,3 +10,9 @@ TARGET_LINK_LIBRARIES(SocketTest nets_net libgtest.a)
 
 ADD_EXECUTABLE(NetPackageTest NetPackageTest.cpp)
 TARGET_LINK_LIBRARIES(NetPackageTest nets_net libgtest.a)
+
+ADD_EXECUTABLE(EpollServer EpollServer.cpp)
+TARGET_LINK_LIBRARIES(EpollServer nets_net)
+
+ADD_EXECUTABLE(EpollClient EpollClient.cpp)
+TARGET_LINK_LIBRARIES(EpollClient nets_net)

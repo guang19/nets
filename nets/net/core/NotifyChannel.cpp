@@ -38,4 +38,7 @@ namespace nets::net
 	{
 		return eventFd_;
 	}
+	void NotifyChannel::handleReadEvent() {}
+	void NotifyChannel::handleWriteEvent() {}
+	void NotifyChannel::handleErrorEvent() {}
 } // namespace nets::net

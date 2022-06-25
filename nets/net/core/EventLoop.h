@@ -42,13 +42,11 @@ namespace nets::net
 		~EventLoop();
 
 	public:
-		void loop();
+		void run();
 		void shutdown();
 
-		bool isInCurrentEventLoop() const;
-		EventLoopRawPtr currentThreadEventLoop() const;
-
-		void notify();
+		bool inCurrentEventLoop() const;
+		EventLoopRawPtr currentEventLoop() const;
 
 		void registerChannel(ChannelPtr channel);
 		void modifyChannel(ChannelPtr channel);
@@ -69,7 +67,7 @@ namespace nets::net
 		::std::future<void> submit(Fn&& func, Args&&... args);
 
 	private:
-		void executePendingTasks();
+		void runPendingTasks();
 
 	private:
 		::std::atomic_bool running_ {false};
@@ -85,7 +83,7 @@ namespace nets::net
 	void EventLoop::execute(Fn&& func, Args&&... args)
 	{
 		TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		if (isInCurrentEventLoop())
+		if (inCurrentEventLoop())
 		{
 			task();
 		}

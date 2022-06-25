@@ -39,7 +39,7 @@ namespace nets::net
 
 	EventLoop::~EventLoop() {}
 
-	void EventLoop::loop()
+	void EventLoop::run()
 	{
 		assert(!running_);
 		running_ = true;
@@ -49,13 +49,14 @@ namespace nets::net
 			poller_->poll(PollTimeoutMs, activeChannels_);
 			for (auto& channel : activeChannels_)
 			{
+				channel->handleEvent();
 			}
-			executePendingTasks();
+			runPendingTasks();
 		}
 		assert(!running_);
 	}
 
-	void EventLoop::executePendingTasks()
+	void EventLoop::runPendingTasks()
 	{
 		TaskList tmpTasks {};
 		{
@@ -70,18 +71,16 @@ namespace nets::net
 
 	void EventLoop::shutdown() {}
 
-	bool EventLoop::isInCurrentEventLoop() const
+	bool EventLoop::inCurrentEventLoop() const
 	{
 		return (this == CurrentThreadEventLoop);
 	}
 
-	EventLoop::EventLoopRawPtr EventLoop::currentThreadEventLoop() const
+	EventLoop::EventLoopRawPtr EventLoop::currentEventLoop() const
 	{
-		assert(isInCurrentEventLoop());
+		assert(inCurrentEventLoop());
 		return CurrentThreadEventLoop;
 	}
-
-	void EventLoop::notify() {}
 
 	void EventLoop::registerChannel(ChannelPtr channel)
 	{

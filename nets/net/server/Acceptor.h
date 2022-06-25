@@ -9,7 +9,7 @@
 
 namespace nets::net
 {
-	class Acceptor
+	class Acceptor : public ServerSocketChannel
 	{
 	public:
 		using EventLoopRawPtr = EventLoop*;
@@ -17,8 +17,10 @@ namespace nets::net
 		explicit Acceptor(EventLoopRawPtr eventLoop);
 		~Acceptor() = default;
 
-	private:
-		ServerSocketChannel serverSocketChannel {nullptr};
+	public:
+		void handleReadEvent() override;
+		void handleWriteEvent() override;
+		void handleErrorEvent() override;
 	};
 }
 

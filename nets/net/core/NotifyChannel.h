@@ -19,6 +19,11 @@ namespace nets::net
 		void notify() const;
 		FdType fd() const override;
 
+	public:
+		void handleReadEvent() override;
+		void handleWriteEvent() override;
+		void handleErrorEvent() override;
+
 	private:
 		FdType eventFd_ {socket::InvalidFd};
 	};

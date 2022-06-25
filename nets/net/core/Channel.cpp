@@ -41,6 +41,6 @@ namespace nets::net
 
 	void Channel::handleEvent()
 	{
-
+		if (readyEvents_ & ReadEvent)
 	}
 } // namespace nets::net
