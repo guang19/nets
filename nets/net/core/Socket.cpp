@@ -64,7 +64,7 @@ namespace nets::net::socket
 
 	void bind(FdType sockFd, const SockAddr* sockAddr)
 	{
-		auto len = static_cast<SockLenType>(sizeof(SockAddr));
+		auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
 		if (0 != ::bind(sockFd, sockAddr, len))
 		{
 			LOGS_FATAL << "socket::bind failed";
@@ -73,7 +73,7 @@ namespace nets::net::socket
 
 	void connect(FdType sockFd, const SockAddr* sockAddr)
 	{
-		auto len = static_cast<SockLenType>(sizeof(SockAddr));
+		auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
 		if (0 != connect(sockFd, sockAddr, len))
 		{
 			LOGS_FATAL << "socket::connect failed";
@@ -88,9 +88,20 @@ namespace nets::net::socket
 		}
 	}
 
-	FdType accept(FdType sockFd, SockAddr* sockAddr)
+	FdType acceptAddr4(FdType sockFd, SockAddr* sockAddr)
 	{
-		auto len = static_cast<SockLenType>(sizeof(SockAddr));
+		auto len = static_cast<SockLenType>(sizeof(SockAddr4));
+		FdType connFd = InvalidFd;
+		if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) < 0)
+		{
+			LOGS_FATAL << "socket::accept failed";
+		}
+		return connFd;
+	}
+
+	FdType acceptAddr6(FdType sockFd, SockAddr* sockAddr)
+	{
+		auto len = static_cast<SockLenType>(sizeof(SockAddr6));
 		FdType connFd = InvalidFd;
 		if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) < 0)
 		{

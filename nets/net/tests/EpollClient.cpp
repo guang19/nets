@@ -15,7 +15,7 @@ using namespace nets::net;
 int main(int argc, char** argv)
 {
 	FdType sockFd = socket::createTcpSocket(AF_INET);
-	InetSockAddress serverAddr("127.0.0.1", 8080, false);
+	InetSockAddress serverAddr("172.17.242.12", 8080, false);
 	socket::connect(sockFd, serverAddr.csockAddr());
 	char buf[1024] = "你好，服务端。";
 	socket::write(sockFd, buf, strlen(buf));

@@ -13,12 +13,11 @@ using namespace nets::net;
 
 int main(int argc, char** argv)
 {
-	FdType listenFd = socket::createTcpSocket(AF_INET);
+	FdType listenFd = socket::createTcpSocket(AF_INET6);
 
 	::std::vector<struct epoll_event> epollEvents(20);
 
-
-	InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080, false);
+	InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080, true);
 	socket::bind(listenFd, serverAddr.csockAddr());
 	socket::listen(listenFd);
 
@@ -33,13 +32,17 @@ int main(int argc, char** argv)
 		numOfReadEvents = epoll_wait(epollFd, &*epollEvents.begin(), epollEvents.size(), -1);
 		for (int32_t i = 0; i < numOfReadEvents; ++i)
 		{
+			if (epollEvents[i].events & (EPOLLERR | EPOLLRDHUP))
+			{
+				::printf("EPOLLRDHUP\n");
+			}
 			if (epollEvents[i].events & EPOLLIN)
 			{
 				if (epollEvents[i].data.fd == listenFd)
 				{
 					::printf("listen listenFd\n");
 					InetSockAddress clientAddr;
-					FdType connFd = socket::accept(listenFd, clientAddr.sockAddr());
+					FdType connFd = socket::acceptAddr4(listenFd, clientAddr.sockAddr());
 					::printf("client fd=%d,client addr:ip=%s,port=%d", connFd, clientAddr.ip().c_str(), clientAddr.port());
 					struct epoll_event epollEvent {};
 					epollEvent.data.fd = connFd;

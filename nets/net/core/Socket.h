@@ -33,7 +33,8 @@ namespace nets::net
 		void connect(FdType sockFd, const SockAddr* sockAddr);
 
 		void listen(FdType sockFd);
-		FdType accept(FdType sockFd, SockAddr* sockAddr);
+		FdType acceptAddr4(FdType sockFd, SockAddr* sockAddr);
+		FdType acceptAddr6(FdType sockFd, SockAddr* sockAddr);
 
 		::ssize_t read(FdType fd, void* buf, ::size_t n);
 		::ssize_t write(FdType fd, const void* buf, ::size_t n);
