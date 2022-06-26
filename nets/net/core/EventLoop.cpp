@@ -32,7 +32,7 @@ namespace nets::net
 		{
 			CurrentThreadEventLoop = this;
 		}
-		notifier_->addReadEvent();
+		notifier_->addEvent(EReadEvent);
 		registerChannel(notifier_);
 		LOGS_INFO << "EventLoop::EventLoop one loop is created in thread" << threadId_;
 	}

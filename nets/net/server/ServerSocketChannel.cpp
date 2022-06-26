@@ -15,7 +15,6 @@ namespace nets::net
 
 	ServerSocketChannel::~ServerSocketChannel()
 	{
-		resetEvent();
 		deregister();
 		socket::closeFd(sockFd_);
 		socket::closeFd(idleFd_);
@@ -29,9 +28,8 @@ namespace nets::net
 		socket::setSockNonBlock(sockFd_, true);
 		socket::bind(sockFd_, sockAddress.csockAddr());
 		socket::listen(sockFd_);
-		addReadEvent();
+		addEvent(EReadEvent);
 		registerTo();
-		assert(isReadable());
 		assert(sockFd_ > 0);
 	}
 } // namespace nets::net

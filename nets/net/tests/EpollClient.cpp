@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <vector>
 #include <cstring>
+#include <unistd.h>
 
 #include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/Socket.h"
@@ -15,10 +16,24 @@ using namespace nets::net;
 int main(int argc, char** argv)
 {
 	FdType sockFd = socket::createTcpSocket(AF_INET);
-	InetSockAddress serverAddr("172.17.242.12", 8080, false);
+	InetSockAddress serverAddr("127.0.0.1", 8080, false);
 	socket::connect(sockFd, serverAddr.csockAddr());
-	char buf[1024] = "你好，服务端。";
-	socket::write(sockFd, buf, strlen(buf));
-	socket::closeFd(sockFd);
+	char buf[1024] = "asdasd1233asd";
+	size_t n = strlen(buf);
+	printf("bytes = %ld", n);
+//	size_t count = n;
+	while (true)
+	{
+		socket::write(sockFd, buf, n);
+		socket::closeFd(sockFd);
+//		count += count;
+//		if (count >= 131072)
+//		{
+//			socket::write(sockFd, "131072 bytes", strlen("131072 bytes"));
+//			break;
+//		}
+		::sleep(5);
+		break;
+	}
 	return 0;
 }

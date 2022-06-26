@@ -20,10 +20,10 @@ namespace nets::net
 	{
 		using EventType = uint32_t;
 		// event type
-		constexpr EventType NoneEvent = 0;
-		constexpr EventType ReadEvent = EPOLLIN | EPOLLPRI;
-		constexpr EventType WriteEvent = EPOLLOUT;
-		constexpr EventType ErrorEvent = EPOLLERR;
+		constexpr EventType ENoneEvent = 0;
+		constexpr EventType EReadEvent = 0x01;
+		constexpr EventType EWriteEvent = 0x02;
+		constexpr EventType EErrorEvent = 0x03;
 	} // namespace
 
 	class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
@@ -41,6 +41,11 @@ namespace nets::net
 		void deregister();
 
 	public:
+		inline EventLoopRawPtr eventLoop() const
+		{
+			return eventLoop_;
+		}
+
 		virtual FdType fd() const = 0;
 
 		inline EventType events() const
@@ -50,7 +55,17 @@ namespace nets::net
 
 		inline bool isNoneEvent() const
 		{
-			return events_ == NoneEvent;
+			return events_ == ENoneEvent;
+		}
+
+		inline bool setEvents(EventType events)
+		{
+			return events_ == events;
+		}
+
+		inline void addEvent(EventType event)
+		{
+			events_ |= event;
 		}
 
 		inline bool isRegistered() const
@@ -63,49 +78,14 @@ namespace nets::net
 			isRegistered_ = registered;
 		}
 
-		inline bool isReadable() const
+		inline void setReadyEvents(EventType events)
 		{
-			return events_ & ReadEvent;
+			readyEvents_ = events;
 		}
 
-		inline bool isWritable() const
+		inline void addReadyEvent(EventType event)
 		{
-			return events_ & WriteEvent;
-		}
-
-		inline EventLoopRawPtr eventLoop() const
-		{
-			return eventLoop_;
-		}
-
-		inline void addReadEvent()
-		{
-			addEvent(ReadEvent);
-		}
-
-		inline void removeReadEvent()
-		{
-			removeEvent(ReadEvent);
-		}
-
-		inline void addWriteEvent()
-		{
-			addEvent(WriteEvent);
-		}
-
-		inline void removeWriteEvent()
-		{
-			removeEvent(WriteEvent);
-		}
-
-		inline void resetEvent()
-		{
-			events_ = NoneEvent;
-		}
-
-		inline void setReadyEvent(EventType event)
-		{
-			readyEvents_ = event;
+			readyEvents_ |= event;
 		}
 
 	public:
@@ -120,14 +100,10 @@ namespace nets::net
 		virtual void handleWriteEvent() = 0;
 		virtual void handleErrorEvent() = 0;
 
-	private:
-		void addEvent(EventType event);
-		void removeEvent(EventType event);
-
 	protected:
 		// channel unique identifier per EventLoop thread
-		EventType events_ {NoneEvent};
-		EventType readyEvents_ {NoneEvent};
+		EventType events_ {ENoneEvent};
+		EventType readyEvents_ {ENoneEvent};
 		bool isRegistered_ {false};
 		ChannelHandlerPipeline channelHandlerPipeline_ {};
 		EventLoopRawPtr eventLoop_ {nullptr};

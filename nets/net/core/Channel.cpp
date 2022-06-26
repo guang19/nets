@@ -9,7 +9,7 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopRawPtr eventLoop)
-		: events_(NoneEvent), readyEvents_(NoneEvent), isRegistered_(false),
+		: events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false),
 		  eventLoop_(eventLoop)
 	{
 	}
@@ -29,18 +29,19 @@ namespace nets::net
 		eventLoop_->deregisterChannel(shared_from_this());
 	}
 
-	void Channel::addEvent(EventType event)
-	{
-		events_ |= event;
-	}
-
-	void Channel::removeEvent(EventType event)
-	{
-		events_ &= ~event;
-	}
-
 	void Channel::handleEvent()
 	{
-//		if (readyEvents_ & ReadEvent)
+		if (readyEvents_ & EErrorEvent)
+		{
+			handleErrorEvent();
+		}
+		if (readyEvents_ & EReadEvent)
+		{
+			handleReadEvent();
+		}
+		if (readyEvents_ & EWriteEvent)
+		{
+			handleWriteEvent();
+		}
 	}
 } // namespace nets::net

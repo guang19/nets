@@ -39,7 +39,7 @@ namespace nets::net::socket
 		{
 			if (0 != ::close(fd))
 			{
-				LOGS_ERROR << "socket::closeFd failed";
+				LOGS_ERROR << "socket::closeFd " << fd << " failed";
 			}
 		}
 	}

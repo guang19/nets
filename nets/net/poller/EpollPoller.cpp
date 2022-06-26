@@ -61,7 +61,20 @@ namespace nets::net
 		for (int32_t i = 0; i < numOfReadyEvent; ++i)
 		{
 			auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
-			channel->setReadyEvent(events_[i].events);
+			uint32_t revents = events_[i].events;
+			channel->setReadyEvents(ENoneEvent);
+			if (revents & (EPOLLERR | EPOLLHUP))
+			{
+				channel->addReadyEvent(EErrorEvent);
+			}
+			if (revents & (EPOLLIN | EPOLLPRI))
+			{
+				channel->addReadyEvent(EReadEvent);
+			}
+			if (revents & EPOLLOUT)
+			{
+				channel->addReadyEvent(EWriteEvent);
+			}
 			activeChannels.push_back(channel->shared_from_this());
 		}
 	}
