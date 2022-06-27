@@ -28,7 +28,7 @@ namespace nets::net
 		InetSockAddress();
 		explicit InetSockAddress(const SockAddr4& addr4);
 		explicit InetSockAddress(const SockAddr6& addr6);
-		explicit InetSockAddress(const char* ip, PortType port, bool ipv6 = true);
+		explicit InetSockAddress(const char* ip, PortType port, bool ipv6 = false);
 		~InetSockAddress() = default;
 
 		InetSockAddress(const InetSockAddress& addr);
@@ -37,8 +37,8 @@ namespace nets::net
 		InetSockAddress& operator=(InetSockAddress&& addr) noexcept;
 
 	public:
-		static InetSockAddress createAnySockAddress(PortType port, bool ipv6 = true);
-		static InetSockAddress createLoopBackSockAddress(PortType port, bool ipv6 = true);
+		static InetSockAddress createAnySockAddress(PortType port, bool ipv6 = false);
+		static InetSockAddress createLoopBackSockAddress(PortType port, bool ipv6 = false);
 
 	public:
 		inline SockAddrFamily ipFamily() const

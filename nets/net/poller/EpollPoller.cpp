@@ -39,7 +39,7 @@ namespace nets::net
 		if (numOfReadyEvent > 0)
 		{
 			LOGS_DEBUG << "EpollPoller::epoll wait:" << numOfReadyEvent << " events";
-			prepareChannelEvents(numOfReadyEvent, activeChannels);
+			prepareChannelReadEvents(numOfReadyEvent, activeChannels);
 			if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
 			{
 				size = size + (size >> 1);
@@ -56,7 +56,7 @@ namespace nets::net
 		}
 	}
 
-	void EpollPoller::prepareChannelEvents(int32_t numOfReadyEvent, ChannelList& activeChannels)
+	void EpollPoller::prepareChannelReadEvents(int32_t numOfReadyEvent, ChannelList& activeChannels)
 	{
 		for (int32_t i = 0; i < numOfReadyEvent; ++i)
 		{
