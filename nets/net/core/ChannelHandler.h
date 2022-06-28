@@ -14,6 +14,8 @@ namespace nets::net
 	public:
 		ChannelHandler() = default;
 		~ChannelHandler() = default;
+
+	public:
 	};
 } // namespace nets::net
 

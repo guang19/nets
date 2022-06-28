@@ -32,4 +32,19 @@ namespace nets::net
 		registerTo();
 		assert(sockFd_ > 0);
 	}
+
+	void ServerSocketChannel::handleReadEvent()
+	{
+
+	}
+
+	void ServerSocketChannel::handleWriteEvent()
+	{
+
+	}
+
+	void ServerSocketChannel::handleErrorEvent()
+	{
+
+	}
 } // namespace nets::net

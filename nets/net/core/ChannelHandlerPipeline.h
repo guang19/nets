@@ -8,20 +8,26 @@
 #include <list>
 #include <memory>
 
+#include "nets/base/Copyable.h"
 #include "nets/net/core/ChannelHandler.h"
 
 namespace nets::net
 {
-	class ChannelHandlerPipeline : nets::base::Noncopyable
+	class ChannelHandlerPipeline : nets::base::Copyable
 	{
 	public:
 		using ChannelHandlerRawPtr = ChannelHandler*;
-		using ChannelHandlerPtr = ::std::unique_ptr<ChannelHandler>;
+		using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
 		using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
 
 	public:
 		ChannelHandlerPipeline() = default;
 		~ChannelHandlerPipeline() = default;
+
+		ChannelHandlerPipeline(const ChannelHandlerPipeline& other);
+		ChannelHandlerPipeline(ChannelHandlerPipeline&& other) noexcept;
+		ChannelHandlerPipeline& operator=(const ChannelHandlerPipeline& other);
+		ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
 
 	public:
 		void addFirst(ChannelHandlerRawPtr channelHandler);

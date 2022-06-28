@@ -5,22 +5,15 @@
 #ifndef NETS_ACCEPTOR_H
 #define NETS_ACCEPTOR_H
 
-#include "nets/net/server/ServerSocketChannel.h"
+#include "nets/net/core/ChannelHandler.h"
 
 namespace nets::net
 {
-	class Acceptor : public ServerSocketChannel
+	class Acceptor : public ChannelHandler
 	{
 	public:
-		using EventLoopRawPtr = EventLoop*;
-	public:
-		explicit Acceptor(EventLoopRawPtr eventLoop);
+		Acceptor() = default;
 		~Acceptor() = default;
-
-	public:
-		void handleReadEvent() override;
-		void handleWriteEvent() override;
-		void handleErrorEvent() override;
 	};
 }
 
