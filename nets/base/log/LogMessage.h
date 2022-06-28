@@ -18,7 +18,7 @@ namespace nets::base
 		WARN,
 		ERROR,
 		FATAL,
-		NUM_OF_LOG_LEVELS = 6
+		NUM_OF_LOG_LEVELS
 	};
 
 	class LogMessage : Noncopyable
