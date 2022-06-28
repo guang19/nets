@@ -41,12 +41,12 @@ namespace nets::net
 		void deregister();
 
 	public:
+		virtual FdType fd() const = 0;
+
 		inline EventLoopRawPtr eventLoop() const
 		{
 			return eventLoop_;
 		}
-
-		virtual FdType fd() const = 0;
 
 		inline EventType events() const
 		{
@@ -58,9 +58,9 @@ namespace nets::net
 			return events_ == ENoneEvent;
 		}
 
-		inline bool setEvents(EventType events)
+		inline void setEvents(EventType events)
 		{
-			return events_ == events;
+			events_ = events;
 		}
 
 		inline void addEvent(EventType event)

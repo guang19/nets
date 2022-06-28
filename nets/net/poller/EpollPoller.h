@@ -30,7 +30,7 @@ namespace nets::net
 		void deregisterChannel(ChannelPtr channel) override;
 
 	private:
-		void prepareChannelEvents(int32_t numOfReadyEvent, ChannelList& activeChannels);
+		void prepareChannelReadEvents(int32_t numOfReadyEvent, ChannelList& activeChannels);
 		bool epollCtl(int32_t opt, const ChannelPtr& channel);
 		const char* epollOptToString(int32_t opt);
 

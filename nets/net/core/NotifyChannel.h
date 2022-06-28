@@ -16,8 +16,8 @@ namespace nets::net
 		~NotifyChannel();
 
 	public:
-		void notify() const;
 		FdType fd() const override;
+		void notify() const;
 
 	public:
 		void handleReadEvent() override;

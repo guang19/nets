@@ -24,6 +24,11 @@ namespace nets::net
 		socket::closeFd(eventFd_);
 	}
 
+	FdType NotifyChannel::fd() const
+	{
+		return eventFd_;
+	}
+
 	void NotifyChannel::notify() const
 	{
 		int8_t c = 1;
@@ -34,10 +39,6 @@ namespace nets::net
 		}
 	}
 
-	FdType NotifyChannel::fd() const
-	{
-		return eventFd_;
-	}
 	void NotifyChannel::handleReadEvent() {}
 	void NotifyChannel::handleWriteEvent() {}
 	void NotifyChannel::handleErrorEvent() {}
