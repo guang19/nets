@@ -23,10 +23,10 @@ namespace nets::net
 	public:
 		ServerBootstrap& group(EventLoopGroupRawPtr group);
 		ServerBootstrap& group(EventLoopGroupRawPtr mainGroup, EventLoopGroupRawPtr subGroup);
-		ServerBootstrap& bind(const InetSockAddress& listenAddr);
-		ServerBootstrap& bind(const char* ip, PortType port);
 		ServerBootstrap& bind(PortType port);
-		void startUp();
+		ServerBootstrap& bind(const char* ip, PortType port);
+		ServerBootstrap& bind(const InetSockAddress& listenAddr);
+		void launch();
 
 	private:
 		::std::atomic_bool running_ {false};
