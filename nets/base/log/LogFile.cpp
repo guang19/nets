@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <libgen.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "nets/base/CommonMacro.h"
 
@@ -76,7 +77,11 @@ namespace nets::base
 				int32_t err = ::ferror(fp_);
 				if (err != 0)
 				{
-					::fprintf(stderr, "Error:log file append error ""\"%s\"""\n", ::strerror(err));
+					::fprintf(stderr,
+							  "Error:log file append error "
+							  "\"%s\""
+							  "\n",
+							  ::strerror(err));
 					break;
 				}
 			}

@@ -19,7 +19,7 @@ namespace nets::net
 	}
 
 	EventLoop::EventLoop()
-		: running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_unique<NotifyChannel>(this)),
+		: running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_unique<NotifyChannel>()),
 		  poller_(PollerFactory::getPoller())
 	{
 		assert(CurrentThreadEventLoop == nullptr);
@@ -33,7 +33,7 @@ namespace nets::net
 			CurrentThreadEventLoop = this;
 		}
 		notifier_->addEvent(EReadEvent);
-		registerChannel(notifier_);
+		notifier_->registerTo(this);
 		LOGS_INFO << "EventLoop::EventLoop one loop is created in thread" << threadId_;
 	}
 

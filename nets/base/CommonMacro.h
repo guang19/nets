@@ -8,13 +8,10 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
-#include <unistd.h>
 
 #define UNUSED(X) ((void) (X))
 
 #define MEMZERO(P, LEN) (::memset((P), 0, (LEN)))
-
-#define AVAILABLE_PROCESSOR (::sysconf(_SC_NPROCESSORS_ONLN))
 
 #define CHECK_CLASS_COMPLETE_TYPE(CLASS)                                                                                    \
 	do                                                                                                                      \

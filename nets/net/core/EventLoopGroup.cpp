@@ -4,32 +4,52 @@
 
 #include "nets/net/core/EventLoopGroup.h"
 
+#include <utility>
+
 namespace nets::net
 {
-	EventLoopGroup::EventLoopGroup(nets::base::ThreadPool::NType numOfEventLoops)
-		: started_(false)
+	EventLoopGroup::EventLoopGroup(NType numOfEventLoops, const ::std::string& name)
+		: started_(false), nextLoop_(0), numOfEventLoops_(numOfEventLoops)
 	{
-		if (numOfEventLoops <= 0)
+		if (numOfEventLoops_ <= 0)
 		{
 			throw ::std::invalid_argument("numOfEventLoops must be greater than 0");
 		}
-		numOfEventLoops_ = numOfEventLoops;
 		eventLoops_.reserve(numOfEventLoops_);
+		futures_.reserve(numOfEventLoops);
+		eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, 0, name);
 	}
 
 	void EventLoopGroup::loopEach()
 	{
-		LockGuardType lock(mutex_);
-		started_ = true;
-		eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, numOfEventLoops_);
-		for (uint32_t i = 0; i < numOfEventLoops_; ++i)
+		for (NType i = 0; i < numOfEventLoops_; ++i)
 		{
-			auto eventLoop = new EventLoop();
-			eventLoops_.emplace_back(eventLoop);
-			eventLoopThreadPool_->execute([&eventLoop]()
-										  {
+			futures_[i] = eventLoopThreadPool_->submit([&]()
+										 {
+											 auto eventLoop = new EventLoop();
+											 {
+												 LockGuardType lock(mutex_);
+												 eventLoops_.emplace_back(::std::unique_ptr<EventLoop>(eventLoop));
+												 if (eventLoops_.size() == numOfEventLoops_)
+												 {
+													 cv_.notify_one();
+												 }
+											 }
 											 eventLoop->run();
-										  });
+										 });
+		}
+		UniqueLockType lock(mutex_);
+		cv_.wait(lock, [this]() -> bool
+				 {
+					 return eventLoops_.size() == numOfEventLoops_;
+				 });
+	}
+
+	void EventLoopGroup::syncEach()
+	{
+		for (NType i = 0; i < numOfEventLoops_; ++i)
+		{
+			futures_[i].wait();
 		}
 	}
 
@@ -41,5 +61,10 @@ namespace nets::net
 			nextLoop_ = 0;
 		}
 		return nextEventLoop;
+	}
+
+	void EventLoopGroup::registerChannel(EventLoopGroup::ChannelPtr channel)
+	{
+		channel->registerTo(next());
 	}
 } // namespace nets::net

@@ -7,7 +7,7 @@
 namespace nets::base
 {
 	ThreadPool::ThreadWrapper::ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task,
-											 ThreadPoolPtr threadPoolPtr)
+											 ThreadPoolRawPtr threadPoolPtr)
 		: threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
 		  thread_(&ThreadWrapper::start, this, threadPoolPtr)
 	{
@@ -17,22 +17,23 @@ namespace nets::base
 		}
 	}
 
-	void ThreadPool::ThreadWrapper::start(ThreadPoolPtr threadPool)
+	void ThreadPool::ThreadWrapper::start(ThreadPoolRawPtr threadPool)
 	{
 		assert(threadPool != nullptr);
 		setCurrentThreadName(threadName_.c_str());
 		threadPool->runThread(this);
 	}
 
-	ThreadPool::ThreadPool(NType corePoolSize, NType maximumPoolSize, NType maxQueueSize, TimeType idleKeepAliveTime,
-						   const ::std::string& name)
+	ThreadPool::ThreadPool(NType corePoolSize, NType maximumPoolSize, NType maxQueueSize, const ::std::string& name,
+						   TimeType idleKeepAliveTime)
 		: corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize), idleKeepAliveTime_(idleKeepAliveTime),
 		  taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
 		  mutex_(), poolCV_()
 	{
 		if (corePoolSize_ == 0 || corePoolSize_ > maximumPoolSize_)
 		{
-			LOGS_FATAL << "ThreadPool::ThreadPool corePoolSize must be greater than 0 and maxPoolSize must be greater than maxPoolSize";
+			LOGS_FATAL << "ThreadPool::ThreadPool corePoolSize must be greater than 0 and maxPoolSize must be greater than "
+						  "maxPoolSize";
 		}
 		threadPool_.reserve(maximumPoolSize_);
 		LOGS_INFO << "ThreadPool::ThreadPool thread pool [" << name_ << "] init success";

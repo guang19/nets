@@ -36,11 +36,11 @@ namespace nets::net
 
 	void ChannelHandlerPipeline::addFirst(ChannelHandlerRawPtr channelHandler)
 	{
-		channelHandlers_.push_front(::std::unique_ptr<ChannelHandler>(channelHandler));
+		channelHandlers_.push_front(::std::shared_ptr<ChannelHandler>(channelHandler));
 	}
 
 	void ChannelHandlerPipeline::addLast(ChannelHandlerRawPtr channelHandler)
 	{
-		channelHandlers_.push_back(::std::unique_ptr<ChannelHandler>(channelHandler));
+		channelHandlers_.push_back(::std::shared_ptr<ChannelHandler>(channelHandler));
 	}
 }

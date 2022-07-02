@@ -8,8 +8,8 @@
 #include <memory>
 #include <sys/epoll.h>
 
+#include "ChannelContext.h"
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/ChannelHandlerPipeline.h"
 #include "nets/net/core/Socket.h"
 
 namespace nets::net
@@ -32,16 +32,26 @@ namespace nets::net
 		using EventLoopRawPtr = EventLoop*;
 
 	public:
-		explicit Channel(EventLoopRawPtr eventLoop);
+		explicit Channel();
 		virtual ~Channel() = default;
 
 	public:
-		void registerTo();
+		void registerTo(EventLoopRawPtr eventLoop);
 		void modify();
 		void deregister();
 
 	public:
 		virtual FdType fd() const = 0;
+
+		inline ChannelContext& context()
+		{
+			return channelContext_;
+		}
+
+		inline ChannelHandlerPipeline& pipeline()
+		{
+			return channelContext_.pipeline();
+		}
 
 		inline EventLoopRawPtr eventLoop() const
 		{
@@ -89,12 +99,6 @@ namespace nets::net
 		}
 
 	public:
-		ChannelHandlerPipeline& pipeline()
-		{
-			return channelHandlerPipeline_;
-		}
-
-	public:
 		void handleEvent();
 		virtual void handleReadEvent() = 0;
 		virtual void handleWriteEvent() = 0;
@@ -105,7 +109,7 @@ namespace nets::net
 		EventType events_ {ENoneEvent};
 		EventType readyEvents_ {ENoneEvent};
 		bool isRegistered_ {false};
-		ChannelHandlerPipeline channelHandlerPipeline_ {};
+		ChannelContext channelContext_;
 		EventLoopRawPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

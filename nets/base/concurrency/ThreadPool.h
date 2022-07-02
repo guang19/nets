@@ -37,16 +37,16 @@ namespace nets::base
 		using ConditionVariableType = ::std::condition_variable;
 		using BlockingQueueType = BoundedBlockingQueue<TaskType>;
 		using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
-		using ThreadPoolPtr = ThreadPool*;
+		using ThreadPoolRawPtr = ThreadPool*;
 
 	private:
 		class ThreadWrapper : Noncopyable
 		{
 		public:
-			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolPtr threadPool);
+			explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolRawPtr threadPool);
 			~ThreadWrapper() = default;
 
-			void start(ThreadPoolPtr threadPoolPtr);
+			void start(ThreadPoolRawPtr threadPoolPtr);
 
 			::std::string threadName_ {};
 			bool isCoreThread_ {false};
@@ -56,8 +56,8 @@ namespace nets::base
 
 	public:
 		explicit ThreadPool(NType corePoolSize, NType maxPoolSize, NType maxQueueSize,
-							TimeType keepAliveTime = DefaultIdleKeepAliveTime,
-							const ::std::string& name = DefaultThreadPoolName);
+							const ::std::string& name = DefaultThreadPoolName,
+							TimeType keepAliveTime = DefaultIdleKeepAliveTime);
 		~ThreadPool();
 
 		void shutdown();
@@ -145,7 +145,7 @@ namespace nets::base
 		static constexpr NType Shutdown = 0 << CountBits;
 
 		static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
-		static constexpr char const* DefaultThreadPoolName = "NetsThreadPool";
+		static constexpr char DefaultThreadPoolName[] = "NetsThreadPool";
 
 	private:
 		// the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
@@ -217,8 +217,8 @@ namespace nets::base
 			catch (const ::std::exception& exception)
 			{
 				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
-						   << name_ << "], reason " << exception.what();
+				LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
+						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{
@@ -251,8 +251,8 @@ namespace nets::base
 			catch (const ::std::exception& exception)
 			{
 				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName() << "] execution in thread pool ["
-						   << name_ << "], reason " << exception.what();
+				LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
+						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
 			}
 			catch (...)
 			{

@@ -8,10 +8,7 @@
 
 namespace nets::net
 {
-	ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
-		: Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd())
-	{
-	}
+	ServerSocketChannel::ServerSocketChannel() : sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()) {}
 
 	ServerSocketChannel::~ServerSocketChannel()
 	{
@@ -22,29 +19,20 @@ namespace nets::net
 
 	void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
 	{
-		socket::createTcpSocket(AF_INET);
+		sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
 		socket::setSockAddrReuse(sockFd_, true);
 		socket::setSockPortReuse(sockFd_, true);
 		socket::setSockNonBlock(sockFd_, true);
 		socket::bind(sockFd_, sockAddress.csockAddr());
 		socket::listen(sockFd_);
 		addEvent(EReadEvent);
-		registerTo();
-		assert(sockFd_ > 0);
+		auto acceptor = new Acceptor();
+		pipeline().addLast(acceptor);
 	}
 
-	void ServerSocketChannel::handleReadEvent()
-	{
+	void ServerSocketChannel::handleReadEvent() {}
 
-	}
+	void ServerSocketChannel::handleWriteEvent() {}
 
-	void ServerSocketChannel::handleWriteEvent()
-	{
-
-	}
-
-	void ServerSocketChannel::handleErrorEvent()
-	{
-
-	}
+	void ServerSocketChannel::handleErrorEvent() {}
 } // namespace nets::net

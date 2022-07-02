@@ -7,31 +7,33 @@
 
 #include "nets/net/core/EventLoopGroup.h"
 #include "nets/net/core/InetSockAddress.h"
+#include "nets/net/core/ChannelHandler.h"
 
 namespace nets::net
 {
 	class ServerBootstrap : nets::base::Noncopyable
 	{
 	public:
-		using EventLoopGroupRawPtr = EventLoopGroup*;
+		using NType = EventLoopGroup::NType;
 		using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
+		using ChannelHandlerRawPtr = ChannelHandler*;
 
 	public:
-		ServerBootstrap();
+		ServerBootstrap(NType numOfSubEventLoops);
+		ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops);
 		~ServerBootstrap();
 
 	public:
-		ServerBootstrap& group(EventLoopGroupRawPtr group);
-		ServerBootstrap& group(EventLoopGroupRawPtr mainGroup, EventLoopGroupRawPtr subGroup);
+		ServerBootstrap& channelHandler(ChannelHandlerRawPtr channelHandler);
 		ServerBootstrap& bind(PortType port);
 		ServerBootstrap& bind(const char* ip, PortType port);
-		ServerBootstrap& bind(const InetSockAddress& listenAddr);
+		ServerBootstrap& bind(const InetSockAddress& localAddress);
 		void launch();
 
 	private:
 		::std::atomic_bool running_ {false};
-		EventLoopGroupRawPtr mainLoopGroup_ {nullptr};
-		EventLoopGroupRawPtr subLoopGroup_ {nullptr};
+		EventLoopGroupPtr mainLoopGroup_ {nullptr};
+		EventLoopGroupPtr subLoopGroup_ {nullptr};
 	};
 } // namespace nets::net
 

@@ -4,6 +4,7 @@
 
 #include "nets/base/ThreadHelper.h"
 
+#include <unistd.h>
 #include <sys/syscall.h>
 
 #include "nets/base/CommonMacro.h"

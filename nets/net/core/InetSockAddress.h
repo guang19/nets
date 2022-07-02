@@ -43,7 +43,7 @@ namespace nets::net
 	public:
 		inline SockAddrFamily ipFamily() const
 		{
-			return addr4_.sin_family;
+			return addr_.sa_family;
 		}
 
 		inline const SockAddr* csockAddr() const

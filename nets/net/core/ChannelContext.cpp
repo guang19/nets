@@ -4,6 +4,8 @@
 
 #include "nets/net/core/ChannelContext.h"
 
+#include "nets/net/core/Channel.h"
+
 namespace nets::net
 {
 	ChannelContext::ChannelContext(ChannelPtr channel) : channel_(channel) {}

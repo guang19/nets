@@ -10,33 +10,48 @@
 
 namespace nets::net
 {
-	class EventLoopGroup
+	class EventLoopGroup : nets::base::Noncopyable
 	{
 	public:
+		using NType = nets::base::ThreadPool::NType;
 		using ThreadPoolType = nets::base::ThreadPool;
 		using ThreadPoolPtr = ::std::unique_ptr<ThreadPoolType>;
 		using EventLoopRawPtr = EventLoop*;
 		using EventLoopPtr = ::std::unique_ptr<EventLoop>;
 		using EventLoopList = ::std::vector<EventLoopPtr>;
+		using FutureList = ::std::vector<::std::future<void>>;
 		using SizeType = typename EventLoopList::size_type;
+		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
+		using UniqueLockType = ::std::unique_lock<MutexType>;
+		using ConditionVariableType = ::std::condition_variable;
 
 	public:
-		explicit EventLoopGroup(nets::base::ThreadPool::NType numOfEventLoops);
+		explicit EventLoopGroup(NType numOfEventLoops, const ::std::string& name);
 		~EventLoopGroup() = default;
 
 	public:
 		void loopEach();
+		void syncEach();
 		EventLoopRawPtr next();
+		void registerChannel(ChannelPtr channel);
+
+		template <typename Fn, typename... Args>
+		void execute(Fn&& func, Args&&... args)
+		{
+			next()->execute(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		}
 
 	private:
 		::std::atomic_bool started_ {false};
-		uint32_t nextLoop_ {0};
-		uint32_t numOfEventLoops_ {0};
+		NType nextLoop_ {0};
+		NType numOfEventLoops_ {0};
 		EventLoopList eventLoops_ {};
+		FutureList futures_ {};
 		ThreadPoolPtr eventLoopThreadPool_ {nullptr};
 		MutexType mutex_ {};
+		ConditionVariableType cv_ {};
 	};
 } // namespace nets::net
 

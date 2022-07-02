@@ -6,8 +6,6 @@
 
 namespace nets::net
 {
-	SocketChannel::SocketChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop) {}
-
 	FdType SocketChannel::fd() const
 	{
 		return fd_;

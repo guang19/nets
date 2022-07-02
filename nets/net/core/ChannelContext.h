@@ -5,10 +5,15 @@
 #ifndef NETS_CHANNEL_CONTEXT_H
 #define NETS_CHANNEL_CONTEXT_H
 
-#include "nets/net/core/Channel.h"
+#include <memory>
+
+#include "nets/base/Noncopyable.h"
+#include "nets/net/core/ChannelHandlerPipeline.h"
 
 namespace nets::net
 {
+	class Channel;
+
 	class ChannelContext : nets::base::Noncopyable
 	{
 	public:
@@ -16,20 +21,22 @@ namespace nets::net
 
 	public:
 		explicit ChannelContext(ChannelPtr channel);
+		~ChannelContext() = default;
 
 	public:
-		ChannelPtr channel()
+		inline ChannelPtr channel()
 		{
 			return channel_;
 		}
 
-		ChannelHandlerPipeline& pipeline()
+		inline ChannelHandlerPipeline& pipeline()
 		{
-			return channel_->pipeline();
+			return channelHandlerPipeline_;
 		}
 
 	private:
 		ChannelPtr channel_;
+		ChannelHandlerPipeline channelHandlerPipeline_{};
 	};
 }
 

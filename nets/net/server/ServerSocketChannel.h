@@ -5,6 +5,8 @@
 #ifndef NETS_NET_SERVER_SOCKET_CHANNEL_H
 #define NETS_NET_SERVER_SOCKET_CHANNEL_H
 
+#include <functional>
+
 #include "nets/net/core/Channel.h"
 #include "nets/net/core/InetSockAddress.h"
 
@@ -13,7 +15,31 @@ namespace nets::net
 	class ServerSocketChannel : public Channel
 	{
 	public:
-		explicit ServerSocketChannel(EventLoopRawPtr eventLoop);
+		using ChannelPtr = ::std::shared_ptr<Channel>;
+		using InitChannelCallback = ::std::function<void (ChannelPtr channel)>;
+
+	private:
+		class Acceptor : public ChannelHandler
+		{
+		private:
+			using InitChannelCallbackList = ::std::vector<InitChannelCallback>;
+
+		public:
+			Acceptor() = default;
+			~Acceptor() = default;
+
+		public:
+			inline void addInitChannelCallback(const InitChannelCallback& initChannelCallback)
+			{
+				initChannelCallbacks_.push_back(initChannelCallback);
+			}
+
+		private:
+			InitChannelCallbackList initChannelCallbacks_ {};
+		};
+
+	public:
+		explicit ServerSocketChannel();
 		~ServerSocketChannel() override;
 
 	public:

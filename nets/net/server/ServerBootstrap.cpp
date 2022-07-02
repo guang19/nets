@@ -4,31 +4,34 @@
 
 #include "nets/net/server/ServerBootstrap.h"
 
-#include "nets/net/server/Acceptor.h"
+#include "nets/net/server/ServerSocketChannel.h"
+#include <unistd.h>
 
 namespace nets::net
 {
-	ServerBootstrap::ServerBootstrap() : running_(false), mainLoopGroup_(nullptr), subLoopGroup_(nullptr) {}
+	namespace
+	{
+		constexpr char MainEventLoopGroupName[] = "MainLoopGroup";
+		constexpr char SubEventLoopGroupName[] = "SubLoopGroup";
+		constexpr ServerBootstrap::NType DefaultNumbOfMainEventLoops = 1;
+		const ServerBootstrap::NType DefaultNumbOfSubEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
+	} // namespace
+
+	ServerBootstrap::ServerBootstrap(NType numOfSubEventLoops) : ServerBootstrap(0, numOfSubEventLoops) {}
+
+	ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops) : running_(false)
+	{
+		numOfMainEventLoops = numOfMainEventLoops <= 0 ? DefaultNumbOfMainEventLoops : numOfMainEventLoops;
+		numOfSubEventLoops = numOfSubEventLoops <= 0 ? DefaultNumbOfSubEventLoops : numOfSubEventLoops;
+		mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName),
+		subLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfSubEventLoops, SubEventLoopGroupName);
+	}
 
 	ServerBootstrap::~ServerBootstrap() {}
 
-	ServerBootstrap& ServerBootstrap::group(EventLoopGroupRawPtr loopGroup)
+	ServerBootstrap& ServerBootstrap::channelHandler(ChannelHandlerRawPtr channelHandler)
 	{
-		return this->group(loopGroup, loopGroup);
-	}
 
-	ServerBootstrap& ServerBootstrap::group(EventLoopGroupRawPtr mainLoopGroup, EventLoopGroupRawPtr subLoopGroup)
-	{
-		if (mainLoopGroup_ != nullptr)
-		{
-			throw ::std::logic_error("mainLoopGroup set already");
-		}
-		if (subLoopGroup_ != nullptr)
-		{
-			throw ::std::logic_error("subLoopGroup set already");
-		}
-		mainLoopGroup_ = mainLoopGroup;
-		subLoopGroup_ = subLoopGroup;
 		return *this;
 	}
 
@@ -44,8 +47,15 @@ namespace nets::net
 		return *this;
 	}
 
-	ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& listenAddr)
+	ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& localAddress)
 	{
+		mainLoopGroup_->loopEach();
+		mainLoopGroup_->execute(
+			[&, serverSocketChannel = ::std::make_shared<ServerSocketChannel>()]()
+			{
+				serverSocketChannel->bind(localAddress);
+				mainLoopGroup_->registerChannel(serverSocketChannel);
+			});
 		return *this;
 	}
 
@@ -56,5 +66,8 @@ namespace nets::net
 			LOGS_DEBUG << "ServerBootstrap has started";
 			return;
 		}
+		running_ = true;
+		subLoopGroup_->loopEach();
+		mainLoopGroup_->syncEach();
 	}
 } // namespace nets::net
