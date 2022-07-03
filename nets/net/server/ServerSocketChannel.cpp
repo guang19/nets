@@ -8,7 +8,10 @@
 
 namespace nets::net
 {
-	ServerSocketChannel::ServerSocketChannel() : sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()) {}
+	ServerSocketChannel::ServerSocketChannel()
+		: sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), acceptor_(new Acceptor())
+	{
+	}
 
 	ServerSocketChannel::~ServerSocketChannel()
 	{
@@ -26,8 +29,7 @@ namespace nets::net
 		socket::bind(sockFd_, sockAddress.csockAddr());
 		socket::listen(sockFd_);
 		addEvent(EReadEvent);
-		auto acceptor = new Acceptor();
-		pipeline().addLast(acceptor);
+		pipeline().addLast(acceptor_);
 	}
 
 	void ServerSocketChannel::handleReadEvent() {}

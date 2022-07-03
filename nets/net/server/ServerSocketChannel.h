@@ -43,6 +43,11 @@ namespace nets::net
 		~ServerSocketChannel() override;
 
 	public:
+		inline void addInitChannelCallback(const InitChannelCallback& initChannelCallback)
+		{
+			acceptor_->addInitChannelCallback(initChannelCallback);
+		}
+
 		void bind(const InetSockAddress& sockAddress);
 
 		inline FdType fd() const override
@@ -57,6 +62,8 @@ namespace nets::net
 	private:
 		FdType sockFd_ {socket::InvalidFd};
 		FdType idleFd_ {socket::InvalidFd};
+		using AcceptorRawPtr = Acceptor*;
+		AcceptorRawPtr acceptor_ {nullptr};
 	};
 } // namespace nets::net
 
