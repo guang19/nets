@@ -5,9 +5,9 @@
 #ifndef NETS_NET_SERVER_BOOTSTRAP_H
 #define NETS_NET_SERVER_BOOTSTRAP_H
 
-#include "nets/net/core/EventLoopGroup.h"
-#include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/ChannelHandler.h"
+#include "nets/net/core/EventLoopGroup.h"
+#include "nets/net/server/ServerSocketChannel.h"
 
 namespace nets::net
 {
@@ -17,6 +17,7 @@ namespace nets::net
 		using NType = EventLoopGroup::NType;
 		using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
 		using ChannelHandlerRawPtr = ChannelHandler*;
+		using ChannelInitializationCallback = ServerSocketChannel::ChannelInitializationCallback;
 
 	public:
 		ServerBootstrap(NType numOfSubEventLoops);
@@ -24,7 +25,7 @@ namespace nets::net
 		~ServerBootstrap();
 
 	public:
-		ServerBootstrap& channelHandler(ChannelHandlerRawPtr channelHandler);
+		ServerBootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
 		ServerBootstrap& bind(PortType port);
 		ServerBootstrap& bind(const char* ip, PortType port);
 		ServerBootstrap& bind(const InetSockAddress& localAddress);
@@ -32,6 +33,7 @@ namespace nets::net
 
 	private:
 		::std::atomic_bool running_ {false};
+		ChannelInitializationCallback channelInitializationCallback_ {nullptr};
 		EventLoopGroupPtr mainLoopGroup_ {nullptr};
 		EventLoopGroupPtr subLoopGroup_ {nullptr};
 	};

@@ -4,7 +4,6 @@
 
 #include "nets/net/server/ServerBootstrap.h"
 
-#include "nets/net/server/ServerSocketChannel.h"
 #include <unistd.h>
 
 namespace nets::net
@@ -29,9 +28,9 @@ namespace nets::net
 
 	ServerBootstrap::~ServerBootstrap() {}
 
-	ServerBootstrap& ServerBootstrap::channelHandler(ChannelHandlerRawPtr channelHandler)
+	ServerBootstrap& ServerBootstrap::channelHandler(const ChannelInitializationCallback& channelInitializationCallback)
 	{
-
+		channelInitializationCallback_ = channelInitializationCallback;
 		return *this;
 	}
 
@@ -51,9 +50,11 @@ namespace nets::net
 	{
 		mainLoopGroup_->loopEach();
 		mainLoopGroup_->execute(
-			[&, serverSocketChannel = ::std::make_shared<ServerSocketChannel>()]()
+			[&]()
 			{
+				auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>();
 				serverSocketChannel->bind(localAddress);
+				serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback_);
 				mainLoopGroup_->registerChannel(serverSocketChannel);
 			});
 		return *this;

@@ -24,22 +24,24 @@ namespace nets::net
 	{
 		for (NType i = 0; i < numOfEventLoops_; ++i)
 		{
-			futures_[i] = eventLoopThreadPool_->submit([&]()
-										 {
-											 auto eventLoop = new EventLoop();
-											 {
-												 LockGuardType lock(mutex_);
-												 eventLoops_.emplace_back(::std::unique_ptr<EventLoop>(eventLoop));
-												 if (eventLoops_.size() == numOfEventLoops_)
-												 {
-													 cv_.notify_one();
-												 }
-											 }
-											 eventLoop->run();
-										 });
+			futures_[i] = eventLoopThreadPool_->submit(
+				[this]()
+				{
+					auto eventLoop = new EventLoop();
+					{
+						LockGuardType lock(mutex_);
+						eventLoops_.push_back(::std::unique_ptr<EventLoop>(eventLoop));
+						if (eventLoops_.size() == numOfEventLoops_)
+						{
+							cv_.notify_one();
+						}
+					}
+					eventLoop->run();
+				});
 		}
 		UniqueLockType lock(mutex_);
-		cv_.wait(lock, [this]() -> bool
+		cv_.wait(lock,
+				 [this]() -> bool
 				 {
 					 return eventLoops_.size() == numOfEventLoops_;
 				 });

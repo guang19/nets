@@ -16,26 +16,23 @@ namespace nets::net
 	{
 	public:
 		using ChannelPtr = ::std::shared_ptr<Channel>;
-		using InitChannelCallback = ::std::function<void (ChannelPtr channel)>;
+		using ChannelInitializationCallback = ::std::function<void (ChannelPtr channel)>;
 
 	private:
 		class Acceptor : public ChannelHandler
 		{
-		private:
-			using InitChannelCallbackList = ::std::vector<InitChannelCallback>;
-
 		public:
 			Acceptor() = default;
 			~Acceptor() = default;
 
 		public:
-			inline void addInitChannelCallback(const InitChannelCallback& initChannelCallback)
+			inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
 			{
-				initChannelCallbacks_.push_back(initChannelCallback);
+				channelInitializationCallback_ = channelInitializationCallback;
 			}
 
 		private:
-			InitChannelCallbackList initChannelCallbacks_ {};
+			ChannelInitializationCallback channelInitializationCallback_ {nullptr};
 		};
 
 	public:
@@ -43,17 +40,17 @@ namespace nets::net
 		~ServerSocketChannel() override;
 
 	public:
-		inline void addInitChannelCallback(const InitChannelCallback& initChannelCallback)
+		inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
 		{
-			acceptor_->addInitChannelCallback(initChannelCallback);
+			acceptor_->setChannelInitializationCallback(channelInitializationCallback);
 		}
-
-		void bind(const InetSockAddress& sockAddress);
 
 		inline FdType fd() const override
 		{
 			return sockFd_;
 		}
+
+		void bind(const InetSockAddress& sockAddress);
 
 		void handleReadEvent() override;
 		void handleWriteEvent() override;
