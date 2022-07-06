@@ -8,14 +8,8 @@
 
 namespace nets::net
 {
-	bool Poller::hasChannel(ChannelPtr channel)
+	PollerFactory::PollerPtr PollerFactory::getPoller(EventLoopRawPtr eventLoop)
 	{
-		const auto it = channels_.find(channel->fd());
-		return it != channels_.end() && it->second == channel;
-	}
-
-	PollerFactory::PollerPtr PollerFactory::getPoller()
-	{
-		return ::std::make_unique<EpollPoller>(nullptr);
+		return ::std::make_unique<EpollPoller>(eventLoop);
 	}
 }; // namespace nets::net

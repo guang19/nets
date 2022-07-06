@@ -13,12 +13,11 @@ namespace nets::net
 {
 	namespace
 	{
-		constexpr ::size_t InitEpollEventSize = 12;
-		constexpr ::time_t Timeout = 1;
+		constexpr ::size_t EpollEventInitialSize = 12;
 	} // namespace
 
-	EpollPoller::EpollPoller(EventLoopPtr eventLoop)
-		: Poller(eventLoop), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(InitEpollEventSize)
+	EpollPoller::EpollPoller(EventLoopRawPtr eventLoop)
+		: Poller(eventLoop), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(EpollEventInitialSize)
 	{
 		assert(epollFd_ >= 0);
 		if (epollFd_ < 0)
@@ -75,73 +74,77 @@ namespace nets::net
 			{
 				channel->addReadyEvent(EWriteEvent);
 			}
-			activeChannels.push_back(channel->shared_from_this());
+			activeChannels.push_back(channel);
 		}
 	}
 
-	void EpollPoller::registerChannel(ChannelPtr channel)
+	bool EpollPoller::registerChannel(ChannelRawPtr channel)
 	{
-		assert(!hasChannel(channel));
 		if (!channel->isRegistered())
 		{
 			if (epollCtl(EPOLL_CTL_ADD, channel))
 			{
-				channels_[channel->fd()] = channel;
 				channel->setRegistered(true);
+				return true;
 			}
+			return false;
 		}
 		else
 		{
-			modifyChannel(channel);
+			return modifyChannel(channel);
 		}
 	}
 
-	void EpollPoller::modifyChannel(ChannelPtr channel)
+	bool EpollPoller::modifyChannel(ChannelRawPtr channel)
 	{
-		assert(hasChannel(channel));
 		if (channel->isRegistered())
 		{
 			if (channel->isNoneEvent())
 			{
-				if (epollCtl(EPOLL_CTL_DEL, channel))
-				{
-					channels_.erase(channel->fd());
-					channel->setRegistered(false);
-				}
+				return deregisterChannel(channel);
 			}
 			else
 			{
-				epollCtl(EPOLL_CTL_MOD, channel);
+				return epollCtl(EPOLL_CTL_MOD, channel);
 			}
 		}
 		else
 		{
-			registerChannel(channel);
+			return registerChannel(channel);
 		}
 	}
 
-	void EpollPoller::deregisterChannel(ChannelPtr channel)
+	bool EpollPoller::deregisterChannel(ChannelRawPtr channel)
 	{
-		assert(hasChannel(channel));
-		assert(channel->isRegistered());
-		assert(channel->isNoneEvent());
-		epollCtl(EPOLL_CTL_DEL, channel);
-		channel->setRegistered(false);
-		channels_.erase(channel->fd());
+		if (epollCtl(EPOLL_CTL_DEL, channel))
+		{
+			channel->setRegistered(false);
+			 return true;
+		}
+		return false;
 	}
 
-	bool EpollPoller::epollCtl(int32_t opt, const ChannelPtr& channel)
+	bool EpollPoller::epollCtl(int32_t opt, const ChannelRawPtr channel)
 	{
 		EpollEvent event {};
 		FdType fd = channel->fd();
 		event.data.fd = fd;
-		event.data.ptr = channel.get();
-		event.events = channel->events();
+		event.data.ptr = channel;
+		event.events = ENoneEvent;
+		EventType events = channel->events();
+		if (events & EReadEvent)
+		{
+			event.events |= EPOLLIN;
+		}
+		if (events & EWriteEvent)
+		{
+			event.events |= EPOLLOUT;
+		}
 		if (0 == ::epoll_ctl(epollFd_, opt, fd, &event))
 		{
 			return true;
 		}
-		LOGS_ERROR << "epoll ctl " << epollOptToString(opt) << " failed";
+		LOGS_ERROR << "EpollPoller::epollCtl [" << epollOptToString(opt) << "] failed";
 		return false;
 	}
 

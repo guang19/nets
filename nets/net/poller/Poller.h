@@ -18,39 +18,37 @@ namespace nets::net
 	class Poller : nets::base::Noncopyable
 	{
 	public:
-		using ChannelPtr = ::std::shared_ptr<Channel>;
-		using ChannelList = ::std::vector<ChannelPtr>;
-		using EventLoopPtr = ::std::shared_ptr<EventLoop>;
-		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
+		using ChannelRawPtr = Channel*;
+		using ChannelList = ::std::vector<ChannelRawPtr>;
+		using EventLoopRawPtr = EventLoop*;
 
 	public:
-		explicit Poller(EventLoopPtr eventLoop) : eventLoop_(eventLoop) {}
+		explicit Poller(EventLoopRawPtr eventLoop) : eventLoop_(eventLoop) {}
 		virtual ~Poller() = default;
 
 	public:
 		virtual void poll(int32_t timeoutMs, ChannelList& activeChannels) = 0;
-		virtual void registerChannel(ChannelPtr channel) = 0;
-		virtual void modifyChannel(ChannelPtr channel) = 0;
-		virtual void deregisterChannel(ChannelPtr channel) = 0;
-		bool hasChannel(ChannelPtr channel);
+		virtual bool registerChannel(ChannelRawPtr channel) = 0;
+		virtual bool modifyChannel(ChannelRawPtr channel) = 0;
+		virtual bool deregisterChannel(ChannelRawPtr channel) = 0;
 
-		inline EventLoopPtr eventLoop() const
+		inline EventLoopRawPtr eventLoop() const
 		{
 			return eventLoop_;
 		}
 
 	protected:
-		ChannelMap channels_ {};
-		EventLoopPtr eventLoop_ {nullptr};
+		EventLoopRawPtr eventLoop_ {nullptr};
 	};
 
 	class PollerFactory
 	{
 	public:
 		using PollerPtr = ::std::unique_ptr<Poller>;
+		using EventLoopRawPtr = Poller::EventLoopRawPtr;
 
 	public:
-		static PollerPtr getPoller();
+		static PollerPtr getPoller(EventLoopRawPtr eventLoop);
 	};
 }; // namespace nets::net
 

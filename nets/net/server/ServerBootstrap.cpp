@@ -52,10 +52,9 @@ namespace nets::net
 		mainLoopGroup_->execute(
 			[&]()
 			{
-				auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>();
+				auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
 				serverSocketChannel->bind(localAddress);
 				serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback_);
-				mainLoopGroup_->registerChannel(serverSocketChannel);
 			});
 		return *this;
 	}

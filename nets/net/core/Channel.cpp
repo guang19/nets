@@ -8,27 +8,24 @@
 
 namespace nets::net
 {
-	Channel::Channel()
-		: events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false), channelContext_(shared_from_this()),
-		  eventLoop_(nullptr)
+	Channel::Channel(EventLoopRawPtr eventLoop)
+		: events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false), channelContext_(this), eventLoop_(eventLoop)
 	{
 	}
 
-	void Channel::registerTo(EventLoopRawPtr eventLoop)
+	bool Channel::registerTo()
 	{
-		eventLoop_ = eventLoop;
-		eventLoop_->registerChannel(shared_from_this());
+		return eventLoop_->registerChannel(shared_from_this());
 	}
 
-	void Channel::modify()
+	bool Channel::modify()
 	{
-		eventLoop_->modifyChannel(shared_from_this());
+		return eventLoop_->modifyChannel(shared_from_this());
 	}
 
 	void Channel::deregister()
 	{
 		eventLoop_->deregisterChannel(shared_from_this());
-		eventLoop_ = nullptr;
 	}
 
 	void Channel::handleEvent()

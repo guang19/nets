@@ -36,7 +36,7 @@ namespace nets::net
 		};
 
 	public:
-		explicit ServerSocketChannel();
+		explicit ServerSocketChannel(EventLoopRawPtr eventLoop);
 		~ServerSocketChannel() override;
 
 	public:
@@ -59,8 +59,8 @@ namespace nets::net
 	private:
 		FdType sockFd_ {socket::InvalidFd};
 		FdType idleFd_ {socket::InvalidFd};
-		using AcceptorRawPtr = Acceptor*;
-		AcceptorRawPtr acceptor_ {nullptr};
+		using AcceptorPtr = ::std::shared_ptr<Acceptor>;
+		AcceptorPtr acceptor_ {nullptr};
 	};
 } // namespace nets::net
 

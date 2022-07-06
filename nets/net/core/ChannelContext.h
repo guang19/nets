@@ -17,10 +17,11 @@ namespace nets::net
 	class ChannelContext : nets::base::Noncopyable
 	{
 	public:
+		using ChannelRawPtr = Channel*;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
 
 	public:
-		explicit ChannelContext(ChannelPtr channel);
+		explicit ChannelContext(ChannelRawPtr channel);
 		~ChannelContext() = default;
 
 	public:
@@ -35,7 +36,7 @@ namespace nets::net
 		}
 
 	private:
-		ChannelPtr channel_;
+		ChannelPtr channel_ {nullptr};
 		ChannelHandlerPipeline channelHandlerPipeline_{};
 	};
 }

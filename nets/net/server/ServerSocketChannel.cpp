@@ -4,18 +4,17 @@
 
 #include "nets/net/server/ServerSocketChannel.h"
 
-#include <cassert>
+#include "nets/base/log/Logging.h"
 
 namespace nets::net
 {
-	ServerSocketChannel::ServerSocketChannel()
-		: sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), acceptor_(new Acceptor())
+	ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
+		: Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), acceptor_(new Acceptor())
 	{
 	}
 
 	ServerSocketChannel::~ServerSocketChannel()
 	{
-		deregister();
 		socket::closeFd(sockFd_);
 		socket::closeFd(idleFd_);
 	}
@@ -28,8 +27,12 @@ namespace nets::net
 		socket::setSockNonBlock(sockFd_, true);
 		socket::bind(sockFd_, sockAddress.csockAddr());
 		socket::listen(sockFd_);
-		addEvent(EReadEvent);
 		pipeline().addLast(acceptor_);
+		addEvent(EReadEvent);
+		if (!registerTo())
+		{
+			LOGS_FATAL << "Register ServerSocketChannel failed";
+		}
 	}
 
 	void ServerSocketChannel::handleReadEvent() {}

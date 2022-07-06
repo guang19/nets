@@ -15,12 +15,12 @@ namespace nets::net
 	{
 		using TimeType = ::time_t;
 		constexpr TimeType PollTimeoutMs = 10000;
-		__thread EventLoop* CurrentThreadEventLoop = nullptr;
-	}
+		__thread EventLoop::EventLoopRawPtr CurrentThreadEventLoop = nullptr;
+	} // namespace
 
 	EventLoop::EventLoop()
-		: running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_unique<NotifyChannel>()),
-		  poller_(PollerFactory::getPoller())
+		: running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_unique<NotifyChannel>(this)),
+		  poller_(PollerFactory::getPoller(this))
 	{
 		assert(CurrentThreadEventLoop == nullptr);
 		// one loop per thread
@@ -33,8 +33,8 @@ namespace nets::net
 			CurrentThreadEventLoop = this;
 		}
 		notifier_->addEvent(EReadEvent);
-		notifier_->registerTo(this);
-		LOGS_INFO << "EventLoop::EventLoop one loop is created in thread" << threadId_;
+		registerChannel(notifier_);
+		LOGS_INFO << "EventLoop::EventLoop one loop is created in thread " << threadId_;
 	}
 
 	EventLoop::~EventLoop() {}
@@ -47,7 +47,7 @@ namespace nets::net
 		{
 			activeChannels_.clear();
 			poller_->poll(PollTimeoutMs, activeChannels_);
-			for (auto& channel : activeChannels_)
+			for (auto& channel: activeChannels_)
 			{
 				channel->handleEvent();
 			}
@@ -63,7 +63,7 @@ namespace nets::net
 			LockGuardType lock(mutex_);
 			tmpTasks.swap(pendingTasks_);
 		}
-		for (const auto& t : tmpTasks)
+		for (const auto& t: tmpTasks)
 		{
 			t();
 		}
@@ -73,6 +73,7 @@ namespace nets::net
 
 	bool EventLoop::inCurrentEventLoop() const
 	{
+		// threadId_ == nets::base::currentTid()
 		return (this == CurrentThreadEventLoop);
 	}
 
@@ -82,23 +83,29 @@ namespace nets::net
 		return CurrentThreadEventLoop;
 	}
 
-	void EventLoop::registerChannel(ChannelPtr channel)
+	bool EventLoop::registerChannel(ChannelPtr channel)
 	{
-		poller_->registerChannel(channel);
+		assert(channels_.find(channel->fd()) == channels_.end());
+		if (poller_->registerChannel(channel.get()))
+		{
+			// use_count + 1
+			channels_[channel->fd()] = channel;
+		}
+		assert(channels_.find(channel->fd()) != channels_.end());
+		return false;
 	}
 
-	void EventLoop::modifyChannel(ChannelPtr channel)
+	bool EventLoop::modifyChannel(ChannelPtr channel)
 	{
-		poller_->modifyChannel(channel);
+		assert(channels_.find(channel->fd()) != channels_.end());
+		return poller_->modifyChannel(channel.get());
 	}
 
 	void EventLoop::deregisterChannel(ChannelPtr channel)
 	{
-		poller_->deregisterChannel(channel);
-	}
-
-	bool EventLoop::hasChannel(ChannelPtr channel)
-	{
-		return poller_->hasChannel(channel);
+		assert(channels_.find(channel->fd()) != channels_.end());
+		channels_.erase(channel->fd());
+		poller_->deregisterChannel(channel.get());
+		assert(channels_.find(channel->fd()) == channels_.end());
 	}
 } // namespace nets::net

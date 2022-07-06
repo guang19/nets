@@ -49,7 +49,8 @@ namespace nets::net::socket
 		FdType idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
 		if (idleFd < 0)
 		{
-			LOGS_FATAL << "socket::createIdleFd failed";
+			LOGS_ERROR << "socket::createIdleFd failed";
+			return socket::InvalidFd;
 		}
 		return idleFd;
 	}
@@ -146,7 +147,7 @@ namespace nets::net::socket
 		OptValType reuse = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(reuse))))
 		{
-			LOGS_ERROR << "socket::setSockAddrReuse failed";
+			LOGS_FATAL << "socket::setSockAddrReuse failed";
 		}
 	}
 
@@ -155,7 +156,7 @@ namespace nets::net::socket
 		OptValType reuse = enable ? 1 : 0;
 		if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(reuse))))
 		{
-			LOGS_ERROR << "socket::setSockPortReuse failed";
+			LOGS_FATAL << "socket::setSockPortReuse failed";
 		}
 	}
 

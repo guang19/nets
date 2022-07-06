@@ -37,23 +37,6 @@ TEST(NetPackageTest, Endian)
 	ASSERT_EQ(x, z);
 }
 
-#include <memory>
-#include <vector>
-
-class TTT
-{
-public:
-	TTT()
-	{
-		::printf("Construct TTT\n");
-	}
-
-	~TTT()
-	{
-		::printf("Destruct TTT\n");
-	}
-};
-
 int main(int argc, char** argv)
 {
 	::testing::InitGoogleTest(&argc, argv);

@@ -22,7 +22,6 @@ namespace nets::net
 	class Channel;
 	class Poller;
 	class PollerFactory;
-	class EventLoop;
 
 	class EventLoop : nets::base::Noncopyable
 	{
@@ -31,8 +30,10 @@ namespace nets::net
 		using TaskList = ::std::vector<TaskType>;
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
+		using ChannelRawPtr = Channel*;
 		using ChannelPtr = ::std::shared_ptr<Channel>;
-		using ChannelList = ::std::vector<ChannelPtr>;
+		using ChannelList = ::std::vector<ChannelRawPtr>;
+		using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
 		using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
 		using PollerPtr = ::std::unique_ptr<Poller>;
 		using EventLoopRawPtr = EventLoop*;
@@ -48,10 +49,9 @@ namespace nets::net
 		bool inCurrentEventLoop() const;
 		EventLoopRawPtr currentEventLoop() const;
 
-		void registerChannel(ChannelPtr channel);
-		void modifyChannel(ChannelPtr channel);
+		bool registerChannel(ChannelPtr channel);
+		bool modifyChannel(ChannelPtr channel);
 		void deregisterChannel(ChannelPtr channel);
-		bool hasChannel(ChannelPtr channel);
 
 		template <typename Fn, typename... Args>
 		void execute(Fn&& func, Args&&... args);
@@ -73,6 +73,7 @@ namespace nets::net
 		::std::atomic_bool running_ {false};
 		const ::pid_t threadId_ {0};
 		NotifyChannelPtr notifier_ {nullptr};
+		ChannelMap channels_ {};
 		ChannelList activeChannels_ {nullptr};
 		PollerPtr poller_ {nullptr};
 		TaskList pendingTasks_ {};

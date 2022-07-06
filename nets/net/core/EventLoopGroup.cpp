@@ -4,8 +4,6 @@
 
 #include "nets/net/core/EventLoopGroup.h"
 
-#include <utility>
-
 namespace nets::net
 {
 	EventLoopGroup::EventLoopGroup(NType numOfEventLoops, const ::std::string& name)
@@ -63,10 +61,5 @@ namespace nets::net
 			nextLoop_ = 0;
 		}
 		return nextEventLoop;
-	}
-
-	void EventLoopGroup::registerChannel(EventLoopGroup::ChannelPtr channel)
-	{
-		channel->registerTo(next());
 	}
 } // namespace nets::net

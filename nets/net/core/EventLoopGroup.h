@@ -35,7 +35,6 @@ namespace nets::net
 		void loopEach();
 		void syncEach();
 		EventLoopRawPtr next();
-		void registerChannel(ChannelPtr channel);
 
 		template <typename Fn, typename... Args>
 		void execute(Fn&& func, Args&&... args)

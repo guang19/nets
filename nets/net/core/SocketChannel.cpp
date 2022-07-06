@@ -6,15 +6,14 @@
 
 namespace nets::net
 {
+	SocketChannel::SocketChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop) {}
+
 	FdType SocketChannel::fd() const
 	{
 		return fd_;
 	}
 
-	void SocketChannel::handleReadEvent()
-	{
-
-	}
+	void SocketChannel::handleReadEvent() {}
 
 	void SocketChannel::handleWriteEvent() {}
 

@@ -14,24 +14,23 @@ namespace nets::net
 	class EpollPoller : public Poller
 	{
 	public:
-		using ChannelRawPtr = Channel*;
 		using EpollEvent = struct epoll_event;
 		using EventList = ::std::vector<EpollEvent>;
 		using SizeType = EventList::size_type;
 
 	public:
-		explicit EpollPoller(EventLoopPtr eventLoop);
+		explicit EpollPoller(EventLoopRawPtr eventLoop);
 		~EpollPoller() override;
 
 	public:
 		void poll(int32_t timeoutMs, ChannelList& activeChannels) override;
-		void registerChannel(ChannelPtr channel) override;
-		void modifyChannel(ChannelPtr channel) override;
-		void deregisterChannel(ChannelPtr channel) override;
+		bool registerChannel(ChannelRawPtr channel) override;
+		bool modifyChannel(ChannelRawPtr channel) override;
+		bool deregisterChannel(ChannelRawPtr channel) override;
 
 	private:
 		void prepareChannelReadEvents(int32_t numOfReadyEvent, ChannelList& activeChannels);
-		bool epollCtl(int32_t opt, const ChannelPtr& channel);
+		bool epollCtl(int32_t opt, ChannelRawPtr channel);
 		const char* epollOptToString(int32_t opt);
 
 	private:

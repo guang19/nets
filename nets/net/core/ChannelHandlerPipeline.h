@@ -16,7 +16,6 @@ namespace nets::net
 	class ChannelHandlerPipeline : nets::base::Copyable
 	{
 	public:
-		using ChannelHandlerRawPtr = ChannelHandler*;
 		using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
 		using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
 
@@ -30,8 +29,8 @@ namespace nets::net
 		ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
 
 	public:
-		void addFirst(ChannelHandlerRawPtr channelHandler);
-		void addLast(ChannelHandlerRawPtr channelHandler);
+		void addFirst(ChannelHandlerPtr channelHandler);
+		void addLast(ChannelHandlerPtr channelHandler);
 
 	private:
 		ChannelHandlerList channelHandlers_ {};

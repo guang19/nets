@@ -12,7 +12,7 @@ namespace nets::net
 	class NotifyChannel : public Channel
 	{
 	public:
-		explicit NotifyChannel();
+		explicit NotifyChannel(EventLoopRawPtr eventLoop);
 		~NotifyChannel();
 
 	public:

@@ -32,12 +32,12 @@ namespace nets::net
 		using EventLoopRawPtr = EventLoop*;
 
 	public:
-		explicit Channel();
+		explicit Channel(EventLoopRawPtr eventLoop);
 		virtual ~Channel() = default;
 
 	public:
-		void registerTo(EventLoopRawPtr eventLoop);
-		void modify();
+		bool registerTo();
+		bool modify();
 		void deregister();
 
 	public:
@@ -109,7 +109,7 @@ namespace nets::net
 		EventType events_ {ENoneEvent};
 		EventType readyEvents_ {ENoneEvent};
 		bool isRegistered_ {false};
-		ChannelContext channelContext_;
+		ChannelContext channelContext_ {nullptr};
 		EventLoopRawPtr eventLoop_ {nullptr};
 	};
 } // namespace nets::net

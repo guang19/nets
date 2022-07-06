@@ -34,13 +34,13 @@ namespace nets::net
 		return *this;
 	}
 
-	void ChannelHandlerPipeline::addFirst(ChannelHandlerRawPtr channelHandler)
+	void ChannelHandlerPipeline::addFirst(ChannelHandlerPtr channelHandler)
 	{
-		channelHandlers_.push_front(::std::shared_ptr<ChannelHandler>(channelHandler));
+		channelHandlers_.push_front(channelHandler);
 	}
 
-	void ChannelHandlerPipeline::addLast(ChannelHandlerRawPtr channelHandler)
+	void ChannelHandlerPipeline::addLast(ChannelHandlerPtr channelHandler)
 	{
-		channelHandlers_.push_back(::std::shared_ptr<ChannelHandler>(channelHandler));
+		channelHandlers_.push_back(channelHandler);
 	}
 }

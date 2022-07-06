@@ -10,8 +10,8 @@
 
 namespace nets::net
 {
-	NotifyChannel::NotifyChannel()
-		: eventFd_(::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK))
+	NotifyChannel::NotifyChannel(EventLoopRawPtr eventLoop)
+		: Channel(eventLoop), eventFd_(::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK))
 	{
 		if (eventFd_ < 0)
 		{
