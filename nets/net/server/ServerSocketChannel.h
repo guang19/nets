@@ -59,6 +59,7 @@ namespace nets::net
 	private:
 		FdType sockFd_ {socket::InvalidFd};
 		FdType idleFd_ {socket::InvalidFd};
+
 		using AcceptorPtr = ::std::shared_ptr<Acceptor>;
 		AcceptorPtr acceptor_ {nullptr};
 	};

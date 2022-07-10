@@ -42,6 +42,22 @@ namespace nets::net
 			next()->execute(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		}
 
+		template <typename Fn, typename... Args,
+				  typename HasRet = typename ::std::enable_if<
+					  !::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
+		::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> submit(Fn&& func, Args&&... args)
+		{
+			return next()->submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		}
+
+		template <typename Fn, typename... Args,
+				  typename HasRet = typename ::std::enable_if<
+					  ::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
+		::std::future<void> submit(Fn&& func, Args&&... args)
+		{
+			return next()->submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+		}
+
 	private:
 		::std::atomic_bool started_ {false};
 		NType nextLoop_ {0};

@@ -116,12 +116,8 @@ namespace nets::net
 
 	bool EpollPoller::deregisterChannel(ChannelRawPtr channel)
 	{
-		if (epollCtl(EPOLL_CTL_DEL, channel))
-		{
-			channel->setRegistered(false);
-			 return true;
-		}
-		return false;
+		channel->setRegistered(false);
+		return epollCtl(EPOLL_CTL_DEL, channel);
 	}
 
 	bool EpollPoller::epollCtl(int32_t opt, const ChannelRawPtr channel)

@@ -19,7 +19,7 @@ namespace nets::net
 	} // namespace
 
 	EventLoop::EventLoop()
-		: running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_unique<NotifyChannel>(this)),
+		: running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)),
 		  poller_(PollerFactory::getPoller(this))
 	{
 		assert(CurrentThreadEventLoop == nullptr);
@@ -34,7 +34,7 @@ namespace nets::net
 		}
 		notifier_->addEvent(EReadEvent);
 		registerChannel(notifier_);
-		LOGS_INFO << "EventLoop::EventLoop one loop is created in thread " << threadId_;
+		LOGS_INFO << "EventLoop::EventLoop one event loop is created in thread " << threadId_;
 	}
 
 	EventLoop::~EventLoop() {}
@@ -71,7 +71,7 @@ namespace nets::net
 
 	void EventLoop::shutdown() {}
 
-	bool EventLoop::inCurrentEventLoop() const
+	bool EventLoop::isInCurrentEventLoop() const
 	{
 		// threadId_ == nets::base::currentTid()
 		return (this == CurrentThreadEventLoop);
@@ -79,7 +79,7 @@ namespace nets::net
 
 	EventLoop::EventLoopRawPtr EventLoop::currentEventLoop() const
 	{
-		assert(inCurrentEventLoop());
+		assert(isInCurrentEventLoop());
 		return CurrentThreadEventLoop;
 	}
 
@@ -90,6 +90,7 @@ namespace nets::net
 		{
 			// use_count + 1
 			channels_[channel->fd()] = channel;
+			return true;
 		}
 		assert(channels_.find(channel->fd()) != channels_.end());
 		return false;

@@ -18,16 +18,15 @@ namespace nets::net
 	{
 	public:
 		using ChannelRawPtr = Channel*;
-		using ChannelPtr = ::std::shared_ptr<Channel>;
 
 	public:
 		explicit ChannelContext(ChannelRawPtr channel);
 		~ChannelContext() = default;
 
 	public:
-		inline ChannelPtr channel()
+		inline Channel& channel()
 		{
-			return channel_;
+			return *channel_;
 		}
 
 		inline ChannelHandlerPipeline& pipeline()
@@ -36,9 +35,9 @@ namespace nets::net
 		}
 
 	private:
-		ChannelPtr channel_ {nullptr};
-		ChannelHandlerPipeline channelHandlerPipeline_{};
+		ChannelRawPtr channel_ {nullptr};
+		ChannelHandlerPipeline channelHandlerPipeline_ {};
 	};
-}
+} // namespace nets::net
 
 #endif // NETS_CHANNEL_CONTEXT_H

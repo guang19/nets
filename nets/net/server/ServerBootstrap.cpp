@@ -49,13 +49,14 @@ namespace nets::net
 	ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& localAddress)
 	{
 		mainLoopGroup_->loopEach();
-		mainLoopGroup_->execute(
+		auto future = mainLoopGroup_->submit(
 			[&]()
 			{
 				auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
 				serverSocketChannel->bind(localAddress);
 				serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback_);
 			});
+		future.wait();
 		return *this;
 	}
 

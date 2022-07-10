@@ -43,12 +43,12 @@ namespace nets::net
 	public:
 		virtual FdType fd() const = 0;
 
-		inline ChannelContext& context()
+		inline ChannelContext& channelContext()
 		{
 			return channelContext_;
 		}
 
-		inline ChannelHandlerPipeline& pipeline()
+		inline ChannelHandlerPipeline& channelHandlerPipeline()
 		{
 			return channelContext_.pipeline();
 		}

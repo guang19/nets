@@ -9,7 +9,8 @@
 namespace nets::net
 {
 	Channel::Channel(EventLoopRawPtr eventLoop)
-		: events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false), channelContext_(this), eventLoop_(eventLoop)
+		: events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false), channelContext_(this),
+		  eventLoop_(eventLoop)
 	{
 	}
 

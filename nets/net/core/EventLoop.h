@@ -46,7 +46,7 @@ namespace nets::net
 		void run();
 		void shutdown();
 
-		bool inCurrentEventLoop() const;
+		bool isInCurrentEventLoop() const;
 		EventLoopRawPtr currentEventLoop() const;
 
 		bool registerChannel(ChannelPtr channel);

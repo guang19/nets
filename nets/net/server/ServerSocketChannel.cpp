@@ -27,7 +27,7 @@ namespace nets::net
 		socket::setSockNonBlock(sockFd_, true);
 		socket::bind(sockFd_, sockAddress.csockAddr());
 		socket::listen(sockFd_);
-		pipeline().addLast(acceptor_);
+		channelHandlerPipeline().addLast(acceptor_);
 		addEvent(EReadEvent);
 		if (!registerTo())
 		{
