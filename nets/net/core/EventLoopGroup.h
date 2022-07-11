@@ -21,7 +21,6 @@ namespace nets::net
 		using EventLoopList = ::std::vector<EventLoopPtr>;
 		using FutureList = ::std::vector<::std::future<void>>;
 		using SizeType = typename EventLoopList::size_type;
-		using ChannelPtr = ::std::shared_ptr<Channel>;
 		using MutexType = ::std::mutex;
 		using LockGuardType = ::std::lock_guard<MutexType>;
 		using UniqueLockType = ::std::unique_lock<MutexType>;

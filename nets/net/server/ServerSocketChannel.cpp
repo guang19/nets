@@ -34,10 +34,4 @@ namespace nets::net
 			LOGS_FATAL << "Register ServerSocketChannel failed";
 		}
 	}
-
-	void ServerSocketChannel::handleReadEvent() {}
-
-	void ServerSocketChannel::handleWriteEvent() {}
-
-	void ServerSocketChannel::handleErrorEvent() {}
 } // namespace nets::net

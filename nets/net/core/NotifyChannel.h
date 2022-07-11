@@ -21,8 +21,6 @@ namespace nets::net
 
 	public:
 		void handleReadEvent() override;
-		void handleWriteEvent() override;
-		void handleErrorEvent() override;
 
 	private:
 		FdType eventFd_ {socket::InvalidFd};

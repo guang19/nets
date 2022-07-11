@@ -84,7 +84,7 @@ namespace nets::net
 	void EventLoop::execute(Fn&& func, Args&&... args)
 	{
 		TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-		if (inCurrentEventLoop())
+		if (isInCurrentEventLoop())
 		{
 			task();
 		}

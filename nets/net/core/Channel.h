@@ -100,9 +100,9 @@ namespace nets::net
 
 	public:
 		void handleEvent();
-		virtual void handleReadEvent() = 0;
-		virtual void handleWriteEvent() = 0;
-		virtual void handleErrorEvent() = 0;
+		virtual void handleReadEvent();
+		virtual void handleWriteEvent();
+		virtual void handleErrorEvent();
 
 	protected:
 		// channel unique identifier per EventLoop thread
