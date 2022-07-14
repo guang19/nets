@@ -39,10 +39,10 @@ namespace nets::net
 		}
 		UniqueLockType lock(mutex_);
 		cv_.wait(lock,
-				 [this]() -> bool
-				 {
-					 return eventLoops_.size() == numOfEventLoops_;
-				 });
+			[this]() -> bool
+			{
+				return eventLoops_.size() == numOfEventLoops_;
+			});
 	}
 
 	void EventLoopGroup::syncEach()

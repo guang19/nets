@@ -106,26 +106,26 @@ namespace nets::net
 		auto future = promise->get_future();
 		::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
-		{
-			assert(promise.use_count() > 0);
-			try
 			{
-				RetType result = f();
-				promise->set_value(result);
-			}
-			catch (const ::std::exception& exception)
-			{
-				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
-						   << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
-			}
-			catch (...)
-			{
-				promise->set_exception(::std::current_exception());
-				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
-						   << "] execution in event loop thread [" << threadId_ << "]";
-			}
-		};
+				assert(promise.use_count() > 0);
+				try
+				{
+					RetType result = f();
+					promise->set_value(result);
+				}
+				catch (const ::std::exception& exception)
+				{
+					promise->set_exception(::std::make_exception_ptr(exception));
+					LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+						<< "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
+				}
+				catch (...)
+				{
+					promise->set_exception(::std::current_exception());
+					LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+						<< "] execution in event loop thread [" << threadId_ << "]";
+				}
+			};
 		assert(2 == promise.use_count());
 		execute(::std::move(promiseTask));
 		return future;
@@ -138,26 +138,26 @@ namespace nets::net
 		auto future = promise->get_future();
 		::std::function<void()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
-		{
-			assert(promise.use_count() > 0);
-			try
 			{
-				f();
-				promise->set_value();
-			}
-			catch (const ::std::exception& exception)
-			{
-				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
-						   << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
-			}
-			catch (...)
-			{
-				promise->set_exception(::std::current_exception());
-				LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
-						   << "] execution in event loop thread [" << threadId_ << "]";
-			}
-		};
+				assert(promise.use_count() > 0);
+				try
+				{
+					f();
+					promise->set_value();
+				}
+				catch (const ::std::exception& exception)
+				{
+					promise->set_exception(::std::make_exception_ptr(exception));
+					LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+						<< "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
+				}
+				catch (...)
+				{
+					promise->set_exception(::std::current_exception());
+					LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+						<< "] execution in event loop thread [" << threadId_ << "]";
+				}
+			};
 		assert(2 == promise.use_count());
 		execute(::std::move(promiseTask));
 		return future;

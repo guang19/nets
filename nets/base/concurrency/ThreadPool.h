@@ -207,26 +207,26 @@ namespace nets::base
 		auto future = promise->get_future();
 		::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
-		{
-			assert(promise.use_count() > 0);
-			try
 			{
-				RetType result = f();
-				promise->set_value(result);
-			}
-			catch (const ::std::exception& exception)
-			{
-				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
-			}
-			catch (...)
-			{
-				promise->set_exception(::std::current_exception());
-				LOGS_ERROR << "ThreadPool::promiseTask unknown exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << ']';
-			}
-		};
+				assert(promise.use_count() > 0);
+				try
+				{
+					RetType result = f();
+					promise->set_value(result);
+				}
+				catch (const ::std::exception& exception)
+				{
+					promise->set_exception(::std::make_exception_ptr(exception));
+					LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
+						<< "] execution in thread pool [" << name_ << "], reason " << exception.what();
+				}
+				catch (...)
+				{
+					promise->set_exception(::std::current_exception());
+					LOGS_ERROR << "ThreadPool::promiseTask unknown exception caught during thread [" << currentThreadName()
+						<< "] execution in thread pool [" << name_ << ']';
+				}
+			};
 		assert(2 == promise.use_count());
 		if (!execute(::std::move(promiseTask)))
 		{
@@ -242,25 +242,25 @@ namespace nets::base
 		auto future = promise->get_future();
 		TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
 		TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
-		{
-			try
 			{
-				f();
-				promise->set_value();
-			}
-			catch (const ::std::exception& exception)
-			{
-				promise->set_exception(::std::make_exception_ptr(exception));
-				LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << "], reason " << exception.what();
-			}
-			catch (...)
-			{
-				promise->set_exception(::std::current_exception());
-				LOGS_ERROR << "ThreadPool::promiseTask unknown exception caught during thread [" << currentThreadName()
-						   << "] execution in thread pool [" << name_ << ']';
-			}
-		};
+				try
+				{
+					f();
+					promise->set_value();
+				}
+				catch (const ::std::exception& exception)
+				{
+					promise->set_exception(::std::make_exception_ptr(exception));
+					LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
+						<< "] execution in thread pool [" << name_ << "], reason " << exception.what();
+				}
+				catch (...)
+				{
+					promise->set_exception(::std::current_exception());
+					LOGS_ERROR << "ThreadPool::promiseTask unknown exception caught during thread [" << currentThreadName()
+						<< "] execution in thread pool [" << name_ << ']';
+				}
+			};
 		assert(2 == promise.use_count());
 		if (!execute(::std::move(promiseTask)))
 		{

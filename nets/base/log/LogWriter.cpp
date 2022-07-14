@@ -199,14 +199,14 @@ namespace nets::base
 			}
 			::time(&currentTime);
 			auto synchronizeTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
-			{
-				for (auto& it: *tmpBuffers)
 				{
-					auto logBuffer = it.get();
-					synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
-				}
-				synchronizer_->flush();
-			};
+					for (auto& it: *tmpBuffers)
+					{
+						auto logBuffer = it.get();
+						synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
+					}
+					synchronizer_->flush();
+				};
 			// if not running, the writer task that is not added to the queue will be discarded
 			writerTaskQueue_->put(::std::move(synchronizeTask));
 			buffers = ::std::make_unique<BufferVectorType>();
@@ -223,14 +223,14 @@ namespace nets::base
 			buffers_->push_back(::std::move(cacheBuffer_));
 			::time(&currentTime);
 			auto writerTask = [this, tmpBuffers = buffers_.release(), currentTime]() mutable
-			{
-				for (auto& it: *tmpBuffers)
 				{
-					auto logBuffer = it.get();
-					synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
-				}
-				synchronizer_->flush();
-			};
+					for (auto& it: *tmpBuffers)
+					{
+						auto logBuffer = it.get();
+						synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
+					}
+					synchronizer_->flush();
+				};
 			writerTaskQueue_->put(::std::move(writerTask));
 		}
 	}
