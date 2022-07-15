@@ -12,7 +12,7 @@
 
 namespace nets::net
 {
-	class Channel;
+    class Channel;
 
 	class ChannelContext : nets::base::Noncopyable
 	{

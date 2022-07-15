@@ -56,53 +56,55 @@
 #define DEFINE_SINGLETON(CLASS_NAME)                                                                                        \
                                                                                                                             \
 private:                                                                                                                    \
-	template <typename C>                                                                                                   \
-	static void _CALL_AFTER_INIT(...)                                                                                       \
-	{                                                                                                                       \
-	}                                                                                                                       \
+    template <typename C>                                                                                                   \
+    static void _CALL_AFTER_INIT(...)                                                                                       \
+    {                                                                                                                       \
+    }                                                                                                                       \
                                                                                                                             \
-	template <typename C, void (C::*)(void) = &C::afterInit>                                                                \
-	static void _CALL_AFTER_INIT(C* c)                                                                                      \
-	{                                                                                                                       \
-		c->afterInit();                                                                                                     \
-	}                                                                                                                       \
+    template <typename C, void (C::*)(void) = &C::afterInit>                                                                \
+    static void _CALL_AFTER_INIT(C* c)                                                                                      \
+    {                                                                                                                       \
+        c->afterInit();                                                                                                     \
+    }                                                                                                                       \
                                                                                                                             \
-	static void _DESTROY(CLASS_NAME* instance)                                                                              \
-	{                                                                                                                       \
-		delete instance;                                                                                                    \
-	}                                                                                                                       \
+    static void _DESTROY(CLASS_NAME* instance)                                                                              \
+    {                                                                                                                       \
+        delete instance;                                                                                                    \
+    }                                                                                                                       \
                                                                                                                             \
-	template <typename... Args>                                                                                             \
-	static void _INIT(Args&&... args)                                                                                       \
-	{                                                                                                                       \
-		CHECK_CLASS_COMPLETE_TYPE(CLASS_NAME);                                                                              \
-		_INSTANCE = ::std::shared_ptr<CLASS_NAME>(new CLASS_NAME(::std::forward<Args>(args)...), &CLASS_NAME::_DESTROY);    \
-		_CALL_AFTER_INIT<CLASS_NAME>(_INSTANCE.get());                                                                      \
-	}                                                                                                                       \
+    template <typename... Args>                                                                                             \
+    static void _INIT(Args&&... args)                                                                                       \
+    {                                                                                                                       \
+        CHECK_CLASS_COMPLETE_TYPE(CLASS_NAME);                                                                              \
+        _INSTANCE = ::std::shared_ptr<CLASS_NAME>(new CLASS_NAME(::std::forward<Args>(args)...), &CLASS_NAME::_DESTROY);    \
+        _CALL_AFTER_INIT<CLASS_NAME>(_INSTANCE.get());                                                                      \
+    }                                                                                                                       \
                                                                                                                             \
 public:                                                                                                                     \
-	template <typename... Args>                                                                                             \
-	static inline ::std::shared_ptr<CLASS_NAME> getInstance(Args&&... args)                                                 \
-	{                                                                                                                       \
-		::std::call_once(                                                                                                   \
-			_ONCE_FLAG,                                                                                                     \
-			[](Args&&... args0)                                                                                             \
-			{                                                                                                               \
-				if (nullptr == _INSTANCE)                                                                                   \
-				{                                                                                                           \
-					CLASS_NAME::_INIT(::std::forward<Args>(args0)...);                                                      \
-				}                                                                                                           \
-			},                                                                                                              \
-			::std::forward<Args>(args)...);                                                                                 \
-		return _INSTANCE;                                                                                                   \
-	}                                                                                                                       \
+    template <typename... Args>                                                                                             \
+    static inline ::std::shared_ptr<CLASS_NAME> getInstance(Args&&... args)                                                 \
+    {                                                                                                                       \
+        ::std::call_once(                                                                                                   \
+            _ONCE_FLAG,                                                                                                     \
+            [](Args&&... args0)                                                                                             \
+            {                                                                                                               \
+                if (nullptr == _INSTANCE)                                                                                   \
+                {                                                                                                           \
+                    CLASS_NAME::_INIT(::std::forward<Args>(args0)...);                                                      \
+                }                                                                                                           \
+            },                                                                                                              \
+            ::std::forward<Args>(args)...);                                                                                 \
+        return _INSTANCE;                                                                                                   \
+    }                                                                                                                       \
                                                                                                                             \
 private:                                                                                                                    \
-	static ::std::shared_ptr<CLASS_NAME> _INSTANCE;                                                                         \
-	static ::std::once_flag _ONCE_FLAG
+    static ::std::shared_ptr<CLASS_NAME> _INSTANCE;                                                                         \
+    static ::std::once_flag _ONCE_FLAG
 
 #define INIT_SINGLETON(CLASS_NAME)                                                                                          \
-	::std::shared_ptr<CLASS_NAME> CLASS_NAME::_INSTANCE {nullptr};                                                          \
-	::std::once_flag CLASS_NAME::_ONCE_FLAG {}
+    ::std::shared_ptr<CLASS_NAME> CLASS_NAME::_INSTANCE {nullptr};                                                          \
+    ::std::once_flag CLASS_NAME::_ONCE_FLAG                                                                                 \
+    {                                                                                                                       \
+    }
 
 #endif // NETS_BASE_SINGLETON_H

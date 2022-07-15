@@ -8,40 +8,39 @@
 
 namespace nets::net
 {
-	Channel::Channel(EventLoopRawPtr eventLoop)
-		: events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false), channelContext_(this),
-		  eventLoop_(eventLoop)
-	{
-	}
+    Channel::Channel(EventLoopRawPtr eventLoop)
+        : events_(ENoneEvent), readyEvents_(ENoneEvent), isRegistered_(false), channelContext_(this), eventLoop_(eventLoop)
+    {
+    }
 
-	bool Channel::registerTo()
-	{
-		return eventLoop_->registerChannel(shared_from_this());
-	}
+    bool Channel::registerTo()
+    {
+        return eventLoop_->registerChannel(shared_from_this());
+    }
 
-	bool Channel::modify()
-	{
-		return eventLoop_->modifyChannel(shared_from_this());
-	}
+    bool Channel::modify()
+    {
+        return eventLoop_->modifyChannel(shared_from_this());
+    }
 
-	void Channel::deregister()
-	{
-		eventLoop_->deregisterChannel(shared_from_this());
-	}
+    void Channel::deregister()
+    {
+        eventLoop_->deregisterChannel(shared_from_this());
+    }
 
-	void Channel::handleEvent()
-	{
-		if (readyEvents_ & EErrorEvent)
-		{
-			handleErrorEvent();
-		}
-		if (readyEvents_ & EReadEvent)
-		{
-			handleReadEvent();
-		}
-		if (readyEvents_ & EWriteEvent)
-		{
-			handleWriteEvent();
-		}
-	}
+    void Channel::handleEvent()
+    {
+        if (readyEvents_ & EErrorEvent)
+        {
+            handleErrorEvent();
+        }
+        if (readyEvents_ & EReadEvent)
+        {
+            handleReadEvent();
+        }
+        if (readyEvents_ & EWriteEvent)
+        {
+            handleWriteEvent();
+        }
+    }
 } // namespace nets::net

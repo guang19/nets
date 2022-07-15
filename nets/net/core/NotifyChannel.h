@@ -9,24 +9,24 @@
 
 namespace nets::net
 {
-	class NotifyChannel : public Channel
-	{
-	public:
-		explicit NotifyChannel(EventLoopRawPtr eventLoop);
-		~NotifyChannel();
+    class NotifyChannel : public Channel
+    {
+    public:
+        explicit NotifyChannel(EventLoopRawPtr eventLoop);
+        ~NotifyChannel();
 
-	public:
-		FdType fd() const override;
-		void notify() const;
+    public:
+        FdType fd() const override;
+        void notify() const;
 
-	public:
-		void handleReadEvent() override;
-		void handleWriteEvent() override;
-		void handleErrorEvent() override;
+    public:
+        void handleReadEvent() override;
+        void handleWriteEvent() override;
+        void handleErrorEvent() override;
 
-	private:
-		FdType eventFd_ {socket::InvalidFd};
-	};
+    private:
+        FdType eventFd_ {socket::InvalidFd};
+    };
 } // namespace nets::net
 
 #endif // NETS_NET_NOTIFY_CHANNEL_H

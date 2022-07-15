@@ -10,56 +10,56 @@
 
 namespace nets::base
 {
-	enum LogLevel
-	{
-		TRACE = 0,
-		DEBUG,
-		INFO,
-		WARN,
-		ERROR,
-		FATAL,
-		NUM_OF_LOG_LEVELS
-	};
+    enum LogLevel
+    {
+        TRACE = 0,
+        DEBUG,
+        INFO,
+        WARN,
+        ERROR,
+        FATAL,
+        NUM_OF_LOG_LEVELS
+    };
 
-	class LogMessage : Noncopyable
-	{
-	public:
-		explicit LogMessage(LogLevel logLevel, const char* file, uint32_t line);
-		~LogMessage() = default;
+    class LogMessage : Noncopyable
+    {
+    public:
+        explicit LogMessage(LogLevel logLevel, const char* file, uint32_t line);
+        ~LogMessage() = default;
 
-	public:
-		inline const Timestamp& getLogTime() const
-		{
-			return logTime_;
-		}
+    public:
+        inline const Timestamp& getLogTime() const
+        {
+            return logTime_;
+        }
 
-		inline LogLevel getLogLevel() const
-		{
-			return logLevel_;
-		}
+        inline LogLevel getLogLevel() const
+        {
+            return logLevel_;
+        }
 
-		inline const char* getFilename() const
-		{
-			return filename_;
-		}
+        inline const char* getFilename() const
+        {
+            return filename_;
+        }
 
-		inline uint32_t getLine() const
-		{
-			return line_;
-		}
+        inline uint32_t getLine() const
+        {
+            return line_;
+        }
 
-		inline LogBufferStream& getStream()
-		{
-			return stream_;
-		}
+        inline LogBufferStream& getStream()
+        {
+            return stream_;
+        }
 
-	private:
-		Timestamp logTime_ {};
-		LogLevel logLevel_ {};
-		const char* filename_ {nullptr};
-		uint32_t line_ {0};
-		LogBufferStream stream_ {};
-	};
+    private:
+        Timestamp logTime_ {};
+        LogLevel logLevel_ {};
+        const char* filename_ {nullptr};
+        uint32_t line_ {0};
+        LogBufferStream stream_ {};
+    };
 } // namespace nets::base
 
 #endif // NETS_BASE_LOG_MESSAGE_H

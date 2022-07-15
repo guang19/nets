@@ -9,14 +9,14 @@
 
 namespace nets::net
 {
-	class ChannelHandler : nets::base::Noncopyable
-	{
-	public:
-		ChannelHandler() = default;
-		~ChannelHandler() = default;
+    class ChannelHandler : nets::base::Noncopyable
+    {
+    public:
+        ChannelHandler() = default;
+        ~ChannelHandler() = default;
 
-	public:
-	};
+    public:
+    };
 } // namespace nets::net
 
 #endif // NETS_NET_CHANNEL_HANDLER_H

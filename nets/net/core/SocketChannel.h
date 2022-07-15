@@ -9,24 +9,24 @@
 
 namespace nets::net
 {
-	class SocketChannel : public Channel
-	{
-	public:
-		explicit SocketChannel(EventLoopRawPtr eventLoop);
-		~SocketChannel() override = default;
+    class SocketChannel : public Channel
+    {
+    public:
+        explicit SocketChannel(EventLoopRawPtr eventLoop);
+        ~SocketChannel() override = default;
 
-	public:
-		FdType fd() const override;
+    public:
+        FdType fd() const override;
 
-		void handleReadEvent() override;
+        void handleReadEvent() override;
 
-		void handleWriteEvent() override;
+        void handleWriteEvent() override;
 
-		void handleErrorEvent() override;
+        void handleErrorEvent() override;
 
-	private:
-		FdType fd_ {socket::InvalidFd};
-	};
+    private:
+        FdType fd_ {socket::InvalidFd};
+    };
 } // namespace nets::net
 
 #endif // NETS_NET_SOCKET_CHANNEL_H

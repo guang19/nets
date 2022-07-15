@@ -13,30 +13,30 @@ using namespace nets::base;
 
 TEST(LoggingTest, BasicUse)
 {
-	LOGS_TRACE << "这是一条trace信息";
-	LOGS_DEBUG << "这是一条debug信息";
-	LOGS_INFO << "这是一条info信息";
-	LOGS_WARN << "这是一条warn信息";
-	LOGS_ERROR << "这是一条error信息";
-	::std::thread t1(
-		[&]()
-		{
-			LOGS_DEBUG << "这是一条debug信息";
-		});
-	t1.join();
-	LOGS_FATAL << "这是一条流式fatal信息";
-	::std::this_thread::sleep_for(::std::chrono::milliseconds(500));
+    LOGS_TRACE << "这是一条trace信息";
+    LOGS_DEBUG << "这是一条debug信息";
+    LOGS_INFO << "这是一条info信息";
+    LOGS_WARN << "这是一条warn信息";
+    LOGS_ERROR << "这是一条error信息";
+    ::std::thread t1(
+        [&]()
+        {
+            LOGS_DEBUG << "这是一条debug信息";
+        });
+    t1.join();
+    LOGS_FATAL << "这是一条流式fatal信息";
+    ::std::this_thread::sleep_for(::std::chrono::milliseconds(500));
 }
 
 // change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
 TEST(LoggingTest, SingleFile)
 {
-	LOGS_TRACE << "这是一条trance信息 stream";
-	LOGS_DEBUG << "这是一条debug信息 stream";
-	LOGS_INFO << "这是一条info信息 stream";
-	LOGS_WARN << "这是一条warn信息 stream";
-	LOGS_ERROR << "这是一条error信息 stream";
-	LOGS_FATAL << "这是一条流式fatal信息 stream";
+    LOGS_TRACE << "这是一条trance信息 stream";
+    LOGS_DEBUG << "这是一条debug信息 stream";
+    LOGS_INFO << "这是一条info信息 stream";
+    LOGS_WARN << "这是一条warn信息 stream";
+    LOGS_ERROR << "这是一条error信息 stream";
+    LOGS_FATAL << "这是一条流式fatal信息 stream";
 }
 
 // before execute:
@@ -44,12 +44,12 @@ TEST(LoggingTest, SingleFile)
 // for testing,  you better change the constant "SecondsPerDay(in LogWriter.cpp)" for short intervals
 TEST(LoggingTest, DailyFile)
 {
-	LOGS_TRACE << "这是一条trance信息 stream";
-	LOGS_DEBUG << "这是一条debug信息 stream";
-	LOGS_INFO << "这是一条info信息 stream";
-	LOGS_WARN << "这是一条warn信息 stream";
-	LOGS_ERROR << "这是一条error信息 stream";
-	LOGS_FATAL << "这是一条fatal信息 stream";
+    LOGS_TRACE << "这是一条trance信息 stream";
+    LOGS_DEBUG << "这是一条debug信息 stream";
+    LOGS_INFO << "这是一条info信息 stream";
+    LOGS_WARN << "这是一条warn信息 stream";
+    LOGS_ERROR << "这是一条error信息 stream";
+    LOGS_FATAL << "这是一条fatal信息 stream";
 }
 
 // before execute:
@@ -57,12 +57,12 @@ TEST(LoggingTest, DailyFile)
 // for testing,  you better change constant "LogFileRollingSize(in LogWriter.cpp)" as small as possible
 TEST(LoggingTest, RollingFile)
 {
-	LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
-				  "一条足够长的信息";
+    LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
+        "一条足够长的信息";
 }
 
 int main(int argc, char** argv)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

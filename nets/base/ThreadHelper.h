@@ -10,18 +10,18 @@
 
 namespace nets::base
 {
-	namespace
-	{
-		// it‘s too short that the max length that unix/linux posix thread name is 16
-		//constexpr int32_t ThreadNameMaxLength = 16;
-		constexpr uint32_t ThreadNameMaxLength = 64;
-	}
+    namespace
+    {
+        // it‘s too short that the max length that unix/linux posix thread name is 16
+        // constexpr int32_t ThreadNameMaxLength = 16;
+        constexpr uint32_t ThreadNameMaxLength = 64;
+    } // namespace
 
-	::pid_t currentTid();
-	bool isMainThread();
+    ::pid_t currentTid();
+    bool isMainThread();
 
-	void setCurrentThreadName(const char* threadName);
-	const char* currentThreadName();
+    void setCurrentThreadName(const char* threadName);
+    const char* currentThreadName();
 } // namespace nets::base
 
 #endif // NETS_BASE_THREAD_HELPER_H

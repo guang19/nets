@@ -68,4 +68,4 @@ SpacesInContainerLiterals: false
 SpacesInParentheses: false
 SpacesInSquareBrackets: false
 TabWidth: 4
-UseTab: ForContinuationAndIndentation
+UseTab: Never

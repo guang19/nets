@@ -7,12 +7,12 @@
 
 namespace nets::base
 {
-	class Copyable
-	{
-	protected:
-		Copyable() = default;
-		~Copyable() = default;
-	};
+    class Copyable
+    {
+    protected:
+        Copyable() = default;
+        ~Copyable() = default;
+    };
 } // namespace nets::base
 
 #endif // NETS_BASE_COPYABLE_H
