@@ -6,12 +6,12 @@
 
 namespace nets::net
 {
-	namespace
-	{
-		constexpr base::ByteBuffer::SizeType DefaultNetPackageLength = 1024;
-	}
+    namespace
+    {
+        constexpr base::ByteBuffer::SizeType DefaultNetPackageLength = 1024;
+    }
 
-	NetPackage::NetPackage() : ByteBuffer(DefaultNetPackageLength) {}
+    NetPackage::NetPackage() : ByteBuffer(DefaultNetPackageLength) {}
 
-	NetPackage::NetPackage(SizeType capacity) : ByteBuffer(capacity) {}
+    NetPackage::NetPackage(SizeType capacity) : ByteBuffer(capacity) {}
 } // namespace nets::net

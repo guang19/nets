@@ -8,37 +8,37 @@
 
 bool isBigEndian()
 {
-	uint16_t var = 1;
-	if (*((uint8_t*) &var) != 1)
-	{
-		return true;
-	}
-	return false;
+    uint16_t var = 1;
+    if (*((uint8_t*) &var) != 1)
+    {
+        return true;
+    }
+    return false;
 }
 
 bool isLittleEndian()
 {
-	uint16_t var = 1;
-	if (1 == *((uint8_t*) &var))
-	{
-		return true;
-	}
-	return false;
+    uint16_t var = 1;
+    if (1 == *((uint8_t*) &var))
+    {
+        return true;
+    }
+    return false;
 }
 
 TEST(NetPackageTest, Endian)
 {
-	ASSERT_FALSE(isBigEndian());
-	ASSERT_TRUE(isLittleEndian());
-	uint32_t x = 1234;
-	uint32_t y = htobe32(x);
-	ASSERT_TRUE(x != y);
-	uint32_t z = be32toh(y);
-	ASSERT_EQ(x, z);
+    ASSERT_FALSE(isBigEndian());
+    ASSERT_TRUE(isLittleEndian());
+    uint32_t x = 1234;
+    uint32_t y = htobe32(x);
+    ASSERT_TRUE(x != y);
+    uint32_t z = be32toh(y);
+    ASSERT_EQ(x, z);
 }
 
 int main(int argc, char** argv)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

@@ -6,17 +6,17 @@
 
 namespace nets::net
 {
-	EventLoopGroup::EventLoopGroup(NType numOfEventLoops, const ::std::string& name)
-		: started_(false), nextLoop_(0), numOfEventLoops_(numOfEventLoops)
-	{
-		if (numOfEventLoops_ <= 0)
-		{
-			throw ::std::invalid_argument("numOfEventLoops must be greater than 0");
-		}
-		eventLoops_.reserve(numOfEventLoops_);
-		futures_.reserve(numOfEventLoops);
-		eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, 0, name);
-	}
+    EventLoopGroup::EventLoopGroup(NType numOfEventLoops, const ::std::string& name)
+        : started_(false), nextLoop_(0), numOfEventLoops_(numOfEventLoops)
+    {
+        if (numOfEventLoops_ <= 0)
+        {
+            throw ::std::invalid_argument("numOfEventLoops must be greater than 0");
+        }
+        eventLoops_.reserve(numOfEventLoops_);
+        futures_.reserve(numOfEventLoops);
+        eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, 0, name);
+    }
 
 	void EventLoopGroup::loopEach()
 	{
@@ -45,21 +45,21 @@ namespace nets::net
 			});
 	}
 
-	void EventLoopGroup::syncEach()
-	{
-		for (NType i = 0; i < numOfEventLoops_; ++i)
-		{
-			futures_[i].wait();
-		}
-	}
+    void EventLoopGroup::syncEach()
+    {
+        for (NType i = 0; i < numOfEventLoops_; ++i)
+        {
+            futures_[i].wait();
+        }
+    }
 
-	EventLoopGroup::EventLoopRawPtr EventLoopGroup::next()
-	{
-		EventLoopRawPtr nextEventLoop = eventLoops_[nextLoop_++].get();
-		if (static_cast<SizeType>(nextLoop_) >= eventLoops_.size())
-		{
-			nextLoop_ = 0;
-		}
-		return nextEventLoop;
-	}
+    EventLoopGroup::EventLoopRawPtr EventLoopGroup::next()
+    {
+        EventLoopRawPtr nextEventLoop = eventLoops_[nextLoop_++].get();
+        if (static_cast<SizeType>(nextLoop_) >= eventLoops_.size())
+        {
+            nextLoop_ = 0;
+        }
+        return nextEventLoop;
+    }
 } // namespace nets::net

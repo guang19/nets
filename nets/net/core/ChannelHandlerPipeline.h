@@ -13,28 +13,28 @@
 
 namespace nets::net
 {
-	class ChannelHandlerPipeline : nets::base::Copyable
-	{
-	public:
-		using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
-		using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
+    class ChannelHandlerPipeline : nets::base::Copyable
+    {
+    public:
+        using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
+        using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
 
-	public:
-		ChannelHandlerPipeline() = default;
-		~ChannelHandlerPipeline() = default;
+    public:
+        ChannelHandlerPipeline() = default;
+        ~ChannelHandlerPipeline() = default;
 
-		ChannelHandlerPipeline(const ChannelHandlerPipeline& other);
-		ChannelHandlerPipeline(ChannelHandlerPipeline&& other) noexcept;
-		ChannelHandlerPipeline& operator=(const ChannelHandlerPipeline& other);
-		ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
+        ChannelHandlerPipeline(const ChannelHandlerPipeline& other);
+        ChannelHandlerPipeline(ChannelHandlerPipeline&& other) noexcept;
+        ChannelHandlerPipeline& operator=(const ChannelHandlerPipeline& other);
+        ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
 
-	public:
-		void addFirst(ChannelHandlerPtr channelHandler);
-		void addLast(ChannelHandlerPtr channelHandler);
+    public:
+        void addFirst(ChannelHandlerPtr channelHandler);
+        void addLast(ChannelHandlerPtr channelHandler);
 
-	private:
-		ChannelHandlerList channelHandlers_ {};
-	};
+    private:
+        ChannelHandlerList channelHandlers_ {};
+    };
 } // namespace nets::net
 
 #endif // NETS_CHANNEL_HANDLER_PIPELINE_H
