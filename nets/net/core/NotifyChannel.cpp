@@ -48,8 +48,4 @@ namespace nets::net
             LOGS_ERROR << "NotifyChannel::read failed";
         }
     }
-
-    void NotifyChannel::handleWriteEvent() {}
-
-    void NotifyChannel::handleErrorEvent() {}
 } // namespace nets::net

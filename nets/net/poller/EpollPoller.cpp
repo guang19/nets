@@ -38,7 +38,7 @@ namespace nets::net
         if (numOfReadyEvent > 0)
         {
             LOGS_DEBUG << "EpollPoller::epoll wait:" << numOfReadyEvent << " events";
-            prepareChannelReadEvents(numOfReadyEvent, activeChannels);
+            prepareChannelReadyEvents(numOfReadyEvent, activeChannels);
             if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
             {
                 size = size + (size >> 1);
@@ -46,16 +46,20 @@ namespace nets::net
                 {
                     size = INT32_MAX - 1;
                 }
+                events_.resize(size);
             }
-            events_.resize(size);
         }
         else if (numOfReadyEvent < 0)
         {
             LOGS_ERROR << "EpollPoller::epoll failed";
         }
+        else
+        {
+            // LOGS_DEBUG << "EpollPoller::epoll wait no event";
+        }
     }
 
-    void EpollPoller::prepareChannelReadEvents(int32_t numOfReadyEvent, ChannelList& activeChannels)
+    void EpollPoller::prepareChannelReadyEvents(int32_t numOfReadyEvent, ChannelList& activeChannels)
     {
         for (int32_t i = 0; i < numOfReadyEvent; ++i)
         {
@@ -99,13 +103,13 @@ namespace nets::net
     {
         if (channel->isRegistered())
         {
-            if (channel->isNoneEvent())
+            if (!channel->isNoneEvent())
             {
-                return deregisterChannel(channel);
+                return epollCtl(EPOLL_CTL_MOD, channel);
             }
             else
             {
-                return epollCtl(EPOLL_CTL_MOD, channel);
+                return deregisterChannel(channel);
             }
         }
         else

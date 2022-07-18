@@ -14,7 +14,7 @@ namespace nets::net
     namespace
     {
         using TimeType = ::time_t;
-        constexpr TimeType PollTimeoutMs = 10000;
+        constexpr TimeType PollTimeout = 10000;
         __thread EventLoop::EventLoopRawPtr CurrentThreadEventLoop = nullptr;
     } // namespace
 
@@ -46,7 +46,7 @@ namespace nets::net
         while (running_)
         {
             activeChannels_.clear();
-            poller_->poll(PollTimeoutMs, activeChannels_);
+            poller_->poll(PollTimeout, activeChannels_);
             for (auto& channel: activeChannels_)
             {
                 channel->handleEvent();

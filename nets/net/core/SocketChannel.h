@@ -18,14 +18,14 @@ namespace nets::net
     public:
         FdType fd() const override;
 
+    public:
         void handleReadEvent() override;
-
         void handleWriteEvent() override;
-
         void handleErrorEvent() override;
 
     private:
         FdType fd_ {socket::InvalidFd};
+        ChannelContext channelContext_ {nullptr};
     };
 } // namespace nets::net
 

@@ -22,8 +22,8 @@ namespace nets::net
         // event type
         constexpr EventType ENoneEvent = 0;
         constexpr EventType EReadEvent = 0x01;
-        constexpr EventType EWriteEvent = 0x02;
-        constexpr EventType EErrorEvent = 0x03;
+        constexpr EventType EWriteEvent = 0x01 << 1;
+        constexpr EventType EErrorEvent = 0x01 << 2;
     } // namespace
 
     class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
@@ -100,9 +100,9 @@ namespace nets::net
 
     public:
         void handleEvent();
-        virtual void handleReadEvent() = 0;
-        virtual void handleWriteEvent() = 0;
-        virtual void handleErrorEvent() = 0;
+        virtual void handleErrorEvent();
+        virtual void handleReadEvent();
+        virtual void handleWriteEvent();
 
     protected:
         // channel unique identifier per EventLoop thread

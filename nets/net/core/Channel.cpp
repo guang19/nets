@@ -43,4 +43,19 @@ namespace nets::net
             handleWriteEvent();
         }
     }
+
+    void Channel::handleReadEvent()
+    {
+        LOGS_DEBUG << "Channel::handleReadEvent";
+    }
+
+    void Channel::handleWriteEvent()
+    {
+        LOGS_DEBUG << "Channel::handleWriteEvent";
+    }
+
+    void Channel::handleErrorEvent()
+    {
+        LOGS_DEBUG << "Channel::handleErrorEvent";
+    }
 } // namespace nets::net
