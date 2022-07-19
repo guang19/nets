@@ -24,13 +24,20 @@ namespace nets::net
         numOfSubEventLoops = numOfSubEventLoops <= 0 ? DefaultNumbOfSubEventLoops : numOfSubEventLoops;
         mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName),
         subLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfSubEventLoops, SubEventLoopGroupName);
+        serverSocketChannel_ = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
     }
 
     ServerBootstrap::~ServerBootstrap() {}
 
+    ServerBootstrap& ServerBootstrap::channelHandler(ChannelHandlerPtr channelHandler)
+    {
+        serverSocketChannel_->addChannelHandler(channelHandler);
+        return *this;
+    }
+
     ServerBootstrap& ServerBootstrap::channelHandler(const ChannelInitializationCallback& channelInitializationCallback)
     {
-        channelInitializationCallback_ = channelInitializationCallback;
+        serverSocketChannel_->setChannelInitializationCallback(channelInitializationCallback);
         return *this;
     }
 
@@ -52,9 +59,7 @@ namespace nets::net
         auto future = mainLoopGroup_->submit(
             [&]()
             {
-                auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
-                serverSocketChannel->bind(localAddress);
-                serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback_);
+                serverSocketChannel_->bind(localAddress);
             });
         future.wait();
         return *this;

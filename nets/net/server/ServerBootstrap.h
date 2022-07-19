@@ -14,17 +14,19 @@ namespace nets::net
     class ServerBootstrap : nets::base::Noncopyable
     {
     public:
-        using NType = EventLoopGroup::NType;
+        using NType = typename EventLoopGroup::NType;
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
-        using ChannelHandlerRawPtr = ChannelHandler*;
-        using ChannelInitializationCallback = ServerSocketChannel::ChannelInitializationCallback;
+        using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
+        using ChannelHandlerPtr = typename ServerSocketChannel::ChannelHandlerPtr;
+        using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:
-        ServerBootstrap(NType numOfSubEventLoops);
-        ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops);
+        explicit ServerBootstrap(NType numOfSubEventLoops);
+        explicit ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops);
         ~ServerBootstrap();
 
     public:
+        ServerBootstrap& channelHandler(ChannelHandlerPtr channelHandler);
         ServerBootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
         ServerBootstrap& bind(PortType port);
         ServerBootstrap& bind(const char* ip, PortType port);
@@ -33,7 +35,7 @@ namespace nets::net
 
     private:
         ::std::atomic_bool running_ {false};
-        ChannelInitializationCallback channelInitializationCallback_ {nullptr};
+        ServerSocketChannelPtr serverSocketChannel_ {nullptr};
         EventLoopGroupPtr mainLoopGroup_ {nullptr};
         EventLoopGroupPtr subLoopGroup_ {nullptr};
     };

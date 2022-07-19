@@ -17,32 +17,22 @@ namespace nets::net
     public:
         using ChannelPtr = ::std::shared_ptr<Channel>;
         using ChannelInitializationCallback = ::std::function<void(ChannelPtr channel)>;
-
-    private:
-        class Acceptor : public ChannelHandler
-        {
-        public:
-            Acceptor() = default;
-            ~Acceptor() = default;
-
-        public:
-            inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
-            {
-                channelInitializationCallback_ = channelInitializationCallback;
-            }
-
-        private:
-            ChannelInitializationCallback channelInitializationCallback_ {nullptr};
-        };
+        using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
+        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
 
     public:
         explicit ServerSocketChannel(EventLoopRawPtr eventLoop);
         ~ServerSocketChannel() override;
 
     public:
+        inline void addChannelHandler(ChannelHandlerPtr channelHandler)
+        {
+            channelHandlers_.push_back(channelHandler);
+        }
+
         inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
         {
-            acceptor_->setChannelInitializationCallback(channelInitializationCallback);
+            channelInitializationCallbacks_ = channelInitializationCallback;
         }
 
         inline FdType fd() const override
@@ -52,16 +42,15 @@ namespace nets::net
 
         void bind(const InetSockAddress& sockAddress);
 
+    public:
         void handleReadEvent() override;
-        void handleWriteEvent() override;
         void handleErrorEvent() override;
 
     private:
         FdType sockFd_ {socket::InvalidFd};
         FdType idleFd_ {socket::InvalidFd};
-
-        using AcceptorPtr = ::std::shared_ptr<Acceptor>;
-        AcceptorPtr acceptor_ {nullptr};
+        ChannelHandlerList channelHandlers_ {};
+        ChannelInitializationCallback channelInitializationCallbacks_ {};
     };
 } // namespace nets::net
 

@@ -43,15 +43,8 @@ namespace nets::net
     public:
         virtual FdType fd() const = 0;
 
-        inline ChannelContext& channelContext()
-        {
-            return channelContext_;
-        }
-
-        inline ChannelHandlerPipeline& channelHandlerPipeline()
-        {
-            return channelContext_.pipeline();
-        }
+        virtual ChannelContext* channelContext();
+        virtual ChannelHandlerPipeline* channelHandlerPipeline();
 
         inline EventLoopRawPtr eventLoop() const
         {
@@ -109,7 +102,6 @@ namespace nets::net
         EventType events_ {ENoneEvent};
         EventType readyEvents_ {ENoneEvent};
         bool isRegistered_ {false};
-        ChannelContext channelContext_ {nullptr};
         EventLoopRawPtr eventLoop_ {nullptr};
     };
 } // namespace nets::net

@@ -13,7 +13,7 @@ namespace nets::net
     class EventLoopGroup : nets::base::Noncopyable
     {
     public:
-        using NType = nets::base::ThreadPool::NType;
+        using NType = typename nets::base::ThreadPool::NType;
         using ThreadPoolType = nets::base::ThreadPool;
         using ThreadPoolPtr = ::std::unique_ptr<ThreadPoolType>;
         using EventLoopRawPtr = EventLoop*;
