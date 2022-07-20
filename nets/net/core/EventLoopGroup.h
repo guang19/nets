@@ -59,7 +59,6 @@ namespace nets::net
         }
 
     private:
-        ::std::atomic_bool started_ {false};
         NType nextLoop_ {0};
         NType numOfEventLoops_ {0};
         EventLoopList eventLoops_ {};

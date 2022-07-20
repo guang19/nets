@@ -30,6 +30,8 @@ namespace nets::net
     {
     public:
         using EventLoopRawPtr = EventLoop*;
+        using ChannelContextRawPtr = ChannelContext*;
+        using ChannelHandlerPipelineRawPtr = ChannelHandlerPipeline*;
 
     public:
         explicit Channel(EventLoopRawPtr eventLoop);
@@ -42,54 +44,21 @@ namespace nets::net
 
     public:
         virtual FdType fd() const = 0;
+        virtual ChannelContextRawPtr channelContext();
+        virtual ChannelHandlerPipelineRawPtr channelHandlerPipeline();
 
-        virtual ChannelContext* channelContext();
-        virtual ChannelHandlerPipeline* channelHandlerPipeline();
+        EventLoopRawPtr eventLoop() const;
 
-        inline EventLoopRawPtr eventLoop() const
-        {
-            return eventLoop_;
-        }
+        EventType events() const;
+        bool isNoneEvent() const;
+        void setEvents(EventType events);
+        void addEvent(EventType event);
 
-        inline EventType events() const
-        {
-            return events_;
-        }
+        bool isRegistered() const;
+        void setRegistered(bool registered);
 
-        inline bool isNoneEvent() const
-        {
-            return events_ == ENoneEvent;
-        }
-
-        inline void setEvents(EventType events)
-        {
-            events_ = events;
-        }
-
-        inline void addEvent(EventType event)
-        {
-            events_ |= event;
-        }
-
-        inline bool isRegistered() const
-        {
-            return isRegistered_;
-        }
-
-        inline void setRegistered(bool registered)
-        {
-            isRegistered_ = registered;
-        }
-
-        inline void setReadyEvents(EventType events)
-        {
-            readyEvents_ = events;
-        }
-
-        inline void addReadyEvent(EventType event)
-        {
-            readyEvents_ |= event;
-        }
+        void setReadyEvents(EventType events);
+        void addReadyEvent(EventType event);
 
     public:
         void handleEvent();

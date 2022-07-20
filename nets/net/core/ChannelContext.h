@@ -18,20 +18,21 @@ namespace nets::net
 	{
 	public:
 		using ChannelRawPtr = Channel*;
+		using ChannelHandlerPipelineRawPtr = ChannelHandlerPipeline*;
 
 	public:
 		explicit ChannelContext(ChannelRawPtr channel);
 		~ChannelContext() = default;
 
 	public:
-		inline Channel& channel()
+		inline ChannelRawPtr channel()
 		{
-			return *channel_;
+			return channel_;
 		}
 
-		inline ChannelHandlerPipeline& pipeline()
+		inline ChannelHandlerPipelineRawPtr pipeline()
 		{
-			return channelHandlerPipeline_;
+			return &channelHandlerPipeline_;
 		}
 
 	private:

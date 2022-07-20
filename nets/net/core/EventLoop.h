@@ -45,10 +45,10 @@ namespace nets::net
     public:
         void run();
         void shutdown();
-
         bool isInCurrentEventLoop() const;
         EventLoopRawPtr currentEventLoop() const;
 
+    public:
         bool registerChannel(ChannelPtr channel);
         bool modifyChannel(ChannelPtr channel);
         void deregisterChannel(ChannelPtr channel);

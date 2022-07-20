@@ -18,6 +18,7 @@ namespace nets::net
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
         using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
         using ChannelHandlerPtr = typename ServerSocketChannel::ChannelHandlerPtr;
+        using ChannelHandlerList = typename ServerSocketChannel::ChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:
@@ -35,7 +36,8 @@ namespace nets::net
 
     private:
         ::std::atomic_bool running_ {false};
-        ServerSocketChannelPtr serverSocketChannel_ {nullptr};
+        ChannelHandlerList channelHandlers_ {};
+        ChannelInitializationCallback channelInitializationCallback_{};
         EventLoopGroupPtr mainLoopGroup_ {nullptr};
         EventLoopGroupPtr subLoopGroup_ {nullptr};
     };
