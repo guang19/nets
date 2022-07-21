@@ -38,15 +38,15 @@ namespace nets::net
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::bind(const char* ip, PortType port)
+    ServerBootstrap& ServerBootstrap::bind(const char* ip, PortType port, bool ipv6)
     {
-        bind(InetSockAddress(ip, port));
+        bind(InetSockAddress(ip, port, ipv6));
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::bind(PortType port)
+    ServerBootstrap& ServerBootstrap::bind(PortType port, bool ipv6)
     {
-        bind(InetSockAddress::createAnySockAddress(port));
+        bind(InetSockAddress::createAnySockAddress(port, ipv6));
         return *this;
     }
 

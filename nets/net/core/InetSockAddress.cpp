@@ -14,6 +14,8 @@ namespace nets::net
     InetSockAddress::InetSockAddress()
     {
         MEMZERO(&addr_, sizeof(SockAddr));
+        MEMZERO(&addr4_, sizeof(SockAddr4));
+        MEMZERO(&addr6_, sizeof(SockAddr6));
     }
 
     InetSockAddress::InetSockAddress(const SockAddr4& addr4) : addr4_(addr4) {}

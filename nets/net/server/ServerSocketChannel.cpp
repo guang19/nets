@@ -4,6 +4,8 @@
 
 #include "nets/net/server/ServerSocketChannel.h"
 
+#include <cassert>
+#include "nets/net/core/EventLoop.h"
 #include "nets/base/log/Logging.h"
 
 namespace nets::net
@@ -34,7 +36,13 @@ namespace nets::net
         }
     }
 
-    void ServerSocketChannel::handleReadEvent() {}
+    void ServerSocketChannel::handleReadEvent()
+    {
+        assert(eventLoop_->isInCurrentEventLoop());
+    }
 
-    void ServerSocketChannel::handleErrorEvent() {}
+    void ServerSocketChannel::handleErrorEvent()
+    {
+
+    }
 } // namespace nets::net

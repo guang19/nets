@@ -56,6 +56,26 @@ namespace nets::net
             return &addr_;
         }
 
+        inline const SockAddr4* csockAddr4() const
+        {
+            return &addr4_;
+        }
+
+        inline SockAddr4* sockAddr4()
+        {
+            return &addr4_;
+        }
+
+        inline const SockAddr6* csockAddr6() const
+        {
+            return &addr6_;
+        }
+
+        inline SockAddr6* sockAddr6()
+        {
+            return &addr6_;
+        }
+
         ::std::string ip() const;
         PortType port() const;
         ::std::string toString() const;

@@ -106,7 +106,14 @@ namespace nets::net::socket
         FdType connFd = InvalidFd;
         if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) < 0)
         {
-            LOGS_FATAL << "socket::accept failed";
+            LOGS_ERROR << "socket::accept failed";
+            int32_t errorN = errno;
+            switch (errorN)
+            {
+                // EWOULDBLOCK
+                case EAGAIN:
+                break;
+            }
         }
         return connFd;
     }

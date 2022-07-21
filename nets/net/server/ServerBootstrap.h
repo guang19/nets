@@ -23,16 +23,18 @@ namespace nets::net
     public:
         explicit ServerBootstrap(NType numOfSubEventLoops);
         explicit ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops);
-        ~ServerBootstrap();
+        ~ServerBootstrap() = default;
 
     public:
         // set the ChannelHandler shared by all channels
         ServerBootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
         // set the ChannelHandler for each channel
         ServerBootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
-        ServerBootstrap& bind(PortType port);
-        ServerBootstrap& bind(const char* ip, PortType port);
+
+        ServerBootstrap& bind(PortType port, bool ipv6 = false);
+        ServerBootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const InetSockAddress& localAddress);
+
         void launch();
 
     private:

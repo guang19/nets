@@ -48,12 +48,17 @@ int main(int argc, char** argv)
                 {
                     ::printf("listen listenFd\n");
                     InetSockAddress clientAddr;
-                    FdType connFd = socket::acceptAddr4(listenFd, clientAddr.sockAddr());
+                    FdType connFd = socket::acceptAddr4(listenFd, (SockAddr*)clientAddr.sockAddr6());
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
+                    ::printf("client addr=%s\n", clientAddr.toString().c_str());
                     struct epoll_event epollEvent {};
                     epollEvent.data.fd = connFd;
                     epollEvent.events = EPOLLIN;
                     epoll_ctl(epollFd, EPOLL_CTL_ADD, connFd, &epollEvent);
+//                    struct epoll_event epollEvent {};
+//                    epollEvent.data.fd = epollEvents[i].data.fd;
+//                    epollEvent.events = 0;
+//                    epoll_ctl(epollFd, EPOLL_CTL_DEL, epollEvents[i].data.fd, &epollEvent);
                 }
                 else
                 {
