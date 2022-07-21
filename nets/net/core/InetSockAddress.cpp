@@ -155,6 +155,7 @@ namespace nets::net
             return InetSockAddress(addr);
         }
     }
+    
     ::std::string InetSockAddress::ip() const
     {
         char buffer[64] = {0};
