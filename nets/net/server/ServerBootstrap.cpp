@@ -28,7 +28,7 @@ namespace nets::net
 
     ServerBootstrap::~ServerBootstrap() {}
 
-    ServerBootstrap& ServerBootstrap::channelHandler(ChannelHandlerPtr channelHandler)
+    ServerBootstrap& ServerBootstrap::channelHandler(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_back(channelHandler);
         return *this;

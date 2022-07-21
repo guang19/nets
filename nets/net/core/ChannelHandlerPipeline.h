@@ -29,8 +29,8 @@ namespace nets::net
         ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
 
     public:
-        void addFirst(ChannelHandlerPtr channelHandler);
-        void addLast(ChannelHandlerPtr channelHandler);
+        void addFirst(const ChannelHandlerPtr& channelHandler);
+        void addLast(const ChannelHandlerPtr& channelHandler);
 
     private:
         ChannelHandlerList channelHandlers_ {};

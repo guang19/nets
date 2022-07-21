@@ -49,9 +49,9 @@ namespace nets::net
         EventLoopRawPtr currentEventLoop() const;
 
     public:
-        bool registerChannel(ChannelPtr channel);
-        bool modifyChannel(ChannelPtr channel);
-        void deregisterChannel(ChannelPtr channel);
+        bool registerChannel(const ChannelPtr& channel);
+        bool modifyChannel(const ChannelPtr& channel);
+        void deregisterChannel(const ChannelPtr& channel);
 
         template <typename Fn, typename... Args>
         void execute(Fn&& func, Args&&... args);

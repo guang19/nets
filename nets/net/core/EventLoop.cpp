@@ -83,7 +83,7 @@ namespace nets::net
         return CurrentThreadEventLoop;
     }
 
-    bool EventLoop::registerChannel(ChannelPtr channel)
+    bool EventLoop::registerChannel(const ChannelPtr& channel)
     {
         assert(channels_.find(channel->fd()) == channels_.end());
         if (poller_->registerChannel(channel.get()))
@@ -96,13 +96,13 @@ namespace nets::net
         return false;
     }
 
-    bool EventLoop::modifyChannel(ChannelPtr channel)
+    bool EventLoop::modifyChannel(const ChannelPtr& channel)
     {
         assert(channels_.find(channel->fd()) != channels_.end());
         return poller_->modifyChannel(channel.get());
     }
 
-    void EventLoop::deregisterChannel(ChannelPtr channel)
+    void EventLoop::deregisterChannel(const ChannelPtr& channel)
     {
         assert(channels_.find(channel->fd()) != channels_.end());
         channels_.erase(channel->fd());

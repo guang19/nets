@@ -34,12 +34,12 @@ namespace nets::net
         return *this;
     }
 
-    void ChannelHandlerPipeline::addFirst(ChannelHandlerPtr channelHandler)
+    void ChannelHandlerPipeline::addFirst(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_front(channelHandler);
     }
 
-    void ChannelHandlerPipeline::addLast(ChannelHandlerPtr channelHandler)
+    void ChannelHandlerPipeline::addLast(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_back(channelHandler);
     }

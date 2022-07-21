@@ -27,7 +27,7 @@ namespace nets::net
 
     public:
         // set the ChannelHandler shared by all channels
-        ServerBootstrap& channelHandler(ChannelHandlerPtr channelHandler);
+        ServerBootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
         // set the ChannelHandler for each channel
         ServerBootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
         ServerBootstrap& bind(PortType port);
@@ -41,7 +41,7 @@ namespace nets::net
     private:
         ::std::atomic_bool running_ {false};
         ChannelHandlerList channelHandlers_ {};
-        ChannelInitializationCallback channelInitializationCallback_{};
+        ChannelInitializationCallback channelInitializationCallback_ {};
         EventLoopGroupPtr mainLoopGroup_ {nullptr};
         EventLoopGroupPtr subLoopGroup_ {nullptr};
     };
