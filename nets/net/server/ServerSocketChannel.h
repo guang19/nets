@@ -16,7 +16,8 @@ namespace nets::net
     {
     public:
         using ChannelPtr = ::std::shared_ptr<Channel>;
-        using ChannelInitializationCallback = ::std::function<void(ChannelPtr channel)>;
+        using ChannelInitializationCallback = ::std::function<void (ChannelPtr channel)>;
+        using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
 
@@ -25,9 +26,14 @@ namespace nets::net
         ~ServerSocketChannel() override;
 
     public:
-        inline void addChannelHandler(ChannelHandlerPtr channelHandler)
+        inline void setNextEventLoopFn(const NextEventLoopFn& nextEventLoopFn)
         {
-            channelHandlers_.push_back(channelHandler);
+            nextEventLoopFn_ = nextEventLoopFn;
+        }
+
+        inline void setChannelHandlers(const ChannelHandlerList& channelHandlers)
+        {
+            channelHandlers_ = channelHandlers;
         }
 
         inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
@@ -49,6 +55,7 @@ namespace nets::net
     private:
         FdType sockFd_ {socket::InvalidFd};
         FdType idleFd_ {socket::InvalidFd};
+        NextEventLoopFn nextEventLoopFn_ {};
         ChannelHandlerList channelHandlers_ {};
         ChannelInitializationCallback channelInitializationCallbacks_ {};
     };

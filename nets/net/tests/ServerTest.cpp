@@ -8,7 +8,7 @@ using namespace nets::net;
 
 int main(int argc, char** argv)
 {
-    ServerBootstrap serverBootstrap(1, 8);
-    serverBootstrap.channelHandler([](::std::shared_ptr<Channel> channel) {}).bind(8080).launch();
+//    ServerBootstrap serverBootstrap(1, 8);
+//    serverBootstrap.channelHandler([](::std::shared_ptr<Channel> channel) {}).bind(8080).launch();
     return 0;
 }

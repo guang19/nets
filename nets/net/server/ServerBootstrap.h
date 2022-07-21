@@ -16,7 +16,6 @@ namespace nets::net
     public:
         using NType = typename EventLoopGroup::NType;
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
-        using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
         using ChannelHandlerPtr = typename ServerSocketChannel::ChannelHandlerPtr;
         using ChannelHandlerList = typename ServerSocketChannel::ChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
@@ -27,12 +26,17 @@ namespace nets::net
         ~ServerBootstrap();
 
     public:
+        // set the ChannelHandler shared by all channels
         ServerBootstrap& channelHandler(ChannelHandlerPtr channelHandler);
+        // set the ChannelHandler for each channel
         ServerBootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
         ServerBootstrap& bind(PortType port);
         ServerBootstrap& bind(const char* ip, PortType port);
         ServerBootstrap& bind(const InetSockAddress& localAddress);
         void launch();
+
+    private:
+        void doBind(const InetSockAddress& localAddress);
 
     private:
         ::std::atomic_bool running_ {false};

@@ -56,14 +56,30 @@ namespace nets::net
     {
         mainLoopGroup_->loopEach();
         auto future = mainLoopGroup_->submit(
-            [&, channelInitializationCallback = ::std::move(channelInitializationCallback_)]()
+            [this, localAddress]
             {
-                auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
-                serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback);
-                serverSocketChannel->bind(localAddress);
+                doBind(localAddress);
             });
         future.wait();
         return *this;
+    }
+
+    void ServerBootstrap::doBind(const InetSockAddress& localAddress)
+    {
+        auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
+        // Clang-Tidy: Prefer a lambda to std::bind
+        serverSocketChannel->setNextEventLoopFn(
+            [this]() -> EventLoopGroup::EventLoopRawPtr
+            {
+                return subLoopGroup_->next();
+            });
+        ChannelHandlerList channelHandlers {::std::move(channelHandlers_)};
+        assert(channelHandlers_.empty());
+        serverSocketChannel->setChannelHandlers(channelHandlers_);
+        ChannelInitializationCallback channelInitializationCallback {::std::move(channelInitializationCallback_)};
+        assert(channelInitializationCallback_ == nullptr);
+        serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback);
+        serverSocketChannel->bind(localAddress);
     }
 
     void ServerBootstrap::launch()
