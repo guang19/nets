@@ -26,8 +26,6 @@ namespace nets::net
         subLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfSubEventLoops, SubEventLoopGroupName);
     }
 
-    ServerBootstrap::~ServerBootstrap() {}
-
     ServerBootstrap& ServerBootstrap::channelHandler(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_back(channelHandler);
@@ -86,7 +84,7 @@ namespace nets::net
     {
         if (running_)
         {
-            LOGS_DEBUG << "ServerBootstrap has started";
+            LOGS_DEBUG << "ServerBootstrap::launch ServerBootstrap has started";
             return;
         }
         running_ = true;

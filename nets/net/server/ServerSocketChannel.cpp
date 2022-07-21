@@ -30,7 +30,7 @@ namespace nets::net
         addEvent(EReadEvent);
         if (!registerTo())
         {
-            LOGS_FATAL << "Register ServerSocketChannel failed";
+            LOGS_FATAL << "ServerSocketChannel::bind ServerSocketChannel register failed";
         }
     }
 
