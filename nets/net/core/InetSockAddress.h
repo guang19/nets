@@ -31,10 +31,10 @@ namespace nets::net
         explicit InetSockAddress(const char* ip, PortType port, bool ipv6 = false);
         ~InetSockAddress() = default;
 
-        InetSockAddress(const InetSockAddress& addr);
-        InetSockAddress(InetSockAddress&& addr) noexcept;
-        InetSockAddress& operator=(const InetSockAddress& addr);
-        InetSockAddress& operator=(InetSockAddress&& addr) noexcept;
+        InetSockAddress(const InetSockAddress& other);
+        InetSockAddress(InetSockAddress&& other) noexcept;
+        InetSockAddress& operator=(const InetSockAddress& other);
+        InetSockAddress& operator=(InetSockAddress&& other) noexcept;
 
     public:
         static InetSockAddress createAnySockAddress(PortType port, bool ipv6 = false);

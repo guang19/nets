@@ -16,15 +16,23 @@ namespace nets::net
         MEMZERO(&addr6_, sizeof(SockAddr6));
     }
 
-    InetSockAddress::InetSockAddress(const SockAddr4& addr4) : addr4_(addr4) {}
+    InetSockAddress::InetSockAddress(const SockAddr4& addr4)
+    {
+        MEMZERO(&addr6_, sizeof(SockAddr6));
+        addr4_ = addr4;
+    }
 
-    InetSockAddress::InetSockAddress(const SockAddr6& addr6) : addr6_(addr6) {}
+    InetSockAddress::InetSockAddress(const SockAddr6& addr6)
+    {
+        MEMZERO(&addr6_, sizeof(SockAddr6));
+        addr6_ = addr6;
+    }
 
     InetSockAddress::InetSockAddress(const char* ip, PortType port, bool ipv6)
     {
+        MEMZERO(&addr6_, sizeof(SockAddr6));
         if (ipv6)
         {
-            MEMZERO(&addr6_, sizeof(SockAddr6));
             addr6_.sin6_family = AF_INET6;
             addr6_.sin6_port = htobe16(port);
             if (1 != ::inet_pton(AF_INET6, ip, &addr6_.sin6_addr))
@@ -34,7 +42,6 @@ namespace nets::net
         }
         else
         {
-            MEMZERO(&addr4_, sizeof(SockAddr4));
             addr4_.sin_family = AF_INET;
             addr4_.sin_port = htobe16(port);
             if (1 != ::inet_pton(AF_INET, ip, &(addr4_.sin_addr)))
@@ -44,70 +51,64 @@ namespace nets::net
         }
     }
 
-    InetSockAddress::InetSockAddress(const InetSockAddress& addr)
+    InetSockAddress::InetSockAddress(const InetSockAddress& other)
     {
-        if (AF_INET6 == addr.ipFamily())
+        MEMZERO(&addr6_, sizeof(SockAddr6));
+        if (AF_INET6 == other.ipFamily())
         {
-            MEMZERO(&addr6_, sizeof(SockAddr6));
-            addr6_ = addr.addr6_;
+            addr6_ = other.addr6_;
         }
-        else if (AF_INET == addr.ipFamily())
+        else if (AF_INET == other.ipFamily())
         {
-            MEMZERO(&addr4_, sizeof(SockAddr4));
-            addr4_ = addr.addr4_;
+            addr4_ = other.addr4_;
         }
     }
 
-    InetSockAddress::InetSockAddress(InetSockAddress&& addr) noexcept
+    InetSockAddress::InetSockAddress(InetSockAddress&& other) noexcept
     {
-        if (AF_INET6 == addr.ipFamily())
+        MEMZERO(&addr6_, sizeof(SockAddr6));
+        if (AF_INET6 == other.ipFamily())
         {
-            MEMZERO(&addr6_, sizeof(SockAddr6));
-            addr6_ = addr.addr6_;
-            MEMZERO(&addr.addr6_, sizeof(SockAddr6));
+            addr6_ = other.addr6_;
         }
-        else if (AF_INET == addr.ipFamily())
+        else if (AF_INET == other.ipFamily())
         {
-            MEMZERO(&addr4_, sizeof(SockAddr4));
-            addr4_ = addr.addr4_;
-            MEMZERO(&addr.addr4_, sizeof(SockAddr4));
+            addr4_ = other.addr4_;
         }
+        MEMZERO(&other.addr6_, sizeof(SockAddr6));
     }
 
-    InetSockAddress& InetSockAddress::operator=(const InetSockAddress& addr)
+    InetSockAddress& InetSockAddress::operator=(const InetSockAddress& other)
     {
-        if (this != &addr)
+        if (this != &other)
         {
-            if (AF_INET6 == addr.ipFamily())
+            MEMZERO(&addr6_, sizeof(SockAddr6));
+            if (AF_INET6 == other.ipFamily())
             {
-                MEMZERO(&addr6_, sizeof(SockAddr6));
-                addr6_ = addr.addr6_;
+                addr6_ = other.addr6_;
             }
-            else if (AF_INET == addr.ipFamily())
+            else if (AF_INET == other.ipFamily())
             {
-                MEMZERO(&addr4_, sizeof(SockAddr4));
-                addr4_ = addr.addr4_;
+                addr4_ = other.addr4_;
             }
         }
         return *this;
     }
 
-    InetSockAddress& InetSockAddress::operator=(InetSockAddress&& addr) noexcept
+    InetSockAddress& InetSockAddress::operator=(InetSockAddress&& other) noexcept
     {
-        if (this != &addr)
+        if (this != &other)
         {
-            if (AF_INET6 == addr.ipFamily())
+            MEMZERO(&addr6_, sizeof(SockAddr6));
+            if (AF_INET6 == other.ipFamily())
             {
-                MEMZERO(&addr6_, sizeof(SockAddr6));
-                addr6_ = addr.addr6_;
-                MEMZERO(&addr.addr6_, sizeof(SockAddr6));
+                addr6_ = other.addr6_;
             }
-            else if (AF_INET == addr.ipFamily())
+            else if (AF_INET == other.ipFamily())
             {
-                MEMZERO(&addr4_, sizeof(SockAddr4));
-                addr4_ = addr.addr4_;
-                MEMZERO(&addr.addr4_, sizeof(SockAddr4));
+                addr4_ = other.addr4_;
             }
+            MEMZERO(&other.addr6_, sizeof(SockAddr6));
         }
         return *this;
     }

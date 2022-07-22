@@ -6,11 +6,9 @@
 
 namespace nets::net
 {
-    SocketChannel::SocketChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop) {}
-
-    FdType SocketChannel::fd() const
+    SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop)
+        : Channel(eventLoop), sockFd_(sockFd), peerAddress_(peerAddress), channelContext_(this)
     {
-        return fd_;
     }
 
     void SocketChannel::handleReadEvent() {}

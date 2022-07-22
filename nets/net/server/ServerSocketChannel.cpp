@@ -5,13 +5,14 @@
 #include "nets/net/server/ServerSocketChannel.h"
 
 #include <cassert>
-#include "nets/net/core/EventLoop.h"
+
 #include "nets/base/log/Logging.h"
+#include "nets/net/core/EventLoop.h"
 
 namespace nets::net
 {
     ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), channelInitializationCallbacks_()
+        : Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), channelInitializationCallback_()
     {
         if (idleFd_ < 0)
         {
@@ -48,12 +49,17 @@ namespace nets::net
         if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr(), &idleFd_)) > 0)
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr: " << peerAddr.toString();
-
+            auto clientSocketChannel = ::std::make_shared<SocketChannel>(connFd, peerAddr, nextEventLoopFn_());
+            for (auto& channelHandler: channelHandlers_)
+            {
+                clientSocketChannel->channelHandlerPipeline()->addLast(channelHandler);
+            }
+            if (channelInitializationCallback_ != nullptr)
+            {
+                channelInitializationCallback_(clientSocketChannel);
+            }
         }
     }
 
-    void ServerSocketChannel::handleErrorEvent()
-    {
-
-    }
+    void ServerSocketChannel::handleErrorEvent() {}
 } // namespace nets::net

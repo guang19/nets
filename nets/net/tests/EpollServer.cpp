@@ -15,11 +15,11 @@ using namespace nets::net;
 
 int main(int argc, char** argv)
 {
-    FdType listenFd = socket::createTcpSocket(AF_INET6);
+    FdType listenFd = socket::createTcpSocket(AF_INET);
 
     ::std::vector<struct epoll_event> epollEvents(20);
 
-    InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080, true);
+    InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080, false);
     socket::bind(listenFd, serverAddr.csockAddr());
     socket::listen(listenFd);
 
@@ -47,18 +47,30 @@ int main(int argc, char** argv)
                 if (epollEvents[i].data.fd == listenFd)
                 {
                     ::printf("listen listenFd\n");
+                    InetSockAddress serverAddr2;
+                    SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));
+                    ::getsockname(listenFd, serverAddr2.sockAddr(), &len);
+                    ::printf("server fd=%d,server addr:ip=%s,port=%d\n", listenFd, serverAddr2.ip().c_str(),
+                             serverAddr2.port());
+                    ::printf("server addr=%s\n", serverAddr2.toString().c_str());
                     InetSockAddress clientAddr;
-                    FdType connFd = socket::acceptAddr4(listenFd, (SockAddr*)clientAddr.sockAddr6());
+                    FdType connFd = socket::accept(listenFd, (SockAddr*) clientAddr.sockAddr6(), nullptr);
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
+
+                    InetSockAddress clientAddr2;
+                    ::getpeername(connFd, clientAddr2.sockAddr(), &len);
+                    ::printf("client2 fd=%d,client2 addr:ip=%s,port=%d\n", connFd, clientAddr2.ip().c_str(),
+                             clientAddr2.port());
+                    ::printf("client2 addr=%s\n", clientAddr2.toString().c_str());
                     struct epoll_event epollEvent {};
                     epollEvent.data.fd = connFd;
                     epollEvent.events = EPOLLIN;
                     epoll_ctl(epollFd, EPOLL_CTL_ADD, connFd, &epollEvent);
-//                    struct epoll_event epollEvent {};
-//                    epollEvent.data.fd = epollEvents[i].data.fd;
-//                    epollEvent.events = 0;
-//                    epoll_ctl(epollFd, EPOLL_CTL_DEL, epollEvents[i].data.fd, &epollEvent);
+                    //                    struct epoll_event epollEvent {};
+                    //                    epollEvent.data.fd = epollEvents[i].data.fd;
+                    //                    epollEvent.events = 0;
+                    //                    epoll_ctl(epollFd, EPOLL_CTL_DEL, epollEvents[i].data.fd, &epollEvent);
                 }
                 else
                 {

@@ -12,11 +12,24 @@ namespace nets::net
     class SocketChannel : public Channel
     {
     public:
-        explicit SocketChannel(EventLoopRawPtr eventLoop);
+        explicit SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop);
         ~SocketChannel() override = default;
 
     public:
-        FdType fd() const override;
+        inline FdType fd() const override
+        {
+            return sockFd_;
+        }
+
+        inline ChannelContextRawPtr channelContext() override
+        {
+            return &channelContext_;
+        }
+
+        inline ChannelHandlerPipelineRawPtr channelHandlerPipeline() override
+        {
+            return channelContext_.pipeline();
+        }
 
     public:
         void handleReadEvent() override;
@@ -24,7 +37,8 @@ namespace nets::net
         void handleErrorEvent() override;
 
     private:
-        FdType fd_ {socket::InvalidFd};
+        FdType sockFd_ {socket::InvalidFd};
+        InetSockAddress peerAddress_ {};
         ChannelContext channelContext_ {nullptr};
     };
 } // namespace nets::net

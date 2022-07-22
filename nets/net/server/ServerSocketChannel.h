@@ -8,6 +8,7 @@
 #include <functional>
 
 #include "nets/net/core/Channel.h"
+#include "nets/net/core/SocketChannel.h"
 #include "nets/net/core/InetSockAddress.h"
 
 namespace nets::net
@@ -15,8 +16,8 @@ namespace nets::net
     class ServerSocketChannel : public Channel
     {
     public:
-        using ChannelPtr = ::std::shared_ptr<Channel>;
-        using ChannelInitializationCallback = ::std::function<void (ChannelPtr channel)>;
+        using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
+        using ChannelInitializationCallback = ::std::function<void(SocketChannelPtr& channel)>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
@@ -26,6 +27,11 @@ namespace nets::net
         ~ServerSocketChannel() override;
 
     public:
+        inline FdType fd() const override
+        {
+            return sockFd_;
+        }
+
         inline void setNextEventLoopFn(const NextEventLoopFn& nextEventLoopFn)
         {
             nextEventLoopFn_ = nextEventLoopFn;
@@ -38,12 +44,7 @@ namespace nets::net
 
         inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
         {
-            channelInitializationCallbacks_ = channelInitializationCallback;
-        }
-
-        inline FdType fd() const override
-        {
-            return sockFd_;
+            channelInitializationCallback_ = channelInitializationCallback;
         }
 
         void bind(const InetSockAddress& sockAddress);
@@ -57,7 +58,7 @@ namespace nets::net
         FdType idleFd_ {socket::InvalidFd};
         NextEventLoopFn nextEventLoopFn_ {};
         ChannelHandlerList channelHandlers_ {};
-        ChannelInitializationCallback channelInitializationCallbacks_ {};
+        ChannelInitializationCallback channelInitializationCallback_ {};
     };
 } // namespace nets::net
 

@@ -53,6 +53,7 @@ namespace nets::net
     ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& localAddress)
     {
         mainLoopGroup_->loopEach();
+        // Clang-Tidy: Prefer a lambda to std::bind
         auto future = mainLoopGroup_->submit(
             [this, localAddress]
             {
@@ -65,7 +66,6 @@ namespace nets::net
     void ServerBootstrap::doBind(const InetSockAddress& localAddress)
     {
         auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
-        // Clang-Tidy: Prefer a lambda to std::bind
         serverSocketChannel->setNextEventLoopFn(
             [this]() -> EventLoopGroup::EventLoopRawPtr
             {

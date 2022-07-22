@@ -32,6 +32,7 @@ namespace nets::net
         using LockGuardType = ::std::lock_guard<MutexType>;
         using ChannelRawPtr = Channel*;
         using ChannelPtr = ::std::shared_ptr<Channel>;
+        // cannot use shared_ptr
         using ChannelList = ::std::vector<ChannelRawPtr>;
         using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
         using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;

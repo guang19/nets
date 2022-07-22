@@ -119,8 +119,14 @@ namespace nets::net::socket
                         continue;
                     // the per-process limit on the number of open file descriptors has been reached
                     case EMFILE:
-                        dealwithEMFILE(idleFd, sockFd);
+                    {
+                        if (idleFd != nullptr && *idleFd >= 0)
+                        {
+                            dealwithEMFILE(idleFd, sockFd);
+                        }
+                        LOGS_ERROR << "socket accpet EAGAIN";
                         break;
+                    }
                     // error
                     case EBADF:
                     case EFAULT:
