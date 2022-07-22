@@ -22,7 +22,7 @@ namespace nets::net
         assert(epollFd_ >= 0);
         if (epollFd_ < 0)
         {
-            LOGS_FATAL << "EpollPoller::EpollPoller epoll create1 failed with result epollFd < 0";
+            LOGS_FATAL << "EpollPoller epoll create1 failed with result epollFd < 0";
         }
     }
 
@@ -37,7 +37,7 @@ namespace nets::net
         int32_t numOfReadyEvent = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
         if (numOfReadyEvent > 0)
         {
-            LOGS_DEBUG << "EpollPoller::epoll wait:" << numOfReadyEvent << " events";
+            LOGS_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvent << " events";
             prepareChannelReadyEvents(numOfReadyEvent, activeChannels);
             if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
             {
@@ -51,11 +51,11 @@ namespace nets::net
         }
         else if (numOfReadyEvent < 0)
         {
-            LOGS_ERROR << "EpollPoller::epoll failed";
+            LOGS_ERROR << "EpollPoller epoll failed";
         }
         else
         {
-            // LOGS_DEBUG << "EpollPoller::epoll wait no event";
+            // LOGS_DEBUG << "EpollPoller epoll wait no event";
         }
     }
 
@@ -144,7 +144,7 @@ namespace nets::net
         {
             return true;
         }
-        LOGS_ERROR << "EpollPoller::epollCtl [" << epollOptToString(opt) << "] failed";
+        LOGS_ERROR << "EpollPoller epollCtl [" << epollOptToString(opt) << "] failed";
         return false;
     }
 

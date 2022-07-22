@@ -15,7 +15,7 @@ namespace nets::net
     {
         if (eventFd_ < 0)
         {
-            LOGS_FATAL << "NotifyChannel::NotifyChannel create eventFd failed";
+            LOGS_FATAL << "NotifyChannel create eventFd failed";
         }
     }
 
@@ -35,7 +35,7 @@ namespace nets::net
         ::ssize_t n = socket::write(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
-            LOGS_ERROR << "NotifyChannel::notify write failed";
+            LOGS_ERROR << "NotifyChannel notify failed";
         }
     }
 
@@ -45,7 +45,7 @@ namespace nets::net
         ::ssize_t n = socket::read(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
-            LOGS_ERROR << "NotifyChannel::handleReadEvent read failed";
+            LOGS_ERROR << "NotifyChannel read failed";
         }
     }
 } // namespace nets::net

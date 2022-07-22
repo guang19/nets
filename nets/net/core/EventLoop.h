@@ -116,13 +116,13 @@ namespace nets::net
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
                     << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
                     << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
@@ -148,13 +148,13 @@ namespace nets::net
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
                     << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "EventLoop::promiseTask exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
                     << "] execution in event loop thread [" << threadId_ << "]";
             }
         };

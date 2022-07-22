@@ -84,7 +84,7 @@ namespace nets::net
     {
         if (running_)
         {
-            LOGS_DEBUG << "ServerBootstrap::launch ServerBootstrap has started";
+            LOGS_DEBUG << "ServerBootstrap has started";
             return;
         }
         running_ = true;

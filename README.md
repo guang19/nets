@@ -21,7 +21,7 @@ nets是一个Linux下非阻塞，事件驱动的多线程网络库，基于React
 - 宏定义命名：全大写，单词之间加下划线；
 - 头文件顺序：首先按文件相关性，比如测试文件必须最先引入gtest.h；.cpp文件的的第一个头文件必须是其对应的.h。其次，标准库应该先被引入，接下来是第三方库的头文件，最后是自己的库的头文件。所有的头文件按字母顺序排序；
 - gtest：test_suite_name和test_name大驼峰;
-- 日志：日志内容以class/namespace::function的形式开始，如“HelloWorld::sayHello ...(日志内容)”。
+- 日志：日志内容以class/namespace的形式开始，如“People ...(日志内容)”。
 
 ## 宏参数
 nets支持使用外部宏定义的方式调整一些关键的参数。

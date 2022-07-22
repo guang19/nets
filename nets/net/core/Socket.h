@@ -33,8 +33,7 @@ namespace nets::net
         void connect(FdType sockFd, const SockAddr* sockAddr);
 
         void listen(FdType sockFd);
-        FdType acceptAddr4(FdType sockFd, SockAddr* sockAddr);
-        FdType acceptAddr6(FdType sockFd, SockAddr* sockAddr);
+        FdType accept(FdType sockFd, SockAddr* sockAddr, FdType* idleFd);
 
         ::ssize_t read(FdType fd, void* buf, ::size_t n);
         ::ssize_t write(FdType fd, const void* buf, ::size_t n);
@@ -49,7 +48,7 @@ namespace nets::net
         void setSockAddrReuse(FdType sockFd, bool enable = true);
         void setSockPortReuse(FdType sockFd, bool enable = true);
         void setSockKeepAlive(FdType sockFd, bool enable = true);
-        void setIpTcpNoDelay(FdType sockFd, bool enable = true);
+        void setTcpNoDelay(FdType sockFd, bool enable = true);
         void setSockNonBlock(FdType sockFd, bool enable = true);
         // set socket linger
         void setSockLinger(FdType sockFd, const SockLinger& linger);

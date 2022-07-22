@@ -26,7 +26,7 @@ namespace nets::net
         // one loop per thread
         if (CurrentThreadEventLoop != nullptr)
         {
-            LOGS_FATAL << "EventLoop::EventLoop there must be only one loop per thread";
+            LOGS_FATAL << "EventLoop there must be only one loop per thread";
         }
         else
         {
@@ -34,7 +34,7 @@ namespace nets::net
         }
         notifier_->addEvent(EReadEvent);
         registerChannel(notifier_);
-        LOGS_INFO << "EventLoop::EventLoop one event loop is created in thread " << threadId_;
+        LOGS_INFO << "EventLoop one event loop is created in thread " << threadId_;
     }
 
     EventLoop::~EventLoop() {}

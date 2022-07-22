@@ -173,7 +173,7 @@ namespace nets::base
         assert(isRunning(ctl));
         if (isShutdown(ctl))
         {
-            LOGS_WARN << "ThreadPool::execute thread pool [" << name_ << "] is shutdown";
+            LOGS_WARN << "ThreadPool thread pool [" << name_ << "] is shutdown";
             return false;
         }
         // if num of active threads less than num of corePoolSize
@@ -217,13 +217,13 @@ namespace nets::base
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
+                LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
                     << "] execution in thread pool [" << name_ << "], reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "ThreadPool::promiseTask unknown exception caught during thread [" << currentThreadName()
+                LOGS_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
                     << "] execution in thread pool [" << name_ << ']';
             }
         };
@@ -251,13 +251,13 @@ namespace nets::base
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "ThreadPool::promiseTask exception caught during thread [" << currentThreadName()
+                LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
                     << "] execution in thread pool [" << name_ << "], reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "ThreadPool::promiseTask unknown exception caught during thread [" << currentThreadName()
+                LOGS_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
                     << "] execution in thread pool [" << name_ << ']';
             }
         };

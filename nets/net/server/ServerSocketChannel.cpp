@@ -13,6 +13,10 @@ namespace nets::net
     ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), channelInitializationCallbacks_()
     {
+        if (idleFd_ < 0)
+        {
+            LOGS_FATAL << "ServerSocketChannel createIdleFd failed";
+        }
     }
 
     ServerSocketChannel::~ServerSocketChannel()
@@ -32,13 +36,20 @@ namespace nets::net
         addEvent(EReadEvent);
         if (!registerTo())
         {
-            LOGS_FATAL << "ServerSocketChannel::bind ServerSocketChannel register failed";
+            LOGS_FATAL << "ServerSocketChannel register failed";
         }
     }
 
     void ServerSocketChannel::handleReadEvent()
     {
         assert(eventLoop_->isInCurrentEventLoop());
+        InetSockAddress peerAddr {};
+        FdType connFd = socket::InvalidFd;
+        if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr(), &idleFd_)) > 0)
+        {
+            LOGS_DEBUG << "ServerSocketChannel accpet client addr: " << peerAddr.toString();
+
+        }
     }
 
     void ServerSocketChannel::handleErrorEvent()
