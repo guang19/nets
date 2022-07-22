@@ -13,8 +13,6 @@ namespace nets::net
 {
     InetSockAddress::InetSockAddress()
     {
-        MEMZERO(&addr_, sizeof(SockAddr));
-        MEMZERO(&addr4_, sizeof(SockAddr4));
         MEMZERO(&addr6_, sizeof(SockAddr6));
     }
 
