@@ -61,5 +61,9 @@ namespace nets::net
         }
     }
 
-    void ServerSocketChannel::handleErrorEvent() {}
+    void ServerSocketChannel::handleErrorEvent()
+    {
+        LOGS_ERROR << "ServerSocketChannel occurred system error";
+        deregister();
+    }
 } // namespace nets::net

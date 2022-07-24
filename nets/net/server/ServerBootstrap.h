@@ -27,9 +27,9 @@ namespace nets::net
 
     public:
         // set the ChannelHandler shared by all channels
-        ServerBootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
+        ServerBootstrap& childHandler(const ChannelHandlerPtr& channelHandler);
         // set the ChannelHandler for each channel
-        ServerBootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
+        ServerBootstrap& childHandler(const ChannelInitializationCallback& channelInitializationCallback);
 
         ServerBootstrap& bind(PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const char* ip, PortType port, bool ipv6 = false);

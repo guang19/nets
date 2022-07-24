@@ -26,13 +26,13 @@ namespace nets::net
         subLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfSubEventLoops, SubEventLoopGroupName);
     }
 
-    ServerBootstrap& ServerBootstrap::channelHandler(const ChannelHandlerPtr& channelHandler)
+    ServerBootstrap& ServerBootstrap::childHandler(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_back(channelHandler);
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::channelHandler(const ChannelInitializationCallback& channelInitializationCallback)
+    ServerBootstrap& ServerBootstrap::childHandler(const ChannelInitializationCallback& channelInitializationCallback)
     {
         channelInitializationCallback_ = channelInitializationCallback;
         return *this;

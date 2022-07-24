@@ -9,6 +9,7 @@ namespace nets::net
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(sockFd), peerAddress_(peerAddress), channelContext_(this)
     {
+        socket::setSockNonBlock(sockFd_);
     }
 
     void SocketChannel::handleReadEvent() {}
