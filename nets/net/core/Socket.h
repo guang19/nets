@@ -23,6 +23,7 @@ namespace nets::net
 
         FdType createTcpSocket(SockAddrFamily family = AF_INET6);
         FdType createUdpSocket(SockAddrFamily family = AF_INET6);
+        void setSockCloExec(FdType sockFd);
         void closeFd(FdType fd);
 
         FdType createIdleFd();
@@ -40,19 +41,35 @@ namespace nets::net
 
         ::ssize_t readv(FdType fd, const IoVec* vec, int32_t iovcnt);
 
-        // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
-        // rmem_default SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x
-        void setSockSendBuf(FdType sockFd, OptValType sendBufLen = 16 * 1024);
-        // SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
-        void setSockRecvBuf(FdType sockFd, OptValType recvBufLen = 128 * 1024);
-        void setSockAddrReuse(FdType sockFd, bool enable = true);
-        void setSockPortReuse(FdType sockFd, bool enable = true);
+        // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
+        // TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x
+        // UDP SO_SNDBUF default value is 212992 bytes on linux which kernel version is 5.10.x
+        void setSockSendBuf(FdType sockFd, OptValType sendBufLen);
+        // TCP SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
+        // UDP SO_RCVBUF default value is 212992 bytes on linux which kernel version is 5.10.x
+        void setSockRecvBuf(FdType sockFd, OptValType recvBufLen);
+        static OptValType getTcpSockSendBuf();
+        static OptValType getTcpSockRecvBuf();
+        static OptValType getUdpSockSendBuf();
+        static OptValType getUdpSockRecvBuf();
+
+        void setSockReuseAddr(FdType sockFd, bool enable = true);
+        void setSockReusePort(FdType sockFd, bool enable = true);
         void setSockKeepAlive(FdType sockFd, bool enable = true);
         void setTcpNoDelay(FdType sockFd, bool enable = true);
         void setSockNonBlock(FdType sockFd, bool enable = true);
         // set socket linger
         void setSockLinger(FdType sockFd, const SockLinger& linger);
     } // namespace socket
+
+    namespace
+    {
+        static const int32_t DefaultTcpSockSendBufLen = socket::getTcpSockSendBuf();
+        static const int32_t DefaultTcpSockRecvBufLen = socket::getTcpSockRecvBuf();
+
+        static const int32_t DefaultUdpSockSendBufLen = socket::getUdpSockSendBuf();
+        static const int32_t DefaultUdpSockRecvBufLen = socket::getUdpSockRecvBuf();
+    }
 } // namespace nets::net
 
 #endif // NETS_NET_SOCKET_H

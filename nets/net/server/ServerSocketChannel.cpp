@@ -29,8 +29,8 @@ namespace nets::net
     void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
     {
         sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
-        socket::setSockAddrReuse(sockFd_, true);
-        socket::setSockPortReuse(sockFd_, true);
+        socket::setSockReuseAddr(sockFd_, true);
+        socket::setSockReusePort(sockFd_, true);
         socket::setSockNonBlock(sockFd_, true);
         socket::bind(sockFd_, sockAddress.csockAddr());
         socket::listen(sockFd_);

@@ -9,35 +9,54 @@
 using namespace nets::net;
 using namespace nets::net::socket;
 
-TEST(SocketTest, BasicUse)
+TEST(SocketTest, createSocket)
 {
     FdType sockFd = -1;
     ASSERT_GE((sockFd = socket::createTcpSocket(AF_INET)), 0);
     socket::closeFd(sockFd);
     ASSERT_GE((sockFd = socket::createUdpSocket(AF_INET)), 0);
     socket::closeFd(sockFd);
-    socket::closeFd(6);
 }
 
-TEST(SocketTest, SocketDefaultOpt)
+TEST(SocketTest, TcpSocketSendBuf)
 {
-    FdType sockFd1 = socket::createTcpSocket(AF_INET);
-    OptValType optVal = 0;
-    auto valPtr = static_cast<SockLenType>(sizeof(optVal));
-    // SO_SNDBUF: default value is 16384 bytes
-    ::getsockopt(sockFd1, SOL_SOCKET, SO_SNDBUF, &optVal, &valPtr);
-    ASSERT_EQ(optVal, 16384);
-    // SO_RCVBUF: default value is 131072 bytes
-    ::getsockopt(sockFd1, SOL_SOCKET, SO_RCVBUF, &optVal, &valPtr);
-    ASSERT_EQ(optVal, 131072);
+    ASSERT_EQ(socket::getTcpSockSendBuf(), 16384);
+}
 
-    ::getsockopt(sockFd1, SOL_SOCKET, SO_REUSEADDR, &optVal, &valPtr);
+TEST(SocketTest, TcpSocketRecvBuf)
+{
+    ASSERT_EQ(socket::getTcpSockRecvBuf(), 131072);
+}
+
+TEST(SocketTest, UdpSocketSendBuf)
+{
+    ASSERT_EQ(socket::getUdpSockSendBuf(), 212992);
+}
+
+TEST(SocketTest, UdpSocketRecvBuf)
+{
+    ASSERT_EQ(socket::getUdpSockRecvBuf(), 212992);
+}
+
+TEST(SocketTest, ReuseAddr)
+{
+    FdType sockFd = socket::createTcpSocket(AF_INET);
+    ASSERT_GE(sockFd, 0);
+    OptValType optVal = 0;
+    auto len = static_cast<SockLenType>(sizeof(optVal));
+    ::getsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &optVal, &len);
     ASSERT_EQ(optVal, 0);
-    ::getsockopt(sockFd1, SOL_SOCKET, SO_REUSEPORT, &optVal, &valPtr);
+    ::getsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &optVal, &len);
     ASSERT_EQ(optVal, 0);
+}
+
+TEST(SocketTest, Linger)
+{
+    FdType sockFd = socket::createTcpSocket(AF_INET);
+    ASSERT_GE(sockFd, 0);
     SockLinger linger_ {};
     auto lingerLen = static_cast<SockLenType>(sizeof(SockLinger));
-    ::getsockopt(sockFd1, SOL_SOCKET, SO_LINGER, &linger_, &lingerLen);
+    ::getsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger_, &lingerLen);
     ASSERT_EQ(linger_.l_onoff, 0);
     ASSERT_EQ(linger_.l_linger, 0);
 }

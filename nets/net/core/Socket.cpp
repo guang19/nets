@@ -20,6 +20,7 @@ namespace nets::net::socket
         {
             LOGS_FATAL << "socket createTcpSocket failed";
         }
+        setSockCloExec(sockFd);
         return sockFd;
     }
 
@@ -30,7 +31,18 @@ namespace nets::net::socket
         {
             LOGS_FATAL << "socket createUdpSocket failed";
         }
+        setSockCloExec(sockFd);
         return sockFd;
+    }
+
+    void setSockCloExec(FdType sockFd)
+    {
+        int32_t flags = ::fcntl(sockFd, F_GETFD, 0);
+        flags |= FD_CLOEXEC;
+        if (-1 == ::fcntl(sockFd, F_SETFD, flags))
+        {
+            LOGS_FATAL << "socket set FD_CLOEXEC failed";
+        }
     }
 
     void closeFd(FdType fd)
@@ -61,7 +73,7 @@ namespace nets::net::socket
         FdType connFd = ::accept(sockFd, nullptr, nullptr);
         // close client connection, avoid listenFd always trigger
         closeFd(connFd);
-        // recreate  idle fd
+        // recreate idle fd
         *idleFd = createIdleFd();
     }
 
@@ -177,7 +189,47 @@ namespace nets::net::socket
         }
     }
 
-    void setSockAddrReuse(FdType sockFd, bool enable)
+    OptValType getTcpSockSendBuf()
+    {
+        FdType sockFd = socket::createTcpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto len = static_cast<SockLenType>(sizeof(optVal));
+        ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len);
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    OptValType getTcpSockRecvBuf()
+    {
+        FdType sockFd = socket::createTcpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto len = static_cast<SockLenType>(sizeof(optVal));
+        ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len);
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    OptValType getUdpSockSendBuf()
+    {
+        FdType sockFd = socket::createUdpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto len = static_cast<SockLenType>(sizeof(optVal));
+        ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len);
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    OptValType getUdpSockRecvBuf()
+    {
+        FdType sockFd = socket::createUdpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto len = static_cast<SockLenType>(sizeof(optVal));
+        ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len);
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    void setSockReuseAddr(FdType sockFd, bool enable)
     {
         OptValType reuse = enable ? 1 : 0;
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(reuse))))
@@ -186,7 +238,7 @@ namespace nets::net::socket
         }
     }
 
-    void setSockPortReuse(FdType sockFd, bool enable)
+    void setSockReusePort(FdType sockFd, bool enable)
     {
         OptValType reuse = enable ? 1 : 0;
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(reuse))))
@@ -233,12 +285,6 @@ namespace nets::net::socket
             flags &= ~O_NONBLOCK;
         }
         if (-1 == ::fcntl(sockFd, F_SETFL, flags))
-        {
-            LOGS_ERROR << "socket setSockNonBlock failed";
-        }
-        flags = ::fcntl(sockFd, F_GETFD, 0);
-        flags |= FD_CLOEXEC;
-        if (-1 == ::fcntl(sockFd, F_SETFD, flags))
         {
             LOGS_ERROR << "socket setSockNonBlock failed";
         }

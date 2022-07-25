@@ -6,6 +6,7 @@
 #define NETS_NET_SERVER_BOOTSTRAP_H
 
 #include "nets/net/core/ChannelHandler.h"
+#include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/EventLoopGroup.h"
 #include "nets/net/server/ServerSocketChannel.h"
 
