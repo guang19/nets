@@ -10,19 +10,14 @@ namespace nets::net
 {
     namespace
     {
-        constexpr char MainEventLoopGroupName[] = "MainLoopGroup";
         constexpr char SubEventLoopGroupName[] = "SubLoopGroup";
-        constexpr ServerBootstrap::NType DefaultNumbOfMainEventLoops = 1;
-        const ServerBootstrap::NType DefaultNumbOfSubEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
+        const AbstractBootstrap::NType DefaultNumbOfSubEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
     } // namespace
 
-    ServerBootstrap::ServerBootstrap(NType numOfSubEventLoops) : ServerBootstrap(0, numOfSubEventLoops) {}
-
-    ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops) : running_(false)
+    ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops)
+        : AbstractBootstrap(numOfMainEventLoops), running_(false)
     {
-        numOfMainEventLoops = numOfMainEventLoops <= 0 ? DefaultNumbOfMainEventLoops : numOfMainEventLoops;
         numOfSubEventLoops = numOfSubEventLoops <= 0 ? DefaultNumbOfSubEventLoops : numOfSubEventLoops;
-        mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName),
         subLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfSubEventLoops, SubEventLoopGroupName);
     }
 

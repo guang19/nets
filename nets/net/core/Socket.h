@@ -48,10 +48,10 @@ namespace nets::net
         // TCP SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
         // UDP SO_RCVBUF default value is 212992 bytes on linux which kernel version is 5.10.x
         void setSockRecvBuf(FdType sockFd, OptValType recvBufLen);
-        static OptValType getTcpSockSendBuf();
-        static OptValType getTcpSockRecvBuf();
-        static OptValType getUdpSockSendBuf();
-        static OptValType getUdpSockRecvBuf();
+        OptValType getTcpSockSendBuf();
+        OptValType getTcpSockRecvBuf();
+        OptValType getUdpSockSendBuf();
+        OptValType getUdpSockRecvBuf();
 
         void setSockReuseAddr(FdType sockFd, bool enable = true);
         void setSockReusePort(FdType sockFd, bool enable = true);
@@ -64,11 +64,14 @@ namespace nets::net
 
     namespace
     {
-        static const int32_t DefaultTcpSockSendBufLen = socket::getTcpSockSendBuf();
-        static const int32_t DefaultTcpSockRecvBufLen = socket::getTcpSockRecvBuf();
+        const int32_t DefaultMaximumOfBackLog = SOMAXCONN;
+        const int32_t DefaultSockLinger = 0;
 
-        static const int32_t DefaultUdpSockSendBufLen = socket::getUdpSockSendBuf();
-        static const int32_t DefaultUdpSockRecvBufLen = socket::getUdpSockRecvBuf();
+        const int32_t DefaultTcpSockSendBufLen = socket::getTcpSockSendBuf();
+        const int32_t DefaultTcpSockRecvBufLen = socket::getTcpSockRecvBuf();
+
+        const int32_t DefaultUdpSockSendBufLen = socket::getUdpSockSendBuf();
+        const int32_t DefaultUdpSockRecvBufLen = socket::getUdpSockRecvBuf();
     }
 } // namespace nets::net
 

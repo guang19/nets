@@ -5,6 +5,9 @@
 #ifndef NETS_CHANNEL_OPTION_H
 #define NETS_CHANNEL_OPTION_H
 
+#include <any>
+#include <variant>
+
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Socket.h"
 
@@ -12,6 +15,7 @@ namespace nets::net
 {
     enum SockOpt
     {
+        InvalidSockOpt = -1,
         NBACKLOG = 0,
         NKEEPALIVE,
         NREUSEADDR,
@@ -24,41 +28,59 @@ namespace nets::net
         UDPRCVBUF,
     };
 
-    template <typename ValueType>
-    class ChannelOption : nets::base::Noncopyable
+    /**
+     *
+     * For unnecessary memory allocation, ValueType only support simple data types, not custom types
+     *
+     */
+    class ChannelOption : nets::base::Copyable
     {
     public:
-        explicit ChannelOption(SockOpt sockOpt, const ValueType& value) : sockOpt_(sockOpt), value_(value) {}
-        ~ChannelOption() = default;
+        using ValueType = ::std::variant<bool, int32_t>;
 
     public:
-        inline const ValueType& get()
+        struct ChannelOptionHasher
         {
-            return value_;
-        }
+            ::size_t operator()(const ChannelOption& channelOption) const;
+        };
 
-        inline void set(const ValueType& value)
-        {
-            value_ = value;
-        }
+    public:
+        ChannelOption();
+        explicit ChannelOption(SockOpt sockOpt, const ValueType& value);
+        ~ChannelOption() = default;
+
+        ChannelOption(const ChannelOption& other);
+        ChannelOption(ChannelOption&& other) noexcept;
+        ChannelOption& operator=(const ChannelOption& other);
+        ChannelOption& operator=(ChannelOption&& other) noexcept;
+
+        bool operator==(const ChannelOption& other) const;
+        bool operator!=(const ChannelOption& other) const;
+        bool operator<(const ChannelOption& other) const;
+        bool operator>(const ChannelOption& other) const;
+
+    public:
+        bool valid() const;
+        ::std::any get() const;
+        void set(const ValueType& value);
 
     private:
-        SockOpt sockOpt_ {};
-        ValueType value_;
+        SockOpt sockOpt_ {SockOpt::InvalidSockOpt};
+        ValueType value_ {};
     };
 
     namespace
     {
-        const ChannelOption<int32_t> NBackLog {SockOpt::NBACKLOG, SOMAXCONN};
-        const ChannelOption<bool> NKeepAlive {SockOpt::NKEEPALIVE, true};
-        const ChannelOption<bool> NReuseAddr {SockOpt::NREUSEADDR, true};
-        const ChannelOption<bool> NReusePort {SockOpt::NREUSEPORT, true};
-        const ChannelOption<bool> NTcpNoDelay {SockOpt::TCPNODELAY, false};
-        const ChannelOption<int32_t> NLinger {SockOpt::LINGER, 0};
-        const ChannelOption<int32_t> NTcpSendBuf {SockOpt::TCPSNDBUF, DefaultTcpSockSendBufLen};
-        const ChannelOption<int32_t> NTcpRecvBuf {SockOpt::TCPRCVBUF, DefaultTcpSockRecvBufLen};
-        const ChannelOption<int32_t> NUdpSendBuf {SockOpt::UDPSNDBUF, DefaultUdpSockSendBufLen};
-        const ChannelOption<int32_t> NUdpRecvBuf {SockOpt::UDPRCVBUF, DefaultUdpSockRecvBufLen};
+        const ChannelOption NReuseAddr {SockOpt::NREUSEADDR, true};
+        const ChannelOption NReusePort {SockOpt::NREUSEPORT, true};
+        const ChannelOption NKeepAlive {SockOpt::NKEEPALIVE, false};
+        const ChannelOption NTcpNoDelay {SockOpt::TCPNODELAY, false};
+        const ChannelOption NLinger {SockOpt::LINGER, DefaultSockLinger};
+        const ChannelOption NBackLog {SockOpt::NBACKLOG, DefaultMaximumOfBackLog};
+        const ChannelOption NTcpSendBuf {SockOpt::TCPSNDBUF, DefaultTcpSockSendBufLen};
+        const ChannelOption NTcpRecvBuf {SockOpt::TCPRCVBUF, DefaultTcpSockRecvBufLen};
+        const ChannelOption NUdpSendBuf {SockOpt::UDPSNDBUF, DefaultUdpSockSendBufLen};
+        const ChannelOption NUdpRecvBuf {SockOpt::UDPRCVBUF, DefaultUdpSockRecvBufLen};
     } // namespace
 } // namespace nets::net
 
