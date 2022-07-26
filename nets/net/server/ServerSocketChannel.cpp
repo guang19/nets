@@ -44,72 +44,62 @@ namespace nets::net
 
     void ServerSocketChannel::setChannelOptions()
     {
-        for (const auto& channelOption : channelOptions_)
+        for (const auto& channelOption: channelOptions_)
         {
             const SockOpt sockOpt = channelOption.sockOpt();
             switch (sockOpt)
             {
                 case NBACKLOG:
-                    if (channelOption != NBackLog)
-                    {
-                        backlog_ = ::std::any_cast<int32_t>(channelOption.get());
-                    }
+                {
+                    backlog_ = ::std::any_cast<int32_t>(channelOption.get());
                     break;
+                }
                 case NREUSEADDR:
-                    if (channelOption != NReuseAddr)
-                    {
-                        socket::setSockReuseAddr(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setSockReuseAddr(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NREUSEPORT:
-                    if (channelOption != NReusePort)
-                    {
-                        socket::setSockReusePort(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setSockReusePort(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NKEEPALIVE:
-                    if (channelOption != NKeepAlive)
-                    {
-                        socket::setSockKeepAlive(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setSockKeepAlive(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NTCPNODELAY:
-                    if (channelOption != NTcpNoDelay)
-                    {
-                        socket::setTcpNoDelay(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setTcpNoDelay(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NLINGER:
-                    if (channelOption != NLinger)
-                    {
-                        auto linger = ::std::any_cast<int32_t>(channelOption.get());
-                        socket::setSockLinger(sockFd_, {1, linger});
-                    }
+                {
+                    auto linger = ::std::any_cast<int32_t>(channelOption.get());
+                    socket::setSockLinger(sockFd_, {1, linger});
                     break;
+                }
                 case NTCPSNDBUF:
-                    if (channelOption != NTcpSendBuf)
-                    {
-                        socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NTCPRCVBUF:
-                    if (channelOption != NTcpRecvBuf)
-                    {
-                        socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NUDPSNDBUF:
-                    if (channelOption != NUdpSendBuf)
-                    {
-                        socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NUDPRCVBUF:
-                    if (channelOption != NUdpRecvBuf)
-                    {
-                        socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case InvalidSockOpt:
                 default:
                     LOGS_ERROR << "Channel set invalid ChannelOption";
@@ -121,6 +111,7 @@ namespace nets::net
     void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
     {
         sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
+        setChannelOptions();
         socket::setSockNonBlock(sockFd_, true);
         socket::bind(sockFd_, sockAddress.csockAddr());
         socket::listen(sockFd_, backlog_);

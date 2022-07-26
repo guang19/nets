@@ -14,7 +14,7 @@ namespace nets::net
         socket::setSockNonBlock(sockFd_);
     }
 
-    void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
+    void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions) const
     {
         for (const auto& channelOption: channelOptions)
         {
@@ -22,63 +22,55 @@ namespace nets::net
             switch (sockOpt)
             {
                 case NREUSEADDR:
-                    if (channelOption != NReuseAddr)
-                    {
-                        socket::setSockReuseAddr(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setSockReuseAddr(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NREUSEPORT:
-                    if (channelOption != NReusePort)
-                    {
-                        socket::setSockReusePort(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setSockReusePort(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NKEEPALIVE:
-                    if (channelOption != NKeepAlive)
-                    {
-                        socket::setSockKeepAlive(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setSockKeepAlive(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NTCPNODELAY:
-                    if (channelOption != NTcpNoDelay)
-                    {
-                        socket::setTcpNoDelay(sockFd_, ::std::any_cast<bool>(channelOption.get()));
-                    }
+                {
+                    socket::setTcpNoDelay(sockFd_, ::std::any_cast<bool>(channelOption.get()));
                     break;
+                }
                 case NLINGER:
-                    if (channelOption != NLinger)
-                    {
-                        socket::setSockLinger(sockFd_, ::std::any_cast<SockLinger>(channelOption.get()));
-                    }
+                {
+                    auto linger = ::std::any_cast<int32_t>(channelOption.get());
+                    socket::setSockLinger(sockFd_, {1, linger});
                     break;
+                }
                 case NTCPSNDBUF:
-                    if (channelOption != NTcpSendBuf)
-                    {
-                        socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NTCPRCVBUF:
-                    if (channelOption != NTcpRecvBuf)
-                    {
-                        socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NUDPSNDBUF:
-                    if (channelOption != NUdpSendBuf)
-                    {
-                        socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NUDPRCVBUF:
-                    if (channelOption != NUdpRecvBuf)
-                    {
-                        socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
-                    }
+                {
+                    socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
                     break;
+                }
                 case NBACKLOG:
                 case InvalidSockOpt:
                 default:
-                    LOGS_ERROR << "Channel set invalid ChannelOption";
+                    LOGS_ERROR << "SocketChannel set invalid ChannelOption";
                     break;
             }
         }

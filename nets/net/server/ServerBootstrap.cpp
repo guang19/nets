@@ -77,6 +77,7 @@ namespace nets::net
         ChannelOptionList childOptions {::std::move(childOptions_)};
         assert(childOptions_.empty());
         serverSocketChannel->setChildOptions(childOptions);
+
         ChannelHandlerList childHandlers {::std::move(childHandlers_)};
         assert(childHandlers_.empty());
         serverSocketChannel->setChildHandlers(childHandlers);

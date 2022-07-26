@@ -31,7 +31,7 @@ namespace nets::net
             return channelContext_.pipeline();
         }
 
-        void setChannelOptions(const ChannelOptionList& channelOptions) override;
+        void setChannelOptions(const ChannelOptionList& channelOptions) const;
 
     public:
         void handleReadEvent() override;

@@ -49,7 +49,6 @@ namespace nets::net
         virtual FdType fd() const = 0;
         virtual ChannelContextRawPtr channelContext();
         virtual ChannelHandlerPipelineRawPtr channelHandlerPipeline();
-        virtual void setChannelOptions(const ChannelOptionList& channelOptions);
 
         EventLoopRawPtr eventLoop() const;
 

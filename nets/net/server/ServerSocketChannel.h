@@ -37,7 +37,7 @@ namespace nets::net
             nextEventLoopFn_ = nextEventLoopFn;
         }
 
-        void setChannelOptions(const ChannelOptionList& channelOptions) override;
+        void setChannelOptions(const ChannelOptionList& channelOptions);
         void setChannelOptions();
         void setChildOptions(const ChannelOptionList& childOptions);
 
