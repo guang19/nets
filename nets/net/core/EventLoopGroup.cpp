@@ -7,7 +7,7 @@
 namespace nets::net
 {
     EventLoopGroup::EventLoopGroup(NType numOfEventLoops, const ::std::string& name)
-        : nextLoop_(0), numOfEventLoops_(numOfEventLoops)
+        : nextLoop_(0), numOfEventLoops_(numOfEventLoops), mutex_(), cv_()
     {
         if (numOfEventLoops_ <= 0)
         {

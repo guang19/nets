@@ -15,7 +15,8 @@ namespace nets::net
     } // namespace
 
     ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfChildEventLoops)
-        : AbstractBootstrap(numOfMainEventLoops), running_(false)
+        : AbstractBootstrap(numOfMainEventLoops), running_(false), childOptions_(), childHandlers_(),
+          childInitializationCallback_()
     {
         numOfChildEventLoops = numOfChildEventLoops <= 0 ? DefaultNumbOfChildEventLoops : numOfChildEventLoops;
         childLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfChildEventLoops, ChildEventLoopGroupName);
@@ -97,5 +98,6 @@ namespace nets::net
         running_ = true;
         childLoopGroup_->loopEach();
         mainLoopGroup_->syncEach();
+        childLoopGroup_->syncEach();
     }
 } // namespace nets::net
