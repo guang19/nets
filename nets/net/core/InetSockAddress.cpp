@@ -130,7 +130,7 @@ namespace nets::net
             MEMZERO(&addr, sizeof(SockAddr4));
             addr.sin_family = AF_INET;
             addr.sin_port = htobe16(port);
-            addr.sin_addr.s_addr = INADDR_ANY;
+            addr.sin_addr.s_addr = htonl(INADDR_ANY);
             return InetSockAddress(addr);
         }
     }
@@ -152,7 +152,7 @@ namespace nets::net
             MEMZERO(&addr, sizeof(SockAddr4));
             addr.sin_family = AF_INET;
             addr.sin_port = htobe16(port);
-            addr.sin_addr.s_addr = INADDR_LOOPBACK;
+            addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
             return InetSockAddress(addr);
         }
     }

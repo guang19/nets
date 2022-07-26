@@ -82,6 +82,7 @@ namespace nets::net::socket
         auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
         if (0 != ::bind(sockFd, sockAddr, len))
         {
+            ::printf("%d\n", errno);
             LOGS_FATAL << "socket bind failed";
         }
     }

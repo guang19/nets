@@ -19,9 +19,9 @@ int main(int argc, char** argv)
 
     ::std::vector<struct epoll_event> epollEvents(20);
 
-    InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080, false);
+    InetSockAddress serverAddr = InetSockAddress::createLoopBackSockAddress(8080, false);
     socket::bind(listenFd, serverAddr.csockAddr());
-    socket::listen(listenFd);
+    socket::listen(listenFd, 1024);
 
     FdType epollFd = ::epoll_create1(EPOLL_CLOEXEC);
     struct epoll_event accpetEpollEvent {};
@@ -63,6 +63,12 @@ int main(int argc, char** argv)
                     ::printf("client2 fd=%d,client2 addr:ip=%s,port=%d\n", connFd, clientAddr2.ip().c_str(),
                              clientAddr2.port());
                     ::printf("client2 addr=%s\n", clientAddr2.toString().c_str());
+
+                    InetSockAddress clientAddr3;
+                    ::getsockname(connFd, clientAddr3.sockAddr(), &len);
+                    ::printf("client3 fd=%d,client3 addr:ip=%s,port=%d\n", connFd, clientAddr3.ip().c_str(),
+                             clientAddr3.port());
+                    ::printf("client3 addr=%s\n", clientAddr3.toString().c_str());
                     struct epoll_event epollEvent {};
                     epollEvent.data.fd = connFd;
                     epollEvent.events = EPOLLIN;
