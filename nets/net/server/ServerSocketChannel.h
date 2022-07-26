@@ -6,10 +6,11 @@
 #define NETS_NET_SERVER_SOCKET_CHANNEL_H
 
 #include <functional>
+#include <map>
 
 #include "nets/net/core/Channel.h"
-#include "nets/net/core/SocketChannel.h"
 #include "nets/net/core/InetSockAddress.h"
+#include "nets/net/core/SocketChannel.h"
 
 namespace nets::net
 {
@@ -19,6 +20,7 @@ namespace nets::net
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using ChannelInitializationCallback = ::std::function<void(SocketChannelPtr& channel)>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
+        using ChannelOptionSet = ::std::map<ChannelOption, ChannelOption::ValueType>;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
 
@@ -37,14 +39,19 @@ namespace nets::net
             nextEventLoopFn_ = nextEventLoopFn;
         }
 
-        inline void setChannelHandlers(const ChannelHandlerList& channelHandlers)
+        inline void setChildOptions(const ChannelOptionSet& childOptions)
         {
-            channelHandlers_ = channelHandlers;
+            childOptions_ = childOptions;
         }
 
-        inline void setChannelInitializationCallback(const ChannelInitializationCallback& channelInitializationCallback)
+        inline void setChildHandlers(const ChannelHandlerList& childHandlers)
         {
-            channelInitializationCallback_ = channelInitializationCallback;
+            childHandlers_ = childHandlers;
+        }
+
+        inline void setChildInitializationCallback(const ChannelInitializationCallback& childInitializationCallback)
+        {
+            childInitializationCallback_ = childInitializationCallback;
         }
 
         void bind(const InetSockAddress& sockAddress);
@@ -57,8 +64,9 @@ namespace nets::net
         FdType sockFd_ {socket::InvalidFd};
         FdType idleFd_ {socket::InvalidFd};
         NextEventLoopFn nextEventLoopFn_ {};
-        ChannelHandlerList channelHandlers_ {};
-        ChannelInitializationCallback channelInitializationCallback_ {};
+        ChannelOptionSet childOptions_ {};
+        ChannelHandlerList childHandlers_ {};
+        ChannelInitializationCallback childInitializationCallback_ {};
     };
 } // namespace nets::net
 

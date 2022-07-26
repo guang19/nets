@@ -28,11 +28,6 @@ namespace nets::net
         UDPRCVBUF,
     };
 
-    /**
-     *
-     * For unnecessary memory allocation, ValueType only support simple data types, not custom types
-     *
-     */
     class ChannelOption : nets::base::Copyable
     {
     public:

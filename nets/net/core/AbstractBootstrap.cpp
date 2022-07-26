@@ -12,9 +12,9 @@ namespace nets::net
         constexpr AbstractBootstrap::NType DefaultNumbOfMainEventLoops = 1;
     }
 
-    AbstractBootstrap::AbstractBootstrap(NType numOfMainEventLoops)
+    AbstractBootstrap::AbstractBootstrap(NType numOfMainEventLoops) : channelOptions_()
     {
         numOfMainEventLoops = numOfMainEventLoops <= 0 ? DefaultNumbOfMainEventLoops : numOfMainEventLoops;
-        mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName),
+        mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName);
     }
 }

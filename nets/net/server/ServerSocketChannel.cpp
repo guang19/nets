@@ -12,7 +12,8 @@
 namespace nets::net
 {
     ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), channelInitializationCallback_()
+        : Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), nextEventLoopFn_(),
+          childOptions_(), childHandlers_(), childInitializationCallback_()
     {
         if (idleFd_ < 0)
         {
@@ -50,13 +51,13 @@ namespace nets::net
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr: " << peerAddr.toString();
             auto clientSocketChannel = ::std::make_shared<SocketChannel>(connFd, peerAddr, nextEventLoopFn_());
-            for (auto& channelHandler: channelHandlers_)
+            for (auto& childHandler: childHandlers_)
             {
-                clientSocketChannel->channelHandlerPipeline()->addLast(channelHandler);
+                clientSocketChannel->channelHandlerPipeline()->addLast(childHandler);
             }
-            if (channelInitializationCallback_ != nullptr)
+            if (childInitializationCallback_ != nullptr)
             {
-                channelInitializationCallback_(clientSocketChannel);
+                childInitializationCallback_(clientSocketChannel);
             }
         }
     }

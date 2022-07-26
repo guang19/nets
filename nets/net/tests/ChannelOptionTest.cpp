@@ -64,6 +64,19 @@ TEST(ChannelOptionTest, GenericStore)
             printf("bool value : %d\n", ::std::any_cast<bool>(it->first.get()));
         }
     }
+    ::std::map<ChannelOption, ChannelOption::ValueType> options2 = ::std::move(options);
+    for (auto it = options2.begin(); it != options2.end(); ++it)
+    {
+        if (typeid(int32_t) == it->first.get().type())
+        {
+            printf("int32_t value : %d\n", ::std::any_cast<int32_t>(it->first.get()));
+        }
+        else if (typeid(bool) == it->first.get().type())
+        {
+            printf("bool value : %d\n", ::std::any_cast<bool>(it->first.get()));
+        }
+    }
+    ASSERT_EQ(options.size(), 0U);
     printf("\n");
 }
 

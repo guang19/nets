@@ -10,6 +10,7 @@
 
 #include "ChannelContext.h"
 #include "nets/base/Noncopyable.h"
+#include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/Socket.h"
 
 namespace nets::net

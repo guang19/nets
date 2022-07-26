@@ -10,26 +10,32 @@ namespace nets::net
 {
     namespace
     {
-        constexpr char SubEventLoopGroupName[] = "SubLoopGroup";
-        const AbstractBootstrap::NType DefaultNumbOfSubEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
+        constexpr char ChildEventLoopGroupName[] = "ChildLoopGroup";
+        const AbstractBootstrap::NType DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
     } // namespace
 
-    ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops)
+    ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfChildEventLoops)
         : AbstractBootstrap(numOfMainEventLoops), running_(false)
     {
-        numOfSubEventLoops = numOfSubEventLoops <= 0 ? DefaultNumbOfSubEventLoops : numOfSubEventLoops;
-        subLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfSubEventLoops, SubEventLoopGroupName);
+        numOfChildEventLoops = numOfChildEventLoops <= 0 ? DefaultNumbOfChildEventLoops : numOfChildEventLoops;
+        childLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfChildEventLoops, ChildEventLoopGroupName);
     }
 
-    ServerBootstrap& ServerBootstrap::childHandler(const ChannelHandlerPtr& channelHandler)
+    ServerBootstrap& ServerBootstrap::childOption(const ChannelOption& channelOption, ChannelOption::ValueType value)
     {
-        channelHandlers_.push_back(channelHandler);
+        childOptions_[channelOption] = value;
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::childHandler(const ChannelInitializationCallback& channelInitializationCallback)
+    ServerBootstrap& ServerBootstrap::childHandler(const ChannelHandlerPtr& childHandler)
     {
-        channelInitializationCallback_ = channelInitializationCallback;
+        childHandlers_.push_back(childHandler);
+        return *this;
+    }
+
+    ServerBootstrap& ServerBootstrap::childHandler(const ChannelInitializationCallback& childInitializationCallback)
+    {
+        childInitializationCallback_ = childInitializationCallback;
         return *this;
     }
 
@@ -48,7 +54,6 @@ namespace nets::net
     ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& localAddress)
     {
         mainLoopGroup_->loopEach();
-        // Clang-Tidy: Prefer a lambda to std::bind
         auto future = mainLoopGroup_->submit(
             [this, localAddress]
             {
@@ -64,14 +69,14 @@ namespace nets::net
         serverSocketChannel->setNextEventLoopFn(
             [this]() -> EventLoopGroup::EventLoopRawPtr
             {
-                return subLoopGroup_->next();
+                return childLoopGroup_->next();
             });
-        ChannelHandlerList channelHandlers {::std::move(channelHandlers_)};
-        assert(channelHandlers_.empty());
-        serverSocketChannel->setChannelHandlers(channelHandlers_);
-        ChannelInitializationCallback channelInitializationCallback {::std::move(channelInitializationCallback_)};
-        assert(channelInitializationCallback_ == nullptr);
-        serverSocketChannel->setChannelInitializationCallback(channelInitializationCallback);
+        ChannelHandlerList childHandlers {::std::move(childHandlers_)};
+        assert(childHandlers_.empty());
+        serverSocketChannel->setChildHandlers(childHandlers);
+        ChannelInitializationCallback childInitializationCallback {::std::move(childInitializationCallback_)};
+        assert(childInitializationCallback_ == nullptr);
+        serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
         serverSocketChannel->bind(localAddress);
     }
 
@@ -83,7 +88,7 @@ namespace nets::net
             return;
         }
         running_ = true;
-        subLoopGroup_->loopEach();
+        childLoopGroup_->loopEach();
         mainLoopGroup_->syncEach();
     }
 } // namespace nets::net

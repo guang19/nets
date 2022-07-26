@@ -19,15 +19,15 @@ namespace nets::net
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:
-        explicit ServerBootstrap(NType numOfMainEventLoops, NType numOfSubEventLoops);
+        explicit ServerBootstrap(NType numOfMainEventLoops, NType numOfChildEventLoops);
         ~ServerBootstrap() = default;
 
     public:
         ServerBootstrap& childOption(const ChannelOption& channelOption, ChannelOption::ValueType value);
         // set the ChannelHandler shared by all channels
-        ServerBootstrap& childHandler(const ChannelHandlerPtr& channelHandler);
+        ServerBootstrap& childHandler(const ChannelHandlerPtr& childHandler);
         // set the ChannelHandler for each channel
-        ServerBootstrap& childHandler(const ChannelInitializationCallback& channelInitializationCallback);
+        ServerBootstrap& childHandler(const ChannelInitializationCallback& childInitializationCallback);
 
         ServerBootstrap& bind(PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
@@ -40,9 +40,10 @@ namespace nets::net
 
     private:
         ::std::atomic_bool running_ {false};
-        ChannelHandlerList channelHandlers_ {};
-        ChannelInitializationCallback channelInitializationCallback_ {};
-        EventLoopGroupPtr subLoopGroup_ {nullptr};
+        ChannelOptionSet childOptions_ {};
+        ChannelHandlerList childHandlers_ {};
+        ChannelInitializationCallback childInitializationCallback_ {};
+        EventLoopGroupPtr childLoopGroup_ {nullptr};
     };
 } // namespace nets::net
 
