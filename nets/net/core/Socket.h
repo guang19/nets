@@ -33,7 +33,7 @@ namespace nets::net
         void bind(FdType sockFd, const SockAddr* sockAddr);
         void connect(FdType sockFd, const SockAddr* sockAddr);
 
-        void listen(FdType sockFd);
+        void listen(FdType sockFd, int32_t backlog);
         FdType accept(FdType sockFd, SockAddr* sockAddr, FdType* idleFd);
 
         ::ssize_t read(FdType fd, void* buf, ::size_t n);

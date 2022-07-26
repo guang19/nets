@@ -6,7 +6,6 @@
 #define NETS_NET_SERVER_SOCKET_CHANNEL_H
 
 #include <functional>
-#include <map>
 
 #include "nets/net/core/Channel.h"
 #include "nets/net/core/InetSockAddress.h"
@@ -20,7 +19,6 @@ namespace nets::net
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using ChannelInitializationCallback = ::std::function<void(SocketChannelPtr& channel)>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
-        using ChannelOptionSet = ::std::map<ChannelOption, ChannelOption::ValueType>;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
 
@@ -39,10 +37,9 @@ namespace nets::net
             nextEventLoopFn_ = nextEventLoopFn;
         }
 
-        inline void setChildOptions(const ChannelOptionSet& childOptions)
-        {
-            childOptions_ = childOptions;
-        }
+        void setChannelOptions(const ChannelOptionList& channelOptions) override;
+        void setChannelOptions();
+        void setChildOptions(const ChannelOptionList& childOptions);
 
         inline void setChildHandlers(const ChannelHandlerList& childHandlers)
         {
@@ -63,8 +60,10 @@ namespace nets::net
     private:
         FdType sockFd_ {socket::InvalidFd};
         FdType idleFd_ {socket::InvalidFd};
+        int32_t backlog_ {0};
+        ChannelOptionList channelOptions_ {};
         NextEventLoopFn nextEventLoopFn_ {};
-        ChannelOptionSet childOptions_ {};
+        ChannelOptionList childOptions_ {};
         ChannelHandlerList childHandlers_ {};
         ChannelInitializationCallback childInitializationCallback_ {};
     };

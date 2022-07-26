@@ -17,15 +17,15 @@ namespace nets::net
     {
         InvalidSockOpt = -1,
         NBACKLOG = 0,
-        NKEEPALIVE,
         NREUSEADDR,
         NREUSEPORT,
-        TCPNODELAY,
-        LINGER,
-        TCPSNDBUF,
-        TCPRCVBUF,
-        UDPSNDBUF,
-        UDPRCVBUF,
+        NKEEPALIVE,
+        NTCPNODELAY,
+        NLINGER,
+        NTCPSNDBUF,
+        NTCPRCVBUF,
+        NUDPSNDBUF,
+        NUDPRCVBUF,
     };
 
     class ChannelOption : nets::base::Copyable
@@ -55,9 +55,22 @@ namespace nets::net
         bool operator>(const ChannelOption& other) const;
 
     public:
-        bool valid() const;
+        inline bool valid() const
+        {
+            return sockOpt_ != SockOpt::InvalidSockOpt;
+        }
+
+        inline SockOpt sockOpt() const
+        {
+            return sockOpt_;
+        }
+
         ::std::any get() const;
-        void set(const ValueType& value);
+
+        inline void set(const ValueType& value)
+        {
+            value_ = value;
+        }
 
     private:
         SockOpt sockOpt_ {SockOpt::InvalidSockOpt};
@@ -69,13 +82,13 @@ namespace nets::net
         const ChannelOption NReuseAddr {SockOpt::NREUSEADDR, true};
         const ChannelOption NReusePort {SockOpt::NREUSEPORT, true};
         const ChannelOption NKeepAlive {SockOpt::NKEEPALIVE, false};
-        const ChannelOption NTcpNoDelay {SockOpt::TCPNODELAY, false};
-        const ChannelOption NLinger {SockOpt::LINGER, DefaultSockLinger};
+        const ChannelOption NTcpNoDelay {SockOpt::NTCPNODELAY, false};
+        const ChannelOption NLinger {SockOpt::NLINGER, DefaultSockLinger};
         const ChannelOption NBackLog {SockOpt::NBACKLOG, DefaultMaximumOfBackLog};
-        const ChannelOption NTcpSendBuf {SockOpt::TCPSNDBUF, DefaultTcpSockSendBufLen};
-        const ChannelOption NTcpRecvBuf {SockOpt::TCPRCVBUF, DefaultTcpSockRecvBufLen};
-        const ChannelOption NUdpSendBuf {SockOpt::UDPSNDBUF, DefaultUdpSockSendBufLen};
-        const ChannelOption NUdpRecvBuf {SockOpt::UDPRCVBUF, DefaultUdpSockRecvBufLen};
+        const ChannelOption NTcpSendBuf {SockOpt::NTCPSNDBUF, DefaultTcpSockSendBufLen};
+        const ChannelOption NTcpRecvBuf {SockOpt::NTCPRCVBUF, DefaultTcpSockRecvBufLen};
+        const ChannelOption NUdpSendBuf {SockOpt::NUDPSNDBUF, DefaultUdpSockSendBufLen};
+        const ChannelOption NUdpRecvBuf {SockOpt::NUDPRCVBUF, DefaultUdpSockRecvBufLen};
     } // namespace
 } // namespace nets::net
 

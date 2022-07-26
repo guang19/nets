@@ -83,6 +83,11 @@ namespace nets::net
         readyEvents_ |= event;
     }
 
+    void Channel::setChannelOptions(const ChannelOptionList& channelOptions)
+    {
+        LOGS_DEBUG << "Channel::setChannelOptions";
+    }
+
     void Channel::handleEvent()
     {
         if (readyEvents_ & EErrorEvent)

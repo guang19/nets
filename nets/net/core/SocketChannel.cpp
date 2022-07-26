@@ -4,12 +4,84 @@
 
 #include "nets/net/core/SocketChannel.h"
 
+#include "nets/base/log/Logging.h"
+
 namespace nets::net
 {
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(sockFd), peerAddress_(peerAddress), channelContext_(this)
     {
         socket::setSockNonBlock(sockFd_);
+    }
+
+    void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
+    {
+        for (const auto& channelOption: channelOptions)
+        {
+            const SockOpt sockOpt = channelOption.sockOpt();
+            switch (sockOpt)
+            {
+                case NREUSEADDR:
+                    if (channelOption != NReuseAddr)
+                    {
+                        socket::setSockReuseAddr(sockFd_, ::std::any_cast<bool>(channelOption.get()));
+                    }
+                    break;
+                case NREUSEPORT:
+                    if (channelOption != NReusePort)
+                    {
+                        socket::setSockReusePort(sockFd_, ::std::any_cast<bool>(channelOption.get()));
+                    }
+                    break;
+                case NKEEPALIVE:
+                    if (channelOption != NKeepAlive)
+                    {
+                        socket::setSockKeepAlive(sockFd_, ::std::any_cast<bool>(channelOption.get()));
+                    }
+                    break;
+                case NTCPNODELAY:
+                    if (channelOption != NTcpNoDelay)
+                    {
+                        socket::setTcpNoDelay(sockFd_, ::std::any_cast<bool>(channelOption.get()));
+                    }
+                    break;
+                case NLINGER:
+                    if (channelOption != NLinger)
+                    {
+                        socket::setSockLinger(sockFd_, ::std::any_cast<SockLinger>(channelOption.get()));
+                    }
+                    break;
+                case NTCPSNDBUF:
+                    if (channelOption != NTcpSendBuf)
+                    {
+                        socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
+                    }
+                    break;
+                case NTCPRCVBUF:
+                    if (channelOption != NTcpRecvBuf)
+                    {
+                        socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
+                    }
+                    break;
+                case NUDPSNDBUF:
+                    if (channelOption != NUdpSendBuf)
+                    {
+                        socket::setSockSendBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
+                    }
+                    break;
+                case NUDPRCVBUF:
+                    if (channelOption != NUdpRecvBuf)
+                    {
+                        socket::setSockRecvBuf(sockFd_, ::std::any_cast<int32_t>(channelOption.get()));
+                    }
+                    break;
+                case NBACKLOG:
+                case InvalidSockOpt:
+                default:
+                    LOGS_ERROR << "Channel set invalid ChannelOption";
+                    break;
+            }
+        }
     }
 
     void SocketChannel::handleReadEvent() {}

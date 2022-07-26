@@ -71,11 +71,6 @@ namespace nets::net
         return sockOpt_ > other.sockOpt_;
     }
 
-    bool ChannelOption::valid() const
-    {
-        return sockOpt_ != SockOpt::InvalidSockOpt;
-    }
-
     ::std::any ChannelOption::get() const
     {
         ::std::any any {};
@@ -86,10 +81,5 @@ namespace nets::net
             },
             value_);
         return any;
-    }
-
-    void ChannelOption::set(const ValueType& value)
-    {
-        value_ = value;
     }
 } // namespace nets::net

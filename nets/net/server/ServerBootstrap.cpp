@@ -21,9 +21,9 @@ namespace nets::net
         childLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfChildEventLoops, ChildEventLoopGroupName);
     }
 
-    ServerBootstrap& ServerBootstrap::childOption(const ChannelOption& channelOption, ChannelOption::ValueType value)
+    ServerBootstrap& ServerBootstrap::childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
     {
-        childOptions_[channelOption] = value;
+        childOptions_.emplace_back(channelOption.sockOpt(), value);
         return *this;
     }
 
@@ -71,6 +71,12 @@ namespace nets::net
             {
                 return childLoopGroup_->next();
             });
+        ChannelOptionList channelOptions {::std::move(channelOptions_)};
+        assert(channelOptions_.empty());
+        serverSocketChannel->setChannelOptions(channelOptions);
+        ChannelOptionList childOptions {::std::move(childOptions_)};
+        assert(childOptions_.empty());
+        serverSocketChannel->setChildOptions(childOptions);
         ChannelHandlerList childHandlers {::std::move(childHandlers_)};
         assert(childHandlers_.empty());
         serverSocketChannel->setChildHandlers(childHandlers);

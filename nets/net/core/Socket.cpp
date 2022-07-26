@@ -95,9 +95,9 @@ namespace nets::net::socket
         }
     }
 
-    void listen(FdType sockFd)
+    void listen(FdType sockFd, int32_t backlog)
     {
-        if (0 != ::listen(sockFd, SOMAXCONN))
+        if (0 != ::listen(sockFd, backlog))
         {
             LOGS_FATAL << "socket listen failed";
         }

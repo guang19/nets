@@ -5,8 +5,9 @@
 #include <gtest/gtest.h>
 
 #include <any>
-#include <map>
 #include <iostream>
+#include <map>
+#include <set>
 #include <unordered_map>
 
 #include "nets/net/core/ChannelOption.h"
@@ -53,15 +54,16 @@ TEST(ChannelOptionTest, GenericStore)
     options.insert({NTcpRecvBuf, 1024});
     options.insert({NUdpSendBuf, 1024});
     options.insert({NUdpRecvBuf, 1024});
+    options.insert_or_assign(NUdpRecvBuf, 1025);
     for (auto it = options.begin(); it != options.end(); ++it)
     {
         if (typeid(int32_t) == it->first.get().type())
         {
-            printf("int32_t value : %d\n", ::std::any_cast<int32_t>(it->first.get()));
+            printf("int32_t value : %d\n", ::std::get<int32_t>(it->second));
         }
         else if (typeid(bool) == it->first.get().type())
         {
-            printf("bool value : %d\n", ::std::any_cast<bool>(it->first.get()));
+            printf("bool value : %d\n", ::std::get<bool>(it->second));
         }
     }
     ::std::map<ChannelOption, ChannelOption::ValueType> options2 = ::std::move(options);

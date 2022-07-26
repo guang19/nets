@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <sys/epoll.h>
+#include <vector>
 
 #include "ChannelContext.h"
 #include "nets/base/Noncopyable.h"
@@ -31,6 +32,7 @@ namespace nets::net
     {
     public:
         using EventLoopRawPtr = EventLoop*;
+        using ChannelOptionList = ::std::vector<ChannelOption>;
         using ChannelContextRawPtr = ChannelContext*;
         using ChannelHandlerPipelineRawPtr = ChannelHandlerPipeline*;
 
@@ -47,6 +49,7 @@ namespace nets::net
         virtual FdType fd() const = 0;
         virtual ChannelContextRawPtr channelContext();
         virtual ChannelHandlerPipelineRawPtr channelHandlerPipeline();
+        virtual void setChannelOptions(const ChannelOptionList& channelOptions);
 
         EventLoopRawPtr eventLoop() const;
 

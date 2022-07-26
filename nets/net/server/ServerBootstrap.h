@@ -23,7 +23,7 @@ namespace nets::net
         ~ServerBootstrap() = default;
 
     public:
-        ServerBootstrap& childOption(const ChannelOption& channelOption, ChannelOption::ValueType value);
+        ServerBootstrap& childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value);
         // set the ChannelHandler shared by all channels
         ServerBootstrap& childHandler(const ChannelHandlerPtr& childHandler);
         // set the ChannelHandler for each channel
@@ -40,7 +40,7 @@ namespace nets::net
 
     private:
         ::std::atomic_bool running_ {false};
-        ChannelOptionSet childOptions_ {};
+        ChannelOptionList childOptions_ {};
         ChannelHandlerList childHandlers_ {};
         ChannelInitializationCallback childInitializationCallback_ {};
         EventLoopGroupPtr childLoopGroup_ {nullptr};
