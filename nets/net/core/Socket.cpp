@@ -151,7 +151,7 @@ namespace nets::net::socket
                     case EPERM:
                     case EPROTO:
                     default:
-                        LOGS_FATAL << "socket accept unexpected error: " << errorN;
+                        LOGS_FATAL << "socket accept unexpected error:" << errorN;
                         break;
                 }
             }

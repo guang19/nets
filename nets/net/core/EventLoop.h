@@ -95,6 +95,7 @@ namespace nets::net
                 LockGuardType lock(mutex_);
                 pendingTasks_.push_back(::std::move(task));
             }
+            // notify poller
             notifier_->notify();
         }
     }

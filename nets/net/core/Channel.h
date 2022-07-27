@@ -63,6 +63,9 @@ namespace nets::net
         void setReadyEvents(EventType events);
         void addReadyEvent(EventType event);
 
+        void setChannelOption(const ChannelOption& channelOption);
+        virtual void setBacklog(int32_t backlog);
+
     public:
         void handleEvent();
         virtual void handleErrorEvent();

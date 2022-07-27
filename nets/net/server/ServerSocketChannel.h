@@ -32,6 +32,11 @@ namespace nets::net
             return sockFd_;
         }
 
+        inline void setBacklog(int32_t backlog) override
+        {
+            backlog_ = ::std::any_cast<int32_t>(backlog);
+        }
+
         inline void setNextEventLoopFn(const NextEventLoopFn& nextEventLoopFn)
         {
             nextEventLoopFn_ = nextEventLoopFn;

@@ -218,7 +218,7 @@ namespace nets::base
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
-                    << "] execution in thread pool [" << name_ << "], reason " << exception.what();
+                    << "] execution in thread pool [" << name_ << "],reason " << exception.what();
             }
             catch (...)
             {
@@ -252,7 +252,7 @@ namespace nets::base
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
-                    << "] execution in thread pool [" << name_ << "], reason " << exception.what();
+                    << "] execution in thread pool [" << name_ << "],reason " << exception.what();
             }
             catch (...)
             {
