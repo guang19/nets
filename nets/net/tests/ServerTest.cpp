@@ -9,7 +9,8 @@ using namespace nets::net;
 int main(int argc, char** argv)
 {
     ServerBootstrap serverBootstrap(1, 8);
-    serverBootstrap.option<ServerBootstrap>(NBackLog, 1024)
+    serverBootstrap.option(NBackLog, 1024)
+        .childOption(NBackLog, 1024)
         .childHandler([](::std::shared_ptr<Channel> channel) {})
         .bind(8080)
         .launch();

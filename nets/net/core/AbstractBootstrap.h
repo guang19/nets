@@ -10,6 +10,7 @@
 
 namespace nets::net
 {
+    template <class SubType>
     class AbstractBootstrap : nets::base::Noncopyable
     {
     public:
@@ -18,20 +19,27 @@ namespace nets::net
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
 
     public:
-        explicit AbstractBootstrap(NType numOfMainEventLoops);
+        explicit AbstractBootstrap(NType numOfMainEventLoops) : channelOptions_()
+        {
+            numOfMainEventLoops = numOfMainEventLoops <= 0 ? DefaultNumbOfMainEventLoops : numOfMainEventLoops;
+            mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName);
+        }
         ~AbstractBootstrap() = default;
 
     public:
-        template <class Self>
-        Self& option(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
+        SubType& option(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
         {
             channelOptions_.emplace_back(channelOption.sockOpt(), value);
-            return static_cast<Self&>(*this);
+            return static_cast<SubType&>(*this);
         }
 
     protected:
         ChannelOptionList channelOptions_ {};
         EventLoopGroupPtr mainLoopGroup_ {nullptr};
+
+    private:
+        static constexpr char MainEventLoopGroupName[] = "MainLoopGroup";
+        static constexpr NType DefaultNumbOfMainEventLoops = 1;
     };
 } // namespace nets::net
 

@@ -39,14 +39,15 @@ namespace nets::net
 
     void ServerSocketChannel::setChildOptions(const ChannelOptionList& childOptions)
     {
-        childOptions_.insert(channelOptions_.end(), childOptions.begin(), childOptions.end());
+        childOptions_.insert(childOptions_.end(), childOptions.begin(), childOptions.end());
     }
 
     void ServerSocketChannel::setChannelOptions()
     {
+        SockOpt sockOpt = SockOpt::InvalidSockOpt;
         for (const auto& channelOption: channelOptions_)
         {
-            const SockOpt sockOpt = channelOption.sockOpt();
+            sockOpt = channelOption.sockOpt();
             switch (sockOpt)
             {
                 case NBACKLOG:

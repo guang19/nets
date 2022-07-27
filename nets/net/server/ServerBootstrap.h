@@ -11,7 +11,7 @@
 
 namespace nets::net
 {
-    class ServerBootstrap : public AbstractBootstrap
+    class ServerBootstrap : public AbstractBootstrap<ServerBootstrap>
     {
     public:
         using ChannelHandlerPtr = typename ServerSocketChannel::ChannelHandlerPtr;
