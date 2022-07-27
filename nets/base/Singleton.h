@@ -103,8 +103,6 @@ private:                                                                        
 
 #define INIT_SINGLETON(CLASS_NAME)                                                                                          \
     ::std::shared_ptr<CLASS_NAME> CLASS_NAME::_INSTANCE {nullptr};                                                          \
-    ::std::once_flag CLASS_NAME::_ONCE_FLAG                                                                                 \
-    {                                                                                                                       \
-    }
+    ::std::once_flag CLASS_NAME::_ONCE_FLAG {}
 
 #endif // NETS_BASE_SINGLETON_H
