@@ -9,13 +9,15 @@
 #include <memory>
 
 #include "nets/base/Copyable.h"
-#include "nets/net/core/ChannelHandler.h"
 
 namespace nets::net
 {
+    class ChannelHandler;
+
     class ChannelHandlerPipeline : nets::base::Copyable
     {
     public:
+        using ChannelHandlerRawPtr = ChannelHandler*;
         using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
         using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
 
@@ -29,7 +31,9 @@ namespace nets::net
         ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
 
     public:
+        void addFirst(ChannelHandlerRawPtr channelHandler);
         void addFirst(const ChannelHandlerPtr& channelHandler);
+        void addLast(ChannelHandlerRawPtr channelHandler);
         void addLast(const ChannelHandlerPtr& channelHandler);
 
     private:

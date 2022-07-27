@@ -72,16 +72,19 @@ namespace nets::net
         if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr(), &idleFd_)) > 0)
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
-            auto clientSocketChannel = ::std::make_shared<SocketChannel>(connFd, peerAddr, nextEventLoopFn_());
-            clientSocketChannel->setChannelOptions(childOptions_);
+            auto socketChannel = ::std::make_shared<SocketChannel>(connFd, peerAddr, nextEventLoopFn_());
+            socketChannel->setChannelOptions(childOptions_);
             for (const auto& childHandler: childHandlers_)
             {
-                clientSocketChannel->channelHandlerPipeline()->addLast(childHandler);
+                assert(childHandler.use_count() == 1);
+                socketChannel->pipeline()->addLast(childHandler);
             }
             if (childInitializationCallback_ != nullptr)
             {
-                childInitializationCallback_(clientSocketChannel);
+                childInitializationCallback_(socketChannel);
             }
+            socketChannel->addEvent(EReadEvent);
+            socketChannel->registerTo();
         }
     }
 

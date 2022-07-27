@@ -28,6 +28,12 @@ namespace nets::net
         return *this;
     }
 
+    ServerBootstrap& ServerBootstrap::childHandler(ChannelHandlerRawPtr childHandler)
+    {
+        childHandlers_.push_back(ChannelHandlerPtr(childHandler));
+        return *this;
+    }
+
     ServerBootstrap& ServerBootstrap::childHandler(const ChannelHandlerPtr& childHandler)
     {
         childHandlers_.push_back(childHandler);

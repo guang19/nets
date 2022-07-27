@@ -14,6 +14,7 @@ namespace nets::net
     class ServerBootstrap : public AbstractBootstrap<ServerBootstrap>
     {
     public:
+        using ChannelHandlerRawPtr = typename ServerSocketChannel::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = typename ServerSocketChannel::ChannelHandlerPtr;
         using ChannelHandlerList = typename ServerSocketChannel::ChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
@@ -25,6 +26,7 @@ namespace nets::net
     public:
         ServerBootstrap& childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value);
         // set the ChannelHandler shared by all channels
+        ServerBootstrap& childHandler(ChannelHandlerRawPtr childHandler);
         ServerBootstrap& childHandler(const ChannelHandlerPtr& childHandler);
         // set the ChannelHandler for each channel
         ServerBootstrap& childHandler(const ChannelInitializationCallback& childInitializationCallback);

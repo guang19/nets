@@ -28,12 +28,12 @@ namespace nets::net
         eventLoop_->deregisterChannel(shared_from_this());
     }
 
-    Channel::ChannelContextRawPtr Channel::channelContext()
+    Channel::ChannelContextRawPtr Channel::context()
     {
         return nullptr;
     }
 
-    Channel::ChannelHandlerPipelineRawPtr Channel::channelHandlerPipeline()
+    Channel::ChannelHandlerPipelineRawPtr Channel::pipeline()
     {
         return nullptr;
     }

@@ -21,12 +21,12 @@ namespace nets::net
             return sockFd_;
         }
 
-        inline ChannelContextRawPtr channelContext() override
+        inline ChannelContextRawPtr context() override
         {
             return &channelContext_;
         }
 
-        inline ChannelHandlerPipelineRawPtr channelHandlerPipeline() override
+        inline ChannelHandlerPipelineRawPtr pipeline() override
         {
             return channelContext_.pipeline();
         }

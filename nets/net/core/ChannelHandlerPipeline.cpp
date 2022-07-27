@@ -4,6 +4,8 @@
 
 #include "nets/net/core/ChannelHandlerPipeline.h"
 
+#include "nets/net/core/ChannelHandler.h"
+
 namespace nets::net
 {
     ChannelHandlerPipeline::ChannelHandlerPipeline(const ChannelHandlerPipeline& other)
@@ -34,9 +36,19 @@ namespace nets::net
         return *this;
     }
 
+    void ChannelHandlerPipeline::addFirst(ChannelHandlerRawPtr channelHandler)
+    {
+        channelHandlers_.push_front(ChannelHandlerPtr(channelHandler));
+    }
+
     void ChannelHandlerPipeline::addFirst(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_front(channelHandler);
+    }
+
+    void ChannelHandlerPipeline::addLast(ChannelHandlerRawPtr channelHandler)
+    {
+        channelHandlers_.push_back(ChannelHandlerPtr(channelHandler));
     }
 
     void ChannelHandlerPipeline::addLast(const ChannelHandlerPtr& channelHandler)

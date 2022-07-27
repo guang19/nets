@@ -2,11 +2,8 @@
 // Created by guang19 on 2022/6/25.
 //
 
-#include <cstdint>
 #include <cstring>
-#include <sys/epoll.h>
 #include <unistd.h>
-#include <vector>
 
 #include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/Socket.h"
@@ -16,7 +13,7 @@ using namespace nets::net;
 int main(int argc, char** argv)
 {
     FdType sockFd = socket::createTcpSocket(AF_INET);
-    InetSockAddress serverAddr("0.0.0.0", 8080, false);
+    InetSockAddress serverAddr("172.27.47.153", 8080, false);
     socket::connect(sockFd, serverAddr.csockAddr());
     InetSockAddress clientAddr;
     SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));

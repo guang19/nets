@@ -9,8 +9,8 @@
 #include <sys/epoll.h>
 #include <vector>
 
-#include "ChannelContext.h"
 #include "nets/base/Noncopyable.h"
+#include "nets/net/core/ChannelContext.h"
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/Socket.h"
 
@@ -47,8 +47,8 @@ namespace nets::net
 
     public:
         virtual FdType fd() const = 0;
-        virtual ChannelContextRawPtr channelContext();
-        virtual ChannelHandlerPipelineRawPtr channelHandlerPipeline();
+        virtual ChannelContextRawPtr context();
+        virtual ChannelHandlerPipelineRawPtr pipeline();
 
         EventLoopRawPtr eventLoop() const;
 
