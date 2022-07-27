@@ -27,6 +27,7 @@ namespace nets::base
         Timestamp();
         explicit Timestamp(TimeType timestamp);
         explicit Timestamp(TimeType secondsSinceEpoch, uint32_t microseconds);
+        ~Timestamp() = default;
 
         Timestamp(const Timestamp& other);
         Timestamp(Timestamp&& other) noexcept;
