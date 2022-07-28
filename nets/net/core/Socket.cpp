@@ -173,6 +173,26 @@ namespace nets::net::socket
         return ::write(fd, buf, n);
     }
 
+    void getLocalAddress(FdType fd, SockAddr* sockAddr)
+    {
+        auto len = static_cast<SockLenType>(sizeof(SockAddr6));
+        if (0 != ::getsockname(fd, sockAddr, &len))
+        {
+            LOGS_ERROR << "socket getLocalAddress failed";
+        }
+    }
+
+    void getPeerAddress(FdType fd, SockAddr* sockAddr)
+    {
+        auto len = static_cast<SockLenType>(sizeof(SockAddr6));
+        if (0 != ::getpeername(fd, sockAddr, &len))
+        {
+            LOGS_ERROR << "socket getPeerAddress failed";
+        }
+    }
+
+    void getPeerAddress(FdType fd, SockAddr* sockAddr);
+
     void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
     {
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sendBufLen)))

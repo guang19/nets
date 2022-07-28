@@ -20,5 +20,8 @@ TARGET_LINK_LIBRARIES(EpollServer nets_net)
 ADD_EXECUTABLE(EpollClient EpollClient.cpp)
 TARGET_LINK_LIBRARIES(EpollClient nets_net)
 
-ADD_EXECUTABLE(ServerTest ServerBootstrapTest.cpp)
-TARGET_LINK_LIBRARIES(ServerTest nets_net)
+ADD_EXECUTABLE(ServerBootstrapTest ServerBootstrapTest.cpp)
+TARGET_LINK_LIBRARIES(ServerBootstrapTest nets_net)
+
+ADD_EXECUTABLE(BootstrapTest BootstrapTest.cpp)
+TARGET_LINK_LIBRARIES(BootstrapTest nets_net)

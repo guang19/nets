@@ -64,7 +64,7 @@ namespace nets::net
         for (int32_t i = 0; i < numOfReadyEvent; ++i)
         {
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
-            uint32_t revents = events_[i].events;
+            EventType revents = events_[i].events;
             channel->setReadyEvents(ENoneEvent);
             if (revents & (EPOLLERR | EPOLLHUP))
             {

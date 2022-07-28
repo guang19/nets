@@ -21,14 +21,24 @@ namespace nets::net
             return sockFd_;
         }
 
-        inline ChannelContextRawPtr context() override
+        inline ChannelContextRawPtr context()
         {
             return &channelContext_;
         }
 
-        inline ChannelHandlerPipelineRawPtr pipeline() override
+        inline ChannelHandlerPipelineRawPtr pipeline()
         {
             return channelContext_.pipeline();
+        }
+
+        inline const InetSockAddress& localAddress() const
+        {
+            return localAddress_;
+        }
+
+        inline const InetSockAddress& peerAddress() const
+        {
+            return peerAddress_;
         }
 
         void setChannelOptions(const ChannelOptionList& channelOptions);
@@ -40,6 +50,7 @@ namespace nets::net
 
     private:
         FdType sockFd_ {socket::InvalidFd};
+        InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};
         ChannelContext channelContext_ {nullptr};
     };

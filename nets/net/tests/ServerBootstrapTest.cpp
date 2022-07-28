@@ -20,7 +20,6 @@ int main(int argc, char** argv)
 {
     ServerBootstrap serverBootstrap(1, 8);
     serverBootstrap.option(NBackLog, 1024)
-        .childOption(NBackLog, 1024)
         //        .childHandler(new TestServerChannelHandler())
         .childHandler(
             [](::std::shared_ptr<SocketChannel>& channel)

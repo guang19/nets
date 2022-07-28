@@ -47,8 +47,6 @@ namespace nets::net
 
     public:
         virtual FdType fd() const = 0;
-        virtual ChannelContextRawPtr context();
-        virtual ChannelHandlerPipelineRawPtr pipeline();
 
         EventLoopRawPtr eventLoop() const;
 

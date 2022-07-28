@@ -84,7 +84,10 @@ namespace nets::net
                 childInitializationCallback_(socketChannel);
             }
             socketChannel->addEvent(EReadEvent);
-            socketChannel->registerTo();
+            if (!socketChannel->registerTo())
+            {
+                LOGS_ERROR << "SocketChannel register failed";
+            }
         }
     }
 

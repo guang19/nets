@@ -28,16 +28,6 @@ namespace nets::net
         eventLoop_->deregisterChannel(shared_from_this());
     }
 
-    Channel::ChannelContextRawPtr Channel::context()
-    {
-        return nullptr;
-    }
-
-    Channel::ChannelHandlerPipelineRawPtr Channel::pipeline()
-    {
-        return nullptr;
-    }
-
     Channel::EventLoopRawPtr Channel::eventLoop() const
     {
         return eventLoop_;
@@ -122,20 +112,12 @@ namespace nets::net
                     break;
                 }
                 case NTCPSNDBUF:
-                {
-                    socket::setSockSendBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
-                    break;
-                }
-                case NTCPRCVBUF:
-                {
-                    socket::setSockRecvBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
-                    break;
-                }
                 case NUDPSNDBUF:
                 {
                     socket::setSockSendBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
                     break;
                 }
+                case NTCPRCVBUF:
                 case NUDPRCVBUF:
                 {
                     socket::setSockRecvBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
