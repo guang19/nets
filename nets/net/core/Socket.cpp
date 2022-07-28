@@ -191,8 +191,6 @@ namespace nets::net::socket
         }
     }
 
-    void getPeerAddress(FdType fd, SockAddr* sockAddr);
-
     void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
     {
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sendBufLen)))

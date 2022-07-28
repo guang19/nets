@@ -93,7 +93,7 @@ namespace nets::net
 
     void ServerSocketChannel::handleErrorEvent()
     {
-        LOGS_ERROR << "ServerSocketChannel occurred system error";
         deregister();
+        LOGS_FATAL << "ServerSocketChannel occurred system error";
     }
 } // namespace nets::net

@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/ChannelContext.h"
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/Socket.h"
 
@@ -33,8 +32,6 @@ namespace nets::net
     public:
         using EventLoopRawPtr = EventLoop*;
         using ChannelOptionList = ::std::vector<ChannelOption>;
-        using ChannelContextRawPtr = ChannelContext*;
-        using ChannelHandlerPipelineRawPtr = ChannelHandlerPipeline*;
 
     public:
         explicit Channel(EventLoopRawPtr eventLoop);

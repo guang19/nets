@@ -4,10 +4,10 @@
 
 #include "nets/net/core/ChannelHandlerPipeline.h"
 
-#include "nets/net/core/ChannelHandler.h"
-
 namespace nets::net
 {
+    ChannelHandlerPipeline::ChannelHandlerPipeline(ChannelRawPtr channel) : channelContext_(channel), channelHandlers_() {}
+
     ChannelHandlerPipeline::ChannelHandlerPipeline(const ChannelHandlerPipeline& other)
     {
         this->channelHandlers_ = other.channelHandlers_;

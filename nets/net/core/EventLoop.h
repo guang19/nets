@@ -119,13 +119,13 @@ namespace nets::net
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
-                    << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
+                           << "] execution in event loop thread [" << threadId_ << "],reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
-                    << "] execution in event loop thread [" << threadId_ << "]";
+                           << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
         assert(2 == promise.use_count());
@@ -151,13 +151,13 @@ namespace nets::net
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
-                    << "] execution in event loop thread [" << threadId_ << "], reason " << exception.what();
+                           << "] execution in event loop thread [" << threadId_ << "],reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
-                    << "] execution in event loop thread [" << threadId_ << "]";
+                           << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
         assert(2 == promise.use_count());

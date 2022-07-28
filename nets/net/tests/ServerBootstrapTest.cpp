@@ -6,7 +6,7 @@
 
 using namespace nets::net;
 
-class TestServerChannelHandler : public ChannelHandler
+class TestSharedServerChannelHandler : public ChannelHandler
 {
 public:
     void channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
@@ -14,17 +14,34 @@ public:
     {
         LOGS_INFO << "client address:" << peerAddress.toString() << "====local address:" << localAddress.toString();
     }
+
+private:
+    int32_t sharedNum = 0;
 };
+
+class TestExclusiveServerChannelHandler : public ChannelHandler
+{
+public:
+    void channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
+                        const InetSockAddress& localAddress) override
+    {
+        LOGS_INFO << "client address:" << peerAddress.toString() << "====local address:" << localAddress.toString();
+    }
+
+private:
+    static int32_t SharedNum;
+};
+int32_t TestExclusiveServerChannelHandler::SharedNum = 0;
 
 int main(int argc, char** argv)
 {
     ServerBootstrap serverBootstrap(1, 8);
     serverBootstrap.option(NBackLog, 1024)
-        //        .childHandler(new TestServerChannelHandler())
+        .childHandler(new TestSharedServerChannelHandler())
         .childHandler(
             [](::std::shared_ptr<SocketChannel>& channel)
             {
-                channel->pipeline()->addLast(new TestServerChannelHandler());
+                channel->pipeline()->addLast(new TestExclusiveServerChannelHandler());
             })
         .bind(8080)
         .launch();

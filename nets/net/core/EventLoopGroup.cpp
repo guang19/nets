@@ -18,32 +18,32 @@ namespace nets::net
         eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, 0, name);
     }
 
-	void EventLoopGroup::loopEach()
-	{
-		for (NType i = 0; i < numOfEventLoops_; ++i)
-		{
-			futures_[i] = eventLoopThreadPool_->submit(
-				[this]()
-				{
-					auto eventLoop = new EventLoop();
-					{
-						LockGuardType lock(mutex_);
-						eventLoops_.push_back(::std::unique_ptr<EventLoop>(eventLoop));
-						if (eventLoops_.size() == numOfEventLoops_)
-						{
-							cv_.notify_one();
-						}
-					}
-					eventLoop->run();
-				});
-		}
-		UniqueLockType lock(mutex_);
-		cv_.wait(lock,
-			[this]() -> bool
-			{
-				return eventLoops_.size() == numOfEventLoops_;
-			});
-	}
+    void EventLoopGroup::loopEach()
+    {
+        for (NType i = 0; i < numOfEventLoops_; ++i)
+        {
+            futures_[i] = eventLoopThreadPool_->submit(
+                [this]()
+                {
+                    auto eventLoop = new EventLoop();
+                    {
+                        LockGuardType lock(mutex_);
+                        eventLoops_.push_back(::std::unique_ptr<EventLoop>(eventLoop));
+                        if (eventLoops_.size() == numOfEventLoops_)
+                        {
+                            cv_.notify_one();
+                        }
+                    }
+                    eventLoop->run();
+                });
+        }
+        UniqueLockType lock(mutex_);
+        cv_.wait(lock,
+                 [this]() -> bool
+                 {
+                     return eventLoops_.size() == numOfEventLoops_;
+                 });
+    }
 
     void EventLoopGroup::syncEach()
     {

@@ -14,6 +14,7 @@ namespace nets::net
     namespace
     {
         constexpr ::size_t EpollEventInitialSize = 12;
+        constexpr EpollPoller::EventList::size_type MaxEpollEventSize = INT32_MAX;
     } // namespace
 
     EpollPoller::EpollPoller(EventLoopRawPtr eventLoop)
@@ -42,9 +43,9 @@ namespace nets::net
             if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
             {
                 size = size + (size >> 1);
-                if (size >= INT32_MAX)
+                if (size >= MaxEpollEventSize)
                 {
-                    size = INT32_MAX - 1;
+                    size = MaxEpollEventSize - 1;
                 }
                 events_.resize(size);
             }

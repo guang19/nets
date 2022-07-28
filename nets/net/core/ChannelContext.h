@@ -8,17 +8,14 @@
 #include <memory>
 
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/ChannelHandlerPipeline.h"
+#include "nets/net/core/Channel.h"
 
 namespace nets::net
 {
-    class Channel;
-
     class ChannelContext : nets::base::Noncopyable
     {
     public:
         using ChannelRawPtr = Channel*;
-        using ChannelHandlerPipelineRawPtr = ChannelHandlerPipeline*;
 
     public:
         explicit ChannelContext(ChannelRawPtr channel);
@@ -30,14 +27,8 @@ namespace nets::net
             return channel_;
         }
 
-        inline ChannelHandlerPipelineRawPtr pipeline()
-        {
-            return &channelHandlerPipeline_;
-        }
-
     private:
         ChannelRawPtr channel_ {nullptr};
-        ChannelHandlerPipeline channelHandlerPipeline_ {};
     };
 } // namespace nets::net
 
