@@ -18,7 +18,6 @@ namespace nets::net
     {
     public:
         using ChannelRawPtr = ChannelContext::ChannelRawPtr;
-        using ChannelContextRawPtr = ChannelContext*;
         using ChannelHandlerRawPtr = ChannelHandler*;
         using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
         using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
@@ -33,15 +32,18 @@ namespace nets::net
         ChannelHandlerPipeline& operator=(ChannelHandlerPipeline&& other) noexcept;
 
     public:
-        inline ChannelContextRawPtr context()
+        inline ChannelContext& context()
         {
-            return &channelContext_;
+            return channelContext_;
         }
 
         void addFirst(ChannelHandlerRawPtr channelHandler);
         void addFirst(const ChannelHandlerPtr& channelHandler);
         void addLast(ChannelHandlerRawPtr channelHandler);
         void addLast(const ChannelHandlerPtr& channelHandler);
+
+    public:
+        void fireChannelConnect(const InetSockAddress& peerAddress, const InetSockAddress& localAddress);
 
     private:
         ChannelContext channelContext_ {nullptr};

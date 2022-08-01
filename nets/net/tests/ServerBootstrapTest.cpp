@@ -39,9 +39,9 @@ int main(int argc, char** argv)
     serverBootstrap.option(NBackLog, 1024)
         .childHandler(new TestSharedServerChannelHandler())
         .childHandler(
-            [](::std::shared_ptr<SocketChannel>& channel)
+            [](SocketChannel& channel)
             {
-                channel->pipeline()->addLast(new TestExclusiveServerChannelHandler());
+                channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
             })
         .bind(8080)
         .launch();

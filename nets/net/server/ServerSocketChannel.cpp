@@ -77,17 +77,20 @@ namespace nets::net
             for (const auto& childHandler: childHandlers_)
             {
                 assert(childHandler.use_count() == 1);
-                socketChannel->pipeline()->addLast(childHandler);
+                socketChannel->pipeline().addLast(childHandler);
             }
             if (childInitializationCallback_ != nullptr)
             {
-                childInitializationCallback_(socketChannel);
+                childInitializationCallback_(*socketChannel);
             }
             socketChannel->addEvent(EReadEvent);
             if (!socketChannel->registerTo())
             {
                 LOGS_ERROR << "SocketChannel register failed";
             }
+            InetSockAddress localAddr {};
+            socket::getLocalAddress(connFd, localAddr.sockAddr());
+            socketChannel->pipeline().fireChannelConnect(peerAddr, localAddr);
         }
     }
 

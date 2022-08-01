@@ -13,9 +13,6 @@ namespace nets::net
     class SocketChannel : public Channel
     {
     public:
-        using ChannelHandlerPipelineRawPtr = ChannelHandlerPipeline*;
-
-    public:
         explicit SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop);
         ~SocketChannel() override = default;
 
@@ -25,9 +22,9 @@ namespace nets::net
             return sockFd_;
         }
 
-        inline ChannelHandlerPipelineRawPtr pipeline()
+        inline ChannelHandlerPipeline& pipeline()
         {
-            return &channelHandlerPipeline_;
+            return channelHandlerPipeline_;
         }
 
         inline const InetSockAddress& localAddress() const

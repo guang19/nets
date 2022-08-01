@@ -55,4 +55,12 @@ namespace nets::net
     {
         channelHandlers_.push_back(channelHandler);
     }
+
+    void ChannelHandlerPipeline::fireChannelConnect(const InetSockAddress& peerAddress, const InetSockAddress& localAddress)
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            channelHandler->channelConnect(channelContext_, peerAddress, localAddress);
+        }
+    }
 } // namespace nets::net
