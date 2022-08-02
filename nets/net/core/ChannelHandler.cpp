@@ -25,12 +25,12 @@ namespace nets::net
         LOGS_DEBUG << "ChannelHandler::channelDisconnect";
     }
 
-    void ChannelHandler::channelRead(ChannelContext& channelContext, NetPackage& message)
+    void ChannelHandler::channelRead(ChannelContext& channelContext, ByteBuffer& message)
     {
         LOGS_DEBUG << "ChannelHandler::channelRead";
     }
 
-    void ChannelHandler::channelWrite(ChannelContext& channelContext, NetPackage& message)
+    void ChannelHandler::channelWrite(ChannelContext& channelContext, ByteBuffer& message)
     {
         LOGS_DEBUG << "ChannelHandler::channelWrite";
     }

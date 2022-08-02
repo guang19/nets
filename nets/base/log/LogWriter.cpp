@@ -50,7 +50,7 @@ namespace nets::base
     void SingleLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
     {
         UNUSED(persistTime);
-        logFile_->append(data, len);
+        logFile_->write(data, len);
     }
 
     void SingleLogFileSynchronizer::flush()
@@ -66,7 +66,7 @@ namespace nets::base
         {
             logFile_->renameByNowTime(persistTime);
         }
-        logFile_->append(data, len);
+        logFile_->write(data, len);
     }
 
     void DailyLogFileSynchronizer::flush()
@@ -82,7 +82,7 @@ namespace nets::base
         {
             logFile_->renameByNowTime(persistTime);
         }
-        logFile_->append(data, len);
+        logFile_->write(data, len);
     }
 
     void RollingLogFileSynchronizer::flush()
@@ -149,7 +149,7 @@ namespace nets::base
         LockGuardType lock(mutex_);
         if (cacheBuffer_->writeableBytes() > len)
         {
-            cacheBuffer_->append(data, len);
+            cacheBuffer_->writeBytes(data, len);
         }
         else
         {
@@ -162,7 +162,7 @@ namespace nets::base
             {
                 cacheBuffer_ = std::make_unique<BufferType>();
             }
-            cacheBuffer_->append(data, len);
+            cacheBuffer_->writeBytes(data, len);
             cv_.notify_one();
         }
     }

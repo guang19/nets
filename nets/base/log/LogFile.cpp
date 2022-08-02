@@ -64,7 +64,7 @@ namespace nets::base
         }
     }
 
-    void LogFile::append(const char* data, SizeType len)
+    void LogFile::write(const char* data, SizeType len)
     {
         uint64_t writtenBytes = 0;
         while (writtenBytes < len)
@@ -78,7 +78,7 @@ namespace nets::base
                 if (err != 0)
                 {
                     ::fprintf(stderr,
-                              "Error:log file append error "
+                              "Error:log file write error "
                               "\"%s\""
                               "\n",
                               ::strerror(err));

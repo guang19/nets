@@ -7,7 +7,7 @@
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/InetSockAddress.h"
-#include "nets/net/core/NetPackage.h"
+#include "nets/net/core/ByteBuffer.h"
 
 namespace nets::net
 {
@@ -25,8 +25,8 @@ namespace nets::net
         virtual void channelClose(ChannelContext& channelContext);
         virtual void channelDisconnect(ChannelContext& channelContext);
 
-        virtual void channelRead(ChannelContext& channelContext, NetPackage& message);
-        virtual void channelWrite(ChannelContext& channelContext, NetPackage& message);
+        virtual void channelRead(ChannelContext& channelContext, ByteBuffer& message);
+        virtual void channelWrite(ChannelContext& channelContext, ByteBuffer& message);
     };
 } // namespace nets::net
 

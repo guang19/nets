@@ -12,11 +12,6 @@
 
 namespace nets::base
 {
-    namespace
-    {
-        constexpr ::size_t FileIoBufferSize = 1024 * 256;
-    }
-
     class LogFile : Noncopyable
     {
     public:
@@ -29,7 +24,7 @@ namespace nets::base
         ~LogFile();
 
     public:
-        void append(const char* data, SizeType len);
+        void write(const char* data, SizeType len);
         void flush();
 
         void renameByNowTime(TimeType now);
@@ -55,6 +50,8 @@ namespace nets::base
         CharArrayPtr file_ {nullptr};
         SizeType bytes_ {0};
         TimeType lastRollTime_ {0};
+
+        static constexpr ::size_t FileIoBufferSize = 1024 * 256;
         char buffer_[FileIoBufferSize] {0};
     };
 

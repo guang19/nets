@@ -2,25 +2,25 @@
 // Created by guang19 on 2022/5/7.
 //
 
-#ifndef NETS_BASE_BYTEBUFFER_H
-#define NETS_BASE_BYTEBUFFER_H
+#ifndef NETS_NET_BYTEBUFFER_H
+#define NETS_NET_BYTEBUFFER_H
 
 #include <cstdint>
-#include <cstring>
 #include <memory>
 
 #include "nets/base/Copyable.h"
 
-namespace nets::base
+namespace nets::net
 {
-    class ByteBuffer : public Copyable
+    class ByteBuffer : public nets::base::Copyable
     {
     public:
-        using SizeType = ::size_t;
+        using SizeType = uint32_t;
         using CharArrayPtr = ::std::unique_ptr<char[]>;
 
     public:
-        explicit ByteBuffer(SizeType capacity);
+        ByteBuffer();
+        explicit ByteBuffer(SizeType initialCapacity);
         virtual ~ByteBuffer() = default;
 
         ByteBuffer(const ByteBuffer& other);
@@ -69,12 +69,12 @@ namespace nets::base
 
         inline bool isReadable() const
         {
-            return (writerIndex_ - readerIndex_) > 0;
+            return writerIndex_ > readerIndex_;
         }
 
         inline bool isWriteable() const
         {
-            return (capacity_ - writerIndex_) > 0;
+            return capacity_ > writerIndex_;
         }
 
         inline SizeType capacity() const
@@ -82,10 +82,18 @@ namespace nets::base
             return capacity_;
         }
 
-    public:
-        void append(const char* data, SizeType len);
+        inline void clear()
+        {
+            readerIndex_ = writerIndex_ = 0;
+        }
 
-    protected:
+    public:
+        void writeBytes(const char* data, SizeType len);
+
+    private:
+        void assureWritable(SizeType minWritableBytes);
+
+    private:
         CharArrayPtr buffer_ {nullptr};
         // reader pointer
         SizeType readerIndex_ {0};
@@ -93,6 +101,6 @@ namespace nets::base
         SizeType writerIndex_ {0};
         SizeType capacity_ {0};
     };
-} // namespace nets::base
+} // namespace nets::net
 
-#endif // NETS_BASE_BYTEBUFFER_H
+#endif // NETS_NET_BYTEBUFFER_H

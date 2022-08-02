@@ -2,15 +2,21 @@
 // Created by guang19 on 2022/5/7.
 //
 
-#include "nets/base/ByteBuffer.h"
-
-#include <algorithm>
-#include <utility>
+#include "nets/net/core/ByteBuffer.h"
 
 #include "nets/base/CommonMacro.h"
 
-namespace nets::base
+namespace nets::net
 {
+    namespace
+    {
+        static constexpr ByteBuffer::SizeType DefaultCapacity = 1024;
+        static constexpr ByteBuffer::SizeType MaxCapacity = INT32_MAX;
+    }
+
+    ByteBuffer::ByteBuffer() : buffer_(nullptr), readerIndex_(0), writerIndex_(0), capacity_(0)
+    {}
+
     ByteBuffer::ByteBuffer(SizeType capacity)
         : buffer_(::std::make_unique<char[]>(capacity)), readerIndex_(0), writerIndex_(0), capacity_(capacity)
     {
@@ -74,4 +80,16 @@ namespace nets::base
         ::std::swap(writerIndex_, other.writerIndex_);
         ::std::swap(capacity_, other.capacity_);
     }
-} // namespace nets::base
+
+    void ByteBuffer::writeBytes(const char* data, SizeType len)
+    {
+        assureWritable(len);
+    }
+
+    void ByteBuffer::assureWritable(SizeType minWritableBytes)
+    {
+        if (writeableBytes() < minWritableBytes)
+        {
+        }
+    }
+} // namespace nets::net

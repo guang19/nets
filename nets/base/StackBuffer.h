@@ -50,15 +50,15 @@ namespace nets::base
             return capacity_ - writerIndex_;
         }
 
-        void append(const char* data, SizeType len);
+        void writeBytes(const char* data, SizeType len);
 
-        void appendPointer(const void* ptr);
+        void writePointer(const void* ptr);
 
         template <typename Number>
-        void appendInteger(Number n);
+        void writeInteger(Number n);
 
         template <typename Float>
-        void appendFloat(Float f);
+        void writeFloat(Float f);
 
     private:
         char buffer_[SIZE] {0};
@@ -68,7 +68,7 @@ namespace nets::base
     };
 
     template <SizeType SIZE>
-    void StackBuffer<SIZE>::append(const char* data, SizeType len)
+    void StackBuffer<SIZE>::writeBytes(const char* data, SizeType len)
     {
         if (writeableBytes() > len)
         {
@@ -78,7 +78,7 @@ namespace nets::base
     }
 
     template <SizeType SIZE>
-    void StackBuffer<SIZE>::appendPointer(const void* ptr)
+    void StackBuffer<SIZE>::writePointer(const void* ptr)
     {
         if (writeableBytes() > MaxNumLen)
         {
@@ -88,7 +88,7 @@ namespace nets::base
 
     template <SizeType SIZE>
     template <typename Number>
-    void StackBuffer<SIZE>::appendInteger(Number n)
+    void StackBuffer<SIZE>::writeInteger(Number n)
     {
         if (writeableBytes() > MaxNumLen)
         {
@@ -98,7 +98,7 @@ namespace nets::base
 
     template <SizeType SIZE>
     template <typename Float>
-    void StackBuffer<SIZE>::appendFloat(Float f)
+    void StackBuffer<SIZE>::writeFloat(Float f)
     {
         if (writeableBytes() > MaxFloatLen)
         {

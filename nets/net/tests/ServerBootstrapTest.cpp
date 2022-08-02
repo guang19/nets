@@ -2,6 +2,8 @@
 // Created by guang19 on 2022/7/2.
 //
 
+#include <limits>
+
 #include "nets/net/server/ServerBootstrap.h"
 
 using namespace nets::net;
