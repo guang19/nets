@@ -203,7 +203,7 @@ namespace nets::base
                 for (auto& it: *tmpBuffers)
                 {
                     auto logBuffer = it.get();
-                    synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
+                    synchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
                 }
                 synchronizer_->flush();
             };
@@ -227,7 +227,7 @@ namespace nets::base
                 for (auto& it: *tmpBuffers)
                 {
                     auto logBuffer = it.get();
-                    synchronizer_->synchronize(logBuffer->carray(), logBuffer->len(), currentTime);
+                    synchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
                 }
                 synchronizer_->flush();
             };

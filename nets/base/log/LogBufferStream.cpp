@@ -98,7 +98,7 @@ namespace nets::base
 
     LogBufferStream& LogBufferStream::operator<<(const LogBufferStream& stream)
     {
-        buffer_.append(stream.buffer_.carray(), stream.buffer_.len());
+        buffer_.append(stream.buffer_.array(), stream.buffer_.len());
         return *this;
     }
 } // namespace nets::base

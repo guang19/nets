@@ -30,7 +30,7 @@ namespace nets::base
         ~StackBuffer() = default;
 
     public:
-        inline const char* carray() const
+        inline const char* array() const
         {
             return buffer_;
         }
@@ -63,8 +63,8 @@ namespace nets::base
     private:
         char buffer_[SIZE] {0};
         // writer pointer
-        uint32_t writerIndex_ {0};
-        uint32_t capacity_ {SIZE};
+        SizeType writerIndex_ {0};
+        SizeType capacity_ {SIZE};
     };
 
     template <SizeType SIZE>
