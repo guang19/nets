@@ -20,8 +20,8 @@ namespace nets::net
         virtual ~ChannelHandler() = default;
 
     public:
-        virtual void channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
-                                    const InetSockAddress& localAddress);
+        virtual void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+                                    const InetSockAddress& peerAddress);
         virtual void channelClose(ChannelContext& channelContext);
         virtual void channelDisconnect(ChannelContext& channelContext);
 

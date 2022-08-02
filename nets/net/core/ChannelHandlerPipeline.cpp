@@ -56,11 +56,11 @@ namespace nets::net
         channelHandlers_.push_back(channelHandler);
     }
 
-    void ChannelHandlerPipeline::fireChannelConnect(const InetSockAddress& peerAddress, const InetSockAddress& localAddress)
+    void ChannelHandlerPipeline::fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress)
     {
         for (auto& channelHandler: channelHandlers_)
         {
-            channelHandler->channelConnect(channelContext_, peerAddress, localAddress);
+            channelHandler->channelConnect(channelContext_, localAddress, peerAddress);
         }
     }
 } // namespace nets::net

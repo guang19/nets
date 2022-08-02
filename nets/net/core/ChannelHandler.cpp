@@ -9,8 +9,8 @@
 namespace nets::net
 {
 
-    void ChannelHandler::channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
-                                        const InetSockAddress& localAddress)
+    void ChannelHandler::channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+                                        const InetSockAddress& peerAddress)
     {
         LOGS_DEBUG << "ChannelHandler::channelConnect";
     }

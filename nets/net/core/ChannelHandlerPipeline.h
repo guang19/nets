@@ -43,7 +43,7 @@ namespace nets::net
         void addLast(const ChannelHandlerPtr& channelHandler);
 
     public:
-        void fireChannelConnect(const InetSockAddress& peerAddress, const InetSockAddress& localAddress);
+        void fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
 
     private:
         ChannelContext channelContext_ {nullptr};

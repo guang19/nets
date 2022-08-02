@@ -90,7 +90,7 @@ namespace nets::net
             }
             InetSockAddress localAddr {};
             socket::getLocalAddress(connFd, localAddr.sockAddr());
-            socketChannel->pipeline().fireChannelConnect(peerAddr, localAddr);
+            socketChannel->pipeline().fireChannelConnect(localAddr, peerAddr);
         }
     }
 

@@ -23,7 +23,10 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::handleReadEvent() {}
+    void SocketChannel::handleReadEvent()
+    {
+        LOGS_INFO << "SocketChannel::handleReadEvent";
+    }
 
     void SocketChannel::handleWriteEvent() {}
 

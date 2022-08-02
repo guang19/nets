@@ -12,7 +12,7 @@ public:
     void channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
                         const InetSockAddress& localAddress) override
     {
-        LOGS_INFO << "client address:" << peerAddress.toString() << "====local address:" << localAddress.toString();
+        LOGS_INFO << "====local address:" << localAddress.toString() << "client address:" << peerAddress.toString();
     }
 
 private:
@@ -22,10 +22,10 @@ private:
 class TestExclusiveServerChannelHandler : public ChannelHandler
 {
 public:
-    void channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
-                        const InetSockAddress& localAddress) override
+    void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+                        const InetSockAddress& peerAddress) override
     {
-        LOGS_INFO << "client address:" << peerAddress.toString() << "====local address:" << localAddress.toString();
+        LOGS_INFO << "====local address:" << localAddress.toString() << "client address:" << peerAddress.toString();
     }
 
 private:
