@@ -14,7 +14,7 @@ namespace nets::base
     namespace
     {
         // log length limit: 2K
-        constexpr uint32_t DefaultLogBufferLength = (1024 << 1);
+        constexpr SizeType DefaultLogBufferLength = (1024 << 1);
     } // namespace
 
     class LogBufferStream : Noncopyable

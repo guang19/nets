@@ -16,7 +16,7 @@ namespace nets::base
     class ByteBuffer : public Copyable
     {
     public:
-        using SizeType = uint32_t;
+        using SizeType = ::size_t;
         using CharArrayPtr = ::std::unique_ptr<char[]>;
 
     public:
@@ -81,6 +81,9 @@ namespace nets::base
         {
             return capacity_;
         }
+
+    public:
+        void append(const char* data, SizeType len);
 
     protected:
         CharArrayPtr buffer_ {nullptr};
