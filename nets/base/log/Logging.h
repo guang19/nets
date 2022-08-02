@@ -8,7 +8,7 @@
 #include "nets/base/log/LogMessage.h"
 
 #ifndef LOG_LEVEL
-#define LOG_LEVEL 1
+#define LOG_LEVEL nets::base::LogLevel::DEBUG
 #endif
 
 namespace nets::base

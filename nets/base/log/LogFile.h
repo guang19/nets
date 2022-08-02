@@ -12,7 +12,6 @@
 
 namespace nets::base
 {
-
     namespace
     {
         constexpr ::size_t FileIoBufferSize = 1024 * 256;
