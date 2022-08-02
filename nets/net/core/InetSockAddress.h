@@ -46,7 +46,7 @@ namespace nets::net
             return addr_.sa_family;
         }
 
-        inline const SockAddr* csockAddr() const
+        inline const SockAddr* sockAddr() const
         {
             return &addr_;
         }
@@ -56,7 +56,7 @@ namespace nets::net
             return &addr_;
         }
 
-        inline const SockAddr4* csockAddr4() const
+        inline const SockAddr4* sockAddr4() const
         {
             return &addr4_;
         }
@@ -66,7 +66,7 @@ namespace nets::net
             return &addr4_;
         }
 
-        inline const SockAddr6* csockAddr6() const
+        inline const SockAddr6* sockAddr6() const
         {
             return &addr6_;
         }

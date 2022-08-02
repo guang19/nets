@@ -55,7 +55,7 @@ namespace nets::net
         sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
         setChannelOptions();
         socket::setSockNonBlock(sockFd_, true);
-        socket::bind(sockFd_, sockAddress.csockAddr());
+        socket::bind(sockFd_, sockAddress.sockAddr());
         socket::listen(sockFd_, backlog_);
         addEvent(EReadEvent);
         if (!registerTo())

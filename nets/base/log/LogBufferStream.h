@@ -27,7 +27,7 @@ namespace nets::base
         ~LogBufferStream() = default;
 
     public:
-        inline const LogBuffer& cbuffer() const
+        inline const LogBuffer& buffer() const
         {
             return buffer_;
         }
