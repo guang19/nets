@@ -2,6 +2,9 @@ INCLUDE_DIRECTORIES(${GOOGLE_TEST_INC_DIR})
 LINK_DIRECTORIES(${GOOGLE_TEST_LIB_DIR})
 
 ###### Core Test
+ADD_EXECUTABLE(ByteBufferTest ByteBufferTest.cpp)
+TARGET_LINK_LIBRARIES(ByteBufferTest nets_net libgtest.a)
+
 ADD_EXECUTABLE(InetSockAddressTest InetSockAddressTest.cpp)
 TARGET_LINK_LIBRARIES(InetSockAddressTest nets_net libgtest.a)
 
@@ -10,9 +13,6 @@ TARGET_LINK_LIBRARIES(SocketTest nets_net libgtest.a)
 
 ADD_EXECUTABLE(ChannelOptionTest ChannelOptionTest.cpp)
 TARGET_LINK_LIBRARIES(ChannelOptionTest nets_net libgtest.a)
-
-ADD_EXECUTABLE(NetPackageTest NetPackageTest.cpp)
-TARGET_LINK_LIBRARIES(NetPackageTest nets_net libgtest.a)
 
 ADD_EXECUTABLE(EpollServer EpollServer.cpp)
 TARGET_LINK_LIBRARIES(EpollServer nets_net)

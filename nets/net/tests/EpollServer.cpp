@@ -110,7 +110,7 @@ int main(int argc, char** argv)
             {
                 FdType sockFd = epollEvents[i].data.fd;
                 ::printf("EPOLLOUT\n");
-                socket::write(sockFd, "啦啦啦啦", strlen("啦啦啦啦"));
+                socket::write(sockFd, "啦啦啦啦", ::strlen("啦啦啦啦"));
                 struct epoll_event epollEvent {};
                 epollEvent.data.fd = sockFd;
                 epollEvent.events = EPOLLIN;

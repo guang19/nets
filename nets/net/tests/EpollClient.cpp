@@ -21,7 +21,7 @@ int main(int argc, char** argv)
     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", sockFd, clientAddr.ip().c_str(), clientAddr.port());
     ::printf("client addr=%s\n", clientAddr.toString().c_str());
     char buf[1024] = "asdasd1233asd";
-    size_t n = strlen(buf);
+    size_t n = ::strlen(buf);
     printf("bytes = %ld", n);
     //	size_t count = n;
     while (true)
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
         //		count += count;
         //		if (count >= 131072)
         //		{
-        //			socket::write(sockFd, "131072 bytes", strlen("131072 bytes"));
+        //			socket::write(sockFd, "131072 bytes", ::strlen("131072 bytes"));
         //			break;
         //		}
         ::sleep(5);

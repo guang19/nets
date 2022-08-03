@@ -9,7 +9,7 @@
 using namespace nets::net;
 using namespace nets::net::socket;
 
-TEST(SocketTest, createSocket)
+TEST(SocketTest, CreateSocket)
 {
     FdType sockFd = -1;
     ASSERT_GE((sockFd = socket::createTcpSocket(AF_INET)), 0);

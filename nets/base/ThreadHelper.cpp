@@ -41,7 +41,7 @@ namespace nets::base
     {
         CacheTid = 0;
         MEMZERO(ThreadName, ThreadNameMaxLength);
-        ::memcpy(ThreadName, MainThreadName, strlen(MainThreadName));
+        ::memcpy(ThreadName, MainThreadName, ::strlen(MainThreadName));
     }
 
     struct ThreadInitializer
@@ -50,7 +50,7 @@ namespace nets::base
         {
             currentTid();
             MEMZERO(ThreadName, ThreadNameMaxLength);
-            ::memcpy(ThreadName, MainThreadName, strlen(MainThreadName));
+            ::memcpy(ThreadName, MainThreadName, ::strlen(MainThreadName));
             ::pthread_atfork(nullptr, nullptr, &afterFork);
         }
     };
@@ -61,7 +61,7 @@ namespace nets::base
     void setCurrentThreadName(const char* threadName)
     {
         MEMZERO(ThreadName, ThreadNameMaxLength);
-        ::memcpy(ThreadName, threadName, strlen(threadName));
+        ::memcpy(ThreadName, threadName, ::strlen(threadName));
     }
 
     const char* currentThreadName()
