@@ -28,10 +28,13 @@ namespace nets::net
         ByteBuffer& operator=(const ByteBuffer& other);
         ByteBuffer& operator=(ByteBuffer&& other) noexcept;
 
-        void swap(ByteBuffer&& other);
-
     public:
         inline SizeType readerIndex() const
+        {
+            return readerIndex_;
+        }
+
+        inline SizeType discardBytes() const
         {
             return readerIndex_;
         }
@@ -62,7 +65,7 @@ namespace nets::net
             return writerIndex_ - readerIndex_;
         }
 
-        inline SizeType writeableBytes() const
+        inline SizeType writableBytes() const
         {
             return capacity_ - writerIndex_;
         }
@@ -72,7 +75,7 @@ namespace nets::net
             return writerIndex_ > readerIndex_;
         }
 
-        inline bool isWriteable() const
+        inline bool isWritable() const
         {
             return capacity_ > writerIndex_;
         }
@@ -88,10 +91,13 @@ namespace nets::net
         }
 
     public:
+        void swap(ByteBuffer&& other);
         void writeBytes(const char* data, SizeType len);
 
     private:
-        void assureWritable(SizeType minWritableBytes);
+        void ensureWritable(SizeType writeLen);
+        SizeType calculateNewCapacity(SizeType targetCapacity);
+        void adjustCapacity(SizeType newCapacity);
 
     private:
         CharArrayPtr buffer_ {nullptr};

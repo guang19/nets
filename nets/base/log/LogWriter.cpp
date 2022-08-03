@@ -147,7 +147,7 @@ namespace nets::base
     void AsyncLogWriter::write(const char* data, SizeType len)
     {
         LockGuardType lock(mutex_);
-        if (cacheBuffer_->writeableBytes() > len)
+        if (cacheBuffer_->writableBytes() > len)
         {
             cacheBuffer_->writeBytes(data, len);
         }

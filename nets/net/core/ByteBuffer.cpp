@@ -4,17 +4,19 @@
 
 #include "nets/net/core/ByteBuffer.h"
 
+#include <stdexcept>
+
 #include "nets/base/CommonMacro.h"
 
 namespace nets::net
 {
     namespace
     {
-        static constexpr ByteBuffer::SizeType DefaultCapacity = 1024;
-        static constexpr ByteBuffer::SizeType MaxCapacity = INT32_MAX;
+        constexpr ByteBuffer::SizeType DefaultInitialCapacity = 1024;
+        constexpr ByteBuffer::SizeType MaxCapacity = INT32_MAX;
     }
 
-    ByteBuffer::ByteBuffer() : buffer_(nullptr), readerIndex_(0), writerIndex_(0), capacity_(0)
+    ByteBuffer::ByteBuffer() : ByteBuffer(DefaultInitialCapacity)
     {}
 
     ByteBuffer::ByteBuffer(SizeType capacity)
@@ -83,13 +85,71 @@ namespace nets::net
 
     void ByteBuffer::writeBytes(const char* data, SizeType len)
     {
-        assureWritable(len);
+        ensureWritable(len);
+        ::memcpy(&buffer_[writerIndex_], data, len);
+        writerIndex_ += len;
     }
 
-    void ByteBuffer::assureWritable(SizeType minWritableBytes)
+    void ByteBuffer::ensureWritable(SizeType writeLen)
     {
-        if (writeableBytes() < minWritableBytes)
+        if (writableBytes() < writeLen)
         {
+            SizeType oldCapacity = capacity_;
+            SizeType newCapacity = oldCapacity;
+            if (oldCapacity != 0)
+            {
+                if (writableBytes() + discardBytes() < writeLen)
+                {
+                    SizeType targetCapacity = writerIndex_ + writeLen;
+                    newCapacity = calculateNewCapacity(targetCapacity);
+                }
+                if (newCapacity > MaxCapacity)
+                {
+                    THROW_FMT(::std::length_error, "ByteBuffer newCapacity exceeds the MaxCapacity");
+                }
+            }
+            else
+            {
+                newCapacity = DefaultInitialCapacity;
+            }
+            adjustCapacity(newCapacity);
         }
+    }
+
+    ByteBuffer::SizeType ByteBuffer::calculateNewCapacity(SizeType targetCapacity)
+    {
+        if (targetCapacity == 0)
+        {
+            return 0;
+        }
+        SizeType newCapacity = 1;
+        while (newCapacity < targetCapacity)
+        {
+            newCapacity <<= 1;
+        }
+        return newCapacity;
+    }
+
+    void ByteBuffer::adjustCapacity(SizeType newCapacity)
+    {
+        SizeType contentBytes = readableBytes();
+        // expansion
+        if (newCapacity != capacity_)
+        {
+            CharArrayPtr newBuffer = ::std::make_unique<char[]>(newCapacity);
+            if (contentBytes > 0)
+            {
+                ::memcpy(&newBuffer[0], &buffer_[readerIndex_], contentBytes);
+            }
+            buffer_.swap(newBuffer);
+            capacity_ = newCapacity;
+        }
+        else
+        {
+            // replace discardBytes with readableBytes
+            ::memmove(&buffer_[0], &buffer_[readerIndex_], contentBytes);
+        }
+        readerIndex_ = 0;
+        writerIndex_ = contentBytes;
     }
 } // namespace nets::net
