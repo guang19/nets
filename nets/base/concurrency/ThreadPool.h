@@ -30,6 +30,7 @@ namespace nets::base
     public:
         using NType = uint32_t;
         using TimeType = ::time_t;
+        using StringType = ::std::string;
         using TaskType = ::std::function<void()>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
@@ -43,12 +44,13 @@ namespace nets::base
         class ThreadWrapper : Noncopyable
         {
         public:
-            explicit ThreadWrapper(const char* threadName, bool isCoreThread, TaskType task, ThreadPoolRawPtr threadPool);
+            explicit ThreadWrapper(const StringType& threadName, bool isCoreThread, TaskType task,
+                                   ThreadPoolRawPtr threadPool);
             ~ThreadWrapper() = default;
 
             void start(ThreadPoolRawPtr threadPoolPtr);
 
-            ::std::string threadName_ {};
+            StringType threadName_ {};
             bool isCoreThread_ {false};
             TaskType task_ {nullptr};
             ::std::thread thread_ {};
@@ -56,7 +58,7 @@ namespace nets::base
 
     public:
         explicit ThreadPool(NType corePoolSize, NType maxPoolSize, NType maxQueueSize,
-                            const ::std::string& name = DefaultThreadPoolName,
+                            const StringType& name = DefaultThreadPoolName,
                             TimeType keepAliveTime = DefaultIdleKeepAliveTime);
         ~ThreadPool();
 
@@ -72,7 +74,7 @@ namespace nets::base
             return numOfActiveThreads(ctl_);
         }
 
-        inline const ::std::string& name() const
+        inline const StringType& name() const
         {
             return name_;
         }
@@ -157,7 +159,7 @@ namespace nets::base
         // task queue
         BlockingQueuePtr taskQueue_ {nullptr};
         ThreadPoolType threadPool_ {};
-        ::std::string name_ {};
+        StringType name_ {};
         // high 2bits represent thread pool status: 00 - shutdown; 01-running.
         // low 30bits represent thread pool active thread size.
         ::std::atomic_uint32_t ctl_ {0};
@@ -218,13 +220,13 @@ namespace nets::base
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
-                    << "] execution in thread pool [" << name_ << "],reason " << exception.what();
+                           << "] execution in thread pool [" << name_ << "],reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 LOGS_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
-                    << "] execution in thread pool [" << name_ << ']';
+                           << "] execution in thread pool [" << name_ << ']';
             }
         };
         assert(2 == promise.use_count());
@@ -252,13 +254,13 @@ namespace nets::base
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
-                    << "] execution in thread pool [" << name_ << "],reason " << exception.what();
+                           << "] execution in thread pool [" << name_ << "],reason " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 LOGS_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
-                    << "] execution in thread pool [" << name_ << ']';
+                           << "] execution in thread pool [" << name_ << ']';
             }
         };
         assert(2 == promise.use_count());

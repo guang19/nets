@@ -15,11 +15,20 @@ namespace nets::base
     class AbstractException : public ::std::exception, Noncopyable
     {
     public:
+        using StringType = ::std::string;
+
+    protected:
         AbstractException();
-        ~AbstractException() noexcept override = default;
+        explicit AbstractException(const StringType& cause);
+        ~AbstractException() override = default;
 
     public:
-        const ::std::string& stackTrace()
+        inline const char* what() const noexcept override
+        {
+            return cause_.c_str();
+        }
+
+        inline const StringType& stackTrace() const
         {
             return stackTrace_;
         }
@@ -27,8 +36,9 @@ namespace nets::base
     private:
         void backTrace() noexcept;
 
-    private:
-        ::std::string stackTrace_ {};
+    protected:
+        StringType cause_ {};
+        StringType stackTrace_ {};
     };
 } // namespace nets::base
 

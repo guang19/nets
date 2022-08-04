@@ -4,13 +4,14 @@
 
 #include <gtest/gtest.h>
 
-#include "nets/base/exception/AbstractException.h"
+#include "nets/base/exception/FileCreateException.h"
+#include "nets/base/exception/FileOpenException.h"
 
 using namespace nets::base;
 
 TEST(ExceptionTest, Dump)
 {
-    AbstractException e;
+    FileOpenException e;
     ::printf("%s", e.stackTrace().c_str());
 }
 

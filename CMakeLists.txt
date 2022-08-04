@@ -25,7 +25,7 @@ ADD_DEFINITIONS(-DLOG_LEVEL=1)
 ADD_DEFINITIONS(-DLOG_WRITER_TYPE=0)
 # log file, default "/tmp/nets/nets.log", must be absolute path.
 ADD_DEFINITIONS(-DLOG_FILE="/tmp/nets/nets.log")
-# log file rollback size, unit:MB, default 24. (ROLLING_FILE takes effect only if LOG_WRITER_TYPE is 0)
+# log file rollback size, unit:MB, default 24.
 ADD_DEFINITIONS(-DLOG_FILE_ROLLING_SIZE=24)
 ################################################################################################
 

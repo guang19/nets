@@ -11,8 +11,7 @@
 #include <vector>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
-#include "nets/base/log/LogFile.h"
-#include "nets/base/Singleton.h"
+#include "nets/base/log/LogSynchronizer.h"
 #include "nets/base/StackBuffer.h"
 
 #ifndef LOG_WRITER_TYPE
@@ -43,94 +42,6 @@ namespace nets::base
         constexpr ::size_t LogBufferPieceSize = 1024 * 1024 << 1;
     } // namespace
 
-    class Synchronizer
-    {
-    protected:
-        using SizeType = ::size_t;
-        using TimeType = ::time_t;
-
-        virtual ~Synchronizer() = default;
-
-    public:
-        virtual void synchronize(const char* data, SizeType len, TimeType persistTime) = 0;
-        virtual void flush() = 0;
-    };
-
-    DECLARE_SINGLETON_CLASS(StdoutSynchronizer), public Synchronizer
-    {
-        DEFINE_SINGLETON(StdoutSynchronizer);
-
-    private:
-        StdoutSynchronizer() = default;
-        ~StdoutSynchronizer() override = default;
-
-    public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
-        void flush() override;
-    };
-
-    class LogFileSynchronizer : public Synchronizer
-    {
-    protected:
-        using FileType = LogFile;
-        using FilePtr = ::std::unique_ptr<FileType>;
-
-    protected:
-        explicit LogFileSynchronizer(const char* logFile);
-
-    public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override = 0;
-        void flush() override = 0;
-
-    protected:
-        FilePtr logFile_ {nullptr};
-    };
-
-    DECLARE_SINGLETON_CLASS(SingleLogFileSynchronizer), public LogFileSynchronizer
-    {
-        DEFINE_SINGLETON(SingleLogFileSynchronizer);
-
-    private:
-        explicit SingleLogFileSynchronizer(const char* logFile);
-        ~SingleLogFileSynchronizer() override = default;
-
-    public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
-        void flush() override;
-    };
-
-    DECLARE_SINGLETON_CLASS(DailyLogFileSynchronizer), public LogFileSynchronizer
-    {
-        DEFINE_SINGLETON(DailyLogFileSynchronizer);
-
-    private:
-        explicit DailyLogFileSynchronizer(const char* logFile);
-        ~DailyLogFileSynchronizer() override = default;
-
-    public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
-        void flush() override;
-    };
-
-    DECLARE_SINGLETON_CLASS(RollingLogFileSynchronizer), public LogFileSynchronizer
-    {
-        DEFINE_SINGLETON(RollingLogFileSynchronizer);
-
-    private:
-        explicit RollingLogFileSynchronizer(const char* logFile);
-        ~RollingLogFileSynchronizer() override = default;
-
-    public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
-        void flush() override;
-    };
-
-    class SynchronizerFactory
-    {
-    public:
-        static ::std::shared_ptr<Synchronizer> getSynchronizer();
-    };
-
     class LogWriter
     {
     protected:
@@ -155,7 +66,7 @@ namespace nets::base
         using LockGuardType = ::std::lock_guard<MutexType>;
         using UniqueLockType = ::std::unique_lock<MutexType>;
         using ConditionVarType = ::std::condition_variable;
-        using SynchronizerPtr = ::std::shared_ptr<Synchronizer>;
+        using SynchronizerPtr = ::std::shared_ptr<LogSynchronizer>;
         using BufferVectorType = ::std::vector<BufferPtr>;
         using BufferVectorPtr = ::std::unique_ptr<BufferVectorType>;
         using SynchronizeTaskType = ::std::function<void()>;

@@ -41,7 +41,7 @@ TEST(LoggingTest, SingleFile)
 
 // before execute:
 // change LOG_WRITER_TYPE to 2（DAILY_FILE）
-// for testing,  you better change the constant "SecondsPerDay(in LogWriter.cpp)" for short intervals
+// for testing,  you better change the constant "SecondsPerDay(in LogSynchronizer.cpp)" for short intervals
 TEST(LoggingTest, DailyFile)
 {
     LOGS_TRACE << "这是一条trance信息 stream";
@@ -54,12 +54,13 @@ TEST(LoggingTest, DailyFile)
 
 // before execute:
 // change LOG_WRITER_TYPE to 3（DLOG_FILE_ROLLING_SIZE）
-// for testing,  you better change constant "LogFileRollingSize(in LogWriter.cpp)" as small as possible
+// for testing,  you better change constant "LogFileRollingSize(in LogSynchronizer.cpp)" as small as possible
 TEST(LoggingTest, RollingFile)
 {
     LOGS_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
-        "一条足够长的信息";
+        "一条足够长的信息一条足够长的信息一条足够长的信息";
 }
+
 
 int main(int argc, char** argv)
 {

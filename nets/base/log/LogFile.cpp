@@ -6,7 +6,7 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <libgen.h>
+#include <stdexcept>
 #include <sys/stat.h>
 #include <unistd.h>
 
@@ -16,40 +16,29 @@ namespace nets::base
 {
     namespace
     {
-        constexpr uint32_t MaxFilePathLen = 256;
+        constexpr uint32_t MaxFilePathLen = 512;
         const char* const LogFileNamePattern = "%Y-%m-%d_%H-%M-%S";
         const char* const LogFileSuffix = ".log";
     } // namespace
 
-    LogFile::LogFile(const char* file)
+    LogFile::LogFile(const char* file) : fp_(nullptr), dir_(), file_(file), bytes_(0), lastRollTime_(0)
     {
-        uint32_t filePathLen = ::strlen(file);
-        if (filePathLen > MaxFilePathLen)
+        SizeType filePathLen = file_.length();
+        if (filePathLen > MaxFilePathLen || filePathLen <= 0)
         {
-            ::fprintf(stderr, "Error:log file name length more than %d\n", MaxFilePathLen);
-            ::exit(1);
+            THROW_FMT(::std::invalid_argument, "log file name length %u more than %u", filePathLen, MaxFilePathLen);
         }
-        file_ = ::std::make_unique<char[]>(filePathLen);
-        MEMZERO(file_.get(), filePathLen);
-        ::memcpy(file_.get(), file, filePathLen);
-        // <dirname> will modifies input str, so reallocate an array
-        char tmpFile[MaxFilePathLen] = {0};
-        ::memcpy(tmpFile, file, filePathLen);
-        const char* dir = ::dirname(tmpFile);
-        uint32_t dirLen = ::strlen(dir);
-        dir_ = ::std::make_unique<char[]>(dirLen);
-        MEMZERO(dir_.get(), dirLen);
-        ::memcpy(dir_.get(), dir, dirLen);
-        // log file has parent directory
-        if (0 != ::strcmp(dir, "."))
+        SizeType lastIndex = file_.find_last_of('/');
+        if (lastIndex != StringType::npos)
         {
+            dir_ = StringType(file_, 0, lastIndex + 1);
             // create parent directory of log file
-            mkdirR(dir);
+            mkdirR(dir_.c_str());
         }
         if (nullptr == (fp_ = ::fopen(file, "ae")))
         {
-            ::fprintf(stderr, "Error:failed to open log file\n");
-            ::exit(1);
+            int32_t errNum = errno;
+            THROW_FILE_OPEN_EXCEPTION(errNum);
         }
         getFileInfo(&bytes_, &lastRollTime_);
         ::setbuffer(fp_, buffer_, FileIoBufferSize);
@@ -74,14 +63,14 @@ namespace nets::base
             uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
             if (n != remain)
             {
-                int32_t err = ::ferror(fp_);
-                if (err != 0)
+                int32_t errNum = ::ferror(fp_);
+                if (errNum != 0)
                 {
                     ::fprintf(stderr,
-                              "Error:log file write error "
+                              "log file write error: "
                               "\"%s\""
                               "\n",
-                              ::strerror(err));
+                              ::strerror(errNum));
                     break;
                 }
             }
@@ -104,26 +93,24 @@ namespace nets::base
         }
         struct tm tmS {};
         ::localtime_r(&now, &tmS);
-        char newFilename[26] = {0};
-        MEMZERO(newFilename, sizeof(newFilename));
+        char newFilename[32] = {0};
         ::strftime(newFilename, sizeof(newFilename), LogFileNamePattern, &tmS);
         ::strcat(newFilename, LogFileSuffix);
-        if (::strcmp(dir_.get(), ".") != 0)
+        if (!dir_.empty())
         {
             char tmpFile[MaxFilePathLen] = {0};
-            ::strcat(tmpFile, dir_.get());
-            ::strcat(tmpFile, "/");
+            ::strcat(tmpFile, dir_.c_str());
             ::strcat(tmpFile, newFilename);
-            ::rename(file_.get(), tmpFile);
+            ::rename(file_.c_str(), tmpFile);
         }
         else
         {
-            ::rename(file_.get(), newFilename);
+            ::rename(file_.c_str(), newFilename);
         }
-        if (nullptr == (fp_ = ::fopen(file_.get(), "ae")))
+        if (nullptr == (fp_ = ::fopen(file_.c_str(), "ae")))
         {
-            ::fprintf(stderr, "Error:after rename log file,failed to open log file\n");
-            ::exit(1);
+            int32_t errNum = errno;
+            THROW_FILE_OPEN_EXCEPTION(errNum);
         }
         getFileInfo(&bytes_, nullptr);
         lastRollTime_ = now;
@@ -135,26 +122,26 @@ namespace nets::base
         {
             return;
         }
-        uint32_t len = ::strlen(multiLevelDir);
-        char dir1[MaxFilePathLen] = {0};
-        char* dirptr = dir1;
-        char dir2[MaxFilePathLen] = {0};
-        MEMZERO(dir1, MaxFilePathLen);
-        MEMZERO(dir2, MaxFilePathLen);
-        ::memcpy(dir1, multiLevelDir, len);
+        SizeType len = ::strlen(multiLevelDir);
+        char tmpDir[MaxFilePathLen] = {0};
+        char* dirPtr = tmpDir;
+        char path[MaxFilePathLen] = {0};
+        MEMZERO(tmpDir, MaxFilePathLen);
+        MEMZERO(path, MaxFilePathLen);
+        ::memcpy(tmpDir, multiLevelDir, len);
         char* spStr = nullptr;
-        while (nullptr != (spStr = ::strsep(&dirptr, "/")))
+        while (nullptr != (spStr = ::strsep(&dirPtr, "/")))
         {
             if (::strlen(spStr) > 0)
             {
-                ::strcat(dir2, "/");
-                ::strcat(dir2, spStr);
-                if (0 != ::access(dir2, F_OK))
+                ::strcat(path, "/");
+                ::strcat(path, spStr);
+                if (0 != ::access(path, F_OK))
                 {
-                    if (0 != ::mkdir(dir2, 0775))
+                    if (0 != ::mkdir(path, 0775))
                     {
-                        ::fprintf(stderr, "Error: failed to create parent directory of log file\n");
-                        ::exit(1);
+                        int32_t errNum = errno;
+                        THROW_FILE_CREATE_EXCEPTION(errNum);
                     }
                 }
             }

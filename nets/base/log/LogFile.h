@@ -7,6 +7,7 @@
 
 #include <ctime>
 #include <memory>
+#include <string>
 
 #include "nets/base/Noncopyable.h"
 
@@ -17,7 +18,7 @@ namespace nets::base
     public:
         using SizeType = ::size_t;
         using TimeType = ::time_t;
-        using CharArrayPtr = ::std::unique_ptr<char[]>;
+        using StringType = ::std::string;
 
     public:
         explicit LogFile(const char* file);
@@ -46,8 +47,8 @@ namespace nets::base
 
     private:
         FILE* fp_ {nullptr};
-        CharArrayPtr dir_ {nullptr};
-        CharArrayPtr file_ {nullptr};
+        StringType dir_ {};
+        StringType file_ {};
         SizeType bytes_ {0};
         TimeType lastRollTime_ {0};
 
