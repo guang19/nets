@@ -10,6 +10,8 @@
 #include <unistd.h>
 
 #include "nets/base/log/Logging.h"
+#include "nets/net/exception/SocketCreateException.h"
+#include "nets/net/exception/SocketOperationException.h"
 
 namespace nets::net::socket
 {
@@ -18,7 +20,7 @@ namespace nets::net::socket
         FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
         if (sockFd < 0)
         {
-            LOGS_FATAL << "socket createTcpSocket failed";
+            THROW_FMT(SocketCreateException, "socket createTcpSocket failed");
         }
         setSockCloExec(sockFd);
         return sockFd;
@@ -29,7 +31,7 @@ namespace nets::net::socket
         FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
         if (sockFd < 0)
         {
-            LOGS_FATAL << "socket createUdpSocket failed";
+            THROW_FMT(SocketCreateException, "socket createUdpSocket failed");
         }
         setSockCloExec(sockFd);
         return sockFd;
@@ -41,7 +43,7 @@ namespace nets::net::socket
         flags |= FD_CLOEXEC;
         if (-1 == ::fcntl(sockFd, F_SETFD, flags))
         {
-            LOGS_FATAL << "socket set FD_CLOEXEC failed";
+            THROW_FMT(SocketOperationException, "socket set FD_CLOEXEC failed");
         }
     }
 
@@ -82,7 +84,7 @@ namespace nets::net::socket
         auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
         if (0 != ::bind(sockFd, sockAddr, len))
         {
-            LOGS_FATAL << "socket bind failed";
+            THROW_FMT(SocketOperationException, "socket bind failed");
         }
     }
 
@@ -99,7 +101,7 @@ namespace nets::net::socket
     {
         if (0 != ::listen(sockFd, backlog))
         {
-            LOGS_FATAL << "socket listen failed";
+            THROW_FMT(SocketOperationException, "socket listen failed");
         }
     }
 
@@ -151,7 +153,7 @@ namespace nets::net::socket
                     case EPERM:
                     case EPROTO:
                     default:
-                        LOGS_FATAL << "socket accept unexpected error:" << errorN;
+                        THROW_FMT(SocketOperationException, "socket accept unexpected exception, errno=%d", errorN);
                         break;
                 }
             }
@@ -252,7 +254,7 @@ namespace nets::net::socket
         OptValType reuse = enable ? 1 : 0;
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(reuse))))
         {
-            LOGS_FATAL << "socket setSockAddrReuse failed";
+            LOGS_ERROR << "socket setSockAddrReuse failed";
         }
     }
 
@@ -261,7 +263,7 @@ namespace nets::net::socket
         OptValType reuse = enable ? 1 : 0;
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(reuse))))
         {
-            LOGS_FATAL << "socket setSockPortReuse failed";
+            LOGS_ERROR << "socket setSockPortReuse failed";
         }
     }
 

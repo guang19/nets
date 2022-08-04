@@ -28,7 +28,7 @@ namespace nets::base
         using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
     public:
-        using NType = uint32_t;
+        using IntType = uint32_t;
         using TimeType = ::time_t;
         using StringType = ::std::string;
         using TaskType = ::std::function<void()>;
@@ -57,7 +57,7 @@ namespace nets::base
         };
 
     public:
-        explicit ThreadPool(NType corePoolSize, NType maxPoolSize, NType maxQueueSize,
+        explicit ThreadPool(IntType corePoolSize, IntType maxPoolSize, IntType maxQueueSize,
                             const StringType& name = DefaultThreadPoolName,
                             TimeType keepAliveTime = DefaultIdleKeepAliveTime);
         ~ThreadPool();
@@ -69,7 +69,7 @@ namespace nets::base
             return isRunning(ctl_);
         }
 
-        inline NType numOfActiveThreads() const
+        inline IntType numOfActiveThreads() const
         {
             return numOfActiveThreads(ctl_);
         }
@@ -120,40 +120,40 @@ namespace nets::base
         void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
         bool addThreadTask(const TaskType& task, bool isCore);
 
-        inline bool isRunning(NType ctl) const
+        inline bool isRunning(IntType ctl) const
         {
             return (ctl & ~CountMask) == Running;
         }
 
-        inline bool isShutdown(NType ctl) const
+        inline bool isShutdown(IntType ctl) const
         {
             return (ctl & ~CountMask) == Shutdown;
         }
 
-        inline NType numOfActiveThreads(NType ctl) const
+        inline IntType numOfActiveThreads(IntType ctl) const
         {
             return ctl & CountMask;
         }
 
     private:
-        static constexpr NType Int32Bits = 32;
-        static constexpr NType CountBits = Int32Bits - 2;
+        static constexpr IntType Int32Bits = 32;
+        static constexpr IntType CountBits = Int32Bits - 2;
         // maximum active thread size
         // 00,111111111111111111111111111111
-        static constexpr NType CountMask = (1 << CountBits) - 1;
+        static constexpr IntType CountMask = (1 << CountBits) - 1;
         // 01,000000000000000000000000000000
-        static constexpr NType Running = 1 << CountBits;
+        static constexpr IntType Running = 1 << CountBits;
         // 00,000000000000000000000000000000
-        static constexpr NType Shutdown = 0 << CountBits;
+        static constexpr IntType Shutdown = 0 << CountBits;
 
         static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
         static constexpr char DefaultThreadPoolName[] = "NetsThreadPool";
 
     private:
         // the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-        NType corePoolSize_ {0};
+        IntType corePoolSize_ {0};
         // the maximum numbers of threads that the thread pool can hold
-        NType maximumPoolSize_ {0};
+        IntType maximumPoolSize_ {0};
         // time that idle threads can survive, unit: ms
         TimeType idleKeepAliveTime_ {0};
         // task queue
@@ -171,7 +171,7 @@ namespace nets::base
     bool ThreadPool::execute(Fn&& func, Args&&... args)
     {
         TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
-        NType ctl = ctl_.load();
+        IntType ctl = ctl_.load();
         assert(isRunning(ctl));
         if (isShutdown(ctl))
         {

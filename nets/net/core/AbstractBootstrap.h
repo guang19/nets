@@ -14,12 +14,12 @@ namespace nets::net
     class AbstractBootstrap : nets::base::Noncopyable
     {
     public:
-        using NType = typename EventLoopGroup::NType;
+        using IntType = typename EventLoopGroup::IntType;
         using ChannelOptionList = ::std::vector<ChannelOption>;
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
 
     public:
-        explicit AbstractBootstrap(NType numOfMainEventLoops) : channelOptions_()
+        explicit AbstractBootstrap(IntType numOfMainEventLoops) : channelOptions_()
         {
             numOfMainEventLoops = numOfMainEventLoops <= 0 ? DefaultNumbOfMainEventLoops : numOfMainEventLoops;
             mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName);
@@ -39,7 +39,7 @@ namespace nets::net
 
     private:
         static constexpr char MainEventLoopGroupName[] = "MainLoopGroup";
-        static constexpr NType DefaultNumbOfMainEventLoops = 1;
+        static constexpr IntType DefaultNumbOfMainEventLoops = 1;
     };
 } // namespace nets::net
 

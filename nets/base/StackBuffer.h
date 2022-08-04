@@ -15,10 +15,10 @@ namespace nets::base
 {
     namespace
     {
-        using SizeType = uint32_t;
+        using IntType = uint32_t;
     }
 
-    template <SizeType SIZE>
+    template <IntType SIZE>
     class StackBuffer : Noncopyable
     {
     public:
@@ -35,22 +35,22 @@ namespace nets::base
             return buffer_;
         }
 
-        inline SizeType len() const
+        inline IntType len() const
         {
             return writerIndex_;
         }
 
-        inline SizeType writerIndex() const
+        inline IntType writerIndex() const
         {
             return writerIndex_;
         }
 
-        inline SizeType writableBytes() const
+        inline IntType writableBytes() const
         {
             return capacity_ - writerIndex_;
         }
 
-        void writeBytes(const char* data, SizeType len);
+        void writeBytes(const char* data, IntType len);
 
         void writePointer(const void* ptr);
 
@@ -63,12 +63,12 @@ namespace nets::base
     private:
         char buffer_[SIZE] {0};
         // writer pointer
-        SizeType writerIndex_ {0};
-        SizeType capacity_ {SIZE};
+        IntType writerIndex_ {0};
+        IntType capacity_ {SIZE};
     };
 
-    template <SizeType SIZE>
-    void StackBuffer<SIZE>::writeBytes(const char* data, SizeType len)
+    template <IntType SIZE>
+    void StackBuffer<SIZE>::writeBytes(const char* data, IntType len)
     {
         if (writableBytes() > len)
         {
@@ -77,7 +77,7 @@ namespace nets::base
         }
     }
 
-    template <SizeType SIZE>
+    template <IntType SIZE>
     void StackBuffer<SIZE>::writePointer(const void* ptr)
     {
         if (writableBytes() > MaxNumLen)
@@ -86,7 +86,7 @@ namespace nets::base
         }
     }
 
-    template <SizeType SIZE>
+    template <IntType SIZE>
     template <typename Number>
     void StackBuffer<SIZE>::writeInteger(Number n)
     {
@@ -96,7 +96,7 @@ namespace nets::base
         }
     }
 
-    template <SizeType SIZE>
+    template <IntType SIZE>
     template <typename Float>
     void StackBuffer<SIZE>::writeFloat(Float f)
     {

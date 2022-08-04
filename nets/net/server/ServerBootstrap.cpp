@@ -11,10 +11,10 @@ namespace nets::net
     namespace
     {
         constexpr char ChildEventLoopGroupName[] = "ChildLoopGroup";
-        const ServerBootstrap::NType DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
+        const ServerBootstrap::IntType DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
     } // namespace
 
-    ServerBootstrap::ServerBootstrap(NType numOfMainEventLoops, NType numOfChildEventLoops)
+    ServerBootstrap::ServerBootstrap(IntType numOfMainEventLoops, IntType numOfChildEventLoops)
         : AbstractBootstrap(numOfMainEventLoops), running_(false), childOptions_(), childHandlers_(),
           childInitializationCallback_()
     {

@@ -5,6 +5,7 @@
 #include "nets/net/poller/EpollPoller.h"
 
 #include <cassert>
+#include <stdexcept>
 #include <unistd.h>
 
 #include "nets/base/log/Logging.h"
@@ -23,7 +24,7 @@ namespace nets::net
         assert(epollFd_ >= 0);
         if (epollFd_ < 0)
         {
-            LOGS_FATAL << "EpollPoller epoll create1 failed with result epollFd < 0";
+            THROW_FMT(::std::runtime_error, "EpollPoller epoll create1 failed with result epollFd < 0");
         }
     }
 

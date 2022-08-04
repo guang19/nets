@@ -26,7 +26,7 @@ namespace nets::net
         // one loop per thread
         if (CurrentThreadEventLoop != nullptr)
         {
-            LOGS_FATAL << "EventLoop there must be only one loop per thread";
+            THROW_FMT(::std::runtime_error, "EventLoop there must be only one loop per thread");
         }
         else
         {

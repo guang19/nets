@@ -16,12 +16,13 @@ namespace nets::net
     class ByteBuffer : public nets::base::Copyable
     {
     public:
-        using SizeType = uint32_t;
+        using IntType = uint32_t;
+        using StringType = ::std::string;
         using CharArrayPtr = ::std::unique_ptr<char[]>;
 
     public:
         ByteBuffer();
-        explicit ByteBuffer(SizeType initialCapacity);
+        explicit ByteBuffer(IntType initialCapacity);
         virtual ~ByteBuffer() = default;
 
         ByteBuffer(const ByteBuffer& other);
@@ -30,27 +31,27 @@ namespace nets::net
         ByteBuffer& operator=(ByteBuffer&& other) noexcept;
 
     public:
-        inline SizeType readerIndex() const
+        inline IntType readerIndex() const
         {
             return readerIndex_;
         }
 
-        inline SizeType discardReadBytes() const
+        inline IntType discardReadBytes() const
         {
             return readerIndex_;
         }
 
-        inline SizeType writerIndex() const
+        inline IntType writerIndex() const
         {
             return writerIndex_;
         }
 
-        inline SizeType readableBytes() const
+        inline IntType readableBytes() const
         {
             return writerIndex_ - readerIndex_;
         }
 
-        inline SizeType writableBytes() const
+        inline IntType writableBytes() const
         {
             return capacity_ - writerIndex_;
         }
@@ -65,7 +66,7 @@ namespace nets::net
             return capacity_ > writerIndex_;
         }
 
-        inline SizeType capacity() const
+        inline IntType capacity() const
         {
             return capacity_;
         }
@@ -79,9 +80,9 @@ namespace nets::net
         void swap(ByteBuffer&& other);
         void writeBoolean(bool value);
         void writeByte(char value);
-        void writeBytes(const void* data, SizeType len);
-        void writeBytes(const char* data, SizeType len);
-        SSizeType writeBytes(SocketChannel& channel);
+        void writeBytes(const void* data, IntType len);
+        void writeBytes(const char* data, IntType len);
+        IntType writeBytes(SocketChannel& channel);
         void writeInt8(int8_t value);
         void writeInt16(int16_t value);
         void writeInt32(int32_t value);
@@ -91,7 +92,7 @@ namespace nets::net
 
         bool readBoolean();
         char readByte();
-        ::std::string readBytes(SizeType len);
+        StringType readBytes(IntType len);
         int8_t readInt8();
         int16_t readInt16();
         int32_t readInt32();
@@ -100,20 +101,20 @@ namespace nets::net
         double readDouble();
 
     private:
-        void ensureWritable(SizeType writeLen);
-        SizeType calculateNewCapacity(SizeType targetCapacity);
-        void adjustCapacity(SizeType newCapacity);
+        void ensureWritable(IntType writeLen);
+        IntType calculateNewCapacity(IntType targetCapacity);
+        void adjustCapacity(IntType newCapacity);
 
-        void checkReadableBytes(SizeType bytes);
-        void adjustReaderIndex(SizeType bytes);
+        void checkReadableBytes(IntType bytes);
+        void adjustReaderIndex(IntType bytes);
 
     private:
         CharArrayPtr buffer_ {nullptr};
         // reader pointer
-        SizeType readerIndex_ {0};
+        IntType readerIndex_ {0};
         // writer pointer
-        SizeType writerIndex_ {0};
-        SizeType capacity_ {0};
+        IntType writerIndex_ {0};
+        IntType capacity_ {0};
     };
 } // namespace nets::net
 

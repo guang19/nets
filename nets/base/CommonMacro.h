@@ -35,7 +35,7 @@ void throwFmt(const char* fmt, ...)
     throw E(msgBuf);
 }
 
-#define THROW_FMT(EXCEPTION, FMT, ...) (throwFmt<EXCEPTION>(FMT "\n", ##__VA_ARGS__))
+#define THROW_FMT(EXCEPTION, FMT, ...) (throwFmt<EXCEPTION>(FMT, ##__VA_ARGS__))
 
 #define THROW_FILE_OPEN_EXCEPTION(ERRNUM)                                                                                   \
     switch (ERRNUM)                                                                                                         \

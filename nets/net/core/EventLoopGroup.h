@@ -13,7 +13,8 @@ namespace nets::net
     class EventLoopGroup : nets::base::Noncopyable
     {
     public:
-        using NType = typename nets::base::ThreadPool::NType;
+        using IntType = typename nets::base::ThreadPool::IntType;
+        using StringType = ::std::string;
         using ThreadPoolType = nets::base::ThreadPool;
         using ThreadPoolPtr = ::std::unique_ptr<ThreadPoolType>;
         using EventLoopRawPtr = EventLoop*;
@@ -27,7 +28,7 @@ namespace nets::net
         using ConditionVariableType = ::std::condition_variable;
 
     public:
-        explicit EventLoopGroup(NType numOfEventLoops, const ::std::string& name);
+        explicit EventLoopGroup(IntType numOfEventLoops, const StringType& name);
         ~EventLoopGroup() = default;
 
     public:
@@ -58,8 +59,8 @@ namespace nets::net
         }
 
     private:
-        NType nextLoop_ {0};
-        NType numOfEventLoops_ {0};
+        IntType nextLoop_ {0};
+        IntType numOfEventLoops_ {0};
         EventLoopList eventLoops_ {};
         FutureList futures_ {};
         ThreadPoolPtr eventLoopThreadPool_ {nullptr};

@@ -1,6 +1,9 @@
 FILE(GLOB CoreHeaders ${PROJECT_SOURCE_DIR}/nets/net/core/*.h)
 INSTALL(FILES ${CoreHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/core)
 
+FILE(GLOB CoreHeaders ${PROJECT_SOURCE_DIR}/nets/net/exception/*.h)
+INSTALL(FILES ${CoreHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/exception)
+
 FILE(GLOB PollerHeaders ${PROJECT_SOURCE_DIR}/nets/net/poller/*.h)
 INSTALL(FILES ${PollerHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/poller)
 

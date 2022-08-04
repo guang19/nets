@@ -26,7 +26,7 @@ namespace nets::base
         SizeType filePathLen = file_.length();
         if (filePathLen > MaxFilePathLen || filePathLen <= 0)
         {
-            THROW_FMT(::std::invalid_argument, "log file name length %u more than %u", filePathLen, MaxFilePathLen);
+            THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLen, MaxFilePathLen);
         }
         SizeType lastIndex = file_.find_last_of('/');
         if (lastIndex != StringType::npos)

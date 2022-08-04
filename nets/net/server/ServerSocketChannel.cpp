@@ -17,7 +17,7 @@ namespace nets::net
     {
         if (idleFd_ < 0)
         {
-            LOGS_FATAL << "ServerSocketChannel createIdleFd failed";
+            THROW_FMT(::std::runtime_error, "ServerSocketChannel createIdleFd failed");
         }
         channelOptions_.push_back(NReuseAddr);
         channelOptions_.push_back(NReusePort);
@@ -60,7 +60,7 @@ namespace nets::net
         addEvent(EReadEvent);
         if (!registerTo())
         {
-            LOGS_FATAL << "ServerSocketChannel register failed";
+            THROW_FMT(::std::runtime_error, "ServerSocketChannel register failed");
         }
     }
 

@@ -20,7 +20,7 @@ namespace nets::net
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:
-        explicit ServerBootstrap(NType numOfMainEventLoops, NType numOfChildEventLoops);
+        explicit ServerBootstrap(IntType numOfMainEventLoops, IntType numOfChildEventLoops);
         ~ServerBootstrap() = default;
 
     public:

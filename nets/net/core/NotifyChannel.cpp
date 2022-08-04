@@ -4,6 +4,7 @@
 
 #include "nets/net/core/NotifyChannel.h"
 
+#include <stdexcept>
 #include <sys/eventfd.h>
 
 #include "nets/base/log/Logging.h"
@@ -15,7 +16,7 @@ namespace nets::net
     {
         if (eventFd_ < 0)
         {
-            LOGS_FATAL << "NotifyChannel create eventFd failed";
+            THROW_FMT(::std::runtime_error, "NotifyChannel create eventFd failed");
         }
     }
 

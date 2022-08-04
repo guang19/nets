@@ -88,7 +88,7 @@ TEST_F(ThreadPoolTest, ExecuteTaskLimit)
             {
                 for (int j = 0; j < 1000; ++j)
                 {
-                    ::printf("your enter number is: %d, threadName:%s\n", j, currentThreadName());
+                    ::printf("your enter number is:%d,threadName:%s\n", j, currentThreadName());
                 }
             });
     }

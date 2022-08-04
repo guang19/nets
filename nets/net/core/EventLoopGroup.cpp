@@ -6,12 +6,12 @@
 
 namespace nets::net
 {
-    EventLoopGroup::EventLoopGroup(NType numOfEventLoops, const ::std::string& name)
+    EventLoopGroup::EventLoopGroup(IntType numOfEventLoops, const StringType& name)
         : nextLoop_(0), numOfEventLoops_(numOfEventLoops), mutex_(), cv_()
     {
         if (numOfEventLoops_ <= 0)
         {
-            throw ::std::invalid_argument("numOfEventLoops must be greater than 0");
+            THROW_FMT(::std::invalid_argument, "numOfEventLoops must be greater than 0,numOfEventLoops=%u", numOfEventLoops_);
         }
         eventLoops_.reserve(numOfEventLoops_);
         futures_.reserve(numOfEventLoops);
@@ -20,7 +20,7 @@ namespace nets::net
 
     void EventLoopGroup::loopEach()
     {
-        for (NType i = 0; i < numOfEventLoops_; ++i)
+        for (IntType i = 0; i < numOfEventLoops_; ++i)
         {
             futures_[i] = eventLoopThreadPool_->submit(
                 [this]()
@@ -47,7 +47,7 @@ namespace nets::net
 
     void EventLoopGroup::syncEach()
     {
-        for (NType i = 0; i < numOfEventLoops_; ++i)
+        for (IntType i = 0; i < numOfEventLoops_; ++i)
         {
             futures_[i].wait();
         }

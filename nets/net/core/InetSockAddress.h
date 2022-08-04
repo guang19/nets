@@ -25,6 +25,9 @@ namespace nets::net
     class InetSockAddress : public nets::base::Copyable
     {
     public:
+        using StringType = ::std::string;
+
+    public:
         InetSockAddress();
         explicit InetSockAddress(const SockAddr4& addr4);
         explicit InetSockAddress(const SockAddr6& addr6);
@@ -76,9 +79,9 @@ namespace nets::net
             return &addr6_;
         }
 
-        ::std::string ip() const;
+        StringType ip() const;
         PortType port() const;
-        ::std::string toString() const;
+        StringType toString() const;
 
     private:
         union

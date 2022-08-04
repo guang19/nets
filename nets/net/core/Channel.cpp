@@ -125,19 +125,19 @@ namespace nets::net
                 }
                 case InvalidSockOpt:
                 default:
-                    LOGS_FATAL << "Channel set invalid ChannelOption";
+                    THROW_FMT(::std::invalid_argument, "Channel set invalid ChannelOption");
                     break;
             }
         }
         catch (const ::std::bad_any_cast& e)
         {
-            LOGS_FATAL << "Channel set invalid type ChannelOption,";
+            THROW_FMT(::std::invalid_argument, "Channel set invalid ChannelOption,cause %s", e.what());
         }
     }
 
     void Channel::setBacklog(int32_t backlog)
     {
-        LOGS_FATAL << "Channel does not support setting backlog";
+        THROW_FMT(::std::runtime_error, "Channel does not support setting backlog");
     }
 
     void Channel::handleEvent()

@@ -24,7 +24,7 @@ namespace nets::base
         threadPool->runThread(this);
     }
 
-    ThreadPool::ThreadPool(NType corePoolSize, NType maximumPoolSize, NType maxQueueSize, const StringType& name,
+    ThreadPool::ThreadPool(IntType corePoolSize, IntType maximumPoolSize, IntType maxQueueSize, const StringType& name,
                            TimeType idleKeepAliveTime)
         : corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize), idleKeepAliveTime_(idleKeepAliveTime),
           taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
@@ -56,7 +56,7 @@ namespace nets::base
         // cas
         while (true)
         {
-            NType ctl = ctl_.load();
+            IntType ctl = ctl_.load();
             // set state to shutdown
             if (ctl_.compare_exchange_strong(ctl, (Shutdown | (ctl & CountMask))))
             {
@@ -137,7 +137,7 @@ namespace nets::base
         // cas
         while (true)
         {
-            NType ctl = ctl_.load();
+            IntType ctl = ctl_.load();
             if (isShutdown(ctl))
             {
                 return false;
