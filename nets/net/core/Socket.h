@@ -15,6 +15,7 @@ namespace nets::net
         using OptValType = int32_t;
         using SockLinger = struct linger;
         using IoVec = struct iovec;
+        using SSizeType = ::ssize_t;
     } // namespace
 
     namespace socket
@@ -36,10 +37,10 @@ namespace nets::net
         void listen(FdType sockFd, int32_t backlog);
         FdType accept(FdType sockFd, SockAddr* sockAddr, FdType* idleFd);
 
-        ::ssize_t read(FdType fd, void* buf, ::size_t n);
-        ::ssize_t readv(FdType fd, const IoVec* vec, int32_t iovcnt);
+        SSizeType read(FdType fd, void* buf, ::size_t n);
+        SSizeType readv(FdType fd, const IoVec* vec, int32_t iovcnt);
 
-        ::ssize_t write(FdType fd, const void* buf, ::size_t n);
+        SSizeType write(FdType fd, const void* buf, ::size_t n);
 
         void getLocalAddress(FdType fd, SockAddr* sockAddr);
         void getPeerAddress(FdType fd, SockAddr* sockAddr);

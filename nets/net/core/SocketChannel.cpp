@@ -15,6 +15,11 @@ namespace nets::net
         socket::setSockNonBlock(sockFd_);
     }
 
+    SocketChannel::~SocketChannel()
+    {
+        socket::closeFd(sockFd_);
+    }
+
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
     {
         for (const auto& channelOption: channelOptions)
@@ -25,7 +30,7 @@ namespace nets::net
 
     void SocketChannel::handleReadEvent()
     {
-        LOGS_INFO << "SocketChannel::handleReadEvent";
+
     }
 
     void SocketChannel::handleWriteEvent() {}

@@ -32,7 +32,7 @@ namespace nets::net
     void NotifyChannel::notify() const
     {
         uint64_t i = 1;
-        ::ssize_t n = socket::write(eventFd_, &i, sizeof(i));
+        SSizeType n = socket::write(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
             LOGS_ERROR << "NotifyChannel notify failed";
@@ -42,7 +42,7 @@ namespace nets::net
     void NotifyChannel::handleReadEvent()
     {
         uint64_t i = 0;
-        ::ssize_t n = socket::read(eventFd_, &i, sizeof(i));
+        SSizeType n = socket::read(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
             LOGS_ERROR << "NotifyChannel read failed";

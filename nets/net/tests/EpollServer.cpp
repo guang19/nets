@@ -82,7 +82,7 @@ int main(int argc, char** argv)
                 {
                     FdType sockFd = epollEvents[i].data.fd;
                     char buf[512] = {0};
-                    ::ssize_t n = socket::read(sockFd, buf, sizeof(buf));
+                    SSizeType n = socket::read(sockFd, buf, sizeof(buf));
                     if (n > 0)
                     {
                         ::printf("recv client msg:%s\n", buf);

@@ -14,7 +14,7 @@ namespace nets::net
     {
     public:
         explicit SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop);
-        ~SocketChannel() override = default;
+        ~SocketChannel() override;
 
     public:
         inline FdType fd() const override
@@ -43,6 +43,8 @@ namespace nets::net
         void handleReadEvent() override;
         void handleWriteEvent() override;
         void handleErrorEvent() override;
+
+    private:
 
     private:
         FdType sockFd_ {socket::InvalidFd};

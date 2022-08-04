@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 {
     FdType sockFd = socket::createTcpSocket(AF_INET);
     InetSockAddress serverAddr("127.0.0.1", 8080, false);
-    socket::connect(sockFd, serverAddr.csockAddr());
+    socket::connect(sockFd, serverAddr.sockAddr());
     InetSockAddress clientAddr;
     SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));
     ::getsockname(sockFd, clientAddr.sockAddr(), &len);

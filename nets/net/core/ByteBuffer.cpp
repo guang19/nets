@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include "nets/base/CommonMacro.h"
+#include "nets/net/core/SocketChannel.h"
 
 namespace nets::net
 {
@@ -116,6 +117,18 @@ namespace nets::net
         writerIndex_ += len;
     }
 
+    SSizeType ByteBuffer::writeBytes(SocketChannel& channel)
+    {
+        ensureWritable(writableBytes());
+        SSizeType bytes = 0;
+        bytes = socket::read(channel.fd(), &buffer_[writerIndex_], writableBytes());
+        if (bytes > 0)
+        {
+            writerIndex_ += bytes;
+        }
+        return bytes;
+    }
+
     void ByteBuffer::writeInt8(int8_t value)
     {
         writeBytes(&value, Int8Bytes);
@@ -199,7 +212,8 @@ namespace nets::net
         int32_t val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], Int32Bytes);
         adjustReaderIndex(Int32Bytes);
-        return be32toh(val);;
+        return be32toh(val);
+        ;
     }
 
     int64_t ByteBuffer::readInt64()
@@ -217,7 +231,7 @@ namespace nets::net
         float val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], FloatBytes);
         adjustReaderIndex(FloatBytes);
-        return *(float*)&val;
+        return *(float*) &val;
     }
 
     double ByteBuffer::readDouble()
@@ -226,7 +240,7 @@ namespace nets::net
         double val;
         ::memcpy(&val, &buffer_[readerIndex_], DoubleBytes);
         adjustReaderIndex(DoubleBytes);
-        return *(double*)&val;
+        return *(double*) &val;
     }
 
     void ByteBuffer::ensureWritable(SizeType writeLen)
@@ -237,7 +251,7 @@ namespace nets::net
             SizeType newCapacity = oldCapacity;
             if (oldCapacity != 0)
             {
-                if (writableBytes() + discardBytes() < writeLen)
+                if (writableBytes() + discardReadBytes() < writeLen)
                 {
                     SizeType targetCapacity = writerIndex_ + writeLen;
                     newCapacity = calculateNewCapacity(targetCapacity);

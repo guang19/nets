@@ -7,10 +7,10 @@
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/InetSockAddress.h"
-#include "nets/net/core/ByteBuffer.h"
 
 namespace nets::net
 {
+    class ByteBuffer;
     class ChannelContext;
 
     class ChannelHandler : nets::base::Noncopyable

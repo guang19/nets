@@ -158,17 +158,17 @@ namespace nets::net::socket
         }
     }
 
-    ::ssize_t read(FdType fd, void* buf, ::size_t n)
+    SSizeType read(FdType fd, void* buf, ::size_t n)
     {
         return ::read(fd, buf, n);
     }
 
-    ::ssize_t readv(FdType fd, const IoVec* vec, int32_t iovcnt)
+    SSizeType readv(FdType fd, const IoVec* vec, int32_t iovcnt)
     {
         return ::readv(fd, vec, iovcnt);
     }
 
-    ::ssize_t write(FdType fd, const void* buf, ::size_t n)
+    SSizeType write(FdType fd, const void* buf, ::size_t n)
     {
         return ::write(fd, buf, n);
     }

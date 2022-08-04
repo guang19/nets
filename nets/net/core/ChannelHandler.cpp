@@ -5,6 +5,7 @@
 #include "nets/net/core/ChannelHandler.h"
 
 #include "nets/base/log/Logging.h"
+#include "nets/net/core/ByteBuffer.h"
 
 namespace nets::net
 {

@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "nets/base/Copyable.h"
+#include "nets/net/core/SocketChannel.h"
 
 namespace nets::net
 {
@@ -34,7 +35,7 @@ namespace nets::net
             return readerIndex_;
         }
 
-        inline SizeType discardBytes() const
+        inline SizeType discardReadBytes() const
         {
             return readerIndex_;
         }
@@ -80,6 +81,7 @@ namespace nets::net
         void writeByte(char value);
         void writeBytes(const void* data, SizeType len);
         void writeBytes(const char* data, SizeType len);
+        SSizeType writeBytes(SocketChannel& channel);
         void writeInt8(int8_t value);
         void writeInt16(int16_t value);
         void writeInt32(int32_t value);
