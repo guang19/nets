@@ -66,11 +66,11 @@ namespace nets::base
         using LockGuardType = ::std::lock_guard<MutexType>;
         using UniqueLockType = ::std::unique_lock<MutexType>;
         using ConditionVarType = ::std::condition_variable;
-        using SynchronizerPtr = ::std::shared_ptr<LogSynchronizer>;
+        using LogSynchronizerPtr = ::std::shared_ptr<LogSynchronizer>;
         using BufferVectorType = ::std::vector<BufferPtr>;
         using BufferVectorPtr = ::std::unique_ptr<BufferVectorType>;
-        using SynchronizeTaskType = ::std::function<void()>;
-        using BlockingQueueType = BoundedBlockingQueue<SynchronizeTaskType>;
+        using LogSynchronizeTaskType = ::std::function<void()>;
+        using BlockingQueueType = BoundedBlockingQueue<LogSynchronizeTaskType>;
         using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
 
     protected:
@@ -94,7 +94,7 @@ namespace nets::base
         ::std::atomic_bool running_ {false};
         BufferPtr cacheBuffer_ {nullptr};
         BufferPtr backupCacheBuffer_ {nullptr};
-        SynchronizerPtr synchronizer_ {nullptr};
+        LogSynchronizerPtr logSynchronizer_ {nullptr};
         // add persistent tasks to the task queue
         ::std::thread writerTaskProducer {};
         // take the persistent task from the task queue and execute it

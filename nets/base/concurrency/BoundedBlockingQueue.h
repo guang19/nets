@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/1/6.
 //
 
-#ifndef NETS_BASE_BLOCKINGQUEUE_H
-#define NETS_BASE_BLOCKINGQUEUE_H
+#ifndef NETS_BASE_BOUNDED_BLOCKING_QUEUE_H
+#define NETS_BASE_BOUNDED_BLOCKING_QUEUE_H
 
 #include <condition_variable>
 #include <ctime>
@@ -345,4 +345,4 @@ namespace nets::base
     }
 } // namespace nets::base
 
-#endif // NETS_BASE_BLOCKINGQUEUE_H
+#endif // NETS_BASE_BOUNDED_BLOCKING_QUEUE_H

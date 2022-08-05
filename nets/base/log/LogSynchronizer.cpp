@@ -86,7 +86,7 @@ namespace nets::base
         logFile_->flush();
     }
 
-    ::std::shared_ptr<LogSynchronizer> SynchronizerFactory::getSynchronizer()
+    ::std::shared_ptr<LogSynchronizer> LogSynchronizerFactory::getLogSynchronizer()
     {
         switch (LOG_WRITER_TYPE)
         {

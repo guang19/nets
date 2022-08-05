@@ -18,7 +18,7 @@ namespace nets::base
 
     AsyncLogWriter::AsyncLogWriter()
         : running_(false), cacheBuffer_(::std::make_unique<BufferType>()),
-          backupCacheBuffer_(::std::make_unique<BufferType>()), synchronizer_(SynchronizerFactory::getSynchronizer()),
+          backupCacheBuffer_(::std::make_unique<BufferType>()), logSynchronizer_(LogSynchronizerFactory::getLogSynchronizer()),
           mutex_(), cv_(), buffers_(::std::make_unique<BufferVectorType>()),
           writerTaskQueue_(::std::make_unique<BlockingQueueType>())
     {
@@ -107,17 +107,17 @@ namespace nets::base
                 }
             }
             ::time(&currentTime);
-            auto synchronizeTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
+            auto logSynchronizeTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
             {
                 for (auto& it: *tmpBuffers)
                 {
                     auto logBuffer = it.get();
-                    synchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
+                    logSynchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
                 }
-                synchronizer_->flush();
+                logSynchronizer_->flush();
             };
             // if not running, the writer task that is not added to the queue will be discarded
-            writerTaskQueue_->put(::std::move(synchronizeTask));
+            writerTaskQueue_->put(::std::move(logSynchronizeTask));
             buffers = ::std::make_unique<BufferVectorType>();
             tmpBuffer1 = std::make_unique<BufferType>();
             if (nullptr == tmpBuffer2)
@@ -136,9 +136,9 @@ namespace nets::base
                 for (auto& it: *tmpBuffers)
                 {
                     auto logBuffer = it.get();
-                    synchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
+                    logSynchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
                 }
-                synchronizer_->flush();
+                logSynchronizer_->flush();
             };
             writerTaskQueue_->put(::std::move(writerTask));
         }
@@ -146,20 +146,20 @@ namespace nets::base
 
     void AsyncLogWriter::synchronize()
     {
-        SynchronizeTaskType synchronizeTask = nullptr;
+        LogSynchronizeTaskType logSynchronizeTask = nullptr;
         while (running_)
         {
-            if (writerTaskQueue_->take(synchronizeTask, LogBufferFlushInterval >> 1))
+            if (writerTaskQueue_->take(logSynchronizeTask, LogBufferFlushInterval >> 1))
             {
-                synchronizeTask();
-                synchronizeTask = nullptr;
+                logSynchronizeTask();
+                logSynchronizeTask = nullptr;
             }
         }
         // last check
         assert(!running_);
-        if (writerTaskQueue_->take(synchronizeTask, LogBufferFlushInterval))
+        if (writerTaskQueue_->take(logSynchronizeTask, LogBufferFlushInterval))
         {
-            synchronizeTask();
+            logSynchronizeTask();
         }
     }
 } // namespace nets::base

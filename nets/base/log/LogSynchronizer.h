@@ -92,10 +92,10 @@ namespace nets::base
         void flush() override;
     };
 
-    class SynchronizerFactory
+    class LogSynchronizerFactory
     {
     public:
-        static ::std::shared_ptr<LogSynchronizer> getSynchronizer();
+        static ::std::shared_ptr<LogSynchronizer> getLogSynchronizer();
     };
 }
 
