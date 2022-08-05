@@ -35,4 +35,9 @@ namespace nets::net
     {
         LOGS_DEBUG << "ChannelHandler::channelWrite";
     }
+
+    void ChannelHandler::exceptionCaught(ChannelContext& channelContext, const ::std::exception& exception)
+    {
+        LOGS_DEBUG << "ChannelHandler::exceptionCaught";
+    }
 } // namespace nets::net

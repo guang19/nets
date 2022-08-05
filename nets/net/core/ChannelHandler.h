@@ -27,6 +27,8 @@ namespace nets::net
 
         virtual void channelRead(ChannelContext& channelContext, ByteBuffer& message);
         virtual void channelWrite(ChannelContext& channelContext, ByteBuffer& message);
+
+        virtual void exceptionCaught(ChannelContext& channelContext, const ::std::exception& exception);
     };
 } // namespace nets::net
 

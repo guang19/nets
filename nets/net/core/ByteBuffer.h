@@ -82,7 +82,7 @@ namespace nets::net
         void writeByte(char value);
         void writeBytes(const void* data, IntType len);
         void writeBytes(const char* data, IntType len);
-        IntType writeBytes(SocketChannel& channel);
+        SSizeType writeBytes(SocketChannel& channel);
         void writeInt8(int8_t value);
         void writeInt16(int16_t value);
         void writeInt32(int32_t value);

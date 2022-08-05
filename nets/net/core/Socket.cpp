@@ -109,6 +109,7 @@ namespace nets::net::socket
     {
         auto len = static_cast<SockLenType>(sizeof(SockAddr6));
         FdType connFd = socket::InvalidFd;
+        bool retryOnce = true;
         while (true)
         {
             if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) >= 0)
@@ -118,8 +119,8 @@ namespace nets::net::socket
             else
             {
                 LOGS_ERROR << "socket accept failed";
-                int32_t errorN = errno;
-                switch (errorN)
+                int32_t errNum = errno;
+                switch (errNum)
                 {
                     // EAGAIN/EWOULDBLOCK is not an error
                     // EWOULDBLOCK
@@ -128,9 +129,16 @@ namespace nets::net::socket
                         break;
                     // retry
                     case EINTR:
+                    case EPROTO:
                     case ECONNABORTED:
-                        MEMZERO(sockAddr, len);
-                        continue;
+                        if (retryOnce)
+                        {
+                            MEMZERO(sockAddr, len);
+                            retryOnce = false;
+                            continue;
+                        }
+                        LOGS_ERROR << "socket accpet unexpected exception,tried again and still failed, errno=" << errNum;
+                        break;
                     // the per-process limit on the number of open file descriptors has been reached
                     case EMFILE:
                     {
@@ -138,7 +146,7 @@ namespace nets::net::socket
                         {
                             dealwithEMFILE(idleFd, sockFd);
                         }
-                        LOGS_ERROR << "socket accpet EAGAIN";
+                        LOGS_ERROR << "socket accpet EMFILE";
                         break;
                     }
                     // error
@@ -146,14 +154,13 @@ namespace nets::net::socket
                     case EFAULT:
                     case EINVAL:
                     case ENFILE:  // the system-wide limit on the total number of open files has been reached
-                    case ENOBUFS: // Not enough free memory
-                    case ENOMEM:  // Not enough free memory
+                    case ENOBUFS: // not enough free memory
+                    case ENOMEM:  // not enough free memory
                     case ENOTSOCK:
                     case EOPNOTSUPP:
                     case EPERM:
-                    case EPROTO:
                     default:
-                        THROW_FMT(SocketOperationException, "socket accept unexpected exception, errno=%d", errorN);
+                        THROW_FMT(SocketOperationException, "socket accept unexpected exception, errno=%d", errNum);
                         break;
                 }
             }

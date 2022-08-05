@@ -63,4 +63,12 @@ namespace nets::net
             channelHandler->channelConnect(channelContext_, localAddress, peerAddress);
         }
     }
+
+    void ChannelHandlerPipeline::fireExceptionCaught(const ::std::exception& exception)
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            channelHandler->exceptionCaught(channelContext_, exception);
+        }
+    }
 } // namespace nets::net

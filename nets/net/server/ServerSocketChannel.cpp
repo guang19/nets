@@ -90,7 +90,14 @@ namespace nets::net
             }
             InetSockAddress localAddr {};
             socket::getLocalAddress(connFd, localAddr.sockAddr());
-            socketChannel->pipeline().fireChannelConnect(localAddr, peerAddr);
+            try
+            {
+                socketChannel->pipeline().fireChannelConnect(localAddr, peerAddr);
+            }
+            catch (const ::std::exception& e)
+            {
+                socketChannel->pipeline().fireExceptionCaught(e);
+            }
         }
     }
 

@@ -28,7 +28,7 @@ namespace nets::base
             return cause_.c_str();
         }
 
-        inline const StringType& stackTrace() const
+        inline const StringType& stackTrace() const noexcept
         {
             return stackTrace_;
         }

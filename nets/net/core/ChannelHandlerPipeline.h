@@ -44,6 +44,7 @@ namespace nets::net
 
     public:
         void fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
+        void fireExceptionCaught(const ::std::exception& exception);
 
     private:
         ChannelContext channelContext_ {nullptr};
