@@ -102,10 +102,10 @@ namespace nets::net
 
     private:
         void ensureWritable(IntType writeLen);
-        IntType calculateNewCapacity(IntType targetCapacity);
+        IntType calculateNewCapacity(IntType targetCapacity) const;
         void adjustCapacity(IntType newCapacity);
 
-        void checkReadableBytes(IntType bytes);
+        void checkReadableBytes(IntType bytes) const;
         void adjustReaderIndex(IntType bytes);
 
     private:

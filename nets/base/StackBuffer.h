@@ -35,7 +35,7 @@ namespace nets::base
             return buffer_;
         }
 
-        inline IntType len() const
+        inline IntType length() const
         {
             return writerIndex_;
         }
@@ -80,7 +80,7 @@ namespace nets::base
     template <IntType SIZE>
     void StackBuffer<SIZE>::writePointer(const void* ptr)
     {
-        if (writableBytes() > MaxNumLen)
+        if (writableBytes() > MaxNumLength)
         {
             writerIndex_ += utils::fromHex(buffer_ + writerIndex_, reinterpret_cast<uintptr_t>(ptr));
         }
@@ -90,7 +90,7 @@ namespace nets::base
     template <typename Number>
     void StackBuffer<SIZE>::writeInteger(Number n)
     {
-        if (writableBytes() > MaxNumLen)
+        if (writableBytes() > MaxNumLength)
         {
             writerIndex_ += utils::fromInt(buffer_ + writerIndex_, n);
         }
@@ -100,7 +100,7 @@ namespace nets::base
     template <typename Float>
     void StackBuffer<SIZE>::writeFloat(Float f)
     {
-        if (writableBytes() > MaxFloatLen)
+        if (writableBytes() > MaxFloatLength)
         {
             writerIndex_ += utils::fromFloat(buffer_ + writerIndex_, f);
         }

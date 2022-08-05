@@ -16,17 +16,17 @@ namespace nets::base
 {
     namespace
     {
-        constexpr uint32_t MaxFilePathLen = 512;
+        constexpr uint32_t MaxFilePathLength = 512;
         const char* const LogFileNamePattern = "%Y-%m-%d_%H-%M-%S";
         const char* const LogFileSuffix = ".log";
     } // namespace
 
     LogFile::LogFile(const char* file) : fp_(nullptr), dir_(), file_(file), bytes_(0), lastRollTime_(0)
     {
-        SizeType filePathLen = file_.length();
-        if (filePathLen > MaxFilePathLen || filePathLen <= 0)
+        SizeType filePathLength = file_.length();
+        if (filePathLength > MaxFilePathLength || filePathLength <= 0)
         {
-            THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLen, MaxFilePathLen);
+            THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLength, MaxFilePathLength);
         }
         SizeType lastIndex = file_.find_last_of('/');
         if (lastIndex != StringType::npos)
@@ -98,7 +98,7 @@ namespace nets::base
         ::strcat(newFilename, LogFileSuffix);
         if (!dir_.empty())
         {
-            char tmpFile[MaxFilePathLen] = {0};
+            char tmpFile[MaxFilePathLength] = {0};
             ::strcat(tmpFile, dir_.c_str());
             ::strcat(tmpFile, newFilename);
             ::rename(file_.c_str(), tmpFile);
@@ -123,11 +123,11 @@ namespace nets::base
             return;
         }
         SizeType len = ::strlen(multiLevelDir);
-        char tmpDir[MaxFilePathLen] = {0};
+        char tmpDir[MaxFilePathLength] = {0};
         char* dirPtr = tmpDir;
-        char path[MaxFilePathLen] = {0};
-        MEMZERO(tmpDir, MaxFilePathLen);
-        MEMZERO(path, MaxFilePathLen);
+        char path[MaxFilePathLength] = {0};
+        MEMZERO(tmpDir, MaxFilePathLength);
+        MEMZERO(path, MaxFilePathLength);
         ::memcpy(tmpDir, multiLevelDir, len);
         char* spStr = nullptr;
         while (nullptr != (spStr = ::strsep(&dirPtr, "/")))

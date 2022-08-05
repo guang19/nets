@@ -93,7 +93,7 @@ namespace nets::base
                              {
                                  return !buffers_->empty();
                              });
-                if (buffers_->empty() && cacheBuffer_->len() <= 0)
+                if (buffers_->empty() && cacheBuffer_->length() <= 0)
                 {
                     lock.unlock();
                     continue;
@@ -112,7 +112,7 @@ namespace nets::base
                 for (auto& it: *tmpBuffers)
                 {
                     auto logBuffer = it.get();
-                    logSynchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
+                    logSynchronizer_->synchronize(logBuffer->array(), logBuffer->length(), currentTime);
                 }
                 logSynchronizer_->flush();
             };
@@ -127,7 +127,7 @@ namespace nets::base
         }
         // last check
         assert(!running_);
-        if (!buffers_->empty() || (cacheBuffer_->len() > 0))
+        if (!buffers_->empty() || (cacheBuffer_->length() > 0))
         {
             buffers_->push_back(::std::move(cacheBuffer_));
             ::time(&currentTime);
@@ -136,7 +136,7 @@ namespace nets::base
                 for (auto& it: *tmpBuffers)
                 {
                     auto logBuffer = it.get();
-                    logSynchronizer_->synchronize(logBuffer->array(), logBuffer->len(), currentTime);
+                    logSynchronizer_->synchronize(logBuffer->array(), logBuffer->length(), currentTime);
                 }
                 logSynchronizer_->flush();
             };

@@ -71,11 +71,11 @@ namespace nets::net
         const int32_t DefaultMaximumOfBackLog = SOMAXCONN;
         const int32_t DefaultSockLinger = 0;
 
-        const int32_t DefaultTcpSockSendBufLen = socket::getTcpSockSendBuf();
-        const int32_t DefaultTcpSockRecvBufLen = socket::getTcpSockRecvBuf();
+        const int32_t DefaultTcpSockSendBufLength = socket::getTcpSockSendBuf();
+        const int32_t DefaultTcpSockRecvBufLength = socket::getTcpSockRecvBuf();
 
-        const int32_t DefaultUdpSockSendBufLen = socket::getUdpSockSendBuf();
-        const int32_t DefaultUdpSockRecvBufLen = socket::getUdpSockRecvBuf();
+        const int32_t DefaultUdpSockSendBufLength = socket::getUdpSockSendBuf();
+        const int32_t DefaultUdpSockRecvBufLength = socket::getUdpSockRecvBuf();
     }
 } // namespace nets::net
 

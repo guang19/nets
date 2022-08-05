@@ -85,10 +85,10 @@ namespace nets::net
         const ChannelOption NTcpNoDelay {SockOpt::NTCPNODELAY, false};
         const ChannelOption NLinger {SockOpt::NLINGER, DefaultSockLinger};
         const ChannelOption NBackLog {SockOpt::NBACKLOG, DefaultMaximumOfBackLog};
-        const ChannelOption NTcpSendBuf {SockOpt::NTCPSNDBUF, DefaultTcpSockSendBufLen};
-        const ChannelOption NTcpRecvBuf {SockOpt::NTCPRCVBUF, DefaultTcpSockRecvBufLen};
-        const ChannelOption NUdpSendBuf {SockOpt::NUDPSNDBUF, DefaultUdpSockSendBufLen};
-        const ChannelOption NUdpRecvBuf {SockOpt::NUDPRCVBUF, DefaultUdpSockRecvBufLen};
+        const ChannelOption NTcpSendBuf {SockOpt::NTCPSNDBUF, DefaultTcpSockSendBufLength};
+        const ChannelOption NTcpRecvBuf {SockOpt::NTCPRCVBUF, DefaultTcpSockRecvBufLength};
+        const ChannelOption NUdpSendBuf {SockOpt::NUDPSNDBUF, DefaultUdpSockSendBufLength};
+        const ChannelOption NUdpRecvBuf {SockOpt::NUDPRCVBUF, DefaultUdpSockRecvBufLength};
     } // namespace
 } // namespace nets::net
 

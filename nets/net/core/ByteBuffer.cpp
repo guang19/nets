@@ -8,8 +8,8 @@
 #include <stdexcept>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/net/core/SocketChannel.h"
 #include "nets/base/exception/OutOfMemoryException.h"
+#include "nets/net/core/SocketChannel.h"
 
 namespace nets::net
 {
@@ -246,9 +246,8 @@ namespace nets::net
     {
         if (writableBytes() < writeLen)
         {
-            IntType oldCapacity = capacity_;
-            IntType newCapacity = oldCapacity;
-            if (oldCapacity != 0)
+            IntType newCapacity = capacity_;
+            if (capacity_ != 0)
             {
                 if (writableBytes() + discardReadBytes() < writeLen)
                 {
@@ -257,7 +256,8 @@ namespace nets::net
                 }
                 if (newCapacity > MaxCapacity)
                 {
-                    THROW_FMT(nets::base::OutOfMemoryException, "ByteBuffer newCapacity %lu exceeds the MaxCapacity", newCapacity);
+                    THROW_FMT(nets::base::OutOfMemoryException, "ByteBuffer newCapacity %lu exceeds the MaxCapacity",
+                              newCapacity);
                 }
             }
             else
@@ -268,7 +268,7 @@ namespace nets::net
         }
     }
 
-    ByteBuffer::IntType ByteBuffer::calculateNewCapacity(IntType targetCapacity)
+    ByteBuffer::IntType ByteBuffer::calculateNewCapacity(IntType targetCapacity) const
     {
         if (targetCapacity == 0)
         {
@@ -305,7 +305,7 @@ namespace nets::net
         writerIndex_ = contentBytes;
     }
 
-    void ByteBuffer::checkReadableBytes(IntType bytes)
+    void ByteBuffer::checkReadableBytes(IntType bytes) const
     {
         if (readableBytes() < bytes)
         {

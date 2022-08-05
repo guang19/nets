@@ -15,8 +15,8 @@ namespace nets::base
     {
     private:
         // log length limit: 2K
-        static constexpr IntType DefaultLogBufferLength = (1024 << 1);
-        using LogBuffer = StackBuffer<DefaultLogBufferLength>;
+        static constexpr IntType DefaultLogBufferSize = (1024 << 1);
+        using LogBuffer = StackBuffer<DefaultLogBufferSize>;
 
     public:
         LogBufferStream() = default;

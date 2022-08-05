@@ -5,6 +5,7 @@
 #include "nets/net/core/SocketChannel.h"
 
 #include "nets/base/log/Logging.h"
+#include "nets/net/core/ByteBuffer.h"
 
 namespace nets::net
 {
@@ -30,7 +31,8 @@ namespace nets::net
 
     void SocketChannel::handleReadEvent()
     {
-
+        ByteBuffer byteBuffer {};
+        byteBuffer.writeBytes(*this);
     }
 
     void SocketChannel::handleWriteEvent() {}

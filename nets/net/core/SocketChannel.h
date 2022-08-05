@@ -45,8 +45,6 @@ namespace nets::net
         void handleErrorEvent() override;
 
     private:
-
-    private:
         FdType sockFd_ {socket::InvalidFd};
         InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};

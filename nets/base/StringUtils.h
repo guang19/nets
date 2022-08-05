@@ -15,8 +15,8 @@ namespace nets::base
     {
         constexpr char Digits[] = {"0123456789"};
         constexpr char HexDigits[] = {"0123456789abcdef"};
-        constexpr uint32_t MaxNumLen = ::std::numeric_limits<uint64_t>::digits10 + 2;
-        constexpr uint32_t MaxFloatLen = ::std::numeric_limits<double>::digits10 + 2;
+        constexpr uint32_t MaxNumLength = ::std::numeric_limits<uint64_t>::digits10 + 2;
+        constexpr uint32_t MaxFloatLength = ::std::numeric_limits<double>::digits10 + 2;
     } // namespace
 
     namespace utils
@@ -58,7 +58,7 @@ namespace nets::base
             }
             else
             {
-                return ::snprintf(buffer, MaxFloatLen, "%.17g", f);
+                return ::snprintf(buffer, MaxFloatLength, "%.17g", f);
             }
         }
 

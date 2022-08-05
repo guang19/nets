@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     ::std::vector<struct epoll_event> epollEvents(20);
 
     InetSockAddress serverAddr = InetSockAddress::createLoopBackSockAddress(8080, false);
-    socket::bind(listenFd, serverAddr.csockAddr());
+    socket::bind(listenFd, serverAddr.sockAddr());
     socket::listen(listenFd, 1024);
 
     FdType epollFd = ::epoll_create1(EPOLL_CLOEXEC);
