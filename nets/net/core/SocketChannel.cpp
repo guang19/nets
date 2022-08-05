@@ -4,15 +4,18 @@
 
 #include "nets/net/core/SocketChannel.h"
 
+#include <cassert>
+
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/ByteBuffer.h"
 
 namespace nets::net
 {
-    SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(sockFd), localAddress_(), peerAddress_(peerAddress), channelHandlerPipeline_(this)
+    SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
+                                 EventLoopRawPtr eventLoop)
+        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress),
+          channelHandlerPipeline_(this)
     {
-        socket::getLocalAddress(sockFd_, localAddress_.sockAddr());
         socket::setSockNonBlock(sockFd_);
     }
 
@@ -31,8 +34,22 @@ namespace nets::net
 
     void SocketChannel::handleReadEvent()
     {
-        ByteBuffer byteBuffer {};
-        byteBuffer.writeBytes(*this);
+        ByteBuffer byteBuffer(DefaultTcpSockRecvBufSize);
+        SSizeType bytes = byteBuffer.writeBytes(*this);
+        if (bytes > 0)
+        {
+            try
+            {
+                channelHandlerPipeline_.fireChannelRead(byteBuffer);
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandlerPipeline_.fireExceptionCaught(exception);
+            }
+        }
+        else if (bytes == 0)
+        {
+        }
     }
 
     void SocketChannel::handleWriteEvent() {}

@@ -9,7 +9,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "nets/base/exception/FileCreateException.h"
+#include "nets/base/exception/FileCreationException.h"
 #include "nets/base/exception/FileOpenException.h"
 
 #define UNUSED(X) ((void) (X))
@@ -66,24 +66,24 @@ void throwFmt(const char* fmt, ...)
     switch (ERRNUM)                                                                                                         \
     {                                                                                                                       \
         case ENOENT:                                                                                                        \
-            THROW_FMT(nets::base::FileCreateException, "no such file");                                                     \
+            THROW_FMT(nets::base::FileCreationException, "no such file");                                                     \
             break;                                                                                                          \
         case EACCES:                                                                                                        \
         case EPERM:                                                                                                         \
-            THROW_FMT(nets::base::FileCreateException, "no permission to create file");                                     \
+            THROW_FMT(nets::base::FileCreationException, "no permission to create file");                                     \
             break;                                                                                                          \
         case EINVAL:                                                                                                        \
-            THROW_FMT(nets::base::FileCreateException, "invalid value in flags");                                           \
+            THROW_FMT(nets::base::FileCreationException, "invalid value in flags");                                           \
             break;                                                                                                          \
         case EMFILE:                                                                                                        \
-            THROW_FMT(nets::base::FileCreateException,                                                                      \
+            THROW_FMT(nets::base::FileCreationException,                                                                      \
                       "the per-process limit on the number of open file descriptors has been reached");                     \
             break;                                                                                                          \
         case ENAMETOOLONG:                                                                                                  \
-            THROW_FMT(nets::base::FileCreateException, "pathname was too long");                                            \
+            THROW_FMT(nets::base::FileCreationException, "pathname was too long");                                            \
             break;                                                                                                          \
         default:                                                                                                            \
-            THROW_FMT(nets::base::FileCreateException, "failed to create file for unknown reason,errno=%d", errNum);        \
+            THROW_FMT(nets::base::FileCreationException, "failed to create file for unknown reason,errno=%d", errNum);        \
             break;                                                                                                          \
     }
 

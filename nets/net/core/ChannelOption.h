@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/7/25.
 //
 
-#ifndef NETS_CHANNEL_OPTION_H
-#define NETS_CHANNEL_OPTION_H
+#ifndef NETS_NET_CHANNEL_OPTION_H
+#define NETS_NET_CHANNEL_OPTION_H
 
 #include <any>
 #include <variant>
@@ -85,11 +85,11 @@ namespace nets::net
         const ChannelOption NTcpNoDelay {SockOpt::NTCPNODELAY, false};
         const ChannelOption NLinger {SockOpt::NLINGER, DefaultSockLinger};
         const ChannelOption NBackLog {SockOpt::NBACKLOG, DefaultMaximumOfBackLog};
-        const ChannelOption NTcpSendBuf {SockOpt::NTCPSNDBUF, DefaultTcpSockSendBufLength};
-        const ChannelOption NTcpRecvBuf {SockOpt::NTCPRCVBUF, DefaultTcpSockRecvBufLength};
-        const ChannelOption NUdpSendBuf {SockOpt::NUDPSNDBUF, DefaultUdpSockSendBufLength};
-        const ChannelOption NUdpRecvBuf {SockOpt::NUDPRCVBUF, DefaultUdpSockRecvBufLength};
+        const ChannelOption NTcpSendBuf {SockOpt::NTCPSNDBUF, DefaultTcpSockSendBufSize};
+        const ChannelOption NTcpRecvBuf {SockOpt::NTCPRCVBUF, DefaultTcpSockRecvBufSize};
+        const ChannelOption NUdpSendBuf {SockOpt::NUDPSNDBUF, DefaultUdpSockSendBufSize};
+        const ChannelOption NUdpRecvBuf {SockOpt::NUDPRCVBUF, DefaultUdpSockRecvBufSize};
     } // namespace
 } // namespace nets::net
 
-#endif // NETS_CHANNEL_OPTION_H
+#endif // NETS_NET_CHANNEL_OPTION_H

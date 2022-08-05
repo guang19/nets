@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/7/26.
 //
 
-#ifndef NETS_ABSTRACT_BOOTSTRAP_H
-#define NETS_ABSTRACT_BOOTSTRAP_H
+#ifndef NETS_NET_ABSTRACT_BOOTSTRAP_H
+#define NETS_NET_ABSTRACT_BOOTSTRAP_H
 
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/EventLoopGroup.h"
@@ -43,4 +43,4 @@ namespace nets::net
     };
 } // namespace nets::net
 
-#endif // NETS_ABSTRACT_BOOTSTRAP_H
+#endif // NETS_NET_ABSTRACT_BOOTSTRAP_H

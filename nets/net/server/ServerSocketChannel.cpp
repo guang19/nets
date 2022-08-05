@@ -8,6 +8,8 @@
 
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/EventLoop.h"
+#include "nets/net/exception/ChannelRegisterException.h"
+#include "nets/net/exception/ServerSocketChannelException.h"
 
 namespace nets::net
 {
@@ -72,7 +74,9 @@ namespace nets::net
         if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr(), &idleFd_)) > 0)
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
-            auto socketChannel = ::std::make_shared<SocketChannel>(connFd, peerAddr, nextEventLoopFn_());
+            InetSockAddress localAddr {};
+            socket::getLocalAddress(connFd, localAddr.sockAddr());
+            auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
             socketChannel->setChannelOptions(childOptions_);
             for (const auto& childHandler: childHandlers_)
             {
@@ -84,19 +88,17 @@ namespace nets::net
                 childInitializationCallback_(*socketChannel);
             }
             socketChannel->addEvent(EReadEvent);
-            if (!socketChannel->registerTo())
-            {
-                LOGS_ERROR << "SocketChannel register failed";
-            }
-            InetSockAddress localAddr {};
-            socket::getLocalAddress(connFd, localAddr.sockAddr());
             try
             {
+                if (!socketChannel->registerTo())
+                {
+                    THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
+                }
                 socketChannel->pipeline().fireChannelConnect(localAddr, peerAddr);
             }
-            catch (const ::std::exception& e)
+            catch (const ::std::exception& exception)
             {
-                socketChannel->pipeline().fireExceptionCaught(e);
+                socketChannel->pipeline().fireExceptionCaught(exception);
             }
         }
     }
@@ -104,6 +106,6 @@ namespace nets::net
     void ServerSocketChannel::handleErrorEvent()
     {
         deregister();
-        LOGS_FATAL << "ServerSocketChannel occurred system error";
+        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel unexpected exception");
     }
 } // namespace nets::net

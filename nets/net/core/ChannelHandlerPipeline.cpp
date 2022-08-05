@@ -64,6 +64,14 @@ namespace nets::net
         }
     }
 
+    void ChannelHandlerPipeline::fireChannelRead(ByteBuffer& message)
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            channelHandler->channelRead(channelContext_, message);
+        }
+    }
+
     void ChannelHandlerPipeline::fireExceptionCaught(const ::std::exception& exception)
     {
         for (auto& channelHandler: channelHandlers_)

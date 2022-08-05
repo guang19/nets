@@ -27,8 +27,8 @@ namespace nets::net
         void setSockCloExec(FdType sockFd);
         void closeFd(FdType fd);
 
-        FdType createIdleFd();
         // EMFILE: The per-process limit of open file descriptors has been reached
+        FdType createIdleFd();
         void dealwithEMFILE(FdType* idleFd, FdType sockFd);
 
         void bind(FdType sockFd, const SockAddr* sockAddr);
@@ -39,7 +39,6 @@ namespace nets::net
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
         SSizeType readv(FdType fd, const IoVec* vec, int32_t iovcnt);
-
         SSizeType write(FdType fd, const void* buf, ::size_t n);
 
         void getLocalAddress(FdType fd, SockAddr* sockAddr);
@@ -62,7 +61,6 @@ namespace nets::net
         void setSockKeepAlive(FdType sockFd, bool enable = true);
         void setTcpNoDelay(FdType sockFd, bool enable = true);
         void setSockNonBlock(FdType sockFd, bool enable = true);
-        // set socket linger
         void setSockLinger(FdType sockFd, const SockLinger& linger);
     } // namespace socket
 
@@ -71,11 +69,11 @@ namespace nets::net
         const int32_t DefaultMaximumOfBackLog = SOMAXCONN;
         const int32_t DefaultSockLinger = 0;
 
-        const int32_t DefaultTcpSockSendBufLength = socket::getTcpSockSendBuf();
-        const int32_t DefaultTcpSockRecvBufLength = socket::getTcpSockRecvBuf();
+        const int32_t DefaultTcpSockSendBufSize = socket::getTcpSockSendBuf();
+        const int32_t DefaultTcpSockRecvBufSize = socket::getTcpSockRecvBuf();
 
-        const int32_t DefaultUdpSockSendBufLength = socket::getUdpSockSendBuf();
-        const int32_t DefaultUdpSockRecvBufLength = socket::getUdpSockRecvBuf();
+        const int32_t DefaultUdpSockSendBufSize = socket::getUdpSockSendBuf();
+        const int32_t DefaultUdpSockRecvBufSize = socket::getUdpSockRecvBuf();
     }
 } // namespace nets::net
 

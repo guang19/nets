@@ -13,7 +13,8 @@ namespace nets::net
     class SocketChannel : public Channel
     {
     public:
-        explicit SocketChannel(FdType sockFd, const InetSockAddress& peerAddress, EventLoopRawPtr eventLoop);
+        explicit SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
+                               EventLoopRawPtr eventLoop);
         ~SocketChannel() override;
 
     public:

@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/6/28.
 //
 
-#ifndef NETS_CHANNEL_CONTEXT_H
-#define NETS_CHANNEL_CONTEXT_H
+#ifndef NETS_NET_CHANNEL_CONTEXT_H
+#define NETS_NET_CHANNEL_CONTEXT_H
 
 #include <memory>
 
@@ -32,4 +32,4 @@ namespace nets::net
     };
 } // namespace nets::net
 
-#endif // NETS_CHANNEL_CONTEXT_H
+#endif // NETS_NET_CHANNEL_CONTEXT_H

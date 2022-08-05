@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/6/26.
 //
 
-#ifndef NETS_CHANNEL_HANDLER_PIPELINE_H
-#define NETS_CHANNEL_HANDLER_PIPELINE_H
+#ifndef NETS_NET_CHANNEL_HANDLER_PIPELINE_H
+#define NETS_NET_CHANNEL_HANDLER_PIPELINE_H
 
 #include <list>
 #include <memory>
@@ -44,6 +44,7 @@ namespace nets::net
 
     public:
         void fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
+        void fireChannelRead(ByteBuffer& message);
         void fireExceptionCaught(const ::std::exception& exception);
 
     private:
@@ -52,4 +53,4 @@ namespace nets::net
     };
 } // namespace nets::net
 
-#endif // NETS_CHANNEL_HANDLER_PIPELINE_H
+#endif // NETS_NET_CHANNEL_HANDLER_PIPELINE_H

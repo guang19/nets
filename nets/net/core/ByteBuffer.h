@@ -2,8 +2,8 @@
 // Created by guang19 on 2022/5/7.
 //
 
-#ifndef NETS_NET_BYTEBUFFER_H
-#define NETS_NET_BYTEBUFFER_H
+#ifndef NETS_NET_BYTE_BUFFER_H
+#define NETS_NET_BYTE_BUFFER_H
 
 #include <cstdint>
 #include <memory>
@@ -118,4 +118,4 @@ namespace nets::net
     };
 } // namespace nets::net
 
-#endif // NETS_NET_BYTEBUFFER_H
+#endif // NETS_NET_BYTE_BUFFER_H

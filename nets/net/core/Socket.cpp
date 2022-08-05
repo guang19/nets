@@ -10,7 +10,7 @@
 #include <unistd.h>
 
 #include "nets/base/log/Logging.h"
-#include "nets/net/exception/SocketCreateException.h"
+#include "nets/net/exception/SocketCreationException.h"
 #include "nets/net/exception/SocketOperationException.h"
 
 namespace nets::net::socket
@@ -20,7 +20,7 @@ namespace nets::net::socket
         FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
         if (sockFd < 0)
         {
-            THROW_FMT(SocketCreateException, "socket createTcpSocket failed");
+            THROW_FMT(SocketCreationException, "socket createTcpSocket failed");
         }
         setSockCloExec(sockFd);
         return sockFd;
@@ -31,7 +31,7 @@ namespace nets::net::socket
         FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
         if (sockFd < 0)
         {
-            THROW_FMT(SocketCreateException, "socket createUdpSocket failed");
+            THROW_FMT(SocketCreationException, "socket createUdpSocket failed");
         }
         setSockCloExec(sockFd);
         return sockFd;
@@ -169,7 +169,33 @@ namespace nets::net::socket
 
     SSizeType read(FdType fd, void* buf, ::size_t n)
     {
-        return ::read(fd, buf, n);
+        SSizeType bytes = ::read(fd, buf, n);
+        if (bytes < 0)
+        {
+            int32_t errNum = errno;
+            switch (errNum)
+            {
+                // EAGAIN/EWOULDBLOCK is not an error
+                // EWOULDBLOCK
+                case EAGAIN:
+                    break;
+                // error
+                case EINTR:
+                case EBADF:
+                case EFAULT:
+                case EINVAL:
+                case ENFILE:  // the system-wide limit on the total number of open files has been reached
+                case ENOBUFS: // not enough free memory
+                case ENOMEM:  // not enough free memory
+                case ENOTSOCK:
+                case EOPNOTSUPP:
+                case EPERM:
+                default:
+                    LOGS_ERROR << "socket accpet unexpected exception,tried again and still failed, errno=" << errNum;
+                    break;
+            }
+        }
+        return bytes;
     }
 
     SSizeType readv(FdType fd, const IoVec* vec, int32_t iovcnt)
