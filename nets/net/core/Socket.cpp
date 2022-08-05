@@ -6,7 +6,6 @@
 
 #include <fcntl.h>
 #include <netinet/tcp.h>
-#include <sys/uio.h>
 #include <unistd.h>
 
 #include "nets/base/log/Logging.h"
@@ -196,11 +195,6 @@ namespace nets::net::socket
             }
         }
         return bytes;
-    }
-
-    SSizeType readv(FdType fd, const IoVec* vec, int32_t iovcnt)
-    {
-        return ::readv(fd, vec, iovcnt);
     }
 
     SSizeType write(FdType fd, const void* buf, ::size_t n)

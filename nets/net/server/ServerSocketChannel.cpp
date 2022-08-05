@@ -44,18 +44,13 @@ namespace nets::net
         childOptions_.insert(childOptions_.end(), childOptions.begin(), childOptions.end());
     }
 
-    void ServerSocketChannel::setChannelOptions()
+    void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
     {
+        sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
         for (const auto& channelOption: channelOptions_)
         {
             setChannelOption(channelOption);
         }
-    }
-
-    void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
-    {
-        sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
-        setChannelOptions();
         socket::setSockNonBlock(sockFd_, true);
         socket::bind(sockFd_, sockAddress.sockAddr());
         socket::listen(sockFd_, backlog_);

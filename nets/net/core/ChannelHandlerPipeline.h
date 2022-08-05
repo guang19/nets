@@ -6,7 +6,6 @@
 #define NETS_NET_CHANNEL_HANDLER_PIPELINE_H
 
 #include <list>
-#include <memory>
 
 #include "nets/base/Copyable.h"
 #include "nets/net/core/ChannelContext.h"

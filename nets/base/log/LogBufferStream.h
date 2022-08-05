@@ -5,8 +5,6 @@
 #ifndef NETS_BASE_LOG_BUFFER_STREAM_H
 #define NETS_BASE_LOG_BUFFER_STREAM_H
 
-#include <string>
-
 #include "nets/base/StackBuffer.h"
 
 namespace nets::base

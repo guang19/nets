@@ -6,7 +6,6 @@
 #define NETS_BASE_BOUNDED_BLOCKING_QUEUE_H
 
 #include <condition_variable>
-#include <ctime>
 #include <deque>
 #include <functional>
 #include <shared_mutex>

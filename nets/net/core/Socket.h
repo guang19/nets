@@ -38,7 +38,6 @@ namespace nets::net
         FdType accept(FdType sockFd, SockAddr* sockAddr, FdType* idleFd);
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
-        SSizeType readv(FdType fd, const IoVec* vec, int32_t iovcnt);
         SSizeType write(FdType fd, const void* buf, ::size_t n);
 
         void getLocalAddress(FdType fd, SockAddr* sockAddr);

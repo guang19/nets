@@ -4,8 +4,6 @@
 
 #include "nets/base/log/LogFile.h"
 
-#include <cstdio>
-#include <cstdlib>
 #include <stdexcept>
 #include <sys/stat.h>
 #include <unistd.h>

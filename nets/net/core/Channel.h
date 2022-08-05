@@ -6,7 +6,6 @@
 #define NETS_NET_CHANNEL_H
 
 #include <memory>
-#include <sys/epoll.h>
 #include <vector>
 
 #include "nets/base/Noncopyable.h"

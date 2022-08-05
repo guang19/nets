@@ -21,6 +21,3 @@ TARGET_LINK_LIBRARIES(LogBufferStreamTest nets_base_shared libgtest.a)
 
 ADD_EXECUTABLE(LoggingTest LoggingTest.cpp)
 TARGET_LINK_LIBRARIES(LoggingTest nets_base_shared libgtest.a)
-
-ADD_EXECUTABLE(ExceptionTest ExceptionTest.cpp)
-TARGET_LINK_LIBRARIES(ExceptionTest nets_base_shared libgtest.a)

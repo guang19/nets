@@ -4,8 +4,6 @@
 
 #include "nets/net/core/SocketChannel.h"
 
-#include <cassert>
-
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/ByteBuffer.h"
 

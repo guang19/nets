@@ -4,7 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <memory>
 #include <thread>
 
 #include "nets/base/log/Logging.h"

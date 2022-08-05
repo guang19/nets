@@ -43,7 +43,6 @@ namespace nets::net
         }
 
         void setChannelOptions(const ChannelOptionList& channelOptions);
-        void setChannelOptions();
         void setChildOptions(const ChannelOptionList& childOptions);
 
         inline void setChildHandlers(const ChannelHandlerList& childHandlers)

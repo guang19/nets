@@ -5,8 +5,6 @@
 #ifndef NETS_BASE_LOG_FILE_H
 #define NETS_BASE_LOG_FILE_H
 
-#include <ctime>
-#include <memory>
 #include <string>
 
 #include "nets/base/Noncopyable.h"

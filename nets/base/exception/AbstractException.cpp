@@ -4,7 +4,6 @@
 
 #include "nets/base/exception/AbstractException.h"
 
-#include <cxxabi.h>
 #include <execinfo.h>
 
 namespace nets::base

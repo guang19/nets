@@ -5,8 +5,6 @@
 #ifndef NETS_NET_CHANNEL_CONTEXT_H
 #define NETS_NET_CHANNEL_CONTEXT_H
 
-#include <memory>
-
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Channel.h"
 
