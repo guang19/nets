@@ -6,6 +6,7 @@
 
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/ByteBuffer.h"
+#include "nets/net/exception/SocketChannelException.h"
 
 namespace nets::net
 {
@@ -14,7 +15,6 @@ namespace nets::net
         : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress),
           channelHandlerPipeline_(this)
     {
-        socket::setSockNonBlock(sockFd_);
     }
 
     SocketChannel::~SocketChannel()
@@ -47,10 +47,46 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
+//            socket::closeFd(sockFd_);
+        }
+        else
+        {
+            int32_t errNum = errno;
+            handleReadError(errNum);
+        }
+    }
+
+    void SocketChannel::handleReadError(int32_t errNum)
+    {
+        switch (errNum)
+        {
+            // EAGAIN/EWOULDBLOCK is not an error
+            // EWOULDBLOCK
+            case EAGAIN:
+            case EINTR:
+                LOGS_ERROR << "SocketChannel read expected exception,errno=" << errNum;
+                break;
+            // error
+            case EBADF:
+            case EFAULT:
+            case EINVAL:
+            case EIO:
+            case EPERM:
+            case EISDIR:
+            case ENOMEM:
+            case ENOTCONN:
+            case ENOTSOCK:
+            default:
+                LOGS_ERROR << "SocketChannel read unexpected exception,errno=" << errNum;
+                break;
         }
     }
 
     void SocketChannel::handleWriteEvent() {}
 
-    void SocketChannel::handleErrorEvent() {}
+    void SocketChannel::handleErrorEvent()
+    {
+        int32_t errNum = socket::getSockError(sockFd_);
+        LOGS_ERROR << "SocketChannel unexpected exception,errNum=" << errNum;
+    }
 } // namespace nets::net

@@ -68,14 +68,14 @@ namespace nets::net::socket
         return idleFd;
     }
 
-    void dealwithEMFILE(FdType* idleFd, FdType sockFd)
+    void dealwithEMFILE(FdType& idleFd, FdType sockFd)
     {
-        closeFd(*idleFd);
+        closeFd(idleFd);
         FdType connFd = ::accept(sockFd, nullptr, nullptr);
         // close client connection, avoid listenFd always trigger
         closeFd(connFd);
         // recreate idle fd
-        *idleFd = createIdleFd();
+        idleFd = createIdleFd();
     }
 
     void bind(FdType sockFd, const SockAddr* sockAddr)
@@ -104,97 +104,15 @@ namespace nets::net::socket
         }
     }
 
-    FdType accept(FdType sockFd, SockAddr* sockAddr, FdType* idleFd)
+    FdType accept(FdType sockFd, SockAddr* sockAddr)
     {
         auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        FdType connFd = socket::InvalidFd;
-        bool retryOnce = true;
-        while (true)
-        {
-            if ((connFd = ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC)) >= 0)
-            {
-                return connFd;
-            }
-            else
-            {
-                LOGS_ERROR << "socket accept failed";
-                int32_t errNum = errno;
-                switch (errNum)
-                {
-                    // EAGAIN/EWOULDBLOCK is not an error
-                    // EWOULDBLOCK
-                    case EAGAIN:
-                        LOGS_WARN << "socket accpet EAGAIN";
-                        break;
-                    // retry
-                    case EINTR:
-                    case EPROTO:
-                    case ECONNABORTED:
-                        if (retryOnce)
-                        {
-                            MEMZERO(sockAddr, len);
-                            retryOnce = false;
-                            continue;
-                        }
-                        LOGS_ERROR << "socket accpet unexpected exception,tried again and still failed, errno=" << errNum;
-                        break;
-                    // the per-process limit on the number of open file descriptors has been reached
-                    case EMFILE:
-                    {
-                        if (idleFd != nullptr && *idleFd >= 0)
-                        {
-                            dealwithEMFILE(idleFd, sockFd);
-                        }
-                        LOGS_ERROR << "socket accpet EMFILE";
-                        break;
-                    }
-                    // error
-                    case EBADF:
-                    case EFAULT:
-                    case EINVAL:
-                    case ENFILE:  // the system-wide limit on the total number of open files has been reached
-                    case ENOBUFS: // not enough free memory
-                    case ENOMEM:  // not enough free memory
-                    case ENOTSOCK:
-                    case EOPNOTSUPP:
-                    case EPERM:
-                    default:
-                        THROW_FMT(SocketOperationException, "socket accept unexpected exception, errno=%d", errNum);
-                        break;
-                }
-            }
-        }
+        return ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
     }
 
     SSizeType read(FdType fd, void* buf, ::size_t n)
     {
-        SSizeType bytes = ::read(fd, buf, n);
-        if (bytes < 0)
-        {
-            int32_t errNum = errno;
-            switch (errNum)
-            {
-                // EAGAIN/EWOULDBLOCK is not an error
-                // EWOULDBLOCK
-                case EAGAIN:
-                    break;
-                // error
-                case EINTR:
-                case EBADF:
-                case EFAULT:
-                case EINVAL:
-                case ENFILE:  // the system-wide limit on the total number of open files has been reached
-                case ENOBUFS: // not enough free memory
-                case ENOMEM:  // not enough free memory
-                case ENOTSOCK:
-                case EOPNOTSUPP:
-                case EPERM:
-                default:
-                    LOGS_ERROR << "socket accpet unexpected exception,tried again and still failed, errno=" << errNum;
-                    break;
-            }
-        }
-        return bytes;
+        return ::read(fd, buf, n);
     }
 
     SSizeType write(FdType fd, const void* buf, ::size_t n)
@@ -220,6 +138,21 @@ namespace nets::net::socket
         }
     }
 
+    OptValType getSockError(FdType sockFd)
+    {
+        OptValType optVal = 0;
+        auto len = static_cast<SockLenType>(sizeof(optVal));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &len))
+        {
+            LOGS_ERROR << "socket getSockError failed";
+            return errno;
+        }
+        else
+        {
+            return optVal;
+        }
+    }
+
     void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
     {
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sendBufLen)))
@@ -241,7 +174,10 @@ namespace nets::net::socket
         FdType sockFd = socket::createTcpSocket(AF_INET);
         OptValType optVal = 0;
         auto len = static_cast<SockLenType>(sizeof(optVal));
-        ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len);
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len))
+        {
+            LOGS_ERROR << "socket getTcpSockSendBuf failed";
+        }
         socket::closeFd(sockFd);
         return optVal;
     }
@@ -251,7 +187,10 @@ namespace nets::net::socket
         FdType sockFd = socket::createTcpSocket(AF_INET);
         OptValType optVal = 0;
         auto len = static_cast<SockLenType>(sizeof(optVal));
-        ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len);
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len))
+        {
+            LOGS_ERROR << "socket getTcpSockRecvBuf failed";
+        }
         socket::closeFd(sockFd);
         return optVal;
     }
@@ -261,7 +200,10 @@ namespace nets::net::socket
         FdType sockFd = socket::createUdpSocket(AF_INET);
         OptValType optVal = 0;
         auto len = static_cast<SockLenType>(sizeof(optVal));
-        ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len);
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len))
+        {
+            LOGS_ERROR << "socket getUdpSockSendBuf failed";
+        }
         socket::closeFd(sockFd);
         return optVal;
     }
@@ -271,7 +213,10 @@ namespace nets::net::socket
         FdType sockFd = socket::createUdpSocket(AF_INET);
         OptValType optVal = 0;
         auto len = static_cast<SockLenType>(sizeof(optVal));
-        ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len);
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len))
+        {
+            LOGS_ERROR << "socket getUdpSockRecvBuf failed";
+        }
         socket::closeFd(sockFd);
         return optVal;
     }

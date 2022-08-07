@@ -46,6 +46,9 @@ namespace nets::net
         void handleErrorEvent() override;
 
     private:
+        void handleReadError(int32_t errNum);
+
+    private:
         FdType sockFd_ {socket::InvalidFd};
         InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};

@@ -72,7 +72,7 @@ namespace nets::net
             {
                 channel->addReadyEvent(EErrorEvent);
             }
-            if (revents & (EPOLLIN | EPOLLPRI))
+            if (revents & (EPOLLIN | EPOLLPRI | EPOLLRDHUP))
             {
                 channel->addReadyEvent(EReadEvent);
             }

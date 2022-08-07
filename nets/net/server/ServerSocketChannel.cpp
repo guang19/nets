@@ -66,7 +66,7 @@ namespace nets::net
         assert(eventLoop_->isInCurrentEventLoop());
         InetSockAddress peerAddr {};
         FdType connFd = socket::InvalidFd;
-        if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr(), &idleFd_)) > 0)
+        if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr())) >= 0)
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
             InetSockAddress localAddr {};
@@ -96,11 +96,54 @@ namespace nets::net
                 socketChannel->pipeline().fireExceptionCaught(exception);
             }
         }
+        else
+        {
+            int32_t errNum = errno;
+            handleAcceptError(errNum);
+        }
+    }
+
+    void ServerSocketChannel::handleAcceptError(int32_t errNum)
+    {
+        switch (errNum)
+        {
+            // EAGAIN/EWOULDBLOCK is not an error
+            // EWOULDBLOCK
+            case EAGAIN:
+                LOGS_WARN << "ServerSocketChannel accpet EAGAIN";
+                break;
+            case EINTR:
+            case EPROTO:
+            case ECONNABORTED:
+                LOGS_ERROR << "ServerSocketChannel expected exception occurred while accepting,errno=" << errNum;
+                break;
+            // the per-process limit on the number of open file descriptors has been reached
+            case EMFILE:
+            {
+                LOGS_ERROR << "ServerSocketChannel accpet EMFILE";
+                socket::dealwithEMFILE(idleFd_, sockFd_);
+                break;
+            }
+            // error
+            case EBADF:
+            case EFAULT:
+            case EINVAL:
+            case ENFILE:  // the system-wide limit on the total number of open files has been reached
+            case ENOBUFS: // not enough free memory
+            case ENOMEM:  // not enough free memory
+            case ENOTSOCK:
+            case EOPNOTSUPP:
+            case EPERM:
+            default:
+                THROW_FMT(ServerSocketChannelException,
+                          "ServerSocketChannel occurred unexpected exception while accepting,errno=%d", errNum);
+                break;
+        }
     }
 
     void ServerSocketChannel::handleErrorEvent()
     {
-        deregister();
-        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel unexpected exception");
+        int32_t errNum = socket::getSockError(sockFd_);
+        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 } // namespace nets::net

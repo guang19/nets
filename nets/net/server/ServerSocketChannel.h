@@ -62,6 +62,9 @@ namespace nets::net
         void handleErrorEvent() override;
 
     private:
+        void handleAcceptError(int32_t errNum);
+
+    private:
         FdType sockFd_ {socket::InvalidFd};
         FdType idleFd_ {socket::InvalidFd};
         int32_t backlog_ {0};

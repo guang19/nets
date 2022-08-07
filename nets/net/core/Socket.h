@@ -29,19 +29,21 @@ namespace nets::net
 
         // EMFILE: The per-process limit of open file descriptors has been reached
         FdType createIdleFd();
-        void dealwithEMFILE(FdType* idleFd, FdType sockFd);
+        void dealwithEMFILE(FdType& idleFd, FdType sockFd);
 
         void bind(FdType sockFd, const SockAddr* sockAddr);
         void connect(FdType sockFd, const SockAddr* sockAddr);
 
         void listen(FdType sockFd, int32_t backlog);
-        FdType accept(FdType sockFd, SockAddr* sockAddr, FdType* idleFd);
+        FdType accept(FdType sockFd, SockAddr* sockAddr);
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
         SSizeType write(FdType fd, const void* buf, ::size_t n);
 
         void getLocalAddress(FdType fd, SockAddr* sockAddr);
         void getPeerAddress(FdType fd, SockAddr* sockAddr);
+
+        OptValType getSockError(FdType sockFd);
 
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
         // TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x

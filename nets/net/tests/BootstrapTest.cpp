@@ -23,9 +23,10 @@ int main(int argc, char** argv)
     char buf[1024] = "asdasd1233asd";
     size_t n = ::strlen(buf);
     printf("bytes = %ld", n);
+    ::shutdown(sockFd, SHUT_RD);
     //	size_t count = n;
-//    while (true)
-//    {
+    while (true)
+    {
 //        socket::write(sockFd, buf, n);
 //        socket::closeFd(sockFd);
         //		count += count;
@@ -36,5 +37,5 @@ int main(int argc, char** argv)
         //		}
 //        ::sleep(5);
 //        break;
-//    }
+    }
 }
