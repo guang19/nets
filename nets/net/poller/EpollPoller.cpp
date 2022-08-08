@@ -36,12 +36,12 @@ namespace nets::net
     void EpollPoller::poll(int32_t timeoutMs, ChannelList& activeChannels)
     {
         SizeType size = events_.size();
-        int32_t numOfReadyEvent = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
-        if (numOfReadyEvent > 0)
+        int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
+        if (numOfReadyEvents > 0)
         {
-            LOGS_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvent << " events";
-            prepareChannelReadyEvents(numOfReadyEvent, activeChannels);
-            if (static_cast<EventList::size_type>(numOfReadyEvent) == size)
+            LOGS_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvents << " events";
+            prepareChannelReadyEvents(numOfReadyEvents, activeChannels);
+            if (static_cast<SizeType>(numOfReadyEvents) >= size)
             {
                 size = size + (size >> 1);
                 if (size >= MaxEpollEventSize)
@@ -51,7 +51,7 @@ namespace nets::net
                 events_.resize(size);
             }
         }
-        else if (numOfReadyEvent < 0)
+        else if (numOfReadyEvents < 0)
         {
             LOGS_ERROR << "EpollPoller epoll failed";
         }
@@ -61,9 +61,9 @@ namespace nets::net
         }
     }
 
-    void EpollPoller::prepareChannelReadyEvents(int32_t numOfReadyEvent, ChannelList& activeChannels)
+    void EpollPoller::prepareChannelReadyEvents(int32_t numOfReadyEvents, ChannelList& activeChannels)
     {
-        for (int32_t i = 0; i < numOfReadyEvent; ++i)
+        for (int32_t i = 0; i < numOfReadyEvents; ++i)
         {
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
             EventType revents = events_[i].events;

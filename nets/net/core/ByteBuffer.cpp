@@ -270,6 +270,7 @@ namespace nets::net
 
     ByteBuffer::IntType ByteBuffer::calculateNewCapacity(IntType targetCapacity) const
     {
+        // ensure newCapacity is a power of 2
         if (targetCapacity == 0)
         {
             return 0;
@@ -321,6 +322,7 @@ namespace nets::net
         }
         else
         {
+            // readerIndex >= writerIndex
             clear();
         }
     }
