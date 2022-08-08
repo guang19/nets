@@ -110,8 +110,8 @@ namespace nets::net
     void EventLoop::deregisterChannel(const ChannelPtr& channel)
     {
         assert(channels_.find(channel->fd()) != channels_.end());
-        channels_.erase(channel->fd());
         poller_->deregisterChannel(channel.get());
+        channels_.erase(channel->fd());
         assert(channels_.find(channel->fd()) == channels_.end());
     }
 } // namespace nets::net

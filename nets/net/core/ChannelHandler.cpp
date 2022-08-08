@@ -16,11 +16,6 @@ namespace nets::net
         LOGS_DEBUG << "ChannelHandler::channelConnect";
     }
 
-    void ChannelHandler::channelClose(ChannelContext& channelContext)
-    {
-        LOGS_DEBUG << "ChannelHandler::channelClose";
-    }
-
     void ChannelHandler::channelDisconnect(ChannelContext& channelContext)
     {
         LOGS_DEBUG << "ChannelHandler::channelDisconnect";

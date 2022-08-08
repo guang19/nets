@@ -72,6 +72,14 @@ namespace nets::net
         }
     }
 
+    void ChannelHandlerPipeline::fireChannelDisconnect()
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            channelHandler->channelDisconnect(channelContext_);
+        }
+    }
+
     void ChannelHandlerPipeline::fireExceptionCaught(const ::std::exception& exception)
     {
         for (auto& channelHandler: channelHandlers_)

@@ -11,10 +11,27 @@ using namespace nets::net;
 class TestSharedServerChannelHandler : public ChannelHandler
 {
 public:
-    void channelConnect(ChannelContext& channelContext, const InetSockAddress& peerAddress,
-                        const InetSockAddress& localAddress) override
+    void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+                        const InetSockAddress& peerAddress) override
     {
-        LOGS_INFO << "====local address:" << localAddress.toString() << "client address:" << peerAddress.toString();
+        LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
+                   << " client address:" << peerAddress.toString();
+    }
+
+    void channelDisconnect(ChannelContext& channelContext) override
+    {
+        socket::write(channelContext.channel()->fd(), "Hello Client", strlen("Hello Client"));
+        LOGS_DEBUG << "Server channelDisconnect";
+    }
+
+    void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
+    {
+        LOGS_DEBUG << "Server recv client message is:" << message.toString();
+    }
+    
+    void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
+    {
+        LOGS_DEBUG << "Server exceptionCaught";
     }
 
 private:
@@ -23,13 +40,6 @@ private:
 
 class TestExclusiveServerChannelHandler : public ChannelHandler
 {
-public:
-    void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
-                        const InetSockAddress& peerAddress) override
-    {
-        LOGS_INFO << "====local address:" << localAddress.toString() << "client address:" << peerAddress.toString();
-    }
-
 private:
     static int32_t SharedNum;
 };
@@ -43,7 +53,7 @@ int main(int argc, char** argv)
         .childHandler(
             [](SocketChannel& channel)
             {
-                channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
+                // channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
             })
         .bind(8080)
         .launch();

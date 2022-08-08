@@ -55,6 +55,9 @@ namespace nets::net
         void deregisterChannel(const ChannelPtr& channel);
 
         template <typename Fn, typename... Args>
+        void addTask(Fn&& func, Args&&... args);
+
+        template <typename Fn, typename... Args>
         void execute(Fn&& func, Args&&... args);
 
         template <typename Fn, typename... Args,
@@ -66,6 +69,8 @@ namespace nets::net
                   typename HasRet = typename ::std::enable_if<
                       ::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
         ::std::future<void> submit(Fn&& func, Args&&... args);
+
+
 
     private:
         void runPendingTasks();
@@ -80,6 +85,20 @@ namespace nets::net
         TaskList pendingTasks_ {};
         MutexType mutex_ {};
     };
+
+    template <typename Fn, typename... Args>
+    void EventLoop::addTask(Fn&& func, Args&&... args)
+    {
+        TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+        {
+            LockGuardType lock(mutex_);
+            pendingTasks_.push_back(::std::move(task));
+        }
+        if (!isInCurrentEventLoop())
+        {
+            notifier_->notify();
+        }
+    }
 
     template <typename Fn, typename... Args>
     void EventLoop::execute(Fn&& func, Args&&... args)

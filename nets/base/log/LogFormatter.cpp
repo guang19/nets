@@ -44,7 +44,7 @@ namespace nets::base
         // check return value to circumvent [-Werror=format-truncation]
         ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1,
                    tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp()) < 0
-            ? throw ::std::runtime_error("snprintf format truncation exception")
+            ? throw ::std::runtime_error("DefaultLogFormatter formatLogMessage snprintf format truncation exception")
             : UNUSED(0);
         logBufferStream << timeBuf;
         logBufferStream << " [" << currentTid() << "] ";

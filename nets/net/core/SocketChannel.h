@@ -5,11 +5,14 @@
 #ifndef NETS_NET_SOCKET_CHANNEL_H
 #define NETS_NET_SOCKET_CHANNEL_H
 
+#include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/Channel.h"
 #include "nets/net/core/ChannelHandlerPipeline.h"
 
 namespace nets::net
 {
+    class ByteBuffer;
+
     class SocketChannel : public Channel
     {
     public:

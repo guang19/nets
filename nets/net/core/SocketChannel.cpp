@@ -5,7 +5,6 @@
 #include "nets/net/core/SocketChannel.h"
 
 #include "nets/base/log/Logging.h"
-#include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/SocketChannelException.h"
 
@@ -48,6 +47,27 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
+            // passively closed, the client may shutdown(write) or close the socket. if the client shutdown write, the tcp
+            // connection is half-close state, the server can still send data, and the client can still recv it; if the
+            // client closes the socket, the server will also close the socket. if the server still needs to send data after
+            // the client shutdown write, then let the user send data in the disConnect callback, and the server will close
+            // the socket after disConnect
+            try
+            {
+                channelHandlerPipeline_.fireChannelDisconnect();
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandlerPipeline_.fireExceptionCaught(exception);
+            }
+            // if cancel directly, because the channel is destroyed in advance, an exception may be thrown when other
+            // events of the channel are executed in the current loop. so add task to pendingTasksQueue, wait next loop execute
+            eventLoop_->addTask(
+                [channel = shared_from_this()]()
+                {
+                    channel->deregister();
+                    assert(channel.use_count() == 1);
+                });
         }
         else
         {
@@ -86,6 +106,8 @@ namespace nets::net
     void SocketChannel::handleWriteEvent()
     {
         LOGS_DEBUG << "SocketChannel::handleWriteEvent";
+        int32_t n = socket::write(sockFd_, "haha", 4);
+        LOGS_DEBUG << "write " << n << " bytes";
     }
 
     void SocketChannel::handleErrorEvent()

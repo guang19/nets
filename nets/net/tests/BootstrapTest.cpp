@@ -23,12 +23,15 @@ int main(int argc, char** argv)
     char sendBuf[1024] = "“发送的数据”";
     size_t n1 = ::strlen(sendBuf);
     socket::write(sockFd, sendBuf, n1);
+    ::sleep(3);
     ::shutdown(sockFd, SHUT_WR);
-
+    ::sleep(3);
     char recvBuf[1024] = {0};
-    size_t n2 = ::strlen(recvBuf);
-    int bytes = socket::read(sockFd, recvBuf, n2);
-    printf("接受的数据:%d\t%s\n", bytes, recvBuf);
+    int bytes = socket::read(sockFd, recvBuf, sizeof(recvBuf));
+    if (bytes > 0)
+    {
+        printf("接受的数据:%d\t%s\n", bytes, recvBuf);
+    }
     socket::closeFd(sockFd);
 }
 

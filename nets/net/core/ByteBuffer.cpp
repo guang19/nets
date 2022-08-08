@@ -236,10 +236,15 @@ namespace nets::net
     double ByteBuffer::readDouble()
     {
         checkReadableBytes(DoubleBytes);
-        double val;
+        double val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], DoubleBytes);
         adjustReaderIndex(DoubleBytes);
         return *(double*) &val;
+    }
+
+    ByteBuffer::StringType ByteBuffer::toString() const
+    {
+        return {&buffer_[readerIndex_], readableBytes()};
     }
 
     void ByteBuffer::ensureWritable(IntType writeLen)

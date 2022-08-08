@@ -9,10 +9,12 @@
 #include <memory>
 
 #include "nets/base/Copyable.h"
-#include "nets/net/core/SocketChannel.h"
+#include "nets/net/core/Socket.h"
 
 namespace nets::net
 {
+    class SocketChannel;
+
     class ByteBuffer : public nets::base::Copyable
     {
     public:
@@ -99,6 +101,7 @@ namespace nets::net
         int64_t readInt64();
         float readFloat();
         double readDouble();
+        StringType toString() const;
 
     private:
         void ensureWritable(IntType writeLen);

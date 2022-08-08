@@ -22,12 +22,8 @@ namespace nets::net
     public:
         virtual void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
                                     const InetSockAddress& peerAddress);
-        virtual void channelClose(ChannelContext& channelContext);
         virtual void channelDisconnect(ChannelContext& channelContext);
-
         virtual void channelRead(ChannelContext& channelContext, ByteBuffer& message);
-        virtual void channelWrite(ChannelContext& channelContext, ByteBuffer& message);
-
         virtual void exceptionCaught(ChannelContext& channelContext, const ::std::exception& exception);
     };
 } // namespace nets::net
