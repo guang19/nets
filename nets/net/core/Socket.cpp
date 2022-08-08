@@ -259,7 +259,7 @@ namespace nets::net::socket
 
     void setSockLinger(FdType sockFd, const SockLinger& linger)
     {
-        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
         {
             LOGS_ERROR << "socket setSockLinger failed";
         }

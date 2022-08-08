@@ -6,13 +6,14 @@
 
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/ByteBuffer.h"
+#include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/SocketChannelException.h"
 
 namespace nets::net
 {
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress),
+        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), sendBuffer_(),
           channelHandlerPipeline_(this)
     {
     }
@@ -47,7 +48,6 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
-            //            socket::closeFd(sockFd_);
         }
         else
         {
@@ -77,12 +77,16 @@ namespace nets::net
             case ENOTCONN:
             case ENOTSOCK:
             default:
+                errno = errNum;
                 LOGS_ERROR << "SocketChannel read unexpected exception,errno=" << errNum;
                 break;
         }
     }
 
-    void SocketChannel::handleWriteEvent() {}
+    void SocketChannel::handleWriteEvent()
+    {
+        LOGS_DEBUG << "SocketChannel::handleWriteEvent";
+    }
 
     void SocketChannel::handleErrorEvent()
     {

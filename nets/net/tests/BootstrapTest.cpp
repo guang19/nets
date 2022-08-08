@@ -20,22 +20,15 @@ int main(int argc, char** argv)
     ::getsockname(sockFd, clientAddr.sockAddr(), &len);
     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", sockFd, clientAddr.ip().c_str(), clientAddr.port());
     ::printf("client addr=%s\n", clientAddr.toString().c_str());
-    char buf[1024] = "asdasd1233asd";
-    size_t n = ::strlen(buf);
-    printf("bytes = %ld", n);
-    ::shutdown(sockFd, SHUT_RD);
-    //	size_t count = n;
-    while (true)
-    {
-//        socket::write(sockFd, buf, n);
-//        socket::closeFd(sockFd);
-        //		count += count;
-        //		if (count >= 131072)
-        //		{
-        //			socket::write(sockFd, "131072 bytes", ::strlen("131072 bytes"));
-        //			break;
-        //		}
-//        ::sleep(5);
-//        break;
-    }
+    char sendBuf[1024] = "“发送的数据”";
+    size_t n1 = ::strlen(sendBuf);
+    socket::write(sockFd, sendBuf, n1);
+    ::shutdown(sockFd, SHUT_WR);
+
+    char recvBuf[1024] = {0};
+    size_t n2 = ::strlen(recvBuf);
+    int bytes = socket::read(sockFd, recvBuf, n2);
+    printf("接受的数据:%d\t%s\n", bytes, recvBuf);
+    socket::closeFd(sockFd);
 }
+
