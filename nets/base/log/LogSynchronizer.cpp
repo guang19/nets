@@ -90,13 +90,13 @@ namespace nets::base
     {
         switch (LOG_WRITER_TYPE)
         {
-            case LogWriterType::Stdout:
+            case LogWriterType::STDOUT:
                 return StdoutLogSynchronizer::getInstance();
-            case LogWriterType::SingFile:
+            case LogWriterType::SINGLE_FILE:
                 return SingleLogFileSynchronizer::getInstance(LOG_FILE);
-            case LogWriterType::DailyFile:
+            case LogWriterType::DAILY_FILE:
                 return DailyLogFileSynchronizer::getInstance(LOG_FILE);
-            case LogWriterType::RollingFile:
+            case LogWriterType::ROLLING_FILE:
                 return RollingLogFileSynchronizer::getInstance(LOG_FILE);
             default:
                 return StdoutLogSynchronizer::getInstance();
