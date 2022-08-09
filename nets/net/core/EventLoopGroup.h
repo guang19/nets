@@ -59,7 +59,7 @@ namespace nets::net
         }
 
     private:
-        IntType nextLoop_ {0};
+        SizeType nextLoop_ {0};
         IntType numOfEventLoops_ {0};
         EventLoopList eventLoops_ {};
         FutureList futures_ {};

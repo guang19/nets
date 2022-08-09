@@ -45,18 +45,18 @@ namespace nets::net
         virtual FdType fd() const = 0;
 
         EventLoopRawPtr eventLoop() const;
-
         EventType events() const;
-        bool isNoneEvent() const;
         void setEvents(EventType events);
         void addEvent(EventType event);
-
-        bool isRegistered() const;
-        void setRegistered(bool registered);
+        bool isNoneEvent() const;
 
         void setReadyEvents(EventType events);
         void addReadyEvent(EventType event);
 
+        bool isRegistered() const;
+        void setRegistered(bool registered);
+
+    public:
         void setChannelOption(const ChannelOption& channelOption);
         virtual void setBacklog(int32_t backlog);
 

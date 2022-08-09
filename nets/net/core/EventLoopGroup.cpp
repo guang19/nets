@@ -56,7 +56,7 @@ namespace nets::net
     EventLoopGroup::EventLoopRawPtr EventLoopGroup::next()
     {
         EventLoopRawPtr nextEventLoop = eventLoops_[nextLoop_++].get();
-        if (static_cast<SizeType>(nextLoop_) >= eventLoops_.size())
+        if (nextLoop_ >= eventLoops_.size())
         {
             nextLoop_ = 0;
         }

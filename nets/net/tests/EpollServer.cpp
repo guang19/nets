@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 
     ::std::vector<struct epoll_event> epollEvents(20);
 
-    InetSockAddress serverAddr = InetSockAddress::createLoopBackSockAddress(8080, false);
+    InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080);
     socket::bind(listenFd, serverAddr.sockAddr());
     socket::listen(listenFd, 1024);
 

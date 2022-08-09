@@ -19,11 +19,11 @@ namespace nets::net
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
 
     public:
-        explicit AbstractBootstrap(IntType numOfMainEventLoops) : channelOptions_()
+        explicit AbstractBootstrap() : channelOptions_()
         {
-            numOfMainEventLoops = numOfMainEventLoops <= 0 ? DefaultNumbOfMainEventLoops : numOfMainEventLoops;
-            mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfMainEventLoops, MainEventLoopGroupName);
+            mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(NumbOfMainEventLoops, MainEventLoopGroupName);
         }
+
         ~AbstractBootstrap() = default;
 
     public:
@@ -38,8 +38,8 @@ namespace nets::net
         EventLoopGroupPtr mainLoopGroup_ {nullptr};
 
     private:
+        static constexpr IntType NumbOfMainEventLoops = 1;
         static constexpr char MainEventLoopGroupName[] = "MainLoopGroup";
-        static constexpr IntType DefaultNumbOfMainEventLoops = 1;
     };
 } // namespace nets::net
 

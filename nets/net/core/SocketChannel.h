@@ -17,6 +17,7 @@ namespace nets::net
     {
     public:
         using IntType = ByteBuffer::IntType;
+        using StringType = ::std::string;
 
     public:
         explicit SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -44,11 +45,14 @@ namespace nets::net
             return peerAddress_;
         }
 
-        void write(const void* data, IntType len);
-
     public:
         void init();
         void setChannelOptions(const ChannelOptionList& channelOptions);
+
+        void connect();
+        void write(const StringType& message);
+        void write(const void* message, IntType len);
+        void write(const ByteBuffer& message);
 
     public:
         void handleReadEvent() override;

@@ -34,16 +34,6 @@ namespace nets::net
         socket::closeFd(idleFd_);
     }
 
-    void ServerSocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
-    {
-        channelOptions_.insert(channelOptions_.end(), channelOptions.begin(), channelOptions.end());
-    }
-
-    void ServerSocketChannel::setChildOptions(const ChannelOptionList& childOptions)
-    {
-        childOptions_.insert(childOptions_.end(), childOptions.begin(), childOptions.end());
-    }
-
     void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
     {
         sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());

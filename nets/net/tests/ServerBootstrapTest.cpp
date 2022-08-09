@@ -48,7 +48,7 @@ int32_t TestExclusiveServerChannelHandler::SharedNum = 0;
 
 int main(int argc, char** argv)
 {
-    ServerBootstrap serverBootstrap(1, 8);
+    ServerBootstrap serverBootstrap(8);
     serverBootstrap.option(NBackLog, 1024)
         .childHandler(new TestSharedServerChannelHandler())
         .childHandler(

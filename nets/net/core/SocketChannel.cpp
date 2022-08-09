@@ -13,8 +13,8 @@ namespace nets::net
 {
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), sendBuffer_(), state_(ChannelState::INACTIVE),
-          channelHandlerPipeline_(this)
+        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), sendBuffer_(),
+          state_(ChannelState::INACTIVE), channelHandlerPipeline_(this)
     {
     }
 
@@ -32,8 +32,15 @@ namespace nets::net
             {
                 THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
             }
-            channelHandlerPipeline_.fireChannelConnect(localAddress_, peerAddress_);
             state_ = ChannelState::ACTIVE;
+            channelHandlerPipeline_.fireChannelConnect(localAddress_, peerAddress_);
+        }
+        catch (const ChannelRegisterException& exception)
+        {
+            if (isRegistered())
+            {
+                deregister();
+            }
         }
         catch (const ::std::exception& exception)
         {
@@ -49,9 +56,29 @@ namespace nets::net
         }
     }
 
+    void SocketChannel::connect()
+    {
+
+    }
+
+    void SocketChannel::write(const StringType& message)
+    {
+
+    }
+
+    void SocketChannel::write(const void* message, IntType len)
+    {
+
+    }
+
+    void SocketChannel::write(const ByteBuffer& message)
+    {
+
+    }
+
     void SocketChannel::handleReadEvent()
     {
-        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        if (state_ != ChannelState::ACTIVE)
         {
             LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
             return;
@@ -71,11 +98,8 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
-            if (state_ != ChannelState::HALF_CLOSE)
-            {
-                socket::shutdown(sockFd_, SHUT_RD);
-                state_ = ChannelState::HALF_CLOSE;
-            }
+            socket::shutdown(sockFd_, SHUT_RD);
+            state_ = ChannelState::HALF_CLOSE;
         }
         else
         {

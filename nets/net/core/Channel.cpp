@@ -38,11 +38,6 @@ namespace nets::net
         return events_;
     }
 
-    bool Channel::isNoneEvent() const
-    {
-        return events_ == ENoneEvent;
-    }
-
     void Channel::setEvents(EventType events)
     {
         events_ = events;
@@ -53,14 +48,9 @@ namespace nets::net
         events_ |= event;
     }
 
-    bool Channel::isRegistered() const
+    bool Channel::isNoneEvent() const
     {
-        return isRegistered_;
-    }
-
-    void Channel::setRegistered(bool registered)
-    {
-        isRegistered_ = registered;
+        return events_ == ENoneEvent;
     }
 
     void Channel::setReadyEvents(EventType events)
@@ -71,6 +61,16 @@ namespace nets::net
     void Channel::addReadyEvent(EventType event)
     {
         readyEvents_ |= event;
+    }
+
+    bool Channel::isRegistered() const
+    {
+        return isRegistered_;
+    }
+
+    void Channel::setRegistered(bool registered)
+    {
+        isRegistered_ = registered;
     }
 
     void Channel::setChannelOption(const ChannelOption& channelOption)

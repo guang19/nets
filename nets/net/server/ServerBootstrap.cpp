@@ -14,9 +14,8 @@ namespace nets::net
         const ServerBootstrap::IntType DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
     } // namespace
 
-    ServerBootstrap::ServerBootstrap(IntType numOfMainEventLoops, IntType numOfChildEventLoops)
-        : AbstractBootstrap(numOfMainEventLoops), running_(false), childOptions_(), childHandlers_(),
-          childInitializationCallback_()
+    ServerBootstrap::ServerBootstrap(IntType numOfChildEventLoops)
+        : AbstractBootstrap(), running_(false), childOptions_(), childHandlers_(), childInitializationCallback_()
     {
         numOfChildEventLoops = numOfChildEventLoops <= 0 ? DefaultNumbOfChildEventLoops : numOfChildEventLoops;
         childLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfChildEventLoops, ChildEventLoopGroupName);
