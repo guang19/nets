@@ -26,6 +26,7 @@ namespace nets::net
         FdType createUdpSocket(SockAddrFamily family = AF_INET6);
         void setSockCloExec(FdType sockFd);
         void closeFd(FdType fd);
+        void shutdown(FdType sockFd, int32_t how);
 
         // EMFILE: The per-process limit of open file descriptors has been reached
         FdType createIdleFd();

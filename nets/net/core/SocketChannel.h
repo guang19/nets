@@ -16,6 +16,9 @@ namespace nets::net
     class SocketChannel : public Channel
     {
     public:
+        using IntType = ByteBuffer::IntType;
+
+    public:
         explicit SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                EventLoopRawPtr eventLoop);
         ~SocketChannel() override;
@@ -41,6 +44,10 @@ namespace nets::net
             return peerAddress_;
         }
 
+        void write(const void* data, IntType len);
+
+    public:
+        void init();
         void setChannelOptions(const ChannelOptionList& channelOptions);
 
     public:
@@ -57,6 +64,14 @@ namespace nets::net
         InetSockAddress peerAddress_ {};
         using BufferList = ::std::vector<ByteBuffer>;
         BufferList sendBuffer_ {};
+
+        enum ChannelState
+        {
+            INACTIVE,
+            ACTIVE,
+            HALF_CLOSE,
+        };
+        ChannelState state_ {ChannelState::INACTIVE};
         ChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
     };
 } // namespace nets::net

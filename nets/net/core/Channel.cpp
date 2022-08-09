@@ -80,50 +80,50 @@ namespace nets::net
         {
             switch (sockOpt)
             {
-                case NBACKLOG:
+                case SockOpt::NBACKLOG:
                 {
                     setBacklog(::std::any_cast<int32_t>(channelOption.get()));
                     break;
                 }
-                case NREUSEADDR:
+                case SockOpt::NREUSE_ADDR:
                 {
                     socket::setSockReuseAddr(fd(), ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case NREUSEPORT:
+                case SockOpt::NREUSE_PORT:
                 {
                     socket::setSockReusePort(fd(), ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case NKEEPALIVE:
+                case SockOpt::NKEEP_ALIVE:
                 {
                     socket::setSockKeepAlive(fd(), ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case NTCPNODELAY:
+                case SockOpt::NTCP_NODELAY:
                 {
                     socket::setTcpNoDelay(fd(), ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case NLINGER:
+                case SockOpt::NLINGER:
                 {
                     auto linger = ::std::any_cast<int32_t>(channelOption.get());
                     socket::setSockLinger(fd(), {1, linger});
                     break;
                 }
-                case NTCPSNDBUF:
-                case NUDPSNDBUF:
+                case SockOpt::NTCP_SNDBUF:
+                case SockOpt::NUDP_SNDBUF:
                 {
                     socket::setSockSendBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
                     break;
                 }
-                case NTCPRCVBUF:
-                case NUDPRCVBUF:
+                case SockOpt::NTCP_RCVBUF:
+                case SockOpt::NUDP_RCVBUF:
                 {
                     socket::setSockRecvBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
                     break;
                 }
-                case InvalidSockOpt:
+                case SockOpt::INVALID_SOCKOPT:
                 default:
                     THROW_FMT(::std::invalid_argument, "Channel set invalid ChannelOption");
                     break;

@@ -57,6 +57,14 @@ namespace nets::net::socket
         }
     }
 
+    void shutdown(FdType sockFd, int32_t how)
+    {
+        if (0 != ::shutdown(sockFd, how))
+        {
+            LOGS_ERROR << "socket shutdown sockFd " << sockFd << " failed";
+        }
+    }
+
     FdType createIdleFd()
     {
         FdType idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);

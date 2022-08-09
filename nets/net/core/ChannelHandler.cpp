@@ -26,11 +26,6 @@ namespace nets::net
         LOGS_DEBUG << "ChannelHandler::channelRead";
     }
 
-    void ChannelHandler::channelWrite(ChannelContext& channelContext, ByteBuffer& message)
-    {
-        LOGS_DEBUG << "ChannelHandler::channelWrite";
-    }
-
     void ChannelHandler::exceptionCaught(ChannelContext& channelContext, const ::std::exception& exception)
     {
         LOGS_DEBUG << "ChannelHandler::exceptionCaught";

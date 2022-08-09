@@ -11,7 +11,7 @@ namespace nets::net
         return ::std::hash<SockOpt>()(channelOption.sockOpt_) ^ ::std::hash<ValueType>()(channelOption.value_);
     }
 
-    ChannelOption::ChannelOption() : sockOpt_(SockOpt::InvalidSockOpt), value_() {}
+    ChannelOption::ChannelOption() : sockOpt_(SockOpt::INVALID_SOCKOPT), value_() {}
 
     ChannelOption::ChannelOption(SockOpt sockOpt, const ValueType& value) : sockOpt_(sockOpt), value_(value) {}
 
@@ -25,7 +25,7 @@ namespace nets::net
     {
         sockOpt_ = other.sockOpt_;
         value_ = other.value_;
-        other.sockOpt_ = SockOpt::InvalidSockOpt;
+        other.sockOpt_ = SockOpt::INVALID_SOCKOPT;
         other.value_ = {};
     }
 
@@ -45,7 +45,7 @@ namespace nets::net
         {
             sockOpt_ = other.sockOpt_;
             value_ = other.value_;
-            other.sockOpt_ = SockOpt::InvalidSockOpt;
+            other.sockOpt_ = SockOpt::INVALID_SOCKOPT;
             other.value_ = {};
         }
         return *this;

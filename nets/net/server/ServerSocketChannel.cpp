@@ -57,7 +57,7 @@ namespace nets::net
         addEvent(EReadEvent);
         if (!registerTo())
         {
-            THROW_FMT(::std::runtime_error, "ServerSocketChannel register failed");
+            THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
         }
     }
 
@@ -82,19 +82,7 @@ namespace nets::net
             {
                 childInitializationCallback_(*socketChannel);
             }
-            socketChannel->addEvent(EReadEvent);
-            try
-            {
-                if (!socketChannel->registerTo())
-                {
-                    THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
-                }
-                socketChannel->pipeline().fireChannelConnect(localAddr, peerAddr);
-            }
-            catch (const ::std::exception& exception)
-            {
-                socketChannel->pipeline().fireExceptionCaught(exception);
-            }
+            socketChannel->init();
         }
         else
         {

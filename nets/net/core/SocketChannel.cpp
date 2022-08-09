@@ -3,16 +3,17 @@
 //
 
 #include "nets/net/core/SocketChannel.h"
+#include <thread>
 
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/EventLoop.h"
-#include "nets/net/exception/SocketChannelException.h"
+#include "nets/net/exception/ChannelRegisterException.h"
 
 namespace nets::net
 {
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), sendBuffer_(),
+        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), sendBuffer_(), state_(ChannelState::INACTIVE),
           channelHandlerPipeline_(this)
     {
     }
@@ -20,6 +21,24 @@ namespace nets::net
     SocketChannel::~SocketChannel()
     {
         socket::closeFd(sockFd_);
+    }
+
+    void SocketChannel::init()
+    {
+        addEvent(EReadEvent);
+        try
+        {
+            if (!registerTo())
+            {
+                THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
+            }
+            channelHandlerPipeline_.fireChannelConnect(localAddress_, peerAddress_);
+            state_ = ChannelState::ACTIVE;
+        }
+        catch (const ::std::exception& exception)
+        {
+            channelHandlerPipeline_.fireExceptionCaught(exception);
+        }
     }
 
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
@@ -32,6 +51,11 @@ namespace nets::net
 
     void SocketChannel::handleReadEvent()
     {
+        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        {
+            LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
+            return;
+        }
         ByteBuffer byteBuffer(DefaultTcpSockRecvBufSize);
         SSizeType bytes = byteBuffer.writeBytes(*this);
         if (bytes > 0)
@@ -47,27 +71,11 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
-            // passively closed, the client may shutdown(write) or close the socket. if the client shutdown write, the tcp
-            // connection is half-close state, the server can still send data, and the client can still recv it; if the
-            // client closes the socket, the server will also close the socket. if the server still needs to send data after
-            // the client shutdown write, then let the user send data in the disConnect callback, and the server will close
-            // the socket after disConnect
-            try
+            if (state_ != ChannelState::HALF_CLOSE)
             {
-                channelHandlerPipeline_.fireChannelDisconnect();
+                socket::shutdown(sockFd_, SHUT_RD);
+                state_ = ChannelState::HALF_CLOSE;
             }
-            catch (const ::std::exception& exception)
-            {
-                channelHandlerPipeline_.fireExceptionCaught(exception);
-            }
-            // if cancel directly, because the channel is destroyed in advance, an exception may be thrown when other
-            // events of the channel are executed in the current loop. so add task to pendingTasksQueue, wait next loop execute
-            eventLoop_->addTask(
-                [channel = shared_from_this()]()
-                {
-                    channel->deregister();
-                    assert(channel.use_count() == 1);
-                });
         }
         else
         {
@@ -105,9 +113,11 @@ namespace nets::net
 
     void SocketChannel::handleWriteEvent()
     {
-        LOGS_DEBUG << "SocketChannel::handleWriteEvent";
-        int32_t n = socket::write(sockFd_, "haha", 4);
-        LOGS_DEBUG << "write " << n << " bytes";
+        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        {
+            LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
+            return;
+        }
     }
 
     void SocketChannel::handleErrorEvent()
