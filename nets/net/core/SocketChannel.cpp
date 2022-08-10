@@ -23,9 +23,8 @@ namespace nets::net
         socket::closeFd(sockFd_);
     }
 
-    void SocketChannel::init()
+    void SocketChannel::channelActive()
     {
-        addEvent(EReadEvent);
         try
         {
             if (!registerTo())
@@ -58,7 +57,24 @@ namespace nets::net
 
     void SocketChannel::connect()
     {
+        int32_t ret = socket::connect(sockFd_, peerAddress_.sockAddr());
+        if (ret == 0)
+        {
+            addEvent(EWriteEvent);
+            channelActive();
+        }
+        else
+        {
+            int32_t errNum = errno;
+            handleConnectError(errNum);
+        }
+    }
 
+    void SocketChannel::reconnect()
+    {
+        assert(state_ == ChannelState::INACTIVE);
+        socket::closeFd(sockFd_);
+        // schedule reconnect
     }
 
     void SocketChannel::write(const StringType& message)
@@ -103,9 +119,22 @@ namespace nets::net
         }
         else
         {
-            int32_t errNum = errno;
-            handleReadError(errNum);
         }
+    }
+
+    void SocketChannel::handleWriteEvent()
+    {
+        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        {
+            LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
+            return;
+        }
+    }
+
+    void SocketChannel::handleErrorEvent()
+    {
+        int32_t errNum = socket::getSockError(sockFd_);
+        LOGS_ERROR << "SocketChannel unexpected exception,errNum=" << errNum;
     }
 
     void SocketChannel::handleReadError(int32_t errNum)
@@ -135,18 +164,42 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::handleWriteEvent()
+    void SocketChannel::handleConnectError(int32_t errNum)
     {
-        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        switch (errNum)
         {
-            LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
-            return;
+            // not error, need to use epoll to check the connection
+            case EINTR:
+            case EISCONN:
+            case EINPROGRESS:
+            {
+                addEvent(EWriteEvent);
+                channelActive();
+                break;
+            }
+            // retry
+            case EAGAIN:
+            case ETIMEDOUT:
+            case EADDRINUSE:
+            case EADDRNOTAVAIL:
+            case ECONNREFUSED:
+            case ENETUNREACH:
+            {
+                reconnect();
+                break;
+            }
+            case EACCES:
+            case EPERM:
+            case EAFNOSUPPORT:
+            case EALREADY:
+            case EBADF:
+            case EFAULT:
+            case ENOTSOCK:
+            case EPROTOTYPE:
+            default:
+                errno = errNum;
+                LOGS_ERROR << "SocketChannel connect unexpected exception,errno=" << errNum;
+                break;
         }
-    }
-
-    void SocketChannel::handleErrorEvent()
-    {
-        int32_t errNum = socket::getSockError(sockFd_);
-        LOGS_ERROR << "SocketChannel unexpected exception,errNum=" << errNum;
     }
 } // namespace nets::net

@@ -10,7 +10,7 @@
 
 namespace nets::net
 {
-    template <class SubType>
+    template <class B>
     class AbstractBootstrap : nets::base::Noncopyable
     {
     public:
@@ -27,10 +27,10 @@ namespace nets::net
         ~AbstractBootstrap() = default;
 
     public:
-        SubType& option(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
+        B& option(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
         {
             channelOptions_.emplace_back(channelOption.sockOpt(), value);
-            return static_cast<SubType&>(*this);
+            return static_cast<B&>(*this);
         }
 
     protected:

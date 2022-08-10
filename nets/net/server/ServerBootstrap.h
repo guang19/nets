@@ -35,7 +35,7 @@ namespace nets::net
         ServerBootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const InetSockAddress& localAddress);
 
-        void launch();
+        void sync();
 
     private:
         void doBind(const InetSockAddress& localAddress);

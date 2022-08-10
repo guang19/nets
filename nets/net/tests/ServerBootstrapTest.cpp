@@ -29,7 +29,7 @@ public:
     {
         LOGS_DEBUG << "Server recv client message is:" << message.toString();
     }
-    
+
     void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
     {
         LOGS_DEBUG << "Server exceptionCaught";
@@ -57,6 +57,6 @@ int main(int argc, char** argv)
                 // channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
             })
         .bind(8080)
-        .launch();
+        .sync();
     return 0;
 }

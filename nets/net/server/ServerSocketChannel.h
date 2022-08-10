@@ -62,13 +62,13 @@ namespace nets::net
             childInitializationCallback_ = childInitializationCallback;
         }
 
-        void bind(const InetSockAddress& sockAddress);
-
     public:
+        void bind(const InetSockAddress& sockAddress);
         void handleReadEvent() override;
         void handleErrorEvent() override;
 
     private:
+        void initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel);
         void handleAcceptError(int32_t errNum);
 
     private:

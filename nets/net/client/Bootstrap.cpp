@@ -8,19 +8,19 @@ namespace nets::net
 {
     Bootstrap::Bootstrap() : channelHandlers_(), channelInitializationCallback_() {}
 
-    Bootstrap& Bootstrap::handler(ChannelHandlerRawPtr channelHandler)
+    Bootstrap& Bootstrap::channelHandler(ChannelHandlerRawPtr channelHandler)
     {
         channelHandlers_.push_back(ChannelHandlerPtr(channelHandler));
         return *this;
     }
 
-    Bootstrap& Bootstrap::handler(const ChannelHandlerPtr& channelHandler)
+    Bootstrap& Bootstrap::channelHandler(const ChannelHandlerPtr& channelHandler)
     {
         channelHandlers_.push_back(channelHandler);
         return *this;
     }
 
-    Bootstrap& Bootstrap::handler(const ChannelInitializationCallback& channelInitializationCallback)
+    Bootstrap& Bootstrap::channelHandler(const ChannelInitializationCallback& channelInitializationCallback)
     {
         channelInitializationCallback_ = channelInitializationCallback;
         return *this;
@@ -34,16 +34,34 @@ namespace nets::net
 
     Bootstrap& Bootstrap::connect(const InetSockAddress& serverAddress)
     {
-        doConnect(serverAddress);
+        mainLoopGroup_->loopEach();
+        auto future = mainLoopGroup_->submit(
+            [this, serverAddress]
+            {
+                doConnect(serverAddress);
+            });
+        future.wait();
         return *this;
+    }
+
+    void Bootstrap::sync()
+    {
+        mainLoopGroup_->syncEach();
     }
 
     void Bootstrap::doConnect(const InetSockAddress& serverAddress)
     {
         FdType sockFd = socket::createTcpSocket(serverAddress.ipFamily());
+        socket::setSockNonBlock(sockFd, true);
         InetSockAddress localAddr {};
         socket::getLocalAddress(sockFd, localAddr.sockAddr());
         auto socketChannel = ::std::make_shared<SocketChannel>(sockFd, localAddr, serverAddress, mainLoopGroup_->next());
+        initSocketChannel(socketChannel);
+        socketChannel->connect();
+    }
+
+    void Bootstrap::initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel)
+    {
         ChannelOptionList channelOptions {::std::move(channelOptions_)};
         assert(channelOptions_.empty());
         socketChannel->setChannelOptions(channelOptions);
@@ -61,6 +79,5 @@ namespace nets::net
         {
             channelInitializationCallback(*socketChannel);
         }
-        socketChannel->init();
     }
 } // namespace nets::net

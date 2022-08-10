@@ -46,7 +46,7 @@ namespace nets::net
         }
 
     public:
-        void init();
+        void channelActive();
         void setChannelOptions(const ChannelOptionList& channelOptions);
 
         void connect();
@@ -61,6 +61,8 @@ namespace nets::net
 
     private:
         void handleReadError(int32_t errNum);
+        void handleConnectError(int32_t errNum);
+        void reconnect();
 
     private:
         FdType sockFd_ {socket::InvalidFd};

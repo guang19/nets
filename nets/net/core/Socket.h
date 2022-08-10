@@ -33,10 +33,9 @@ namespace nets::net
         void dealwithEMFILE(FdType& idleFd, FdType sockFd);
 
         void bind(FdType sockFd, const SockAddr* sockAddr);
-        void connect(FdType sockFd, const SockAddr* sockAddr);
-
         void listen(FdType sockFd, int32_t backlog);
         FdType accept(FdType sockFd, SockAddr* sockAddr);
+        int32_t connect(FdType sockFd, const SockAddr* sockAddr);
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
         SSizeType write(FdType fd, const void* buf, ::size_t n);

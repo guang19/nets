@@ -23,15 +23,18 @@ namespace nets::net
         ~Bootstrap() = default;
 
     public:
-        Bootstrap& handler(ChannelHandlerRawPtr channelHandler);
-        Bootstrap& handler(const ChannelHandlerPtr& channelHandler);
-        Bootstrap& handler(const ChannelInitializationCallback& channelInitializationCallback);
+        Bootstrap& channelHandler(ChannelHandlerRawPtr channelHandler);
+        Bootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
+        Bootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
 
         Bootstrap& connect(const char* ip, PortType port, bool ipv6 = false);
         Bootstrap& connect(const InetSockAddress& serverAddress);
 
+        void sync();
+
     private:
         void doConnect(const InetSockAddress& serverAddress);
+        void initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel);
 
     private:
         ChannelHandlerList channelHandlers_ {};

@@ -69,6 +69,19 @@ namespace nets::net
         return *this;
     }
 
+    void ServerBootstrap::sync()
+    {
+        if (running_)
+        {
+            LOGS_DEBUG << "ServerBootstrap has started";
+            return;
+        }
+        running_ = true;
+        childLoopGroup_->loopEach();
+        mainLoopGroup_->syncEach();
+        childLoopGroup_->syncEach();
+    }
+
     void ServerBootstrap::doBind(const InetSockAddress& localAddress)
     {
         auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
@@ -91,18 +104,5 @@ namespace nets::net
         assert(childInitializationCallback_ == nullptr);
         serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
         serverSocketChannel->bind(localAddress);
-    }
-
-    void ServerBootstrap::launch()
-    {
-        if (running_)
-        {
-            LOGS_DEBUG << "ServerBootstrap has started";
-            return;
-        }
-        running_ = true;
-        childLoopGroup_->loopEach();
-        mainLoopGroup_->syncEach();
-        childLoopGroup_->syncEach();
     }
 } // namespace nets::net

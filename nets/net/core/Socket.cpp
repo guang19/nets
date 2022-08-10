@@ -95,15 +95,6 @@ namespace nets::net::socket
         }
     }
 
-    void connect(FdType sockFd, const SockAddr* sockAddr)
-    {
-        auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
-        if (0 != connect(sockFd, sockAddr, len))
-        {
-            LOGS_ERROR << "socket connect failed";
-        }
-    }
-
     void listen(FdType sockFd, int32_t backlog)
     {
         if (0 != ::listen(sockFd, backlog))
@@ -116,6 +107,12 @@ namespace nets::net::socket
     {
         auto len = static_cast<SockLenType>(sizeof(SockAddr6));
         return ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+    }
+
+    int32_t connect(FdType sockFd, const SockAddr* sockAddr)
+    {
+        auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
+        return ::connect(sockFd, sockAddr, len);
     }
 
     SSizeType read(FdType fd, void* buf, ::size_t n)

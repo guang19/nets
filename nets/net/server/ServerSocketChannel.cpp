@@ -62,23 +62,35 @@ namespace nets::net
             InetSockAddress localAddr {};
             socket::getLocalAddress(connFd, localAddr.sockAddr());
             auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
-            socketChannel->setChannelOptions(childOptions_);
-            for (const auto& childHandler: childHandlers_)
-            {
-                assert(childHandler.use_count() == 1);
-                socketChannel->pipeline().addLast(childHandler);
-            }
-            if (childInitializationCallback_ != nullptr)
-            {
-                childInitializationCallback_(*socketChannel);
-            }
-            socketChannel->init();
+            initSocketChannel(socketChannel);
         }
         else
         {
             int32_t errNum = errno;
             handleAcceptError(errNum);
         }
+    }
+
+    void ServerSocketChannel::initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel)
+    {
+        socketChannel->setChannelOptions(childOptions_);
+        for (const auto& childHandler: childHandlers_)
+        {
+            assert(childHandler.use_count() == 1);
+            socketChannel->pipeline().addLast(childHandler);
+        }
+        if (childInitializationCallback_ != nullptr)
+        {
+            childInitializationCallback_(*socketChannel);
+        }
+        socketChannel->addEvent(EReadEvent);
+        socketChannel->channelActive();
+    }
+
+    void ServerSocketChannel::handleErrorEvent()
+    {
+        int32_t errNum = socket::getSockError(sockFd_);
+        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 
     void ServerSocketChannel::handleAcceptError(int32_t errNum)
@@ -117,11 +129,5 @@ namespace nets::net
                           "ServerSocketChannel occurred unexpected exception while accepting,errno=%d", errNum);
                 break;
         }
-    }
-
-    void ServerSocketChannel::handleErrorEvent()
-    {
-        int32_t errNum = socket::getSockError(sockFd_);
-        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 } // namespace nets::net
