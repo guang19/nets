@@ -34,14 +34,15 @@ namespace nets::net
 
         void bind(FdType sockFd, const SockAddr* sockAddr);
         void listen(FdType sockFd, int32_t backlog);
-        FdType accept(FdType sockFd, SockAddr* sockAddr);
+        FdType accept(FdType sockFd, SockAddr6* sockAddr);
         int32_t connect(FdType sockFd, const SockAddr* sockAddr);
+        bool isSelfConnect(FdType sockFd);
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
         SSizeType write(FdType fd, const void* buf, ::size_t n);
 
-        void getLocalAddress(FdType fd, SockAddr* sockAddr);
-        void getPeerAddress(FdType fd, SockAddr* sockAddr);
+        void getLocalAddress(FdType fd, SockAddr6* sockAddr);
+        void getPeerAddress(FdType fd, SockAddr6* sockAddr);
 
         OptValType getSockError(FdType sockFd);
 

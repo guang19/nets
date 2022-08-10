@@ -54,7 +54,7 @@ int main(int argc, char** argv)
                              serverAddr2.port());
                     ::printf("server addr=%s\n", serverAddr2.toString().c_str());
                     InetSockAddress clientAddr;
-                    FdType connFd = socket::accept(listenFd, (SockAddr*) clientAddr.sockAddr6());
+                    FdType connFd = socket::accept(listenFd, clientAddr.sockAddr6());
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
 

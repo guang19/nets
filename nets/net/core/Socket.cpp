@@ -103,16 +103,37 @@ namespace nets::net::socket
         }
     }
 
-    FdType accept(FdType sockFd, SockAddr* sockAddr)
+    FdType accept(FdType sockFd, SockAddr6* sockAddr)
     {
         auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        return ::accept4(sockFd, sockAddr, &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+        return ::accept4(sockFd, reinterpret_cast<SockAddr*>(sockAddr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
     }
 
     int32_t connect(FdType sockFd, const SockAddr* sockAddr)
     {
         auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
         return ::connect(sockFd, sockAddr, len);
+    }
+
+    bool isSelfConnect(FdType sockFd)
+    {
+        SockAddr6 localAddr, peerAddr;
+        MEMZERO(&localAddr, sizeof(SockAddr6));
+        MEMZERO(&peerAddr, sizeof(SockAddr6));
+        getLocalAddress(sockFd, &localAddr);
+        getPeerAddress(sockFd, &peerAddr);
+        if (localAddr.sin6_family == AF_INET)
+        {
+            const SockAddr4* localAddr4 = reinterpret_cast<SockAddr4*>(&localAddr);
+            const SockAddr4* peerAddr4 = reinterpret_cast<SockAddr4*>(&peerAddr);
+            return localAddr4->sin_port == peerAddr4->sin_port && localAddr4->sin_addr.s_addr == peerAddr4->sin_addr.s_addr;
+        }
+        else if (localAddr.sin6_family == AF_INET6)
+        {
+            return localAddr.sin6_port == peerAddr.sin6_port &&
+                   (::memcmp(&localAddr.sin6_addr, &peerAddr.sin6_addr, sizeof(localAddr.sin6_addr)) == 0);
+        }
+        return false;
     }
 
     SSizeType read(FdType fd, void* buf, ::size_t n)
@@ -125,19 +146,19 @@ namespace nets::net::socket
         return ::write(fd, buf, n);
     }
 
-    void getLocalAddress(FdType fd, SockAddr* sockAddr)
+    void getLocalAddress(FdType fd, SockAddr6* sockAddr)
     {
         auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        if (0 != ::getsockname(fd, sockAddr, &len))
+        if (0 != ::getsockname(fd, reinterpret_cast<SockAddr*>(sockAddr), &len))
         {
             LOGS_ERROR << "socket getLocalAddress failed";
         }
     }
 
-    void getPeerAddress(FdType fd, SockAddr* sockAddr)
+    void getPeerAddress(FdType fd, SockAddr6* sockAddr)
     {
         auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        if (0 != ::getpeername(fd, sockAddr, &len))
+        if (0 != ::getpeername(fd, reinterpret_cast<SockAddr*>(sockAddr), &len))
         {
             LOGS_ERROR << "socket getPeerAddress failed";
         }

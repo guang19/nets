@@ -61,19 +61,6 @@ namespace nets::net
         assert(!running_);
     }
 
-    void EventLoop::runPendingTasks()
-    {
-        TaskList tmpTasks {};
-        {
-            LockGuardType lock(mutex_);
-            tmpTasks.swap(pendingTasks_);
-        }
-        for (const auto& t: tmpTasks)
-        {
-            t();
-        }
-    }
-
     void EventLoop::shutdown() {}
 
     bool EventLoop::isInCurrentEventLoop() const
@@ -113,5 +100,18 @@ namespace nets::net
         poller_->deregisterChannel(channel.get());
         channels_.erase(channel->fd());
         assert(channels_.find(channel->fd()) == channels_.end());
+    }
+
+    void EventLoop::runPendingTasks()
+    {
+        TaskList tmpTasks {};
+        {
+            LockGuardType lock(mutex_);
+            tmpTasks.swap(pendingTasks_);
+        }
+        for (const auto& t: tmpTasks)
+        {
+            t();
+        }
     }
 } // namespace nets::net

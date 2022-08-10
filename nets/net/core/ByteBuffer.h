@@ -25,7 +25,7 @@ namespace nets::net
     public:
         ByteBuffer();
         explicit ByteBuffer(IntType initialCapacity);
-        virtual ~ByteBuffer() = default;
+        ~ByteBuffer() = default;
 
         ByteBuffer(const ByteBuffer& other);
         ByteBuffer(ByteBuffer&& other) noexcept;

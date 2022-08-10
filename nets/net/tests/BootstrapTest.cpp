@@ -46,10 +46,10 @@ int main(int argc, char** argv)
         .sync();
 //        FdType sockFd = socket::createTcpSocket(AF_INET);
 //        InetSockAddress serverAddr("127.0.0.1", 8080, false);
-//        socket::connect(sockFd, serverAddr.sockAddr());
 //        InetSockAddress clientAddr;
 //        SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));
 //        ::getsockname(sockFd, clientAddr.sockAddr(), &len);
+//        socket::connect(sockFd, serverAddr.sockAddr());
 //        ::printf("client fd=%d,client addr:ip=%s,port=%d\n", sockFd, clientAddr.ip().c_str(), clientAddr.port());
 //        ::printf("client addr=%s\n", clientAddr.toString().c_str());
 //        while(1) {}

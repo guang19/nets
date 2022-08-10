@@ -5,14 +5,15 @@
 #ifndef NETS_NET_BOOTSTRAP_H
 #define NETS_NET_BOOTSTRAP_H
 
+#include "nets/net/client/ConnectorChannel.h"
 #include "nets/net/core/AbstractBootstrap.h"
-#include "nets/net/core/SocketChannel.h"
 
 namespace nets::net
 {
     class Bootstrap : public AbstractBootstrap<Bootstrap>
     {
     public:
+        using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using ChannelHandlerRawPtr = ChannelHandlerPipeline::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = ChannelHandlerPipeline::ChannelHandlerList;
@@ -34,7 +35,7 @@ namespace nets::net
 
     private:
         void doConnect(const InetSockAddress& serverAddress);
-        void initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel);
+        void initConnectorChannel(::std::shared_ptr<ConnectorChannel>& connectorChannel);
 
     private:
         ChannelHandlerList channelHandlers_ {};

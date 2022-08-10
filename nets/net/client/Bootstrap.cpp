@@ -51,33 +51,23 @@ namespace nets::net
 
     void Bootstrap::doConnect(const InetSockAddress& serverAddress)
     {
-        FdType sockFd = socket::createTcpSocket(serverAddress.ipFamily());
-        socket::setSockNonBlock(sockFd, true);
-        InetSockAddress localAddr {};
-        socket::getLocalAddress(sockFd, localAddr.sockAddr());
-        auto socketChannel = ::std::make_shared<SocketChannel>(sockFd, localAddr, serverAddress, mainLoopGroup_->next());
-        initSocketChannel(socketChannel);
-        socketChannel->connect();
+        auto connectorChannel = ::std::make_shared<ConnectorChannel>(mainLoopGroup_->next());
+        initConnectorChannel(connectorChannel);
+        connectorChannel->connect(serverAddress);
     }
 
-    void Bootstrap::initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel)
+    void Bootstrap::initConnectorChannel(ConnectorChannelPtr& connectorChannel)
     {
         ChannelOptionList channelOptions {::std::move(channelOptions_)};
         assert(channelOptions_.empty());
-        socketChannel->setChannelOptions(channelOptions);
+        connectorChannel->setChannelOptions(channelOptions);
 
         ChannelHandlerList channelHandlers {::std::move(channelHandlers_)};
         assert(channelHandlers_.empty());
-        for (const auto& channelHandler: channelHandlers)
-        {
-            assert(channelHandler.use_count() == 1);
-            socketChannel->pipeline().addLast(channelHandler);
-        }
+        connectorChannel->setChannelHandlers(channelHandlers);
+
         ChannelInitializationCallback channelInitializationCallback {::std::move(channelInitializationCallback_)};
         assert(channelInitializationCallback_ == nullptr);
-        if (channelInitializationCallback != nullptr)
-        {
-            channelInitializationCallback(*socketChannel);
-        }
+        connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
     }
 } // namespace nets::net

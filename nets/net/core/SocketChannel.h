@@ -25,11 +25,12 @@ namespace nets::net
         ~SocketChannel() override;
 
     public:
-        inline FdType fd() const override
-        {
-            return sockFd_;
-        }
+        FdType fd() const override;
+        void handleReadEvent() override;
+        void handleWriteEvent() override;
+        void handleErrorEvent() override;
 
+    public:
         inline ChannelHandlerPipeline& pipeline()
         {
             return channelHandlerPipeline_;
@@ -45,24 +46,15 @@ namespace nets::net
             return peerAddress_;
         }
 
-    public:
-        void channelActive();
         void setChannelOptions(const ChannelOptionList& channelOptions);
+        void channelActive();
 
-        void connect();
         void write(const StringType& message);
         void write(const void* message, IntType len);
         void write(const ByteBuffer& message);
 
-    public:
-        void handleReadEvent() override;
-        void handleWriteEvent() override;
-        void handleErrorEvent() override;
-
     private:
         void handleReadError(int32_t errNum);
-        void handleConnectError(int32_t errNum);
-        void reconnect();
 
     private:
         FdType sockFd_ {socket::InvalidFd};

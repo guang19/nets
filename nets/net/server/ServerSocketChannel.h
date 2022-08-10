@@ -16,6 +16,7 @@ namespace nets::net
     class ServerSocketChannel : public Channel
     {
     public:
+        using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
         using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
@@ -27,11 +28,11 @@ namespace nets::net
         ~ServerSocketChannel() override;
 
     public:
-        inline FdType fd() const override
-        {
-            return sockFd_;
-        }
+        FdType fd() const override;
+        void handleReadEvent() override;
+        void handleErrorEvent() override;
 
+    public:
         inline void setBacklog(int32_t backlog) override
         {
             backlog_ = ::std::any_cast<int32_t>(backlog);
@@ -62,13 +63,10 @@ namespace nets::net
             childInitializationCallback_ = childInitializationCallback;
         }
 
-    public:
         void bind(const InetSockAddress& sockAddress);
-        void handleReadEvent() override;
-        void handleErrorEvent() override;
 
     private:
-        void initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel);
+        void initSocketChannel(SocketChannelPtr& socketChannel);
         void handleAcceptError(int32_t errNum);
 
     private:

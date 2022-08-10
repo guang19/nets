@@ -42,8 +42,6 @@ namespace nets::net
         void deregister();
 
     public:
-        virtual FdType fd() const = 0;
-
         EventLoopRawPtr eventLoop() const;
         EventType events() const;
         void setEvents(EventType events);
@@ -61,10 +59,11 @@ namespace nets::net
         virtual void setBacklog(int32_t backlog);
 
     public:
+        virtual FdType fd() const = 0;
         void handleEvent();
-        virtual void handleErrorEvent();
         virtual void handleReadEvent();
         virtual void handleWriteEvent();
+        virtual void handleErrorEvent();
 
     protected:
         // channel unique identifier per EventLoop thread

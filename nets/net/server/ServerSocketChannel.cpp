@@ -21,6 +21,7 @@ namespace nets::net
         {
             THROW_FMT(::std::runtime_error, "ServerSocketChannel createIdleFd failed");
         }
+        // default options
         channelOptions_.push_back(NReuseAddr);
         channelOptions_.push_back(NReusePort);
         channelOptions_.push_back(NBackLog);
@@ -32,6 +33,37 @@ namespace nets::net
     {
         socket::closeFd(sockFd_);
         socket::closeFd(idleFd_);
+    }
+
+    FdType ServerSocketChannel::fd() const
+    {
+        return sockFd_;
+    }
+
+    void ServerSocketChannel::handleReadEvent()
+    {
+        assert(eventLoop_->isInCurrentEventLoop());
+        InetSockAddress peerAddr {};
+        FdType connFd = socket::InvalidFd;
+        if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr6())) >= 0)
+        {
+            LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
+            InetSockAddress localAddr {};
+            socket::getLocalAddress(connFd, localAddr.sockAddr6());
+            auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
+            initSocketChannel(socketChannel);
+        }
+        else
+        {
+            int32_t errNum = errno;
+            handleAcceptError(errNum);
+        }
+    }
+
+    void ServerSocketChannel::handleErrorEvent()
+    {
+        int32_t errNum = socket::getSockError(sockFd_);
+        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 
     void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
@@ -51,27 +83,7 @@ namespace nets::net
         }
     }
 
-    void ServerSocketChannel::handleReadEvent()
-    {
-        assert(eventLoop_->isInCurrentEventLoop());
-        InetSockAddress peerAddr {};
-        FdType connFd = socket::InvalidFd;
-        if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr())) >= 0)
-        {
-            LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
-            InetSockAddress localAddr {};
-            socket::getLocalAddress(connFd, localAddr.sockAddr());
-            auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
-            initSocketChannel(socketChannel);
-        }
-        else
-        {
-            int32_t errNum = errno;
-            handleAcceptError(errNum);
-        }
-    }
-
-    void ServerSocketChannel::initSocketChannel(::std::shared_ptr<SocketChannel>& socketChannel)
+    void ServerSocketChannel::initSocketChannel(SocketChannelPtr& socketChannel)
     {
         socketChannel->setChannelOptions(childOptions_);
         for (const auto& childHandler: childHandlers_)
@@ -83,14 +95,7 @@ namespace nets::net
         {
             childInitializationCallback_(*socketChannel);
         }
-        socketChannel->addEvent(EReadEvent);
         socketChannel->channelActive();
-    }
-
-    void ServerSocketChannel::handleErrorEvent()
-    {
-        int32_t errNum = socket::getSockError(sockFd_);
-        THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 
     void ServerSocketChannel::handleAcceptError(int32_t errNum)
@@ -105,7 +110,7 @@ namespace nets::net
             case EINTR:
             case EPROTO:
             case ECONNABORTED:
-                LOGS_ERROR << "ServerSocketChannel expected exception occurred while accepting,errno=" << errNum;
+                LOGS_ERROR << "ServerSocketChannel occurred expected exception occurred while accepting,errno=" << errNum;
                 break;
             // the per-process limit on the number of open file descriptors has been reached
             case EMFILE:
