@@ -6,13 +6,12 @@
 #define NETS_NET_CHANNEL_HANDLER_H
 
 #include "nets/base/Noncopyable.h"
+#include "nets/net/core/ChannelContext.h"
 #include "nets/net/core/InetSockAddress.h"
 
 namespace nets::net
 {
     class ByteBuffer;
-    class ChannelContext;
-
     class ChannelHandler : nets::base::Noncopyable
     {
     public:

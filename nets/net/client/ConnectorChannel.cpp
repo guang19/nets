@@ -15,14 +15,14 @@ namespace nets::net
 {
     ConnectorChannel::ConnectorChannel(EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(socket::InvalidFd), localAddress_(), peerAddress_(),
-          connectionState_(ConnectionState::DISCONNECTED)
+          state_(ConnectionState::DISCONNECTED)
     {
     }
 
     ConnectorChannel::~ConnectorChannel()
     {
         // prevent close of connected fd
-        if (connectionState_ != ConnectionState::CONNECTED)
+        if (state_ != ConnectionState::CONNECTED)
         {
             socket::closeFd(sockFd_);
         }
@@ -35,16 +35,17 @@ namespace nets::net
 
     void ConnectorChannel::handleWriteEvent()
     {
-        if (connectionState_ != ConnectionState::CONNECTING)
+        if (state_ != ConnectionState::CONNECTING)
         {
-            LOGS_WARN << "ConnectorChannel handleWriteEvent connectionState=" << connectionState_;
+            LOGS_WARN << "ConnectorChannel handleWriteEvent connectionState=" << state_;
             return;
         }
         int32_t errNum = socket::getSockError(sockFd_);
         if (errNum != 0)
         {
-            LOGS_ERROR << "ConnectorChannel occurred unexpected exception while connecting,errNum=" << errNum;
-            reconnect();
+            LOGS_ERROR << "ConnectorChannel handleWriteEvent unable to connect to " << peerAddress_.toString()
+                       << ",errNum=" << errNum;
+            handleErrorEvent();
             return;
         }
         channelActive();
@@ -52,8 +53,9 @@ namespace nets::net
 
     void ConnectorChannel::handleErrorEvent()
     {
-        assert(connectionState_ != ConnectionState::CONNECTED);
-        if (connectionState_ == ConnectionState::CONNECTING)
+        LOGS_ERROR << "ConnectorChannel handleErrorEvent unable to connect to " << peerAddress_.toString();
+        assert(state_ != ConnectionState::CONNECTED);
+        if (state_ == ConnectionState::CONNECTING)
         {
             // wait next loop deregister, because channel might has other event
             eventLoop_->addTask(
@@ -75,8 +77,8 @@ namespace nets::net
         if (ret == 0)
         {
             socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
-            assert(connectionState_ == ConnectionState::DISCONNECTED);
-            connectionState_ = ConnectionState::CONNECTED;
+            assert(state_ == ConnectionState::DISCONNECTED);
+            state_ = ConnectionState::CONNECTED;
             channelActive();
         }
         else
@@ -105,15 +107,14 @@ namespace nets::net
         auto socketChannel = ::std::make_shared<SocketChannel>(sockFd_, localAddress_, peerAddress_, eventLoop_);
         initSocketChannel(socketChannel);
         // must remove self from EventLoop before socketChannel register
-        if (connectionState_ == ConnectionState::CONNECTING)
+        if (state_ == ConnectionState::CONNECTING)
         {
-            connectionState_ = ConnectionState::CONNECTED;
+            state_ = ConnectionState::CONNECTED;
             deregister();
             assert(!isRegistered());
         }
         socketChannel->channelActive();
     }
-
 
     void ConnectorChannel::handleConnectError(int32_t errNum)
     {
@@ -163,7 +164,7 @@ namespace nets::net
             {
                 THROW_FMT(ChannelRegisterException, "ConnectorChannel register failed");
             }
-            connectionState_ = ConnectionState::CONNECTING;
+            state_ = ConnectionState::CONNECTING;
         }
         catch (const ChannelRegisterException& exception)
         {
@@ -179,7 +180,7 @@ namespace nets::net
     void ConnectorChannel::reconnect()
     {
         LOGS_WARN << "ConnectorChannel reconnect";
-        connectionState_ = ConnectorChannel::DISCONNECTED;
+        state_ = ConnectorChannel::DISCONNECTED;
         socket::closeFd(sockFd_);
         // schedule reconnect
     }

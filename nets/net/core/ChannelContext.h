@@ -6,23 +6,30 @@
 #define NETS_NET_CHANNEL_CONTEXT_H
 
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/Channel.h"
 
 namespace nets::net
 {
+    class SocketChannel;
     class ChannelContext : nets::base::Noncopyable
     {
     public:
-        using ChannelRawPtr = Channel*;
+        using ChannelRawPtr = SocketChannel*;
 
     public:
         explicit ChannelContext(ChannelRawPtr channel);
         ~ChannelContext() = default;
 
     public:
-        inline ChannelRawPtr channel()
+        bool isActive() const;
+        // shutdown RD and WR
+        void shutdown();
+        void shutdownRead();
+        void shutdownWrite();
+
+    public:
+        inline SocketChannel& channel()
         {
-            return channel_;
+            return *channel_;
         }
 
     private:

@@ -27,6 +27,7 @@ namespace nets::net
         void setSockCloExec(FdType sockFd);
         void closeFd(FdType fd);
         void shutdown(FdType sockFd, int32_t how);
+        const char* shutdownHowToString(int32_t how);
 
         // EMFILE: The per-process limit of open file descriptors has been reached
         FdType createIdleFd();

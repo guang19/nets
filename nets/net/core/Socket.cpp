@@ -61,7 +61,22 @@ namespace nets::net::socket
     {
         if (0 != ::shutdown(sockFd, how))
         {
-            LOGS_ERROR << "socket shutdown sockFd " << sockFd << " failed";
+            LOGS_ERROR << "socket shutdown " << shutdownHowToString(how) << " sockFd " << sockFd << " failed";
+        }
+    }
+
+    const char* shutdownHowToString(int32_t how)
+    {
+        switch (how)
+        {
+            case SHUT_WR:
+                return "write";
+            case SHUT_RD:
+                return "read";
+            case SHUT_RDWR:
+                return "both";
+            default:
+                return "unknown shutdown operation";
         }
     }
 

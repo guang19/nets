@@ -13,7 +13,7 @@ namespace nets::net
 {
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), sendBuffer_(),
+        : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), writeBuffer_(),
           state_(ChannelState::INACTIVE), channelHandlerPipeline_(this)
     {
     }
@@ -50,8 +50,20 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
-            socket::shutdown(sockFd_, SHUT_RD);
-            state_ = ChannelState::HALF_CLOSE;
+            // the peer may shutdown write or close socket, the local can not close socket directly
+            // if the peer shutdown write, but the local can still send data, the peer can also read the data send by local
+            // So if the local still has data waiting to be sent, just shutdown read; if there is no data waiting to be sent,
+            // shutdown both
+            if (writeBuffer_.empty())
+            {
+                shutdown(SHUT_RDWR);
+                state_ = ChannelState::INACTIVE;
+            }
+            else
+            {
+                shutdown(SHUT_RD);
+                state_ = ChannelState::HALF_CLOSE;
+            }
         }
         else
         {
@@ -114,6 +126,21 @@ namespace nets::net
 
     void SocketChannel::write(const ByteBuffer& message) {}
 
+    void SocketChannel::shutdown()
+    {
+        shutdown(SHUT_RDWR);
+    }
+
+    void SocketChannel::shutdownRead()
+    {
+        shutdown(SHUT_RD);
+    }
+
+    void SocketChannel::shutdownWrite()
+    {
+        shutdown(SHUT_WR);
+    }
+
     void SocketChannel::handleReadError(int32_t errNum)
     {
         switch (errNum)
@@ -139,5 +166,10 @@ namespace nets::net
                 LOGS_ERROR << "SocketChannel read unexpected exception,errno=" << errNum;
                 break;
         }
+    }
+
+    void SocketChannel::shutdown(int32_t how)
+    {
+        socket::shutdown(sockFd_, how);
     }
 } // namespace nets::net

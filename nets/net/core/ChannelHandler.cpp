@@ -9,7 +9,6 @@
 
 namespace nets::net
 {
-
     void ChannelHandler::channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
                                         const InetSockAddress& peerAddress)
     {

@@ -14,13 +14,14 @@ public:
     void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
                         const InetSockAddress& peerAddress) override
     {
+        LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
                    << " client address:" << peerAddress.toString();
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
     {
-        int bytes = socket::write(channelContext.channel()->fd(), "Hello Client", strlen("Hello Client"));
+        int bytes = socket::write(channelContext.channel().fd(), "Hello Client", strlen("Hello Client"));
         LOGS_DEBUG << bytes << " " << errno;
         LOGS_DEBUG << "Server channelDisconnect";
     }

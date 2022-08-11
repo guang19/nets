@@ -46,6 +46,11 @@ namespace nets::net
             return peerAddress_;
         }
 
+        inline bool isActive() const
+        {
+            return state_ == ChannelState::ACTIVE;
+        }
+
         void setChannelOptions(const ChannelOptionList& channelOptions);
         void channelActive();
 
@@ -53,15 +58,21 @@ namespace nets::net
         void write(const void* message, IntType len);
         void write(const ByteBuffer& message);
 
+        // shutdown RD and WR
+        void shutdown();
+        void shutdownRead();
+        void shutdownWrite();
+
     private:
         void handleReadError(int32_t errNum);
+        void shutdown(int32_t how);
 
     private:
         FdType sockFd_ {socket::InvalidFd};
         InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};
         using BufferList = ::std::vector<ByteBuffer>;
-        BufferList sendBuffer_ {};
+        BufferList writeBuffer_ {};
 
         enum ChannelState
         {

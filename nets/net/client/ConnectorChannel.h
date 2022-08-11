@@ -62,7 +62,7 @@ namespace nets::net
             CONNECTING,
             DISCONNECTED
         };
-        ConnectionState connectionState_;
+        ConnectionState state_;
         ChannelOptionList channelOptions_ {};
         ChannelHandlerList channelHandlers_ {};
         ChannelInitializationCallback channelInitializationCallback_ {};

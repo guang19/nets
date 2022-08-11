@@ -161,7 +161,7 @@ namespace nets::net
             case EPOLL_CTL_DEL:
                 return "del";
             default:
-                return "unknown operation";
+                return "unknown epoll ctl operation";
         }
     }
 } // namespace nets::net
