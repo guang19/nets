@@ -44,11 +44,12 @@ namespace nets::net
         }
 
         void connect(const InetSockAddress& serverAddress);
-        void channelActive();
 
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);
+        void channelActive();
         void handleConnectError(int32_t errNum);
+        void checkConnected();
         void reconnect();
 
     private:

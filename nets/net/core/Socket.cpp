@@ -115,27 +115,6 @@ namespace nets::net::socket
         return ::connect(sockFd, sockAddr, len);
     }
 
-    bool isSelfConnect(FdType sockFd)
-    {
-        SockAddr6 localAddr, peerAddr;
-        MEMZERO(&localAddr, sizeof(SockAddr6));
-        MEMZERO(&peerAddr, sizeof(SockAddr6));
-        getLocalAddress(sockFd, &localAddr);
-        getPeerAddress(sockFd, &peerAddr);
-        if (localAddr.sin6_family == AF_INET)
-        {
-            const SockAddr4* localAddr4 = reinterpret_cast<SockAddr4*>(&localAddr);
-            const SockAddr4* peerAddr4 = reinterpret_cast<SockAddr4*>(&peerAddr);
-            return localAddr4->sin_port == peerAddr4->sin_port && localAddr4->sin_addr.s_addr == peerAddr4->sin_addr.s_addr;
-        }
-        else if (localAddr.sin6_family == AF_INET6)
-        {
-            return localAddr.sin6_port == peerAddr.sin6_port &&
-                   (::memcmp(&localAddr.sin6_addr, &peerAddr.sin6_addr, sizeof(localAddr.sin6_addr)) == 0);
-        }
-        return false;
-    }
-
     SSizeType read(FdType fd, void* buf, ::size_t n)
     {
         return ::read(fd, buf, n);

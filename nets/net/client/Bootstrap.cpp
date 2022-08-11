@@ -36,7 +36,7 @@ namespace nets::net
     {
         mainLoopGroup_->loopEach();
         auto future = mainLoopGroup_->submit(
-            [this, serverAddress]
+            [this, serverAddress]()
             {
                 doConnect(serverAddress);
             });

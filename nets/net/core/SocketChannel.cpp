@@ -99,6 +99,7 @@ namespace nets::net
             {
                 deregister();
             }
+            LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
         }
         // catch fireChannelConnect
         catch (const ::std::exception& exception)

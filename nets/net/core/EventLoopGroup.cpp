@@ -11,7 +11,7 @@ namespace nets::net
     {
         if (numOfEventLoops_ <= 0)
         {
-            THROW_FMT(::std::invalid_argument, "numOfEventLoops must be greater than 0,numOfEventLoops=%u", numOfEventLoops_);
+            THROW_FMT(::std::invalid_argument, "EventLoopGroup numOfEventLoops must be greater than 0,numOfEventLoops=%u", numOfEventLoops_);
         }
         eventLoops_.reserve(numOfEventLoops_);
         futures_.reserve(numOfEventLoops);

@@ -36,7 +36,6 @@ namespace nets::net
         void listen(FdType sockFd, int32_t backlog);
         FdType accept(FdType sockFd, SockAddr6* sockAddr);
         int32_t connect(FdType sockFd, const SockAddr* sockAddr);
-        bool isSelfConnect(FdType sockFd);
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
         SSizeType write(FdType fd, const void* buf, ::size_t n);

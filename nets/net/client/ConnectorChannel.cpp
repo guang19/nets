@@ -35,9 +35,9 @@ namespace nets::net
 
     void ConnectorChannel::handleWriteEvent()
     {
-        assert(connectionState_ == ConnectionState::CONNECTING);
         if (connectionState_ != ConnectionState::CONNECTING)
         {
+            LOGS_WARN << "ConnectorChannel handleWriteEvent connectionState=" << connectionState_;
             return;
         }
         int32_t errNum = socket::getSockError(sockFd_);
@@ -47,22 +47,23 @@ namespace nets::net
             reconnect();
             return;
         }
-        if (socket::isSelfConnect(sockFd_))
-        {
-            LOGS_ERROR << "ConnectorChannel occurred unexpected exception while connecting,errNum=" << errNum;
-            return;
-        }
-        connectionState_ = ConnectionState::CONNECTED;
-        auto socketChannel = ::std::make_shared<SocketChannel>(sockFd_, localAddress_, peerAddress_, eventLoop_);
-        initSocketChannel(socketChannel);
-        // must remove self before socketChannel register
-        deregister();
-        socketChannel->channelActive();
+        channelActive();
     }
 
     void ConnectorChannel::handleErrorEvent()
     {
         assert(connectionState_ != ConnectionState::CONNECTED);
+        if (connectionState_ == ConnectionState::CONNECTING)
+        {
+            // wait next loop deregister, because channel might has other event
+            eventLoop_->addTask(
+                [channel = shared_from_this()]()
+                {
+                    channel->deregister();
+                    assert(!channel->isRegistered());
+                    assert(channel.use_count() == 1);
+                });
+        }
     }
 
     void ConnectorChannel::connect(const InetSockAddress& serverAddress)
@@ -73,33 +74,15 @@ namespace nets::net
         peerAddress_ = serverAddress;
         if (ret == 0)
         {
+            socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
+            assert(connectionState_ == ConnectionState::DISCONNECTED);
+            connectionState_ = ConnectionState::CONNECTED;
             channelActive();
         }
         else
         {
             int32_t errNum = errno;
             handleConnectError(errNum);
-        }
-    }
-
-    void ConnectorChannel::channelActive()
-    {
-        socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
-        addEvent(EWriteEvent);
-        try
-        {
-            if (!registerTo())
-            {
-                THROW_FMT(ChannelRegisterException, "ConnectorChannel register failed");
-            }
-            connectionState_ = ConnectionState::CONNECTING;
-        }
-        catch (const ChannelRegisterException& exception)
-        {
-            if (isRegistered())
-            {
-                deregister();
-            }
         }
     }
 
@@ -117,6 +100,21 @@ namespace nets::net
         }
     }
 
+    void ConnectorChannel::channelActive()
+    {
+        auto socketChannel = ::std::make_shared<SocketChannel>(sockFd_, localAddress_, peerAddress_, eventLoop_);
+        initSocketChannel(socketChannel);
+        // must remove self from EventLoop before socketChannel register
+        if (connectionState_ == ConnectionState::CONNECTING)
+        {
+            connectionState_ = ConnectionState::CONNECTED;
+            deregister();
+            assert(!isRegistered());
+        }
+        socketChannel->channelActive();
+    }
+
+
     void ConnectorChannel::handleConnectError(int32_t errNum)
     {
         switch (errNum)
@@ -126,7 +124,7 @@ namespace nets::net
             case EISCONN:
             case EINPROGRESS:
             {
-                channelActive();
+                checkConnected();
                 break;
             }
             // retry
@@ -150,9 +148,31 @@ namespace nets::net
             case EPROTOTYPE:
             default:
                 errno = errNum;
-                LOGS_ERROR << "ConnectorChannel connect unexpected exception,errno=" << errNum;
-                socket::closeFd(sockFd_);
+                LOGS_ERROR << "ConnectorChannel occurred unexpected exception occurred while connecting,errno=" << errNum;
                 break;
+        }
+    }
+
+    void ConnectorChannel::checkConnected()
+    {
+        socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
+        addEvent(EWriteEvent);
+        try
+        {
+            if (!registerTo())
+            {
+                THROW_FMT(ChannelRegisterException, "ConnectorChannel register failed");
+            }
+            connectionState_ = ConnectionState::CONNECTING;
+        }
+        catch (const ChannelRegisterException& exception)
+        {
+            if (isRegistered())
+            {
+                deregister();
+            }
+            LOGS_ERROR << "ConnectorChannel checkConnected failed,cause " << exception.what();
+            reconnect();
         }
     }
 
