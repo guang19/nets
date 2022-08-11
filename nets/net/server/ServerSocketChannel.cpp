@@ -69,11 +69,11 @@ namespace nets::net
     void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
     {
         sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
+        socket::setSockNonBlock(sockFd_, true);
         for (const auto& channelOption: channelOptions_)
         {
             setChannelOption(channelOption);
         }
-        socket::setSockNonBlock(sockFd_, true);
         socket::bind(sockFd_, sockAddress.sockAddr());
         socket::listen(sockFd_, backlog_);
         addEvent(EReadEvent);

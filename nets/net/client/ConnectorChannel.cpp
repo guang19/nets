@@ -53,10 +53,11 @@ namespace nets::net
             return;
         }
         connectionState_ = ConnectionState::CONNECTED;
-        // remove self before socketChannel register
-        deregister();
         auto socketChannel = ::std::make_shared<SocketChannel>(sockFd_, localAddress_, peerAddress_, eventLoop_);
         initSocketChannel(socketChannel);
+        // must remove self before socketChannel register
+        deregister();
+        socketChannel->channelActive();
     }
 
     void ConnectorChannel::handleErrorEvent()
@@ -72,7 +73,6 @@ namespace nets::net
         peerAddress_ = serverAddress;
         if (ret == 0)
         {
-            socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
             channelActive();
         }
         else
@@ -84,6 +84,7 @@ namespace nets::net
 
     void ConnectorChannel::channelActive()
     {
+        socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
         addEvent(EWriteEvent);
         try
         {
@@ -114,8 +115,6 @@ namespace nets::net
         {
             channelInitializationCallback_(*socketChannel);
         }
-        socketChannel->addEvent(EReadEvent);
-        socketChannel->channelActive();
     }
 
     void ConnectorChannel::handleConnectError(int32_t errNum)
