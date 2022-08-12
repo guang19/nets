@@ -21,8 +21,6 @@ public:
 
     void channelDisconnect(ChannelContext& channelContext) override
     {
-        int bytes = socket::write(channelContext.channel().fd(), "Hello Client", strlen("Hello Client"));
-        LOGS_DEBUG << bytes << " " << errno;
         LOGS_DEBUG << "Server channelDisconnect";
     }
 

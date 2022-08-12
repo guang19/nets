@@ -3,6 +3,7 @@
 //
 
 #include "nets/net/core/SocketChannel.h"
+
 #include <thread>
 
 #include "nets/base/log/Logging.h"
@@ -20,6 +21,7 @@ namespace nets::net
 
     SocketChannel::~SocketChannel()
     {
+        assert(state_ == ChannelState::INACTIVE);
         socket::closeFd(sockFd_);
     }
 
@@ -50,23 +52,42 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
-            // the peer may shutdown write or close socket, the local can not close socket directly
-            // if the peer shutdown write, but the local can still send data, the peer can also read the data send by local
+            // the peer may shutdown write or close socket, the local can not close socket directly.
+            // if the peer shutdown write, but the local can still send data, the peer can also read the data send by local.
             // So if the local still has data waiting to be sent, just shutdown read; if there is no data waiting to be sent,
             // shutdown both
             if (writeBuffer_.empty())
             {
-                shutdown(SHUT_RDWR);
                 state_ = ChannelState::INACTIVE;
+                shutdown(SHUT_RDWR);
+                try
+                {
+                    channelHandlerPipeline_.fireChannelDisconnect();
+                }
+                catch (const ::std::exception& exception)
+                {
+                    channelHandlerPipeline_.fireExceptionCaught(exception);
+                }
+                eventLoop_->addTask(
+                    [channel = shared_from_this()]()
+                    {
+                        channel->deregister();
+                        assert(!channel->isRegistered());
+                        assert(channel.use_count() == 1);
+                    });
             }
             else
             {
-                shutdown(SHUT_RD);
                 state_ = ChannelState::HALF_CLOSE;
+                shutdown(SHUT_RD);
+                setEvents(EWriteEvent);
+                modify();
             }
         }
         else
         {
+            int32_t errNum = errno;
+            handleReadError(errNum);
         }
     }
 
@@ -74,7 +95,7 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
-            LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
+            LOGS_ERROR << "SocketChannel handleWriteEvent error state " << state_;
             return;
         }
     }
@@ -82,7 +103,7 @@ namespace nets::net
     void SocketChannel::handleErrorEvent()
     {
         int32_t errNum = socket::getSockError(sockFd_);
-        LOGS_ERROR << "SocketChannel unexpected exception,errNum=" << errNum;
+        LOGS_ERROR << "SocketChannel unexpected error,errNum=" << errNum;
     }
 
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
@@ -122,9 +143,9 @@ namespace nets::net
 
     void SocketChannel::write(const StringType& message) {}
 
-    void SocketChannel::write(const void* message, IntType len) {}
-
     void SocketChannel::write(const ByteBuffer& message) {}
+
+    void SocketChannel::write(const void* message, IntType len) {}
 
     void SocketChannel::shutdown()
     {
@@ -149,7 +170,7 @@ namespace nets::net
             // EWOULDBLOCK
             case EAGAIN:
             case EINTR:
-                LOGS_ERROR << "SocketChannel read expected exception,errno=" << errNum;
+                LOGS_ERROR << "SocketChannel handleReadError errno=" << errNum;
                 break;
             // error
             case EBADF:
@@ -162,8 +183,7 @@ namespace nets::net
             case ENOTCONN:
             case ENOTSOCK:
             default:
-                errno = errNum;
-                LOGS_ERROR << "SocketChannel read unexpected exception,errno=" << errNum;
+                LOGS_ERROR << "SocketChannel handleReadError unexpected error,errno=" << errNum;
                 break;
         }
     }

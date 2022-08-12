@@ -56,6 +56,7 @@ namespace nets::net
         FdType sockFd_ {socket::InvalidFd};
         InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};
+
         enum ConnectionState
         {
             CONNECTED,
