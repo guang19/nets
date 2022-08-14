@@ -118,10 +118,11 @@ namespace nets::net
         writerIndex_ += len;
     }
 
-    SSizeType ByteBuffer::writeBytes(SocketChannel& channel)
+    SSizeType ByteBuffer::writeBytes(SocketChannel& channel, IntType len)
     {
+        ensureWritable(len);
         SSizeType bytes = 0;
-        bytes = socket::read(channel.fd(), &buffer_[writerIndex_], writableBytes());
+        bytes = socket::read(channel.fd(), &buffer_[writerIndex_], len);
         if (bytes > 0)
         {
             writerIndex_ += bytes;

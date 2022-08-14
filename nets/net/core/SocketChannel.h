@@ -64,6 +64,7 @@ namespace nets::net
         void shutdownWrite();
 
     private:
+        SSizeType doRead(ByteBuffer& byteBuffer);
         void handleReadError(int32_t errNum);
         void shutdown(int32_t how);
 

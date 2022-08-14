@@ -39,7 +39,10 @@ namespace nets::net
         int32_t connect(FdType sockFd, const SockAddr* sockAddr);
 
         SSizeType read(FdType fd, void* buf, ::size_t n);
+        SSizeType readv(FdType fd, const IoVec* iov, int32_t iovcnt);
         SSizeType write(FdType fd, const void* buf, ::size_t n);
+        SSizeType writev(FdType fd, const IoVec* iov, int32_t iovcnt);
+
 
         void getLocalAddress(FdType fd, SockAddr6* sockAddr);
         void getPeerAddress(FdType fd, SockAddr6* sockAddr);
@@ -71,11 +74,11 @@ namespace nets::net
         const int32_t DefaultMaximumOfBackLog = SOMAXCONN;
         const int32_t DefaultSockLinger = 0;
 
-        const int32_t DefaultTcpSockSendBufSize = socket::getTcpSockSendBuf();
-        const int32_t DefaultTcpSockRecvBufSize = socket::getTcpSockRecvBuf();
+        const int32_t DefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
+        const int32_t DefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
 
-        const int32_t DefaultUdpSockSendBufSize = socket::getUdpSockSendBuf();
-        const int32_t DefaultUdpSockRecvBufSize = socket::getUdpSockRecvBuf();
+        const int32_t DefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
+        const int32_t DefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
     }
 } // namespace nets::net
 

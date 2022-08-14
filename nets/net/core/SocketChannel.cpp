@@ -12,6 +12,11 @@
 
 namespace nets::net
 {
+    namespace
+    {
+        const SocketChannel::IntType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
+    }
+
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), writeBuffer_(),
@@ -37,8 +42,8 @@ namespace nets::net
             LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
             return;
         }
-        ByteBuffer byteBuffer(DefaultTcpSockRecvBufSize);
-        SSizeType bytes = byteBuffer.writeBytes(*this);
+        ByteBuffer byteBuffer(RecvBufferSize);
+        SSizeType bytes = readEAGAIN(byteBuffer);
         if (bytes > 0)
         {
             try
@@ -52,10 +57,11 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
+            // close_wait
             // the peer may shutdown write or close socket, the local can not close socket directly.
             // if the peer shutdown write, but the local can still send data, the peer can also read the data send by local.
             // So if the local still has data waiting to be sent, just shutdown read; if there is no data waiting to be sent,
-            // shutdown both
+            // then shutdown both
             if (writeBuffer_.empty())
             {
                 state_ = ChannelState::INACTIVE;
@@ -162,6 +168,26 @@ namespace nets::net
         shutdown(SHUT_WR);
     }
 
+    SSizeType SocketChannel::doRead(ByteBuffer& byteBuffer)
+    {
+        SSizeType bytes = 0;
+        IntType expectedLen = byteBuffer.writableBytes();
+        while (true)
+        {
+            SSizeType readBytes = byteBuffer.writeBytes(*this, expectedLen);
+            if (readBytes > 0)
+            {
+                bytes += readBytes;
+                expectedLen = (readBytes < expectedLen) ? (expectedLen >>= 1) : (expectedLen += expectedLen >> 1);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return bytes;
+    }
+
     void SocketChannel::handleReadError(int32_t errNum)
     {
         switch (errNum)
@@ -169,6 +195,7 @@ namespace nets::net
             // EAGAIN/EWOULDBLOCK is not an error
             // EWOULDBLOCK
             case EAGAIN:
+                break;
             case EINTR:
                 LOGS_ERROR << "SocketChannel handleReadError errno=" << errNum;
                 break;
