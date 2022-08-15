@@ -15,6 +15,7 @@ namespace nets::net
         using OptValType = int32_t;
         using SockLinger = struct linger;
         using IoVec = struct iovec;
+        using SizeType = ::size_t;
         using SSizeType = ::ssize_t;
     } // namespace
 
@@ -38,9 +39,9 @@ namespace nets::net
         FdType accept(FdType sockFd, SockAddr6* sockAddr);
         int32_t connect(FdType sockFd, const SockAddr* sockAddr);
 
-        SSizeType read(FdType fd, void* buf, ::size_t n);
+        SSizeType read(FdType fd, void* buf, SizeType n);
         SSizeType readv(FdType fd, const IoVec* iov, int32_t iovcnt);
-        SSizeType write(FdType fd, const void* buf, ::size_t n);
+        SSizeType write(FdType fd, const void* buf, SizeType n);
         SSizeType writev(FdType fd, const IoVec* iov, int32_t iovcnt);
 
 

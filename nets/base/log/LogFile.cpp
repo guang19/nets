@@ -23,7 +23,7 @@ namespace nets::base
     LogFile::LogFile(const char* file) : fp_(nullptr), dir_(), file_(file), bytes_(0), lastRollTime_(0)
     {
         SizeType filePathLength = file_.length();
-        if (filePathLength > MaxFilePathLength || filePathLength <= 0)
+        if (filePathLength > MaxFilePathLength || filePathLength == 0)
         {
             THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLength, MaxFilePathLength);
         }
@@ -52,12 +52,12 @@ namespace nets::base
         }
     }
 
-    void LogFile::write(const char* data, SizeType len)
+    void LogFile::write(const char* data, SizeType length)
     {
         uint64_t writtenBytes = 0;
-        while (writtenBytes < len)
+        while (writtenBytes < length)
         {
-            uint64_t remain = len - writtenBytes;
+            uint64_t remain = length - writtenBytes;
             // not thread-safe
             uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
             if (n != remain)
@@ -121,13 +121,13 @@ namespace nets::base
         {
             return;
         }
-        SizeType len = ::strlen(multiLevelDir);
+        SizeType length = ::strlen(multiLevelDir);
         char tmpDir[MaxFilePathLength] = {0};
         char* dirPtr = tmpDir;
         char path[MaxFilePathLength] = {0};
         MEMZERO(tmpDir, MaxFilePathLength);
         MEMZERO(path, MaxFilePathLength);
-        ::memcpy(tmpDir, multiLevelDir, len);
+        ::memcpy(tmpDir, multiLevelDir, length);
         char* spStr = nullptr;
         while (nullptr != (spStr = ::strsep(&dirPtr, "/")))
         {

@@ -15,10 +15,10 @@ namespace nets::base
 {
     namespace
     {
-        using IntType = uint32_t;
+        using SizeType = ::size_t;
     }
 
-    template <IntType SIZE>
+    template <SizeType SIZE>
     class StackBuffer : Noncopyable
     {
     public:
@@ -35,22 +35,22 @@ namespace nets::base
             return buffer_;
         }
 
-        inline IntType length() const
+        inline SizeType length() const
         {
             return writerIndex_;
         }
 
-        inline IntType writerIndex() const
+        inline SizeType writerIndex() const
         {
             return writerIndex_;
         }
 
-        inline IntType writableBytes() const
+        inline SizeType writableBytes() const
         {
             return capacity_ - writerIndex_;
         }
 
-        void writeBytes(const char* data, IntType len);
+        void writeBytes(const char* data, SizeType length);
 
         void writePointer(const void* ptr);
 
@@ -63,21 +63,21 @@ namespace nets::base
     private:
         char buffer_[SIZE] {0};
         // writer pointer
-        IntType writerIndex_ {0};
-        IntType capacity_ {SIZE};
+        SizeType writerIndex_ {0};
+        SizeType capacity_ {SIZE};
     };
 
-    template <IntType SIZE>
-    void StackBuffer<SIZE>::writeBytes(const char* data, IntType len)
+    template <SizeType SIZE>
+    void StackBuffer<SIZE>::writeBytes(const char* data, SizeType length)
     {
-        if (writableBytes() > len)
+        if (writableBytes() > length)
         {
-            ::memcpy(buffer_ + writerIndex_, data, len);
-            writerIndex_ += len;
+            ::memcpy(buffer_ + writerIndex_, data, length);
+            writerIndex_ += length;
         }
     }
 
-    template <IntType SIZE>
+    template <SizeType SIZE>
     void StackBuffer<SIZE>::writePointer(const void* ptr)
     {
         if (writableBytes() > MaxNumLength)
@@ -86,7 +86,7 @@ namespace nets::base
         }
     }
 
-    template <IntType SIZE>
+    template <SizeType SIZE>
     template <typename Number>
     void StackBuffer<SIZE>::writeInteger(Number n)
     {
@@ -96,7 +96,7 @@ namespace nets::base
         }
     }
 
-    template <IntType SIZE>
+    template <SizeType SIZE>
     template <typename Float>
     void StackBuffer<SIZE>::writeFloat(Float f)
     {

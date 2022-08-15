@@ -16,7 +16,7 @@ namespace nets::net
     class SocketChannel : public Channel
     {
     public:
-        using IntType = ByteBuffer::IntType;
+        using SizeType = ByteBuffer::SizeType;
         using StringType = ::std::string;
 
     public:
@@ -55,7 +55,7 @@ namespace nets::net
         void channelActive();
 
         void write(const StringType& message);
-        void write(const void* message, IntType len);
+        void write(const void* message, SizeType length);
         void write(const ByteBuffer& message);
 
         // shutdown RD and WR
@@ -65,6 +65,8 @@ namespace nets::net
 
     private:
         SSizeType doRead(ByteBuffer& byteBuffer);
+        void doWrite(const void* data, SizeType length);
+        bool writeBufferLastCanAppend(SizeType length);
         void handleReadError(int32_t errNum);
         void shutdown(int32_t how);
 

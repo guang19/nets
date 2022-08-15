@@ -15,25 +15,31 @@ namespace nets::net
 {
     namespace
     {
-        constexpr ByteBuffer::IntType DefaultInitialCapacity = 1024;
-        constexpr ByteBuffer::IntType MaxCapacity = INT32_MAX - 1;
+        constexpr ByteBuffer::SizeType DefaultInitialCapacity = 1024;
+        constexpr ByteBuffer::SizeType MaxCapacity = INT32_MAX - 1;
 
-        constexpr ByteBuffer::IntType BooleanBytes = sizeof(bool);
-        constexpr ByteBuffer::IntType CharBytes = sizeof(char);
-        constexpr ByteBuffer::IntType Int8Bytes = sizeof(int8_t);
-        constexpr ByteBuffer::IntType Int16Bytes = sizeof(int16_t);
-        constexpr ByteBuffer::IntType Int32Bytes = sizeof(int32_t);
-        constexpr ByteBuffer::IntType Int64Bytes = sizeof(int64_t);
-        constexpr ByteBuffer::IntType FloatBytes = sizeof(float);
-        constexpr ByteBuffer::IntType DoubleBytes = sizeof(double);
+        constexpr ByteBuffer::SizeType BooleanBytes = sizeof(bool);
+        constexpr ByteBuffer::SizeType CharBytes = sizeof(char);
+        constexpr ByteBuffer::SizeType Int8Bytes = sizeof(int8_t);
+        constexpr ByteBuffer::SizeType Int16Bytes = sizeof(int16_t);
+        constexpr ByteBuffer::SizeType Int32Bytes = sizeof(int32_t);
+        constexpr ByteBuffer::SizeType Int64Bytes = sizeof(int64_t);
+        constexpr ByteBuffer::SizeType FloatBytes = sizeof(float);
+        constexpr ByteBuffer::SizeType DoubleBytes = sizeof(double);
     } // namespace
 
     ByteBuffer::ByteBuffer() : ByteBuffer(DefaultInitialCapacity) {}
 
-    ByteBuffer::ByteBuffer(IntType capacity)
+    ByteBuffer::ByteBuffer(SizeType capacity)
         : buffer_(::std::make_unique<char[]>(capacity)), readerIndex_(0), writerIndex_(0), capacity_(capacity)
     {
         MEMZERO(&buffer_[0], capacity_);
+    }
+
+    ByteBuffer::ByteBuffer(const void* data, SizeType length)
+        : buffer_(nullptr), readerIndex_(0), writerIndex_(0), capacity_(0)
+    {
+        writeBytes(data, length);
     }
 
     ByteBuffer::ByteBuffer(const ByteBuffer& other)
@@ -106,23 +112,23 @@ namespace nets::net
         writeBytes(&value, CharBytes);
     }
 
-    void ByteBuffer::writeBytes(const void* data, IntType len)
+    void ByteBuffer::writeBytes(const void* data, SizeType length)
     {
-        writeBytes(reinterpret_cast<const char*>(data), len);
+        writeBytes(reinterpret_cast<const char*>(data), length);
     }
 
-    void ByteBuffer::writeBytes(const char* data, IntType len)
+    void ByteBuffer::writeBytes(const char* data, SizeType length)
     {
-        ensureWritable(len);
-        ::memcpy(&buffer_[writerIndex_], data, len);
-        writerIndex_ += len;
+        ensureWritable(length);
+        ::memcpy(&buffer_[writerIndex_], data, length);
+        writerIndex_ += length;
     }
 
-    SSizeType ByteBuffer::writeBytes(SocketChannel& channel, IntType len)
+    SSizeType ByteBuffer::writeBytes(SocketChannel& channel, SizeType length)
     {
-        ensureWritable(len);
+        ensureWritable(length);
         SSizeType bytes = 0;
-        bytes = socket::read(channel.fd(), &buffer_[writerIndex_], len);
+        bytes = socket::read(channel.fd(), &buffer_[writerIndex_], length);
         if (bytes > 0)
         {
             writerIndex_ += bytes;
@@ -181,11 +187,11 @@ namespace nets::net
         return c;
     }
 
-    ByteBuffer::StringType ByteBuffer::readBytes(IntType len)
+    ByteBuffer::StringType ByteBuffer::readBytes(SizeType length)
     {
-        checkReadableBytes(len);
-        StringType s(&buffer_[readerIndex_], len);
-        adjustReaderIndex(len);
+        checkReadableBytes(length);
+        StringType s(&buffer_[readerIndex_], length);
+        adjustReaderIndex(length);
         return s;
     }
 
@@ -248,16 +254,16 @@ namespace nets::net
         return {&buffer_[readerIndex_], readableBytes()};
     }
 
-    void ByteBuffer::ensureWritable(IntType writeLen)
+    void ByteBuffer::ensureWritable(SizeType writeLen)
     {
         if (writableBytes() < writeLen)
         {
-            IntType newCapacity = capacity_;
+            SizeType newCapacity = capacity_;
             if (capacity_ != 0)
             {
                 if (writableBytes() + discardReadBytes() < writeLen)
                 {
-                    IntType targetCapacity = writerIndex_ + writeLen;
+                    SizeType targetCapacity = writerIndex_ + writeLen;
                     newCapacity = calculateNewCapacity(targetCapacity);
                 }
                 if (newCapacity > MaxCapacity)
@@ -268,20 +274,20 @@ namespace nets::net
             }
             else
             {
-                newCapacity = DefaultInitialCapacity;
+                newCapacity = calculateNewCapacity(writeLen);
             }
             adjustCapacity(newCapacity);
         }
     }
 
-    ByteBuffer::IntType ByteBuffer::calculateNewCapacity(IntType targetCapacity) const
+    ByteBuffer::SizeType ByteBuffer::calculateNewCapacity(SizeType targetCapacity) const
     {
         // ensure newCapacity is a power of 2
         if (targetCapacity == 0)
         {
             return 0;
         }
-        IntType newCapacity = 1;
+        SizeType newCapacity = 1;
         while (newCapacity < targetCapacity)
         {
             newCapacity <<= 1;
@@ -289,13 +295,14 @@ namespace nets::net
         return newCapacity;
     }
 
-    void ByteBuffer::adjustCapacity(IntType newCapacity)
+    void ByteBuffer::adjustCapacity(SizeType newCapacity)
     {
-        IntType contentBytes = readableBytes();
+        SizeType contentBytes = readableBytes();
         // expansion
         if (newCapacity != capacity_)
         {
             CharArrayPtr newBuffer = ::std::make_unique<char[]>(newCapacity);
+            MEMZERO(&newBuffer[0], newCapacity);
             if (contentBytes > 0)
             {
                 ::memcpy(&newBuffer[0], &buffer_[readerIndex_], contentBytes);
@@ -312,7 +319,7 @@ namespace nets::net
         writerIndex_ = contentBytes;
     }
 
-    void ByteBuffer::checkReadableBytes(IntType bytes) const
+    void ByteBuffer::checkReadableBytes(SizeType bytes) const
     {
         if (readableBytes() < bytes)
         {
@@ -320,7 +327,7 @@ namespace nets::net
         }
     }
 
-    void ByteBuffer::adjustReaderIndex(IntType bytes)
+    void ByteBuffer::adjustReaderIndex(SizeType bytes)
     {
         if (readableBytes() > bytes)
         {

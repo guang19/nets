@@ -28,10 +28,10 @@ namespace nets::base
         // constexpr ::size_t LogFileRollingSize = 200;
     } // namespace
 
-    void StdoutLogSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
+    void StdoutLogSynchronizer::synchronize(const char* data, SizeType length, TimeType persistTime)
     {
         UNUSED(persistTime);
-        ::fwrite(data, 1, len, stdout);
+        ::fwrite(data, 1, length, stdout);
     }
 
     void StdoutLogSynchronizer::flush()
@@ -43,10 +43,10 @@ namespace nets::base
 
     SingleLogFileSynchronizer::SingleLogFileSynchronizer(const char* logFile) : LogFileSynchronizer(logFile) {}
 
-    void SingleLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType persistTime)
+    void SingleLogFileSynchronizer::synchronize(const char* data, SizeType length, TimeType persistTime)
     {
         UNUSED(persistTime);
-        logFile_->write(data, len);
+        logFile_->write(data, length);
     }
 
     void SingleLogFileSynchronizer::flush()
@@ -56,13 +56,13 @@ namespace nets::base
 
     DailyLogFileSynchronizer::DailyLogFileSynchronizer(const char* logFile) : LogFileSynchronizer(logFile) {}
 
-    void DailyLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType now)
+    void DailyLogFileSynchronizer::synchronize(const char* data, SizeType length, TimeType now)
     {
         if (now - logFile_->lastRollTime() >= SecondsPerDay)
         {
             logFile_->renameByNowTime(now);
         }
-        logFile_->write(data, len);
+        logFile_->write(data, length);
     }
 
     void DailyLogFileSynchronizer::flush()
@@ -72,13 +72,13 @@ namespace nets::base
 
     RollingLogFileSynchronizer::RollingLogFileSynchronizer(const char* logFile) : LogFileSynchronizer(logFile) {}
 
-    void RollingLogFileSynchronizer::synchronize(const char* data, SizeType len, TimeType now)
+    void RollingLogFileSynchronizer::synchronize(const char* data, SizeType length, TimeType now)
     {
-        if (logFile_->size() + len > LogFileRollingSize)
+        if (logFile_->size() + length > LogFileRollingSize)
         {
             logFile_->renameByNowTime(now);
         }
-        logFile_->write(data, len);
+        logFile_->write(data, length);
     }
 
     void RollingLogFileSynchronizer::flush()

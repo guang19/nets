@@ -50,8 +50,8 @@ int main(int argc, char** argv)
 //        FdType sockFd = socket::createTcpSocket(AF_INET);
 //        InetSockAddress serverAddr("127.0.0.1", 8080, false);
 //        InetSockAddress clientAddr;
-//        SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));
-//        ::getsockname(sockFd, clientAddr.sockAddr(), &len);
+//        SockLenType length = static_cast<SockLenType>(sizeof(SockAddr6));
+//        ::getsockname(sockFd, clientAddr.sockAddr(), &length);
 //        socket::connect(sockFd, serverAddr.sockAddr());
 //        ::printf("client fd=%d,client addr:ip=%s,port=%d\n", sockFd, clientAddr.ip().c_str(), clientAddr.port());
 //        ::printf("client addr=%s\n", clientAddr.toString().c_str());

@@ -14,7 +14,7 @@ namespace nets::net
 {
     namespace
     {
-        const SocketChannel::IntType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
+        const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
     }
 
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -39,7 +39,7 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE)
         {
-            LOGS_ERROR << "SocketChannel handleReadEvent error state " << state_;
+            LOGS_ERROR << "SocketChannel handleReadEvent,but error state " << state_;
             return;
         }
         ByteBuffer byteBuffer(RecvBufferSize);
@@ -100,7 +100,7 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
-            LOGS_ERROR << "SocketChannel handleWriteEvent error state " << state_;
+            LOGS_ERROR << "SocketChannel handleWriteEvent,but error state " << state_;
             return;
         }
     }
@@ -150,7 +150,7 @@ namespace nets::net
 
     void SocketChannel::write(const ByteBuffer& message) {}
 
-    void SocketChannel::write(const void* message, IntType len) {}
+    void SocketChannel::write(const void* message, SizeType length) {}
 
     void SocketChannel::shutdown()
     {
@@ -170,14 +170,14 @@ namespace nets::net
     SSizeType SocketChannel::doRead(ByteBuffer& byteBuffer)
     {
         // read all at once
-        IntType expectedReadLen = byteBuffer.writableBytes();
+        SizeType expectedReadLen = byteBuffer.writableBytes();
         SSizeType bytes = 0;
         while (true)
         {
             bytes = byteBuffer.writeBytes(*this, expectedReadLen);
             if (bytes > 0)
             {
-                if (bytes < expectedReadLen)
+                if (static_cast<SizeType>(bytes) < expectedReadLen)
                 {
                     expectedReadLen = expectedReadLen - bytes;
                 }
@@ -197,7 +197,43 @@ namespace nets::net
                 return 0;
             }
         }
-        return byteBuffer.readableBytes();
+        return static_cast<SSizeType>(byteBuffer.readableBytes());
+    }
+
+    void SocketChannel::doWrite(const void* data, SizeType length)
+    {
+        if (length == 0)
+        {
+            return;
+        }
+        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        {
+            LOGS_ERROR << "SocketChannel write,but error state " << state_;
+            return;
+        }
+        // the writeBuffer has residual data waiting to be sent, append the data to the end of the writeBuffer
+        if (hasWriteEvent() && !writeBuffer_.empty())
+        {
+            // to avoid allocating new memory, check whether the writeBuffer back() can be directly appended
+            if (writeBufferLastCanAppend(length))
+            {
+                writeBuffer_.back().writeBytes(data, length);
+            }
+            else
+            {
+                writeBuffer_.emplace_back(data, length);
+            }
+        }
+        // write directly
+    }
+
+    bool SocketChannel::writeBufferLastCanAppend(SizeType length)
+    {
+        if (!writeBuffer_.empty())
+        {
+            return writeBuffer_.back().writableBytes() >= length;
+        }
+        return false;
     }
 
     void SocketChannel::handleReadError(int32_t errNum)

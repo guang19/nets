@@ -52,7 +52,7 @@ namespace nets::base
         virtual ~LogWriter() = default;
 
     public:
-        virtual void write(const char* data, SizeType len) = 0;
+        virtual void write(const char* data, SizeType length) = 0;
     };
 
     DECLARE_SINGLETON_CLASS(AsyncLogWriter), public LogWriter
@@ -78,7 +78,7 @@ namespace nets::base
         ~AsyncLogWriter() override;
 
     public:
-        void write(const char* data, SizeType len) override;
+        void write(const char* data, SizeType length) override;
 
     private:
         void afterInit()

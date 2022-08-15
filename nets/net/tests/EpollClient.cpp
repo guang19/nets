@@ -16,8 +16,8 @@ int main(int argc, char** argv)
     InetSockAddress serverAddr("127.0.0.1", 8080);
     socket::connect(sockFd, serverAddr.sockAddr());
     InetSockAddress clientAddr;
-    SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));
-    ::getsockname(sockFd, clientAddr.sockAddr(), &len);
+    SockLenType length = static_cast<SockLenType>(sizeof(SockAddr6));
+    ::getsockname(sockFd, clientAddr.sockAddr(), &length);
     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", sockFd, clientAddr.ip().c_str(), clientAddr.port());
     ::printf("client addr=%s\n", clientAddr.toString().c_str());
     char buf[1024] = "asdasd1233asd";

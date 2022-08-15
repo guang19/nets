@@ -43,10 +43,10 @@ TEST(SocketTest, ReuseAddr)
     FdType sockFd = socket::createTcpSocket(AF_INET);
     ASSERT_GE(sockFd, 0);
     OptValType optVal = 0;
-    auto len = static_cast<SockLenType>(sizeof(optVal));
-    ::getsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &optVal, &len);
+    auto length = static_cast<SockLenType>(sizeof(optVal));
+    ::getsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &optVal, &length);
     ASSERT_EQ(optVal, 0);
-    ::getsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &optVal, &len);
+    ::getsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &optVal, &length);
     ASSERT_EQ(optVal, 0);
 }
 

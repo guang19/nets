@@ -53,6 +53,16 @@ namespace nets::net
         return events_ == ENoneEvent;
     }
 
+    bool Channel::hasReadEvent() const
+    {
+        return events_ & EReadEvent;
+    }
+
+    bool Channel::hasWriteEvent() const
+    {
+        return events_ & EWriteEvent;
+    }
+
     void Channel::setReadyEvents(EventType events)
     {
         readyEvents_ = events;

@@ -48,8 +48,8 @@ int main(int argc, char** argv)
                 {
                     ::printf("listen listenFd\n");
                     InetSockAddress serverAddr2;
-                    SockLenType len = static_cast<SockLenType>(sizeof(SockAddr6));
-                    ::getsockname(listenFd, serverAddr2.sockAddr(), &len);
+                    SockLenType length = static_cast<SockLenType>(sizeof(SockAddr6));
+                    ::getsockname(listenFd, serverAddr2.sockAddr(), &length);
                     ::printf("server fd=%d,server addr:ip=%s,port=%d\n", listenFd, serverAddr2.ip().c_str(),
                              serverAddr2.port());
                     ::printf("server addr=%s\n", serverAddr2.toString().c_str());
@@ -59,13 +59,13 @@ int main(int argc, char** argv)
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
 
                     InetSockAddress clientAddr2;
-                    ::getpeername(connFd, clientAddr2.sockAddr(), &len);
+                    ::getpeername(connFd, clientAddr2.sockAddr(), &length);
                     ::printf("client2 fd=%d,client2 addr:ip=%s,port=%d\n", connFd, clientAddr2.ip().c_str(),
                              clientAddr2.port());
                     ::printf("client2 addr=%s\n", clientAddr2.toString().c_str());
 
                     InetSockAddress clientAddr3;
-                    ::getsockname(connFd, clientAddr3.sockAddr(), &len);
+                    ::getsockname(connFd, clientAddr3.sockAddr(), &length);
                     ::printf("client3 fd=%d,client3 addr:ip=%s,port=%d\n", connFd, clientAddr3.ip().c_str(),
                              clientAddr3.port());
                     ::printf("client3 addr=%s\n", clientAddr3.toString().c_str());

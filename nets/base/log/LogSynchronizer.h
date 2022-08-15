@@ -19,7 +19,7 @@ namespace nets::base
         virtual ~LogSynchronizer() = default;
 
     public:
-        virtual void synchronize(const char* data, SizeType len, TimeType persistTime) = 0;
+        virtual void synchronize(const char* data, SizeType length, TimeType persistTime) = 0;
         virtual void flush() = 0;
     };
 
@@ -32,7 +32,7 @@ namespace nets::base
         ~StdoutLogSynchronizer() override = default;
 
     public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
+        void synchronize(const char* data, SizeType length, TimeType persistTime) override;
         void flush() override;
     };
 
@@ -46,7 +46,7 @@ namespace nets::base
         explicit LogFileSynchronizer(const char* logFile);
 
     public:
-        void synchronize(const char* data, SizeType len, TimeType now) override = 0;
+        void synchronize(const char* data, SizeType length, TimeType now) override = 0;
         void flush() override = 0;
 
     protected:
@@ -62,7 +62,7 @@ namespace nets::base
         ~SingleLogFileSynchronizer() override = default;
 
     public:
-        void synchronize(const char* data, SizeType len, TimeType now) override;
+        void synchronize(const char* data, SizeType length, TimeType now) override;
         void flush() override;
     };
 
@@ -75,7 +75,7 @@ namespace nets::base
         ~DailyLogFileSynchronizer() override = default;
 
     public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
+        void synchronize(const char* data, SizeType length, TimeType persistTime) override;
         void flush() override;
     };
 
@@ -88,7 +88,7 @@ namespace nets::base
         ~RollingLogFileSynchronizer() override = default;
 
     public:
-        void synchronize(const char* data, SizeType len, TimeType persistTime) override;
+        void synchronize(const char* data, SizeType length, TimeType persistTime) override;
         void flush() override;
     };
 

@@ -23,7 +23,7 @@ namespace nets::base
         ~LogFile();
 
     public:
-        void write(const char* data, SizeType len);
+        void write(const char* data, SizeType length);
         void flush();
 
         void renameByNowTime(TimeType now);

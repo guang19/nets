@@ -161,17 +161,17 @@ namespace nets::net
     InetSockAddress::StringType InetSockAddress::ip() const
     {
         char buffer[64] = {0};
-        auto len = static_cast<SockLenType>(sizeof(buffer));
+        auto length = static_cast<SockLenType>(sizeof(buffer));
         if (AF_INET6 == addr_.sa_family)
         {
-            if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer, len))
+            if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer, length))
             {
                 THROW_FMT(InetSockAddressException, "InetSockAddress inet_ntop AF_INET6 failed");
             }
         }
         else if (AF_INET == addr_.sa_family)
         {
-            if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
+            if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, length))
             {
                 THROW_FMT(InetSockAddressException, "InetSockAddress inet_ntop AF_INET failed");
             }
@@ -187,28 +187,28 @@ namespace nets::net
     InetSockAddress::StringType InetSockAddress::toString() const
     {
         char buffer[64] = {0};
-        auto len = static_cast<SockLenType>(sizeof(buffer));
+        auto length = static_cast<SockLenType>(sizeof(buffer));
         if (AF_INET6 == addr_.sa_family)
         {
             // ipv6 + port address like: [2a01:198:603:0:396e]:8080
             buffer[0] = '[';
-            if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer + 1, len))
+            if (nullptr == ::inet_ntop(AF_INET6, &addr6_.sin6_addr, buffer + 1, length))
             {
                 THROW_FMT(InetSockAddressException, "InetSockAddress inet_ntop AF_INET6 failed");
             }
             SockLenType ipLen = ::strlen(buffer);
             PortType port = be16toh(addr6_.sin6_port);
-            ::snprintf(buffer + ipLen, len - ipLen, "]:%u", port);
+            ::snprintf(buffer + ipLen, length - ipLen, "]:%u", port);
         }
         else if (AF_INET == addr_.sa_family)
         {
-            if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, len))
+            if (nullptr == ::inet_ntop(AF_INET, &addr4_.sin_addr, buffer, length))
             {
                 THROW_FMT(InetSockAddressException, "InetSockAddress inet_ntop AF_INET failed");
             }
             SockLenType ipLen = ::strlen(buffer);
             PortType port = be16toh(addr4_.sin_port);
-            ::snprintf(buffer + ipLen, len - ipLen, ":%u", port);
+            ::snprintf(buffer + ipLen, length - ipLen, ":%u", port);
         }
         return buffer;
     }

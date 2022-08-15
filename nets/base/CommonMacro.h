@@ -58,7 +58,7 @@ void throwFmt(const char* fmt, ...)
             THROW_FMT(nets::base::FileOpenException, "pathname was too long");                                              \
             break;                                                                                                          \
         default:                                                                                                            \
-            THROW_FMT(nets::base::FileOpenException, "failed to open file for unknown reason,errno=%d", errNum);           \
+            THROW_FMT(nets::base::FileOpenException, "failed to open file for unknown reason,errno=%d", errNum);            \
             break;                                                                                                          \
     }
 
@@ -66,24 +66,24 @@ void throwFmt(const char* fmt, ...)
     switch (ERRNUM)                                                                                                         \
     {                                                                                                                       \
         case ENOENT:                                                                                                        \
-            THROW_FMT(nets::base::FileCreationException, "no such file");                                                     \
+            THROW_FMT(nets::base::FileCreationException, "no such file");                                                   \
             break;                                                                                                          \
         case EACCES:                                                                                                        \
         case EPERM:                                                                                                         \
-            THROW_FMT(nets::base::FileCreationException, "no permission to create file");                                     \
+            THROW_FMT(nets::base::FileCreationException, "no permission to create file");                                   \
             break;                                                                                                          \
         case EINVAL:                                                                                                        \
-            THROW_FMT(nets::base::FileCreationException, "invalid value in flags");                                           \
+            THROW_FMT(nets::base::FileCreationException, "invalid value in flags");                                         \
             break;                                                                                                          \
         case EMFILE:                                                                                                        \
-            THROW_FMT(nets::base::FileCreationException,                                                                      \
+            THROW_FMT(nets::base::FileCreationException,                                                                    \
                       "the per-process limit on the number of open file descriptors has been reached");                     \
             break;                                                                                                          \
         case ENAMETOOLONG:                                                                                                  \
-            THROW_FMT(nets::base::FileCreationException, "pathname was too long");                                            \
+            THROW_FMT(nets::base::FileCreationException, "pathname was too long");                                          \
             break;                                                                                                          \
         default:                                                                                                            \
-            THROW_FMT(nets::base::FileCreationException, "failed to create file for unknown reason,errno=%d", errNum);        \
+            THROW_FMT(nets::base::FileCreationException, "failed to create file for unknown reason,errno=%d", errNum);      \
             break;                                                                                                          \
     }
 

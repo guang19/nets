@@ -47,6 +47,8 @@ namespace nets::net
         void setEvents(EventType events);
         void addEvent(EventType event);
         bool isNoneEvent() const;
+        bool hasReadEvent() const;
+        bool hasWriteEvent() const;
 
         void setReadyEvents(EventType events);
         void addReadyEvent(EventType event);

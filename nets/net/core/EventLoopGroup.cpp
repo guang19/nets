@@ -9,7 +9,7 @@ namespace nets::net
     EventLoopGroup::EventLoopGroup(IntType numOfEventLoops, const StringType& name)
         : nextLoop_(0), numOfEventLoops_(numOfEventLoops), mutex_(), cv_()
     {
-        if (numOfEventLoops_ <= 0)
+        if (numOfEventLoops_ == 0)
         {
             THROW_FMT(::std::invalid_argument, "EventLoopGroup numOfEventLoops must be greater than 0,numOfEventLoops=%u", numOfEventLoops_);
         }

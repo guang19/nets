@@ -53,7 +53,7 @@ int main(int argc, char** argv)
         .childHandler(
             [](SocketChannel& channel)
             {
-                // channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
+                 channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
             })
         .bind(8080)
         .sync();

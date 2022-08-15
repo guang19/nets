@@ -104,8 +104,8 @@ namespace nets::net::socket
 
     void bind(FdType sockFd, const SockAddr* sockAddr)
     {
-        auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
-        if (0 != ::bind(sockFd, sockAddr, len))
+        auto length = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
+        if (0 != ::bind(sockFd, sockAddr, length))
         {
             THROW_FMT(SocketOperationException, "socket bind failed");
         }
@@ -121,17 +121,17 @@ namespace nets::net::socket
 
     FdType accept(FdType sockFd, SockAddr6* sockAddr)
     {
-        auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        return ::accept4(sockFd, reinterpret_cast<SockAddr*>(sockAddr), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+        auto length = static_cast<SockLenType>(sizeof(SockAddr6));
+        return ::accept4(sockFd, reinterpret_cast<SockAddr*>(sockAddr), &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
     }
 
     int32_t connect(FdType sockFd, const SockAddr* sockAddr)
     {
-        auto len = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
-        return ::connect(sockFd, sockAddr, len);
+        auto length = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
+        return ::connect(sockFd, sockAddr, length);
     }
 
-    SSizeType read(FdType fd, void* buf, ::size_t n)
+    SSizeType read(FdType fd, void* buf, SizeType n)
     {
         return ::read(fd, buf, n);
     }
@@ -141,7 +141,7 @@ namespace nets::net::socket
         return ::readv(fd, iov, iovcnt);
     }
 
-    SSizeType write(FdType fd, const void* buf, ::size_t n)
+    SSizeType write(FdType fd, const void* buf, SizeType n)
     {
         return ::write(fd, buf, n);
     }
@@ -153,8 +153,8 @@ namespace nets::net::socket
 
     void getLocalAddress(FdType fd, SockAddr6* sockAddr)
     {
-        auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        if (0 != ::getsockname(fd, reinterpret_cast<SockAddr*>(sockAddr), &len))
+        auto length = static_cast<SockLenType>(sizeof(SockAddr6));
+        if (0 != ::getsockname(fd, reinterpret_cast<SockAddr*>(sockAddr), &length))
         {
             LOGS_ERROR << "socket getLocalAddress failed";
         }
@@ -162,8 +162,8 @@ namespace nets::net::socket
 
     void getPeerAddress(FdType fd, SockAddr6* sockAddr)
     {
-        auto len = static_cast<SockLenType>(sizeof(SockAddr6));
-        if (0 != ::getpeername(fd, reinterpret_cast<SockAddr*>(sockAddr), &len))
+        auto length = static_cast<SockLenType>(sizeof(SockAddr6));
+        if (0 != ::getpeername(fd, reinterpret_cast<SockAddr*>(sockAddr), &length))
         {
             LOGS_ERROR << "socket getPeerAddress failed";
         }
@@ -172,8 +172,8 @@ namespace nets::net::socket
     OptValType getSockError(FdType sockFd)
     {
         OptValType optVal = 0;
-        auto len = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &len))
+        auto length = static_cast<SockLenType>(sizeof(optVal));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &length))
         {
             LOGS_ERROR << "socket getSockError failed";
             return errno;
@@ -204,8 +204,8 @@ namespace nets::net::socket
     {
         FdType sockFd = socket::createTcpSocket(AF_INET);
         OptValType optVal = 0;
-        auto len = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len))
+        auto length = static_cast<SockLenType>(sizeof(optVal));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
         {
             LOGS_ERROR << "socket getTcpSockSendBuf failed";
         }
@@ -217,8 +217,8 @@ namespace nets::net::socket
     {
         FdType sockFd = socket::createTcpSocket(AF_INET);
         OptValType optVal = 0;
-        auto len = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len))
+        auto length = static_cast<SockLenType>(sizeof(optVal));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
         {
             LOGS_ERROR << "socket getTcpSockRecvBuf failed";
         }
@@ -230,8 +230,8 @@ namespace nets::net::socket
     {
         FdType sockFd = socket::createUdpSocket(AF_INET);
         OptValType optVal = 0;
-        auto len = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &len))
+        auto length = static_cast<SockLenType>(sizeof(optVal));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
         {
             LOGS_ERROR << "socket getUdpSockSendBuf failed";
         }
@@ -243,8 +243,8 @@ namespace nets::net::socket
     {
         FdType sockFd = socket::createUdpSocket(AF_INET);
         OptValType optVal = 0;
-        auto len = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &len))
+        auto length = static_cast<SockLenType>(sizeof(optVal));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
         {
             LOGS_ERROR << "socket getUdpSockRecvBuf failed";
         }

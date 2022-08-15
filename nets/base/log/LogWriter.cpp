@@ -53,12 +53,12 @@ namespace nets::base
         writerTaskConsumer = ::std::thread(&AsyncLogWriter::synchronize, this);
     }
 
-    void AsyncLogWriter::write(const char* data, SizeType len)
+    void AsyncLogWriter::write(const char* data, SizeType length)
     {
         LockGuardType lock(mutex_);
-        if (cacheBuffer_->writableBytes() > len)
+        if (cacheBuffer_->writableBytes() > length)
         {
-            cacheBuffer_->writeBytes(data, len);
+            cacheBuffer_->writeBytes(data, length);
         }
         else
         {
@@ -71,7 +71,7 @@ namespace nets::base
             {
                 cacheBuffer_ = std::make_unique<BufferType>();
             }
-            cacheBuffer_->writeBytes(data, len);
+            cacheBuffer_->writeBytes(data, length);
             cv_.notify_one();
         }
     }
@@ -93,7 +93,7 @@ namespace nets::base
                              {
                                  return !buffers_->empty();
                              });
-                if (buffers_->empty() && cacheBuffer_->length() <= 0)
+                if (buffers_->empty() && cacheBuffer_->length() == 0)
                 {
                     lock.unlock();
                     continue;
