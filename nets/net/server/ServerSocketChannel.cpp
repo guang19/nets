@@ -107,6 +107,7 @@ namespace nets::net
             case EAGAIN:
                 LOGS_WARN << "ServerSocketChannel accpet EAGAIN";
                 break;
+            // allow retry
             case EINTR:
             case EPROTO:
             case ECONNABORTED:

@@ -15,7 +15,8 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Client channelConnect ====local address:" << localAddress.toString()
                    << " server address:" << peerAddress.toString();
-        channelContext.shutdown();
+        socket::write(channelContext.channel().fd(), "Hello Server", strlen("Hello Server"));
+//        channelContext.shutdown();
     }
 
     void channelDisconnect(ChannelContext& channelContext) override

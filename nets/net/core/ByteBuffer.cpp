@@ -16,7 +16,7 @@ namespace nets::net
     namespace
     {
         constexpr ByteBuffer::IntType DefaultInitialCapacity = 1024;
-        constexpr ByteBuffer::IntType MaxCapacity = INT32_MAX;
+        constexpr ByteBuffer::IntType MaxCapacity = INT32_MAX - 1;
 
         constexpr ByteBuffer::IntType BooleanBytes = sizeof(bool);
         constexpr ByteBuffer::IntType CharBytes = sizeof(char);

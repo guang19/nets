@@ -43,7 +43,7 @@ namespace nets::net
             return;
         }
         ByteBuffer byteBuffer(RecvBufferSize);
-        SSizeType bytes = readEAGAIN(byteBuffer);
+        SSizeType bytes = doRead(byteBuffer);
         if (bytes > 0)
         {
             try
@@ -57,10 +57,9 @@ namespace nets::net
         }
         else if (bytes == 0)
         {
-            // close_wait
-            // the peer may shutdown write or close socket, the local can not close socket directly.
+            // close_wait.the peer may shutdown write or close socket, the local can not close socket directly.
             // if the peer shutdown write, but the local can still send data, the peer can also read the data send by local.
-            // So if the local still has data waiting to be sent, just shutdown read; if there is no data waiting to be sent,
+            // so if the local still has data waiting to be sent, just shutdown read; if there is no data waiting to be sent,
             // then shutdown both
             if (writeBuffer_.empty())
             {
@@ -170,22 +169,35 @@ namespace nets::net
 
     SSizeType SocketChannel::doRead(ByteBuffer& byteBuffer)
     {
+        // read all at once
+        IntType expectedReadLen = byteBuffer.writableBytes();
         SSizeType bytes = 0;
-        IntType expectedLen = byteBuffer.writableBytes();
         while (true)
         {
-            SSizeType readBytes = byteBuffer.writeBytes(*this, expectedLen);
-            if (readBytes > 0)
+            bytes = byteBuffer.writeBytes(*this, expectedReadLen);
+            if (bytes > 0)
             {
-                bytes += readBytes;
-                expectedLen = (readBytes < expectedLen) ? (expectedLen >>= 1) : (expectedLen += expectedLen >> 1);
+                if (bytes < expectedReadLen)
+                {
+                    expectedReadLen = expectedReadLen - bytes;
+                }
+            }
+            else if (bytes < 0)
+            {
+                int32_t errNum = errno;
+                if (errNum != EAGAIN)
+                {
+                    errno = errNum;
+                    return -1;
+                }
+                break;
             }
             else
             {
-                break;
+                return 0;
             }
         }
-        return bytes;
+        return byteBuffer.readableBytes();
     }
 
     void SocketChannel::handleReadError(int32_t errNum)
