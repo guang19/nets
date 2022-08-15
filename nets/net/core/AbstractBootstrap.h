@@ -1,5 +1,5 @@
 //
-// Created by guang19 on 2022/7/26.
+// Created by guang19
 //
 
 #ifndef NETS_NET_ABSTRACT_BOOTSTRAP_H

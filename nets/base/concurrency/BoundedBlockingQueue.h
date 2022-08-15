@@ -1,5 +1,5 @@
 //
-// Created by guang19 on 2022/1/6.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_BOUNDED_BLOCKING_QUEUE_H

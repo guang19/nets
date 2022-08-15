@@ -1,5 +1,5 @@
 //
-// Created by guang19 on 2022/8/10.
+// Created by guang19
 //
 
 #include "nets/net/client/ConnectorChannel.h"

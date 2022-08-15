@@ -1,5 +1,5 @@
 //
-// Created by guang19 on 2022/8/4.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_ABSTRACT_EXCEPTION_H

@@ -1,5 +1,5 @@
 //
-// Created by guang19 on 2022/8/5.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_OUT_OF_MEMORY_EXCEPTION_H
