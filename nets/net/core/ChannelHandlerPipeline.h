@@ -45,6 +45,7 @@ namespace nets::net
         void fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
         void fireChannelDisconnect();
         void fireChannelRead(ByteBuffer& message);
+        void fireChannelWriteComplete();
         void fireExceptionCaught(const ::std::exception& exception);
 
     private:

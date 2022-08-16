@@ -63,23 +63,7 @@ namespace nets::net
             // then shutdown both
             if (writeBuffer_.empty())
             {
-                state_ = ChannelState::INACTIVE;
-                shutdown(SHUT_RDWR);
-                try
-                {
-                    channelHandlerPipeline_.fireChannelDisconnect();
-                }
-                catch (const ::std::exception& exception)
-                {
-                    channelHandlerPipeline_.fireExceptionCaught(exception);
-                }
-                eventLoop_->addTask(
-                    [channel = shared_from_this()]()
-                    {
-                        channel->deregister();
-                        assert(!channel->isRegistered());
-                        assert(channel.use_count() == 1);
-                    });
+                disConnect();
             }
             else
             {
@@ -177,9 +161,11 @@ namespace nets::net
             bytes = byteBuffer.writeBytes(*this, expectedReadLen);
             if (bytes > 0)
             {
-                if (static_cast<SizeType>(bytes) < expectedReadLen)
+                // adjust read bytes for next time
+                SizeType adjustment = expectedReadLen - bytes;
+                if (adjustment > 0)
                 {
-                    expectedReadLen = expectedReadLen - bytes;
+                    expectedReadLen = adjustment;
                 }
             }
             else if (bytes < 0)
@@ -212,19 +198,68 @@ namespace nets::net
             return;
         }
         // the writeBuffer has residual data waiting to be sent, append the data to the end of the writeBuffer
-        if (hasWriteEvent() && !writeBuffer_.empty())
+        if (!writeBuffer_.empty())
         {
-            // to avoid allocating new memory, check whether the writeBuffer back() can be directly appended
-            if (writeBufferLastCanAppend(length))
+            appendBuffer(data, length);
+            return;
+        }
+        // write directly
+        doWriteDirectly(data, length);
+    }
+
+    void SocketChannel::doWriteDirectly(const void* data, SizeType length)
+    {
+        SSizeType bytes = socket::write(sockFd_, data, length);
+        if (bytes < 0)
+        {
+            int32_t errNum = errno;
+            // ignore write EAGAIN
+            if (errNum == EAGAIN || errNum == EINTR)
             {
-                writeBuffer_.back().writeBytes(data, length);
+                bytes = 0;
             }
             else
             {
-                writeBuffer_.emplace_back(data, length);
+                errno = errNum;
+                handleErrorEvent();
             }
         }
-        // write directly
+        SizeType remaining = length - bytes;
+        // write complete
+        if (remaining == 0)
+        {
+            try
+            {
+                channelHandlerPipeline_.fireChannelWriteComplete();
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandlerPipeline_.fireExceptionCaught(exception);
+            }
+        }
+        // tcp send buffer size less than length,only part of it is sent
+        else
+        {
+            appendBuffer(static_cast<const char*>(data) + bytes, remaining);
+        }
+    }
+
+    void SocketChannel::appendBuffer(const void* data, SizeType length)
+    {
+        // to avoid allocating new memory, check whether the writeBuffer back() can be directly appended
+        if (writeBufferLastCanAppend(length))
+        {
+            writeBuffer_.back().writeBytes(data, length);
+        }
+        else
+        {
+            writeBuffer_.emplace_back(data, length);
+        }
+        if (!hasWriteEvent())
+        {
+            addEvent(EWriteEvent);
+            modify();
+        }
     }
 
     bool SocketChannel::writeBufferLastCanAppend(SizeType length)
@@ -240,13 +275,6 @@ namespace nets::net
     {
         switch (errNum)
         {
-            // EAGAIN/EWOULDBLOCK is not an error
-            // EWOULDBLOCK
-            case EAGAIN:
-                break;
-            case EINTR:
-                LOGS_ERROR << "SocketChannel handleReadError errno=" << errNum;
-                break;
             // error
             case EBADF:
             case EFAULT:
@@ -261,6 +289,27 @@ namespace nets::net
                 LOGS_ERROR << "SocketChannel handleReadError unexpected error,errno=" << errNum;
                 break;
         }
+    }
+
+    void SocketChannel::disConnect()
+    {
+        state_ = ChannelState::INACTIVE;
+        shutdown(SHUT_RDWR);
+        try
+        {
+            channelHandlerPipeline_.fireChannelDisconnect();
+        }
+        catch (const ::std::exception& exception)
+        {
+            channelHandlerPipeline_.fireExceptionCaught(exception);
+        }
+        eventLoop_->addTask(
+            [channel = shared_from_this()]()
+            {
+                channel->deregister();
+                assert(!channel->isRegistered());
+                assert(channel.use_count() == 1);
+            });
     }
 
     void SocketChannel::shutdown(int32_t how)

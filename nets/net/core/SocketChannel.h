@@ -66,8 +66,11 @@ namespace nets::net
     private:
         SSizeType doRead(ByteBuffer& byteBuffer);
         void doWrite(const void* data, SizeType length);
+        void doWriteDirectly(const void* data, SizeType length);
+        void appendBuffer(const void* data, SizeType length);
         bool writeBufferLastCanAppend(SizeType length);
         void handleReadError(int32_t errNum);
+        void disConnect();
         void shutdown(int32_t how);
 
     private:

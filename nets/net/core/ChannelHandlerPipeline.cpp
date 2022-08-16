@@ -64,6 +64,14 @@ namespace nets::net
         }
     }
 
+    void ChannelHandlerPipeline::fireChannelDisconnect()
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            channelHandler->channelDisconnect(channelContext_);
+        }
+    }
+
     void ChannelHandlerPipeline::fireChannelRead(ByteBuffer& message)
     {
         for (auto& channelHandler: channelHandlers_)
@@ -72,11 +80,11 @@ namespace nets::net
         }
     }
 
-    void ChannelHandlerPipeline::fireChannelDisconnect()
+    void ChannelHandlerPipeline::fireChannelWriteComplete()
     {
         for (auto& channelHandler: channelHandlers_)
         {
-            channelHandler->channelDisconnect(channelContext_);
+            channelHandler->channelWriteComplete(channelContext_);
         }
     }
 
