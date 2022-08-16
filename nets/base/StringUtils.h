@@ -28,7 +28,7 @@ namespace nets::base
             char* tmp = buffer;
             do
             {
-                uint16_t lstIdx = static_cast<uint16_t>(n % 10);
+                auto lstIdx = static_cast<uint16_t>(n % 10);
                 *tmp = Digits[lstIdx];
                 ++tmp;
                 n /= 10;
@@ -72,7 +72,7 @@ namespace nets::base
             tmp += 2;
             do
             {
-                uint16_t lstIdx = static_cast<uint16_t>(h % 16);
+                auto lstIdx = static_cast<uint16_t>(h % 16);
                 *tmp = HexDigits[lstIdx];
                 ++tmp;
                 h /= 16;
