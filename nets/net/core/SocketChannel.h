@@ -54,8 +54,8 @@ namespace nets::net
         void setChannelOptions(const ChannelOptionList& channelOptions);
         void channelActive();
 
-        void write(const StringType& message);
         void write(const void* message, SizeType length);
+        void write(const StringType& message);
         void write(const ByteBuffer& message);
 
         // shutdown RD and WR
@@ -70,7 +70,8 @@ namespace nets::net
         void appendBuffer(const void* data, SizeType length);
         bool writeBufferLastCanAppend(SizeType length);
         void handleReadError(int32_t errNum);
-        void disConnect();
+        void handleWriteError(int32_t errNum);
+        void channelInActive();
         void shutdown(int32_t how);
 
     private:

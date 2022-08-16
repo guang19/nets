@@ -124,7 +124,7 @@ namespace nets::net
         writerIndex_ += length;
     }
 
-    SSizeType ByteBuffer::writeBytes(SocketChannel& channel, SizeType length)
+    SSizeType ByteBuffer::writeBytes(const SocketChannel& channel, SizeType length)
     {
         ensureWritable(length);
         SSizeType bytes = 0;

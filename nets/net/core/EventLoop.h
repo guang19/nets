@@ -94,10 +94,7 @@ namespace nets::net
             LockGuardType lock(mutex_);
             pendingTasks_.push_back(::std::move(task));
         }
-        if (!isInCurrentEventLoop())
-        {
-            notifier_->notify();
-        }
+        notifier_->notify();
     }
 
     template <typename Fn, typename... Args>

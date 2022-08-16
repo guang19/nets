@@ -39,7 +39,7 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE)
         {
-            LOGS_ERROR << "SocketChannel handleReadEvent,but error state " << state_;
+            LOGS_ERROR << "SocketChannel handleReadEvent,but wrong state " << state_;
             return;
         }
         ByteBuffer byteBuffer(RecvBufferSize);
@@ -63,7 +63,7 @@ namespace nets::net
             // then shutdown both
             if (writeBuffer_.empty())
             {
-                disConnect();
+                channelInActive();
             }
             else
             {
@@ -130,11 +130,44 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::write(const StringType& message) {}
+    void SocketChannel::write(const void* message, SizeType length)
+    {
+        write(StringType(static_cast<const char*>(message), length));
+    }
 
-    void SocketChannel::write(const ByteBuffer& message) {}
+    void SocketChannel::write(const StringType& message)
+    {
+        if (eventLoop_->isInCurrentEventLoop())
+        {
+            doWrite(message.data(), message.length());
+        }
+        else
+        {
+            eventLoop_->execute(
+                // msg must be value catch
+                [this, msg = message]()
+                {
+                    doWrite(msg.data(), msg.length());
+                });
+        }
+    }
 
-    void SocketChannel::write(const void* message, SizeType length) {}
+    void SocketChannel::write(const ByteBuffer& message)
+    {
+        if (eventLoop_->isInCurrentEventLoop())
+        {
+            doWrite(message.data(), message.readableBytes());
+        }
+        else
+        {
+            eventLoop_->execute(
+                // msg must be value catch
+                [this, msg = message]()
+                {
+                    doWrite(msg.data(), msg.readableBytes());
+                });
+        }
+    }
 
     void SocketChannel::shutdown()
     {
@@ -171,7 +204,7 @@ namespace nets::net
             else if (bytes < 0)
             {
                 int32_t errNum = errno;
-                if (errNum != EAGAIN)
+                if (errNum != EAGAIN && errNum != EINTR)
                 {
                     errno = errNum;
                     return -1;
@@ -194,7 +227,7 @@ namespace nets::net
         }
         if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
-            LOGS_ERROR << "SocketChannel write,but error state " << state_;
+            LOGS_ERROR << "SocketChannel write,but wrong state " << state_;
             return;
         }
         // the writeBuffer has residual data waiting to be sent, append the data to the end of the writeBuffer
@@ -221,7 +254,7 @@ namespace nets::net
             else
             {
                 errno = errNum;
-                handleErrorEvent();
+                handleWriteError(errNum);
             }
         }
         SizeType remaining = length - bytes;
@@ -237,7 +270,7 @@ namespace nets::net
                 channelHandlerPipeline_.fireExceptionCaught(exception);
             }
         }
-        // tcp send buffer size less than length,only part of it is sent
+        // tcp send buffer size less than length,only part of it was sent
         else
         {
             appendBuffer(static_cast<const char*>(data) + bytes, remaining);
@@ -275,6 +308,11 @@ namespace nets::net
     {
         switch (errNum)
         {
+            // EAGAIN/EWOULDBLOCK is not an error
+            // EWOULDBLOCK
+            case EAGAIN:
+            case EINTR:
+                break;
             // error
             case EBADF:
             case EFAULT:
@@ -287,11 +325,39 @@ namespace nets::net
             case ENOTSOCK:
             default:
                 LOGS_ERROR << "SocketChannel handleReadError unexpected error,errno=" << errNum;
+                channelInActive();
                 break;
         }
     }
 
-    void SocketChannel::disConnect()
+    void SocketChannel::handleWriteError(int32_t errNum)
+    {
+        switch (errNum)
+        {
+            // EAGAIN/EWOULDBLOCK is not an error
+            // EWOULDBLOCK
+            case EAGAIN:
+            case EINTR:
+                break;
+            // error
+            case EBADF:
+            case EDESTADDRREQ:
+            case EDQUOT:
+            case EFAULT:
+            case EFBIG:
+            case EINVAL:
+            case EIO:
+            case ENOSPC:
+            case EPERM:
+            case EPIPE:
+            default:
+                LOGS_ERROR << "SocketChannel handleWriteError unexpected error,errno=" << errNum;
+                channelInActive();
+                break;
+        }
+    }
+
+    void SocketChannel::channelInActive()
     {
         state_ = ChannelState::INACTIVE;
         shutdown(SHUT_RDWR);

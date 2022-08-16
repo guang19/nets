@@ -74,6 +74,11 @@ namespace nets::net
             return capacity_;
         }
 
+        inline const char* data() const
+        {
+            return &buffer_[readerIndex_];
+        }
+
         inline void clear()
         {
             readerIndex_ = writerIndex_ = 0;
@@ -85,7 +90,7 @@ namespace nets::net
         void writeByte(char value);
         void writeBytes(const void* data, SizeType length);
         void writeBytes(const char* data, SizeType length);
-        SSizeType writeBytes(SocketChannel& channel, SizeType length);
+        SSizeType writeBytes(const SocketChannel& channel, SizeType length);
         void writeInt8(int8_t value);
         void writeInt16(int16_t value);
         void writeInt32(int32_t value);

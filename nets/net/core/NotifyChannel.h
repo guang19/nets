@@ -13,7 +13,7 @@ namespace nets::net
     {
     public:
         explicit NotifyChannel(EventLoopRawPtr eventLoop);
-        ~NotifyChannel();
+        ~NotifyChannel() override;
 
     public:
         FdType fd() const override;
