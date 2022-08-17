@@ -4,6 +4,7 @@
 
 #include "nets/net/core/SocketChannel.h"
 
+#include <climits>
 #include <thread>
 
 #include "nets/base/log/Logging.h"
@@ -15,7 +16,8 @@ namespace nets::net
     namespace
     {
         const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
-    }
+        constexpr int32_t CountOfWriteVOnce = IOV_MAX >> 2;
+    } // namespace
 
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
@@ -88,6 +90,50 @@ namespace nets::net
             return;
         }
         assert(!writeBuffer_.empty());
+        SizeType size = writeBuffer_.size();
+        IoVecList ioves(size);
+        SizeType totalBytes = 0;
+        for (SizeType i = 0; i < size; ++i)
+        {
+            ioves[i].iov_base = writeBuffer_[i].data();
+            ioves[i].iov_len = writeBuffer_[i].readableBytes();
+            totalBytes += writeBuffer_[i].readableBytes();
+        }
+        assert(totalBytes > 0);
+        SSizeType writtenBytes = writev(ioves, static_cast<int32_t>(size));
+        if (writtenBytes < 0)
+        {
+            int32_t errNum = errno;
+            handleWriteError(errNum);
+        }
+        else
+        {
+            if (totalBytes == static_cast<SizeType>(writtenBytes))
+            {
+                writeBuffer_.clear();
+                try
+                {
+                    channelHandlerPipeline_.fireChannelWriteComplete();
+                }
+                catch (const ::std::exception& exception)
+                {
+                    channelHandlerPipeline_.fireExceptionCaught(exception);
+                }
+                if (state_ == ChannelState::HALF_CLOSE)
+                {
+                    channelInActive();
+                }
+                else
+                {
+                    setEvents(EReadEvent);
+                    modify();
+                }
+            }
+            else
+            {
+                removeSentBuffer(writtenBytes);
+            }
+        }
     }
 
     void SocketChannel::handleErrorEvent()
@@ -189,20 +235,20 @@ namespace nets::net
     {
         // read all at once
         SizeType expectedReadLen = byteBuffer.writableBytes();
-        SSizeType bytes = 0;
+        SSizeType readBytes = 0;
         while (true)
         {
-            bytes = byteBuffer.writeBytes(*this, expectedReadLen);
-            if (bytes > 0)
+            readBytes = byteBuffer.writeBytes(*this, expectedReadLen);
+            if (readBytes > 0)
             {
                 // adjust read bytes for next time
-                SizeType adjustment = expectedReadLen - bytes;
+                SizeType adjustment = expectedReadLen - readBytes;
                 if (adjustment > 0)
                 {
                     expectedReadLen = adjustment;
                 }
             }
-            else if (bytes < 0)
+            else if (readBytes < 0)
             {
                 int32_t errNum = errno;
                 if (errNum != EAGAIN && errNum != EINTR)
@@ -258,9 +304,9 @@ namespace nets::net
                 handleWriteError(errNum);
             }
         }
-        SizeType remaining = length - bytes;
+        SizeType remainingBytes = length - bytes;
         // write complete
-        if (remaining == 0)
+        if (remainingBytes == 0)
         {
             try
             {
@@ -274,7 +320,7 @@ namespace nets::net
         // tcp send buffer size less than length,only part of it was sent
         else
         {
-            appendBuffer(static_cast<const char*>(data) + bytes, remaining);
+            appendBuffer(static_cast<const char*>(data) + bytes, remainingBytes);
         }
     }
 
@@ -303,6 +349,58 @@ namespace nets::net
             return writeBuffer_.back().writableBytes() >= length;
         }
         return false;
+    }
+
+    SSizeType SocketChannel::writev(const IoVecList& iovecs, int32_t count)
+    {
+        SSizeType writtenBytes = 0;
+        for (int32_t writtenBlocks = 0; writtenBlocks < count;)
+        {
+            int32_t leftBlocks = count - writtenBlocks;
+            SSizeType bytes = 0;
+            // if leftBlocks more than CountOfWriteVOnce
+            if (leftBlocks >= CountOfWriteVOnce)
+            {
+                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], CountOfWriteVOnce);
+                writtenBlocks += CountOfWriteVOnce;
+            }
+            else
+            {
+                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], leftBlocks);
+                writtenBlocks += leftBlocks;
+            }
+            if (bytes < 0)
+            {
+                int32_t errNum = errno;
+                if (errNum == EAGAIN || errNum == EINTR)
+                {
+                    break;
+                }
+                return -1;
+            }
+            else
+            {
+                writtenBytes += bytes;
+            }
+        }
+        return writtenBytes;
+    }
+
+    void SocketChannel::removeSentBuffer(SSizeType writtenBytes)
+    {
+        for (auto it = writeBuffer_.begin(); it != writeBuffer_.end() && writtenBytes > 0; ++it)
+        {
+            if (it->readableBytes() <= static_cast<SizeType>(writtenBytes))
+            {
+                writeBuffer_.erase(it);
+                writtenBytes -= it->readableBytes();
+            }
+            else
+            {
+                it->setReaderIndex(it->readerIndex() + writtenBytes);
+                writtenBytes = 0;
+            }
+        }
     }
 
     void SocketChannel::handleReadError(int32_t errNum)

@@ -37,6 +37,42 @@ namespace nets::base
         void swap(Timestamp&& other);
 
     public:
+        inline bool operator<(const Timestamp& other) const
+        {
+            return timestampSinceEpoch_ < other.timestampSinceEpoch_;
+        }
+
+        inline bool operator>(const Timestamp& other) const
+        {
+            return timestampSinceEpoch_ > other.timestampSinceEpoch_;
+        }
+
+        inline bool operator==(const Timestamp& other) const
+        {
+            return timestampSinceEpoch_ == other.timestampSinceEpoch_;
+        }
+
+        inline bool operator<=(const Timestamp& other) const
+        {
+            return timestampSinceEpoch_ <= other.timestampSinceEpoch_;
+        }
+
+        inline bool operator>=(const Timestamp& other) const
+        {
+            return timestampSinceEpoch_ >= other.timestampSinceEpoch_;
+        }
+
+        inline Timestamp operator-(const Timestamp& other) const
+        {
+            return Timestamp(timestampSinceEpoch_ - other.timestampSinceEpoch_);
+        }
+
+        inline Timestamp operator+(const Timestamp& other) const
+        {
+            return Timestamp(timestampSinceEpoch_ + other.timestampSinceEpoch_);
+        }
+
+    public:
         static Timestamp now();
 
         inline TimeType timestamp() const

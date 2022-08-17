@@ -17,6 +17,17 @@ TEST(TimestampTest, BasicUse)
     ASSERT_EQ(now.secsFromTimestamp(), 0);
 }
 
+TEST(TimestampTest, Compare)
+{
+    Timestamp start(Timestamp::now());
+    ::sleep(1);
+    Timestamp end(Timestamp::now());
+    ASSERT_GE(end, start);
+    ASSERT_GE((end - start).secsFromTimestamp(), 1);
+    ::printf("%ld\n", (end - start).secsFromTimestamp());
+    ::printf("%u\n", (end - start).microsFromTimestamp());
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

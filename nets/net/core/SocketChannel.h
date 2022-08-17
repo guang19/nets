@@ -18,6 +18,7 @@ namespace nets::net
     public:
         using SizeType = ByteBuffer::SizeType;
         using StringType = ::std::string;
+        using IoVecList = ::std::vector<IoVec>;
 
     public:
         explicit SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -71,6 +72,8 @@ namespace nets::net
         void doWriteDirectly(const void* data, SizeType length);
         void appendBuffer(const void* data, SizeType length);
         bool writeBufferLastCanAppend(SizeType length);
+        SSizeType writev(const IoVecList& iovecs, int32_t count);
+        void removeSentBuffer(SSizeType writtenBytes);
         void handleReadError(int32_t errNum);
         void handleWriteError(int32_t errNum);
         void channelInActive();

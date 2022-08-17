@@ -69,9 +69,24 @@ namespace nets::net
             return capacity_ > writerIndex_;
         }
 
+        inline void setReaderIndex(SizeType readerIndex)
+        {
+            readerIndex_ = readerIndex;
+        }
+
+        inline void setWriterIndex(SizeType writerIndex)
+        {
+            writerIndex_ = writerIndex;
+        }
+
         inline SizeType capacity() const
         {
             return capacity_;
+        }
+
+        inline char* data()
+        {
+            return &buffer_[readerIndex_];
         }
 
         inline const char* data() const
