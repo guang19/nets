@@ -4,27 +4,49 @@
 
 #include <cstdint>
 #include <cstring>
+#include <unistd.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
 #include <vector>
 
+#include "nets/base/Timestamp.h"
 #include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/Socket.h"
 
+using namespace nets::base;
 using namespace nets::net;
 
-int main(int argc, char** argv)
+void testWriteV(int32_t sockFd)
+{
+    Timestamp start(Timestamp::now());
+    const int32_t count = 5;
+    const char* strArr[count] = {"hello client\n",          "this is first message\n",  "this is second message\n",
+                                 "this is third message\n", "this is fourth message\n"};
+    SSizeType expectedBytes = 0;
+    IoVec iovecs[count];
+    for (int32_t i = 0; i < count; ++i)
+    {
+        SizeType len = ::strlen(strArr[i]);
+        iovecs[i].iov_base = const_cast<char*>(&strArr[i][0]);
+        iovecs[i].iov_len = len;
+        expectedBytes += len;
+    }
+    SSizeType bytes = socket::writev(sockFd, iovecs, count);
+    Timestamp end(Timestamp::now());
+    ::printf("expectedBytes=%ld, write bytes=%ld, writeV=%d\n", expectedBytes, bytes, end.microsFromTimestamp() - start.microsFromTimestamp());
+}
+
+int32_t main(int32_t argc, char** argv)
 {
     FdType listenFd = socket::createTcpSocket(AF_INET);
 
     ::std::vector<struct epoll_event> epollEvents(20);
-
     InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080);
     socket::bind(listenFd, serverAddr.sockAddr());
     socket::listen(listenFd, 1024);
 
     FdType epollFd = ::epoll_create1(EPOLL_CLOEXEC);
-    struct epoll_event accpetEpollEvent {};
+    struct epoll_event accpetEpollEvent{};
     accpetEpollEvent.data.fd = listenFd;
     accpetEpollEvent.events = EPOLLIN;
     epoll_ctl(epollFd, EPOLL_CTL_ADD, listenFd, &accpetEpollEvent);
@@ -36,7 +58,7 @@ int main(int argc, char** argv)
         {
             if (epollEvents[i].events & (EPOLLHUP | EPOLLERR))
             {
-                int optval;
+                int32_t optval;
                 auto optlen = static_cast<SockLenType>(sizeof(optval));
                 ::getsockopt(epollEvents[i].data.fd, SOL_SOCKET, SO_ERROR, &optval, &optlen);
                 // broken pipe
@@ -47,36 +69,16 @@ int main(int argc, char** argv)
                 if (epollEvents[i].data.fd == listenFd)
                 {
                     ::printf("listen listenFd\n");
-                    InetSockAddress serverAddr2;
-                    SockLenType length = static_cast<SockLenType>(sizeof(SockAddr6));
-                    ::getsockname(listenFd, serverAddr2.sockAddr(), &length);
-                    ::printf("server fd=%d,server addr:ip=%s,port=%d\n", listenFd, serverAddr2.ip().c_str(),
-                             serverAddr2.port());
-                    ::printf("server addr=%s\n", serverAddr2.toString().c_str());
                     InetSockAddress clientAddr;
                     FdType connFd = socket::accept(listenFd, clientAddr.sockAddr6());
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
-
-                    InetSockAddress clientAddr2;
-                    ::getpeername(connFd, clientAddr2.sockAddr(), &length);
-                    ::printf("client2 fd=%d,client2 addr:ip=%s,port=%d\n", connFd, clientAddr2.ip().c_str(),
-                             clientAddr2.port());
-                    ::printf("client2 addr=%s\n", clientAddr2.toString().c_str());
-
-                    InetSockAddress clientAddr3;
-                    ::getsockname(connFd, clientAddr3.sockAddr(), &length);
-                    ::printf("client3 fd=%d,client3 addr:ip=%s,port=%d\n", connFd, clientAddr3.ip().c_str(),
-                             clientAddr3.port());
-                    ::printf("client3 addr=%s\n", clientAddr3.toString().c_str());
-                    struct epoll_event epollEvent {};
+                    struct epoll_event epollEvent
+                    {
+                    };
                     epollEvent.data.fd = connFd;
                     epollEvent.events = EPOLLIN;
                     epoll_ctl(epollFd, EPOLL_CTL_ADD, connFd, &epollEvent);
-                    //                    struct epoll_event epollEvent {};
-                    //                    epollEvent.data.fd = epollEvents[i].data.fd;
-                    //                    epollEvent.events = 0;
-                    //                    epoll_ctl(epollFd, EPOLL_CTL_DEL, epollEvents[i].data.fd, &epollEvent);
                 }
                 else
                 {
@@ -93,6 +95,7 @@ int main(int argc, char** argv)
                     }
                     else if (n == 0)
                     {
+                        ::sleep(2);
                         ::printf("close\n");
                         socket::closeFd(sockFd);
                         struct epoll_event epollEvent {};
@@ -109,8 +112,7 @@ int main(int argc, char** argv)
             if (epollEvents[i].events & EPOLLOUT)
             {
                 FdType sockFd = epollEvents[i].data.fd;
-                ::printf("EPOLLOUT\n");
-                socket::write(sockFd, "啦啦啦啦", ::strlen("啦啦啦啦"));
+                testWriteV(sockFd);
                 struct epoll_event epollEvent {};
                 epollEvent.data.fd = sockFd;
                 epollEvent.events = EPOLLIN;

@@ -58,9 +58,11 @@ namespace nets::net
         void write(const StringType& message);
         void write(const ByteBuffer& message);
 
-        // shutdown RD and WR
+        // shutdown Both
         void shutdown();
+        // shutdown Read
         void shutdownRead();
+        // shutdown Write
         void shutdownWrite();
 
     private:

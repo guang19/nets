@@ -84,9 +84,10 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
-            LOGS_ERROR << "SocketChannel handleWriteEvent,but error state " << state_;
+            LOGS_ERROR << "SocketChannel handleWriteEvent,but wrong state " << state_;
             return;
         }
+        assert(!writeBuffer_.empty());
     }
 
     void SocketChannel::handleErrorEvent()
@@ -380,6 +381,22 @@ namespace nets::net
 
     void SocketChannel::shutdown(int32_t how)
     {
-        socket::shutdown(sockFd_, how);
+        switch (how)
+        {
+            case SHUT_RD:
+                socket::shutdown(sockFd_, how);
+                break;
+            case SHUT_WR:
+            case SHUT_RDWR:
+                if (!writeBuffer_.empty())
+                {
+                    writeBuffer_.clear();
+                }
+                socket::shutdown(sockFd_, how);
+                break;
+            default:
+                LOGS_ERROR << "SocketChannel unknown shutdown operation";
+                return;
+        }
     }
 } // namespace nets::net
