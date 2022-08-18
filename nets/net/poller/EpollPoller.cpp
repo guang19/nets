@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <unistd.h>
 
+#include <iostream>
+
 #include "nets/base/log/Logging.h"
 
 namespace nets::net
@@ -36,7 +38,7 @@ namespace nets::net
     void EpollPoller::poll(int32_t timeoutMs, ChannelList& activeChannels)
     {
         SizeType size = events_.size();
-        int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &*events_.begin(), static_cast<int32_t>(size), timeoutMs);
+        int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<int32_t>(size), timeoutMs);
         if (numOfReadyEvents > 0)
         {
             LOGS_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvents << " events";
@@ -68,7 +70,11 @@ namespace nets::net
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
             EventType revents = events_[i].events;
             channel->setReadyEvents(ENoneEvent);
-            if (revents & (EPOLLERR | EPOLLHUP))
+            // local read or write error
+            LOGS_DEBUG << "revents= " << revents << " revents & EPOLLIN=" << (revents & EPOLLIN) << " revents & EPOLLERR=" << (revents & EPOLLERR)
+                        << " revents & EPOLLHUP=" << (revents & EPOLLHUP) << " revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
+                        << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT) << '\n';
+            if ((revents & EPOLLIN) && revents & (EPOLLERR | EPOLLHUP))
             {
                 channel->addReadyEvent(EErrorEvent);
             }
@@ -132,7 +138,7 @@ namespace nets::net
         FdType fd = channel->fd();
         event.data.fd = fd;
         event.data.ptr = channel;
-        event.events = ENoneEvent;
+        event.events = 0;
         EventType events = channel->events();
         if (events & EReadEvent)
         {

@@ -16,7 +16,7 @@ namespace nets::net
     namespace
     {
         const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
-        constexpr int32_t CountOfWriteVOnce = IOV_MAX >> 2;
+        constexpr int32_t MaxCountOfWriteVOnce = IOV_MAX >> 2;
     } // namespace
 
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -39,7 +39,7 @@ namespace nets::net
 
     void SocketChannel::handleReadEvent()
     {
-        if (state_ != ChannelState::ACTIVE)
+        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
             LOGS_ERROR << "SocketChannel handleReadEvent,but wrong state " << state_;
             return;
@@ -69,8 +69,7 @@ namespace nets::net
             }
             else
             {
-                state_ = ChannelState::HALF_CLOSE;
-                shutdown(SHUT_RD);
+                shutdownRead();
                 setEvents(EWriteEvent);
                 modify();
             }
@@ -216,19 +215,26 @@ namespace nets::net
         }
     }
 
+    void SocketChannel::disconnect()
+    {
+        channelInActive();
+    }
+
     void SocketChannel::shutdown()
     {
-        shutdown(SHUT_RDWR);
+        channelInActive();
     }
 
     void SocketChannel::shutdownRead()
     {
         shutdown(SHUT_RD);
+        state_ = ChannelState::HALF_CLOSE;
     }
 
     void SocketChannel::shutdownWrite()
     {
         shutdown(SHUT_WR);
+        state_ = ChannelState::HALF_CLOSE;
     }
 
     SSizeType SocketChannel::doRead(ByteBuffer& byteBuffer)
@@ -260,7 +266,13 @@ namespace nets::net
             }
             else
             {
-                return 0;
+                // The peer may close or shut down the connection immediately after sending the data,
+                // so the read data cannot be ignored
+                if (byteBuffer.readableBytes() == 0)
+                {
+                    return 0;
+                }
+                break;
             }
         }
         return static_cast<SSizeType>(byteBuffer.readableBytes());
@@ -358,16 +370,25 @@ namespace nets::net
         {
             int32_t leftBlocks = count - writtenBlocks;
             SSizeType bytes = 0;
-            // if leftBlocks more than CountOfWriteVOnce
-            if (leftBlocks >= CountOfWriteVOnce)
+            SizeType expectedWriteLen = 0;
+            // if leftBlocks less than CountOfWriteVOnce
+            if (leftBlocks < MaxCountOfWriteVOnce)
             {
-                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], CountOfWriteVOnce);
-                writtenBlocks += CountOfWriteVOnce;
+                for (int32_t i = writtenBlocks; i < leftBlocks; ++i)
+                {
+                    expectedWriteLen += iovecs[i].iov_len;
+                }
+                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], leftBlocks);
+                writtenBlocks += leftBlocks;
             }
             else
             {
-                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], leftBlocks);
-                writtenBlocks += leftBlocks;
+                for (int32_t i = writtenBlocks; i < MaxCountOfWriteVOnce; ++i)
+                {
+                    expectedWriteLen += iovecs[i].iov_len;
+                }
+                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], MaxCountOfWriteVOnce);
+                writtenBlocks += MaxCountOfWriteVOnce;
             }
             if (bytes < 0)
             {
@@ -381,6 +402,11 @@ namespace nets::net
             else
             {
                 writtenBytes += bytes;
+                // tcp send buffer may not be enough
+                if (static_cast<SizeType>(bytes) < expectedWriteLen)
+                {
+                    break;
+                }
             }
         }
         return writtenBytes;
@@ -458,8 +484,8 @@ namespace nets::net
 
     void SocketChannel::channelInActive()
     {
-        state_ = ChannelState::INACTIVE;
         shutdown(SHUT_RDWR);
+        state_ = ChannelState::INACTIVE;
         try
         {
             channelHandlerPipeline_.fireChannelDisconnect();
@@ -494,7 +520,7 @@ namespace nets::net
                 break;
             default:
                 LOGS_ERROR << "SocketChannel unknown shutdown operation";
-                return;
+                break;
         }
     }
 } // namespace nets::net

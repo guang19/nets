@@ -59,12 +59,15 @@ namespace nets::net
         void write(const StringType& message);
         void write(const ByteBuffer& message);
 
-        // shutdown Both
+
+        void disconnect();
+        // shutdown both
         void shutdown();
-        // shutdown Read
+        // shutdown read
         void shutdownRead();
-        // shutdown Write
+        // shutdown write
         void shutdownWrite();
+
 
     private:
         SSizeType doRead(ByteBuffer& byteBuffer);

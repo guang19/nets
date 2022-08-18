@@ -17,6 +17,7 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
                    << " client address:" << peerAddress.toString();
+        channelContext.shutdown();
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
@@ -27,6 +28,7 @@ public:
     void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
     {
         LOGS_DEBUG << "Server recv client message is:" << message.toString();
+//        channelContext.write(message);
     }
 
     void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
@@ -53,7 +55,7 @@ int main(int argc, char** argv)
         .childHandler(
             [](SocketChannel& channel)
             {
-                 channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
+//                 channel.pipeline().addLast(new TestExclusiveServerChannelHandler());
             })
         .bind(8080)
         .sync();

@@ -62,7 +62,7 @@ namespace nets::net::socket
     {
         if (0 != ::shutdown(sockFd, how))
         {
-            LOGS_ERROR << "socket shutdown " << shutdownHowToString(how) << " sockFd " << sockFd << " failed";
+            LOGS_ERROR << "socket shutdown " << shutdownHowToString(how) << " failed";
         }
     }
 
