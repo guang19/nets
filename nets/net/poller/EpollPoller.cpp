@@ -55,7 +55,7 @@ namespace nets::net
         }
         else if (numOfReadyEvents < 0)
         {
-            LOGS_ERROR << "EpollPoller epoll failed";
+//            LOGS_ERROR << "EpollPoller epoll failed";
         }
         else
         {
@@ -68,13 +68,15 @@ namespace nets::net
         for (int32_t i = 0; i < numOfReadyEvents; ++i)
         {
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
+            activeChannels.push_back(channel);
             EventType revents = events_[i].events;
             channel->setReadyEvents(ENoneEvent);
             // local read or write error
             LOGS_DEBUG << "revents= " << revents << " revents & EPOLLIN=" << (revents & EPOLLIN) << " revents & EPOLLERR=" << (revents & EPOLLERR)
                         << " revents & EPOLLHUP=" << (revents & EPOLLHUP) << " revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
-                        << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT) << '\n';
-            if ((revents & EPOLLIN) && revents & (EPOLLERR | EPOLLHUP))
+                        << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT);
+            // local may shutdown connection or read/write error
+            if (revents & EPOLLIN && revents & (EPOLLERR | EPOLLHUP))
             {
                 channel->addReadyEvent(EErrorEvent);
             }
@@ -86,7 +88,6 @@ namespace nets::net
             {
                 channel->addReadyEvent(EWriteEvent);
             }
-            activeChannels.push_back(channel);
         }
     }
 

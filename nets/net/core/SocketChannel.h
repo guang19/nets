@@ -59,8 +59,6 @@ namespace nets::net
         void write(const StringType& message);
         void write(const ByteBuffer& message);
 
-
-        void disconnect();
         // shutdown both
         void shutdown();
         // shutdown read

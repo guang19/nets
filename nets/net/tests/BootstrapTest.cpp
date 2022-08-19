@@ -15,8 +15,8 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Client channelConnect ====local address:" << localAddress.toString()
                    << " server address:" << peerAddress.toString();
-//        channelContext.write("Hello Server");
-//        channelContext.shutdown();
+        channelContext.write("Hello Server");
+        channelContext.shutdownWrite();
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
@@ -27,6 +27,12 @@ public:
     void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
     {
         LOGS_DEBUG << "Client recv server message is:" << message.toString();
+//        channelContext.write(message);
+    }
+
+    void channelWriteComplete(ChannelContext& channelContext) override
+    {
+        LOGS_DEBUG << "Client channelWriteComplete";
     }
 
     void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override

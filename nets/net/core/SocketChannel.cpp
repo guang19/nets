@@ -41,7 +41,7 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
-            LOGS_ERROR << "SocketChannel handleReadEvent,but wrong state " << state_;
+            LOGS_WARN << "SocketChannel handleReadEvent,but wrong state " << state_;
             return;
         }
         ByteBuffer byteBuffer(RecvBufferSize);
@@ -85,7 +85,7 @@ namespace nets::net
     {
         if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
         {
-            LOGS_ERROR << "SocketChannel handleWriteEvent,but wrong state " << state_;
+            LOGS_WARN << "SocketChannel handleWriteEvent,but wrong state " << state_;
             return;
         }
         assert(!writeBuffer_.empty());
@@ -137,8 +137,13 @@ namespace nets::net
 
     void SocketChannel::handleErrorEvent()
     {
+        if (state_ == ChannelState::INACTIVE)
+        {
+            return;
+        }
         int32_t errNum = socket::getSockError(sockFd_);
         LOGS_ERROR << "SocketChannel unexpected error,errNum=" << errNum;
+        channelInActive();
     }
 
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
@@ -215,13 +220,9 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::disconnect()
-    {
-        channelInActive();
-    }
-
     void SocketChannel::shutdown()
     {
+        shutdown(SHUT_RDWR);
         channelInActive();
     }
 
@@ -484,7 +485,6 @@ namespace nets::net
 
     void SocketChannel::channelInActive()
     {
-        shutdown(SHUT_RDWR);
         state_ = ChannelState::INACTIVE;
         try
         {

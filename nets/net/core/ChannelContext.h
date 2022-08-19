@@ -31,6 +31,7 @@ namespace nets::net
         void write(const ByteBuffer& message);
 
         bool isActive() const;
+        void disconnect();
         // shutdown both
         void shutdown();
         // shutdown read

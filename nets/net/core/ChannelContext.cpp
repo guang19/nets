@@ -40,6 +40,11 @@ namespace nets::net
         return channel_->isActive();
     }
 
+    void ChannelContext::disconnect()
+    {
+        shutdown();
+    }
+
     void ChannelContext::shutdown()
     {
         channel_->shutdown();
