@@ -65,7 +65,7 @@ namespace nets::net
             // then shutdown both
             if (writeBuffer_.empty())
             {
-                channelInActive();
+                shutdown();
             }
             else
             {
@@ -141,8 +141,7 @@ namespace nets::net
         {
             return;
         }
-        int32_t errNum = socket::getSockError(sockFd_);
-        LOGS_ERROR << "SocketChannel unexpected error,errNum=" << errNum;
+        LOGS_ERROR << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
         channelInActive();
     }
 

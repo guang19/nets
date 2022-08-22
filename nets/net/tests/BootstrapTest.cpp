@@ -16,7 +16,7 @@ public:
         LOGS_DEBUG << "Client channelConnect ====local address:" << localAddress.toString()
                    << " server address:" << peerAddress.toString();
         channelContext.write("Hello Server");
-        channelContext.shutdownWrite();
+        channelContext.shutdownRead();
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
