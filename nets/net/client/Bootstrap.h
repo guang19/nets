@@ -13,6 +13,7 @@ namespace nets::net
     class Bootstrap : public AbstractBootstrap<Bootstrap>
     {
     public:
+        using TimeType = ::time_t;
         using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using ChannelHandlerRawPtr = ChannelHandlerPipeline::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = ChannelHandlerPipeline::ChannelHandlerPtr;
@@ -28,6 +29,11 @@ namespace nets::net
         Bootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
         Bootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
 
+        // whether to retry after connect failure
+        // interval is reconnect interval, unit:milliseconds
+        // when retry is true, the interval takes effect
+        Bootstrap& retry(bool retry = true, TimeType interval = DefaultRetryInterval);
+
         Bootstrap& connect(const char* ip, PortType port, bool ipv6 = false);
         Bootstrap& connect(const InetSockAddress& serverAddress);
 
@@ -38,8 +44,13 @@ namespace nets::net
         void initConnectorChannel(::std::shared_ptr<ConnectorChannel>& connectorChannel);
 
     private:
+        bool retry_ {false};
+        TimeType retryInterval_ {0};
         ChannelHandlerList channelHandlers_ {};
         ChannelInitializationCallback channelInitializationCallback_ {};
+
+        // default retry interval
+        static constexpr TimeType DefaultRetryInterval = 1000;
     };
 } // namespace nets::net
 

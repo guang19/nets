@@ -73,9 +73,7 @@ int32_t main(int32_t argc, char** argv)
                     FdType connFd = socket::accept(listenFd, clientAddr.sockAddr6());
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
-                    struct epoll_event epollEvent
-                    {
-                    };
+                    struct epoll_event epollEvent {};
                     epollEvent.data.fd = connFd;
                     epollEvent.events = EPOLLIN;
                     epoll_ctl(epollFd, EPOLL_CTL_ADD, connFd, &epollEvent);

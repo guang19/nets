@@ -6,7 +6,7 @@
 
 namespace nets::net
 {
-    Bootstrap::Bootstrap() : channelHandlers_(), channelInitializationCallback_() {}
+    Bootstrap::Bootstrap() : retry_(false), retryInterval_(0), channelHandlers_(), channelInitializationCallback_() {}
 
     Bootstrap& Bootstrap::channelHandler(ChannelHandlerRawPtr channelHandler)
     {
@@ -23,6 +23,13 @@ namespace nets::net
     Bootstrap& Bootstrap::channelHandler(const ChannelInitializationCallback& channelInitializationCallback)
     {
         channelInitializationCallback_ = channelInitializationCallback;
+        return *this;
+    }
+
+    Bootstrap& Bootstrap::retry(bool retry, TimeType interval)
+    {
+        retry_ = retry;
+        retryInterval_ = interval;
         return *this;
     }
 
