@@ -13,7 +13,7 @@ namespace nets::base
     namespace
     {
         // Log buffer flush interval,unit：milliseconds
-        constexpr ::time_t LogBufferFlushInterval = 1000;
+        constexpr ::time_t LogBufferFlushInterval = 500;
     }
 
     AsyncLogWriter::AsyncLogWriter()
@@ -78,11 +78,10 @@ namespace nets::base
 
     void AsyncLogWriter::swap()
     {
-        auto buffers = ::std::make_unique<BufferVectorType>();
-        buffers->reserve(LOG_FILE_ROLLING_SIZE >> 1);
+        auto tmpBuffers = ::std::make_unique<BufferVectorType>();
+        tmpBuffers->reserve(buffers_->size());
         auto tmpBuffer1 = ::std::make_unique<BufferType>();
         auto tmpBuffer2 = ::std::make_unique<BufferType>();
-        TimeType currentTime = 0;
         while (running_)
         {
             {
@@ -91,7 +90,7 @@ namespace nets::base
                 cv_.wait_for(lock, ::std::chrono::milliseconds(LogBufferFlushInterval),
                              [this]() -> bool
                              {
-                                 return !buffers_->empty();
+                                 return !buffers_->empty() || cacheBuffer_->length() > 0;
                              });
                 if (buffers_->empty() && cacheBuffer_->length() == 0)
                 {
@@ -99,15 +98,16 @@ namespace nets::base
                     continue;
                 }
                 buffers_->push_back(::std::move(cacheBuffer_));
-                buffers->swap(*buffers_);
+                tmpBuffers->swap(*buffers_);
                 cacheBuffer_ = ::std::move(tmpBuffer1);
                 if (nullptr == backupCacheBuffer_)
                 {
                     backupCacheBuffer_ = ::std::move(tmpBuffer2);
                 }
             }
+            TimeType currentTime = 0;
             ::time(&currentTime);
-            auto logSynchronizeTask = [this, tmpBuffers = buffers.release(), currentTime]() mutable
+            auto logSynchronizeTask = [this, tmpBuffers = tmpBuffers.release(), currentTime]() mutable
             {
                 for (auto& it: *tmpBuffers)
                 {
@@ -118,7 +118,7 @@ namespace nets::base
             };
             // if not running, the writer task that is not added to the queue will be discarded
             writerTaskQueue_->put(::std::move(logSynchronizeTask));
-            buffers = ::std::make_unique<BufferVectorType>();
+            tmpBuffers = ::std::make_unique<BufferVectorType>();
             tmpBuffer1 = std::make_unique<BufferType>();
             if (nullptr == tmpBuffer2)
             {
@@ -127,9 +127,10 @@ namespace nets::base
         }
         // last check
         assert(!running_);
-        if (!buffers_->empty() || (cacheBuffer_->length() > 0))
+        if (!buffers_->empty() || cacheBuffer_->length() > 0)
         {
             buffers_->push_back(::std::move(cacheBuffer_));
+            TimeType currentTime = 0;
             ::time(&currentTime);
             auto writerTask = [this, tmpBuffers = buffers_.release(), currentTime]() mutable
             {
@@ -157,7 +158,7 @@ namespace nets::base
         }
         // last check
         assert(!running_);
-        if (writerTaskQueue_->take(logSynchronizeTask, LogBufferFlushInterval))
+        if (writerTaskQueue_->take(logSynchronizeTask, LogBufferFlushInterval >> 1))
         {
             logSynchronizeTask();
         }
