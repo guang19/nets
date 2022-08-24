@@ -39,7 +39,7 @@ namespace nets::net
 
     void SocketChannel::handleReadEvent()
     {
-        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        if (state_ == ChannelState::INACTIVE)
         {
             LOGS_WARN << "SocketChannel handleReadEvent,but wrong state " << state_;
             return;
@@ -83,7 +83,7 @@ namespace nets::net
 
     void SocketChannel::handleWriteEvent()
     {
-        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        if (state_ == ChannelState::INACTIVE)
         {
             LOGS_WARN << "SocketChannel handleWriteEvent,but wrong state " << state_;
             return;
@@ -130,6 +130,7 @@ namespace nets::net
             }
             else
             {
+                // if buffer has not been sent, clear the data that has been sent and send it next time
                 removeSentBuffer(writtenBytes);
             }
         }
@@ -141,7 +142,7 @@ namespace nets::net
         {
             return;
         }
-        LOGS_ERROR << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
+        LOGS_WARN << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
         channelInActive();
     }
 
@@ -280,23 +281,25 @@ namespace nets::net
 
     void SocketChannel::doWrite(const void* data, SizeType length)
     {
-        if (length == 0)
-        {
-            return;
-        }
-        if (state_ != ChannelState::ACTIVE && state_ != ChannelState::HALF_CLOSE)
+        if (state_ == ChannelState::INACTIVE)
         {
             LOGS_ERROR << "SocketChannel write,but wrong state " << state_;
+            return;
+        }
+        if (length == 0)
+        {
             return;
         }
         // the writeBuffer has residual data waiting to be sent, append the data to the end of the writeBuffer
         if (!writeBuffer_.empty())
         {
             appendBuffer(data, length);
-            return;
         }
-        // write directly
-        doWriteDirectly(data, length);
+        else
+        {
+            // write directly
+            doWriteDirectly(data, length);
+        }
     }
 
     void SocketChannel::doWriteDirectly(const void* data, SizeType length)
@@ -363,7 +366,7 @@ namespace nets::net
         return false;
     }
 
-    SSizeType SocketChannel::writev(const IoVecList& iovecs, int32_t count)
+    SSizeType SocketChannel::writev(const IoVecList& iovecs, int32_t count) const
     {
         SSizeType writtenBytes = 0;
         for (int32_t writtenBlocks = 0; writtenBlocks < count;)

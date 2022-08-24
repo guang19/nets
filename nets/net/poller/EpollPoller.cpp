@@ -8,8 +8,6 @@
 #include <stdexcept>
 #include <unistd.h>
 
-#include <iostream>
-
 #include "nets/base/log/Logging.h"
 
 namespace nets::net
@@ -71,8 +69,7 @@ namespace nets::net
             activeChannels.push_back(channel);
             EventType revents = events_[i].events;
             channel->setReadyEvents(ENoneEvent);
-            // local read or write error
-            LOGS_DEBUG << "revents= " << revents << " revents & EPOLLIN=" << (revents & EPOLLIN) << " revents & EPOLLERR=" << (revents & EPOLLERR)
+            LOGS_DEBUG << "revents=" << revents << " revents & EPOLLIN=" << (revents & EPOLLIN) << " revents & EPOLLERR=" << (revents & EPOLLERR)
                         << " revents & EPOLLHUP=" << (revents & EPOLLHUP) << " revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
                         << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT);
             // local may shutdown connection or read/write error

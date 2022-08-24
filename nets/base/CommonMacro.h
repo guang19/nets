@@ -80,7 +80,7 @@ void throwFmt(const char* fmt, ...)
                       "the per-process limit on the number of open file descriptors has been reached");                     \
             break;                                                                                                          \
         case ENAMETOOLONG:                                                                                                  \
-            THROW_FMT(nets::base::FileCreationException, "pathname was too long");                                          \
+            THROW_FMT(nets::base::FileCreationException, "path name was too long");                                          \
             break;                                                                                                          \
         default:                                                                                                            \
             THROW_FMT(nets::base::FileCreationException, "failed to create file for unknown reason,errno=%d", errNum);      \

@@ -73,7 +73,7 @@ namespace nets::net
         void doWriteDirectly(const void* data, SizeType length);
         void appendBuffer(const void* data, SizeType length);
         bool writeBufferLastCanAppend(SizeType length);
-        SSizeType writev(const IoVecList& iovecs, int32_t count);
+        SSizeType writev(const IoVecList& iovecs, int32_t count) const;
         void removeSentBuffer(SSizeType writtenBytes);
         void handleReadError(int32_t errNum);
         void handleWriteError(int32_t errNum);

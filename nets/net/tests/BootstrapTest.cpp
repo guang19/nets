@@ -6,7 +6,7 @@
 
 using namespace nets::net;
 
-class TestSharedClientChannelHandler : public ChannelHandler
+class TestClientChannelHandler : public ChannelHandler
 {
 public:
     void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
@@ -15,8 +15,39 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Client channelConnect ====local address:" << localAddress.toString()
                    << " server address:" << peerAddress.toString();
-        channelContext.write("Hello Server");
-        channelContext.shutdownRead();
+        channelContext.write(
+            "你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你"
+            "好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好"
+            "，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，"
+            "服务端，这是客户端发来的消息"
+            "你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你"
+            "好，服务端，这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消"
+            "息这是客户端发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
+            "发来的消息这是客户端发来的消息"
+            "结尾");
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
@@ -27,7 +58,7 @@ public:
     void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
     {
         LOGS_DEBUG << "Client recv server message is:" << message.toString();
-//        channelContext.write(message);
+        //        channelContext.write(message);
     }
 
     void channelWriteComplete(ChannelContext& channelContext) override
@@ -47,11 +78,13 @@ private:
 int main(int argc, char** argv)
 {
     Bootstrap bootstrap;
-    bootstrap.option(NTcpSendBuf, 20480)
-        .channelHandler(new TestSharedClientChannelHandler())
+    bootstrap.option(NTcpSendBuffer, 1024)
+        .option(NTcpRecvBuffer, 1024)
+        //        .channelHandler(new TestClientChannelHandler())
         .channelHandler(
-            [](SocketChannel& channel) {
-
+            [](SocketChannel& channel)
+            {
+                channel.pipeline().addLast(new TestClientChannelHandler);
             })
         .connect("127.0.0.1", 8080)
         .sync();

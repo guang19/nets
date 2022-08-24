@@ -52,6 +52,7 @@ namespace nets::net
 
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
         // TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x
+        // note:UDP has no send buffer,for UDP,SO_SNDBUF just sets the maximum size of a single datagram sent
         // UDP SO_SNDBUF default value is 212992 bytes on linux which kernel version is 5.10.x
         void setSockSendBuf(FdType sockFd, OptValType sendBufLen);
         // TCP SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
