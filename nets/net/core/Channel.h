@@ -63,6 +63,8 @@ namespace nets::net
     public:
         virtual FdType fd() const = 0;
         void handleEvent();
+
+    protected:
         virtual void handleReadEvent();
         virtual void handleWriteEvent();
         virtual void handleErrorEvent();

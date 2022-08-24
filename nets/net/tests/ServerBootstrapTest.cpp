@@ -21,7 +21,7 @@ public:
 
     void channelDisconnect(ChannelContext& channelContext) override
     {
-        LOGS_DEBUG << "Server channelDisconnect";
+        LOGS_DEBUG << "Server channelDisconnect:" << channelContext.peerAddress().toString();
     }
 
     void channelRead(ChannelContext& channelContext, ByteBuffer& message) override

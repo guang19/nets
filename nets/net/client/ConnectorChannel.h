@@ -24,6 +24,8 @@ namespace nets::net
 
     public:
         FdType fd() const override;
+
+    protected:
         void handleWriteEvent() override;
         void handleErrorEvent() override;
 

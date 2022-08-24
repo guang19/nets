@@ -186,7 +186,7 @@ namespace nets::net
 
     InetSockAddress::StringType InetSockAddress::toString() const
     {
-        char buffer[64] = {0};
+        char buffer[128] = {0};
         auto length = static_cast<SockLenType>(sizeof(buffer));
         if (AF_INET6 == addr_.sa_family)
         {

@@ -19,7 +19,7 @@ namespace nets::net
         FdType fd() const override;
         void notify() const;
 
-    public:
+    protected:
         void handleReadEvent() override;
 
     private:

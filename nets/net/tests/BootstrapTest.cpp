@@ -52,7 +52,7 @@ public:
 
     void channelDisconnect(ChannelContext& channelContext) override
     {
-        LOGS_DEBUG << "Client channelDisconnect";
+        LOGS_DEBUG << "Client channelDisconnect:" << channelContext.peerAddress().toString();
     }
 
     void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
@@ -66,7 +66,7 @@ public:
         LOGS_DEBUG << "Client channelWriteComplete";
     }
 
-    void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
+    void exceptionCaught(ChannelContext& channelContext, const ::std::exception& exception) override
     {
         LOGS_DEBUG << "Client exceptionCaught";
     }
