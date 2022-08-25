@@ -13,11 +13,11 @@ namespace nets::net
     class Bootstrap : public AbstractBootstrap<Bootstrap>
     {
     public:
-        using TimeType = ::time_t;
-        using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
-        using ChannelHandlerRawPtr = ChannelHandlerPipeline::ChannelHandlerRawPtr;
-        using ChannelHandlerPtr = ChannelHandlerPipeline::ChannelHandlerPtr;
-        using ChannelHandlerList = ChannelHandlerPipeline::ChannelHandlerList;
+        using TimeType = typename ConnectorChannel::TimeType;
+        using ConnectorChannelPtr = typename ConnectorChannel::ConnectorChannelPtr;
+        using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
+        using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
+        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:

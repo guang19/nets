@@ -14,7 +14,9 @@ namespace nets::net
     class ConnectorChannel : public Channel
     {
     public:
+        using TimeType = ::time_t;
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
+        using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
@@ -30,6 +32,16 @@ namespace nets::net
         void handleErrorEvent() override;
 
     public:
+        inline void setRetry(bool retry)
+        {
+            retry_ = retry;
+        }
+
+        inline void setRetryInterval(TimeType retryInterval)
+        {
+            retryInterval_ = retryInterval;
+        }
+
         inline void setChannelOptions(const ChannelOptionList& channelOptions)
         {
             channelOptions_ = channelOptions;
@@ -49,9 +61,9 @@ namespace nets::net
 
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);
-        void channelActive();
+        void newSocketChannel();
         void handleConnectError(int32_t errNum);
-        void checkConnected();
+        void waitConnect();
         void reconnect();
 
     private:
@@ -66,6 +78,8 @@ namespace nets::net
             DISCONNECTED
         };
         ConnectionState state_;
+        bool retry_ {false};
+        TimeType retryInterval_ {0};
         ChannelOptionList channelOptions_ {};
         ChannelHandlerList channelHandlers_ {};
         ChannelInitializationCallback channelInitializationCallback_ {};

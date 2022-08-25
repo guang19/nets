@@ -80,6 +80,7 @@ int main(int argc, char** argv)
     Bootstrap bootstrap;
     bootstrap.option(NTcpSendBuffer, 1024)
         .option(NTcpRecvBuffer, 1024)
+        .retry()
         //        .channelHandler(new TestClientChannelHandler())
         .channelHandler(
             [](SocketChannel& channel)

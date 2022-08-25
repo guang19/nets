@@ -65,6 +65,9 @@ namespace nets::net
 
     void Bootstrap::initConnectorChannel(ConnectorChannelPtr& connectorChannel)
     {
+        connectorChannel->setRetry(retry_);
+        connectorChannel->setRetryInterval(retryInterval_);
+
         ChannelOptionList channelOptions {::std::move(channelOptions_)};
         assert(channelOptions_.empty());
         connectorChannel->setChannelOptions(channelOptions);
