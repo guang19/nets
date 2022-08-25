@@ -108,7 +108,7 @@ TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 
 TEST_F(ThreadPoolTest, SubmitHasRetval)
 {
-    ::std::function<int32_t()> f = []() -> int32_t
+    ::std::function<::int32_t()> f = []() -> ::int32_t
     {
         ::printf("%s\n", currentThreadName());
         return 5;
@@ -137,7 +137,7 @@ TEST_F(ThreadPoolTest, SubmitNoRetval)
 
 TEST_F(ThreadPoolTest, SubmitFutureThrow)
 {
-    ::std::function<int32_t()> f1 = []() -> int32_t
+    ::std::function<::int32_t()> f1 = []() -> ::int32_t
     {
         ::printf("%s\n", currentThreadName());
         throw ::std::invalid_argument("123123123");

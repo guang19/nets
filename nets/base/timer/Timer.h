@@ -17,7 +17,7 @@ namespace nets::base
     {
     public:
         using TimeType = ::time_t;
-        using IdType = int64_t;
+        using IdType = ::int64_t;
         using TimerCallback = ::std::function<void()>;
 
     public:

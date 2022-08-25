@@ -14,8 +14,8 @@ namespace nets::base
 {
     namespace
     {
-        constexpr uint32_t MillisecondsPerSecond = 1000U;
-        constexpr uint32_t MicrosecondsPerSecond = 1000000U;
+        constexpr ::int32_t MillisecondsPerSecond = 1000;
+        constexpr ::int32_t MicrosecondsPerSecond = 1000000;
     } // namespace
 
     class Timestamp : public Copyable
@@ -26,7 +26,7 @@ namespace nets::base
     public:
         Timestamp();
         explicit Timestamp(TimeType timestamp);
-        explicit Timestamp(TimeType secondsSinceEpoch, uint32_t microseconds);
+        explicit Timestamp(TimeType secondsSinceEpoch, ::int32_t microseconds);
         ~Timestamp() = default;
 
         Timestamp(const Timestamp& other);
@@ -85,9 +85,9 @@ namespace nets::base
             return static_cast<TimeType>(timestampSinceEpoch_ / MicrosecondsPerSecond);
         }
 
-        inline uint32_t microsFromTimestamp() const
+        inline ::int32_t microsFromTimestamp() const
         {
-            return static_cast<uint32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
+            return static_cast<::int32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
         }
 
     private:

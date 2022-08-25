@@ -72,7 +72,7 @@ public:
     }
 
 private:
-    int32_t sharedNum = 0;
+    ::int32_t sharedNum = 0;
 };
 
 int main(int argc, char** argv)

@@ -8,7 +8,7 @@
 
 namespace nets::base
 {
-    LogMessage::LogMessage(LogLevel logLevel, const char* file, uint32_t line)
+    LogMessage::LogMessage(LogLevel logLevel, const char* file, ::uint32_t line)
         : logTime_(Timestamp::now()), logLevel_(logLevel), line_(line), stream_()
     {
         filename_ = ::strrchr(file, '/');

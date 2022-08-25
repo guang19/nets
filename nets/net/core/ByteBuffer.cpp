@@ -20,10 +20,10 @@ namespace nets::net
 
         constexpr ByteBuffer::SizeType BooleanBytes = sizeof(bool);
         constexpr ByteBuffer::SizeType CharBytes = sizeof(char);
-        constexpr ByteBuffer::SizeType Int8Bytes = sizeof(int8_t);
-        constexpr ByteBuffer::SizeType Int16Bytes = sizeof(int16_t);
-        constexpr ByteBuffer::SizeType Int32Bytes = sizeof(int32_t);
-        constexpr ByteBuffer::SizeType Int64Bytes = sizeof(int64_t);
+        constexpr ByteBuffer::SizeType Int8Bytes = sizeof(::int8_t);
+        constexpr ByteBuffer::SizeType Int16Bytes = sizeof(::int16_t);
+        constexpr ByteBuffer::SizeType Int32Bytes = sizeof(::int32_t);
+        constexpr ByteBuffer::SizeType Int64Bytes = sizeof(::int64_t);
         constexpr ByteBuffer::SizeType FloatBytes = sizeof(float);
         constexpr ByteBuffer::SizeType DoubleBytes = sizeof(double);
     } // namespace
@@ -136,26 +136,26 @@ namespace nets::net
         return bytes;
     }
 
-    void ByteBuffer::writeInt8(int8_t value)
+    void ByteBuffer::writeInt8(::int8_t value)
     {
         writeBytes(&value, Int8Bytes);
     }
 
-    void ByteBuffer::writeInt16(int16_t value)
+    void ByteBuffer::writeInt16(::int16_t value)
     {
-        int16_t tmp = htobe16(value);
+        ::int16_t tmp = htobe16(value);
         writeBytes(&tmp, Int16Bytes);
     }
 
-    void ByteBuffer::writeInt32(int32_t value)
+    void ByteBuffer::writeInt32(::int32_t value)
     {
-        int32_t tmp = htobe32(value);
+        ::int32_t tmp = htobe32(value);
         writeBytes(&tmp, Int32Bytes);
     }
 
-    void ByteBuffer::writeInt64(int64_t value)
+    void ByteBuffer::writeInt64(::int64_t value)
     {
-        int64_t tmp = htobe64(value);
+        ::int64_t tmp = htobe64(value);
         writeBytes(&tmp, Int64Bytes);
     }
 
@@ -195,37 +195,37 @@ namespace nets::net
         return s;
     }
 
-    int8_t ByteBuffer::readInt8()
+    ::int8_t ByteBuffer::readInt8()
     {
         checkReadableBytes(Int8Bytes);
-        int8_t val = 0;
+        ::int8_t val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], Int8Bytes);
         adjustReaderIndex(Int8Bytes);
         return val;
     }
 
-    int16_t ByteBuffer::readInt16()
+    ::int16_t ByteBuffer::readInt16()
     {
         checkReadableBytes(Int16Bytes);
-        int16_t val = 0;
+        ::int16_t val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], Int16Bytes);
         adjustReaderIndex(Int16Bytes);
         return be16toh(val);
     }
 
-    int32_t ByteBuffer::readInt32()
+    ::int32_t ByteBuffer::readInt32()
     {
         checkReadableBytes(Int32Bytes);
-        int32_t val = 0;
+        ::int32_t val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], Int32Bytes);
         adjustReaderIndex(Int32Bytes);
         return be32toh(val);
     }
 
-    int64_t ByteBuffer::readInt64()
+    ::int64_t ByteBuffer::readInt64()
     {
         checkReadableBytes(Int64Bytes);
-        int64_t val = 0;
+        ::int64_t val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], Int64Bytes);
         adjustReaderIndex(Int64Bytes);
         return be64toh(val);

@@ -13,7 +13,7 @@ namespace nets::base
 
     Timestamp::Timestamp(TimeType timestamp) : timestampSinceEpoch_(timestamp) {}
 
-    Timestamp::Timestamp(TimeType secondsSinceEpoch, uint32_t microseconds)
+    Timestamp::Timestamp(TimeType secondsSinceEpoch, ::int32_t microseconds)
         : Timestamp((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
     {
     }

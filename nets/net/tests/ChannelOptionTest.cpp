@@ -20,8 +20,8 @@ TEST(ChannelOptionTest, BasicUse)
     ChannelOption B(nets::net::NBACKLOG, 5);
     ChannelOption C(nets::net::NBACKLOG, 6);
     ASSERT_EQ(::std::any_cast<bool>(A.get()), true);
-    ASSERT_EQ(::std::any_cast<int32_t>(B.get()), 5);
-    ASSERT_EQ(::std::any_cast<int32_t>(C.get()), 6);
+    ASSERT_EQ(::std::any_cast<::int32_t>(B.get()), 5);
+    ASSERT_EQ(::std::any_cast<::int32_t>(C.get()), 6);
 }
 
 TEST(ChannelOptionTest, Equal)
@@ -57,9 +57,9 @@ TEST(ChannelOptionTest, GenericStore)
     options.insert_or_assign(NUdpRecvBuffer, 1025);
     for (auto it = options.begin(); it != options.end(); ++it)
     {
-        if (typeid(int32_t) == it->first.get().type())
+        if (typeid(::int32_t) == it->first.get().type())
         {
-            printf("int32_t value : %d\n", ::std::get<int32_t>(it->second));
+            printf("::int32_t value : %d\n", ::std::get<::int32_t>(it->second));
         }
         else if (typeid(bool) == it->first.get().type())
         {
@@ -69,9 +69,9 @@ TEST(ChannelOptionTest, GenericStore)
     ::std::map<ChannelOption, ChannelOption::ValueType> options2 = ::std::move(options);
     for (auto it = options2.begin(); it != options2.end(); ++it)
     {
-        if (typeid(int32_t) == it->first.get().type())
+        if (typeid(::int32_t) == it->first.get().type())
         {
-            printf("int32_t value : %d\n", ::std::any_cast<int32_t>(it->first.get()));
+            printf("::int32_t value : %d\n", ::std::any_cast<::int32_t>(it->first.get()));
         }
         else if (typeid(bool) == it->first.get().type())
         {
@@ -84,7 +84,7 @@ TEST(ChannelOptionTest, GenericStore)
 
 TEST(ChannelOptionTest, MapStore)
 {
-    ::std::map<ChannelOption, int32_t> options {};
+    ::std::map<ChannelOption, ::int32_t> options {};
     options.insert({NLinger, 1});
     options.insert({NBackLog, 2});
     options.insert({NTcpRecvBuffer, 3});
@@ -93,14 +93,14 @@ TEST(ChannelOptionTest, MapStore)
     options.insert({NUdpRecvBuffer, 6});
     for (auto it = options.begin(); it != options.end(); ++it)
     {
-        printf("{value is %d=>%d}\t", ::std::any_cast<int32_t>(it->first.get()), it->second);
+        printf("{value is %d=>%d}\t", ::std::any_cast<::int32_t>(it->first.get()), it->second);
     }
     printf("\n");
 }
 
 TEST(ChannelOptionTest, HashMapStore)
 {
-    ::std::unordered_map<ChannelOption, int32_t, ChannelOption::ChannelOptionHasher> options {};
+    ::std::unordered_map<ChannelOption, ::int32_t, ChannelOption::ChannelOptionHasher> options {};
     options.insert({NLinger, 1});
     options.insert({NBackLog, 2});
     options.insert({NTcpRecvBuffer, 3});
@@ -109,7 +109,7 @@ TEST(ChannelOptionTest, HashMapStore)
     options.insert({NUdpRecvBuffer, 6});
     for (auto it = options.begin(); it != options.end(); ++it)
     {
-        printf("{value is %d=>%d}\t", ::std::any_cast<int32_t>(it->first.get()), it->second);
+        printf("{value is %d=>%d}\t", ::std::any_cast<::int32_t>(it->first.get()), it->second);
     }
     printf("\n");
 }

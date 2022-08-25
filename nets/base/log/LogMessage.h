@@ -24,7 +24,7 @@ namespace nets::base
     class LogMessage : Noncopyable
     {
     public:
-        explicit LogMessage(LogLevel logLevel, const char* file, uint32_t line);
+        explicit LogMessage(LogLevel logLevel, const char* file, ::uint32_t line);
         ~LogMessage() = default;
 
     public:
@@ -43,7 +43,7 @@ namespace nets::base
             return filename_;
         }
 
-        inline uint32_t getLine() const
+        inline ::uint32_t getLine() const
         {
             return line_;
         }
@@ -57,7 +57,7 @@ namespace nets::base
         Timestamp logTime_ {};
         LogLevel logLevel_ {};
         const char* filename_ {nullptr};
-        uint32_t line_ {0};
+        ::uint32_t line_ {0};
         LogBufferStream stream_ {};
     };
 } // namespace nets::base

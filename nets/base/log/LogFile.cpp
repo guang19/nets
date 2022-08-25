@@ -15,7 +15,7 @@ namespace nets::base
 {
     namespace
     {
-        constexpr uint32_t MaxFilePathLength = 512;
+        constexpr ::uint32_t MaxFilePathLength = 512;
         const char* const LogFileNamePattern = "%Y-%m-%d_%H-%M-%S";
         const char* const LogFileSuffix = ".log";
     } // namespace
@@ -36,7 +36,7 @@ namespace nets::base
         }
         if (nullptr == (fp_ = ::fopen(file, "ae")))
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             THROW_FILE_OPEN_EXCEPTION(errNum);
         }
         getFileInfo(&bytes_, &lastRollTime_);
@@ -54,15 +54,15 @@ namespace nets::base
 
     void LogFile::write(const char* data, SizeType length)
     {
-        uint64_t writtenBytes = 0;
+        ::uint64_t writtenBytes = 0;
         while (writtenBytes < length)
         {
-            uint64_t remain = length - writtenBytes;
+            ::uint64_t remain = length - writtenBytes;
             // not thread-safe
-            uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
+            ::uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
             if (n != remain)
             {
-                int32_t errNum = ::ferror(fp_);
+                ::int32_t errNum = ::ferror(fp_);
                 if (errNum != 0)
                 {
                     ::fprintf(stderr,
@@ -108,7 +108,7 @@ namespace nets::base
         }
         if (nullptr == (fp_ = ::fopen(file_.c_str(), "ae")))
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             THROW_FILE_OPEN_EXCEPTION(errNum);
         }
         getFileInfo(&bytes_, nullptr);
@@ -139,7 +139,7 @@ namespace nets::base
                 {
                     if (0 != ::mkdir(path, 0775))
                     {
-                        int32_t errNum = errno;
+                        ::int32_t errNum = errno;
                         THROW_FILE_CREATE_EXCEPTION(errNum);
                     }
                 }

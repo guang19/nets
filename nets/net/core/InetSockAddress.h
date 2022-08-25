@@ -15,7 +15,7 @@ namespace nets::net
     namespace
     {
         using SockLenType = ::socklen_t;
-        using PortType = uint16_t;
+        using PortType = ::uint16_t;
         using SockAddr = struct sockaddr;
         using SockAddr4 = struct sockaddr_in;
         using SockAddr6 = struct sockaddr_in6;

@@ -33,10 +33,10 @@ namespace nets::net
         socket::closeFd(epollFd_);
     }
 
-    void EpollPoller::poll(int32_t timeoutMs, ChannelList& activeChannels)
+    void EpollPoller::poll(::int32_t timeoutMs, ChannelList& activeChannels)
     {
         SizeType size = events_.size();
-        int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<int32_t>(size), timeoutMs);
+        ::int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<::int32_t>(size), timeoutMs);
         if (numOfReadyEvents > 0)
         {
             LOGS_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvents << " events";
@@ -61,9 +61,9 @@ namespace nets::net
         }
     }
 
-    void EpollPoller::prepareChannelReadyEvents(int32_t numOfReadyEvents, ChannelList& activeChannels)
+    void EpollPoller::prepareChannelReadyEvents(::int32_t numOfReadyEvents, ChannelList& activeChannels)
     {
-        for (int32_t i = 0; i < numOfReadyEvents; ++i)
+        for (::int32_t i = 0; i < numOfReadyEvents; ++i)
         {
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
             activeChannels.push_back(channel);
@@ -130,7 +130,7 @@ namespace nets::net
         return epollCtl(EPOLL_CTL_DEL, channel);
     }
 
-    bool EpollPoller::epollCtl(int32_t opt, const ChannelRawPtr channel)
+    bool EpollPoller::epollCtl(::int32_t opt, const ChannelRawPtr channel)
     {
         EpollEvent event {};
         FdType fd = channel->fd();
@@ -154,7 +154,7 @@ namespace nets::net
         return false;
     }
 
-    const char* EpollPoller::epollOptToString(int32_t opt)
+    const char* EpollPoller::epollOptToString(::int32_t opt)
     {
         switch (opt)
         {

@@ -39,7 +39,7 @@ namespace nets::net::socket
 
     void setSockCloExec(FdType sockFd)
     {
-        int32_t flags = ::fcntl(sockFd, F_GETFD, 0);
+        ::int32_t flags = ::fcntl(sockFd, F_GETFD, 0);
         flags |= FD_CLOEXEC;
         if (-1 == ::fcntl(sockFd, F_SETFD, flags))
         {
@@ -58,7 +58,7 @@ namespace nets::net::socket
         }
     }
 
-    void shutdown(FdType sockFd, int32_t how)
+    void shutdown(FdType sockFd, ::int32_t how)
     {
         if (0 != ::shutdown(sockFd, how))
         {
@@ -66,7 +66,7 @@ namespace nets::net::socket
         }
     }
 
-    const char* shutdownHowToString(int32_t how)
+    const char* shutdownHowToString(::int32_t how)
     {
         switch (how)
         {
@@ -111,7 +111,7 @@ namespace nets::net::socket
         }
     }
 
-    void listen(FdType sockFd, int32_t backlog)
+    void listen(FdType sockFd, ::int32_t backlog)
     {
         if (0 != ::listen(sockFd, backlog))
         {
@@ -125,7 +125,7 @@ namespace nets::net::socket
         return ::accept4(sockFd, reinterpret_cast<SockAddr*>(sockAddr), &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
     }
 
-    int32_t connect(FdType sockFd, const SockAddr* sockAddr)
+    ::int32_t connect(FdType sockFd, const SockAddr* sockAddr)
     {
         auto length = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
         return ::connect(sockFd, sockAddr, length);
@@ -136,7 +136,7 @@ namespace nets::net::socket
         return ::read(fd, buf, n);
     }
 
-    SSizeType readv(FdType fd, const IoVec* iov, int32_t iovcnt)
+    SSizeType readv(FdType fd, const IoVec* iov, ::int32_t iovcnt)
     {
         return ::readv(fd, iov, iovcnt);
     }
@@ -146,7 +146,7 @@ namespace nets::net::socket
         return ::write(fd, buf, n);
     }
 
-    SSizeType writev(FdType fd, const IoVec* iov, int32_t iovcnt)
+    SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt)
     {
         return ::writev(fd, iov, iovcnt);
     }
@@ -298,7 +298,7 @@ namespace nets::net::socket
 
     void setSockNonBlock(FdType sockFd, bool enable)
     {
-        int32_t flags = ::fcntl(sockFd, F_GETFL, 0);
+        ::int32_t flags = ::fcntl(sockFd, F_GETFL, 0);
         if (enable)
         {
             flags |= O_NONBLOCK;

@@ -24,15 +24,15 @@ namespace nets::net
         ~EpollPoller() override;
 
     public:
-        void poll(int32_t timeoutMs, ChannelList& activeChannels) override;
+        void poll(::int32_t timeoutMs, ChannelList& activeChannels) override;
         bool registerChannel(ChannelRawPtr channel) override;
         bool modifyChannel(ChannelRawPtr channel) override;
         bool deregisterChannel(ChannelRawPtr channel) override;
 
     private:
-        void prepareChannelReadyEvents(int32_t numOfReadyEvents, ChannelList& activeChannels);
-        bool epollCtl(int32_t opt, ChannelRawPtr channel);
-        const char* epollOptToString(int32_t opt);
+        void prepareChannelReadyEvents(::int32_t numOfReadyEvents, ChannelList& activeChannels);
+        bool epollCtl(::int32_t opt, ChannelRawPtr channel);
+        const char* epollOptToString(::int32_t opt);
 
     private:
         FdType epollFd_ {-1};

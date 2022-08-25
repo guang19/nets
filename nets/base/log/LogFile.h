@@ -41,7 +41,7 @@ namespace nets::base
         }
 
     private:
-        void getFileInfo(uint64_t* fileSize, ::time_t* createTime);
+        void getFileInfo(::uint64_t* fileSize, ::time_t* createTime);
 
     private:
         FILE* fp_ {nullptr};

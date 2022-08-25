@@ -16,15 +16,15 @@
 using namespace nets::base;
 using namespace nets::net;
 
-void testWriteV(int32_t sockFd)
+void testWriteV(::int32_t sockFd)
 {
     Timestamp start(Timestamp::now());
-    const int32_t count = 5;
+    const ::int32_t count = 5;
     const char* strArr[count] = {"hello client\n",          "this is first message\n",  "this is second message\n",
                                  "this is third message\n", "this is fourth message\n"};
     SSizeType expectedBytes = 0;
     IoVec iovecs[count];
-    for (int32_t i = 0; i < count; ++i)
+    for (::int32_t i = 0; i < count; ++i)
     {
         SizeType len = ::strlen(strArr[i]);
         iovecs[i].iov_base = const_cast<char*>(&strArr[i][0]);
@@ -36,7 +36,7 @@ void testWriteV(int32_t sockFd)
     ::printf("expectedBytes=%ld, write bytes=%ld, writeV=%d\n", expectedBytes, bytes, end.microsFromTimestamp() - start.microsFromTimestamp());
 }
 
-int32_t main(int32_t argc, char** argv)
+::int32_t main(::int32_t argc, char** argv)
 {
     FdType listenFd = socket::createTcpSocket(AF_INET);
 
@@ -54,11 +54,11 @@ int32_t main(int32_t argc, char** argv)
     {
         FdType numOfReadEvents = 0;
         numOfReadEvents = epoll_wait(epollFd, &*epollEvents.begin(), epollEvents.size(), -1);
-        for (int32_t i = 0; i < numOfReadEvents; ++i)
+        for (::int32_t i = 0; i < numOfReadEvents; ++i)
         {
             if (epollEvents[i].events & (EPOLLHUP | EPOLLERR))
             {
-                int32_t optval;
+                ::int32_t optval;
                 auto optlen = static_cast<SockLenType>(sizeof(optval));
                 ::getsockopt(epollEvents[i].data.fd, SOL_SOCKET, SO_ERROR, &optval, &optlen);
                 // broken pipe

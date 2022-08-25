@@ -55,14 +55,14 @@ namespace nets::net
         }
         else
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             handleAcceptError(errNum);
         }
     }
 
     void ServerSocketChannel::handleErrorEvent()
     {
-        int32_t errNum = socket::getSockError(sockFd_);
+        ::int32_t errNum = socket::getSockError(sockFd_);
         THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 
@@ -98,7 +98,7 @@ namespace nets::net
         socketChannel->channelActive();
     }
 
-    void ServerSocketChannel::handleAcceptError(int32_t errNum)
+    void ServerSocketChannel::handleAcceptError(::int32_t errNum)
     {
         switch (errNum)
         {

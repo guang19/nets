@@ -18,7 +18,7 @@ namespace nets::net
 
     namespace
     {
-        using EventType = uint32_t;
+        using EventType = ::uint32_t;
         // event type
         constexpr EventType ENoneEvent = 0;
         constexpr EventType EReadEvent = 0x01;
@@ -58,7 +58,7 @@ namespace nets::net
 
     public:
         void setChannelOption(const ChannelOption& channelOption);
-        virtual void setBacklog(int32_t backlog);
+        virtual void setBacklog(::int32_t backlog);
 
     public:
         virtual FdType fd() const = 0;

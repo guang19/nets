@@ -26,7 +26,7 @@ namespace nets::base
     void AbstractException::backTrace() noexcept
     {
         void* addrList[MaxAddressSize];
-        int32_t addrLen = ::backtrace(addrList, MaxAddressSize);
+        ::int32_t addrLen = ::backtrace(addrList, MaxAddressSize);
         if (addrLen == 0)
         {
             return;
@@ -34,7 +34,7 @@ namespace nets::base
         char** symbolList = ::backtrace_symbols(addrList, addrLen);
         if (symbolList != nullptr)
         {
-            for (int32_t i = 1; i < addrLen; ++i)
+            for (::int32_t i = 1; i < addrLen; ++i)
             {
                 stackTrace_.append(symbolList[i]);
                 stackTrace_.push_back('\n');

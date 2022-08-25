@@ -16,7 +16,7 @@ namespace nets::net
     namespace
     {
         const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
-        constexpr int32_t MaxCountOfWriteVOnce = IOV_MAX >> 2;
+        constexpr ::int32_t MaxCountOfWriteVOnce = IOV_MAX >> 2;
     } // namespace
 
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -76,7 +76,7 @@ namespace nets::net
         }
         else
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             handleReadError(errNum);
         }
     }
@@ -99,10 +99,10 @@ namespace nets::net
             totalBytes += writeBuffer_[i].readableBytes();
         }
         assert(totalBytes > 0);
-        SSizeType writtenBytes = writev(ioves, static_cast<int32_t>(size));
+        SSizeType writtenBytes = writev(ioves, static_cast<::int32_t>(size));
         if (writtenBytes < 0)
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             handleWriteError(errNum);
         }
         else
@@ -257,7 +257,7 @@ namespace nets::net
             }
             else if (readBytes < 0)
             {
-                int32_t errNum = errno;
+                ::int32_t errNum = errno;
                 if (errNum != EAGAIN && errNum != EINTR)
                 {
                     errno = errNum;
@@ -307,7 +307,7 @@ namespace nets::net
         SSizeType bytes = socket::write(sockFd_, data, length);
         if (bytes < 0)
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             // ignore write EAGAIN
             if (errNum == EAGAIN || errNum == EINTR)
             {
@@ -366,18 +366,18 @@ namespace nets::net
         return false;
     }
 
-    SSizeType SocketChannel::writev(const IoVecList& iovecs, int32_t count) const
+    SSizeType SocketChannel::writev(const IoVecList& iovecs, ::int32_t count) const
     {
         SSizeType writtenBytes = 0;
-        for (int32_t writtenBlocks = 0; writtenBlocks < count;)
+        for (::int32_t writtenBlocks = 0; writtenBlocks < count;)
         {
-            int32_t leftBlocks = count - writtenBlocks;
+            ::int32_t leftBlocks = count - writtenBlocks;
             SSizeType bytes = 0;
             SizeType expectedWriteLen = 0;
             // if leftBlocks less than CountOfWriteVOnce
             if (leftBlocks < MaxCountOfWriteVOnce)
             {
-                for (int32_t i = writtenBlocks; i < leftBlocks; ++i)
+                for (::int32_t i = writtenBlocks; i < leftBlocks; ++i)
                 {
                     expectedWriteLen += iovecs[i].iov_len;
                 }
@@ -386,7 +386,7 @@ namespace nets::net
             }
             else
             {
-                for (int32_t i = writtenBlocks; i < MaxCountOfWriteVOnce; ++i)
+                for (::int32_t i = writtenBlocks; i < MaxCountOfWriteVOnce; ++i)
                 {
                     expectedWriteLen += iovecs[i].iov_len;
                 }
@@ -395,7 +395,7 @@ namespace nets::net
             }
             if (bytes < 0)
             {
-                int32_t errNum = errno;
+                ::int32_t errNum = errno;
                 if (errNum == EAGAIN || errNum == EINTR)
                 {
                     break;
@@ -432,7 +432,7 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::handleReadError(int32_t errNum)
+    void SocketChannel::handleReadError(::int32_t errNum)
     {
         switch (errNum)
         {
@@ -458,7 +458,7 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::handleWriteError(int32_t errNum)
+    void SocketChannel::handleWriteError(::int32_t errNum)
     {
         switch (errNum)
         {
@@ -505,7 +505,7 @@ namespace nets::net
             });
     }
 
-    void SocketChannel::shutdown(int32_t how)
+    void SocketChannel::shutdown(::int32_t how)
     {
         switch (how)
         {

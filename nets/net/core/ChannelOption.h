@@ -31,7 +31,7 @@ namespace nets::net
     class ChannelOption : nets::base::Copyable
     {
     public:
-        using ValueType = ::std::variant<bool, int32_t>;
+        using ValueType = ::std::variant<bool, ::int32_t>;
 
     public:
         struct ChannelOptionHasher

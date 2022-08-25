@@ -16,7 +16,7 @@ namespace nets::base
     class LogMessageStream
     {
     public:
-        explicit LogMessageStream(LogLevel logLevel, const char* file, uint32_t line);
+        explicit LogMessageStream(LogLevel logLevel, const char* file, ::uint32_t line);
         ~LogMessageStream();
 
     public:

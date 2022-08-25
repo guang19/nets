@@ -40,7 +40,7 @@ namespace nets::net
             LOGS_WARN << "ConnectorChannel handleWriteEvent connectionState=" << state_;
             return;
         }
-        int32_t errNum = socket::getSockError(sockFd_);
+        ::int32_t errNum = socket::getSockError(sockFd_);
         if (errNum != 0)
         {
             LOGS_ERROR << "ConnectorChannel handleWriteEvent unable to connect to " << peerAddress_.toString()
@@ -86,7 +86,7 @@ namespace nets::net
     {
         sockFd_ = socket::createTcpSocket(serverAddress.ipFamily());
         socket::setSockNonBlock(sockFd_);
-        int32_t ret = socket::connect(sockFd_, serverAddress.sockAddr());
+        ::int32_t ret = socket::connect(sockFd_, serverAddress.sockAddr());
         peerAddress_ = serverAddress;
         assert(state_ == ConnectionState::DISCONNECTED);
         if (ret == 0)
@@ -95,7 +95,7 @@ namespace nets::net
         }
         else
         {
-            int32_t errNum = errno;
+            ::int32_t errNum = errno;
             handleConnectError(errNum);
         }
     }
@@ -135,7 +135,7 @@ namespace nets::net
         socketChannel->channelActive();
     }
 
-    void ConnectorChannel::handleConnectError(int32_t errNum)
+    void ConnectorChannel::handleConnectError(::int32_t errNum)
     {
         switch (errNum)
         {

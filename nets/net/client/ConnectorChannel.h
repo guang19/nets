@@ -62,7 +62,7 @@ namespace nets::net
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);
         void newSocketChannel();
-        void handleConnectError(int32_t errNum);
+        void handleConnectError(::int32_t errNum);
         void waitConnect();
         void reconnect();
 

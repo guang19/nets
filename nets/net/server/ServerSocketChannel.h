@@ -35,9 +35,9 @@ namespace nets::net
         void handleErrorEvent() override;
 
     public:
-        inline void setBacklog(int32_t backlog) override
+        inline void setBacklog(::int32_t backlog) override
         {
-            backlog_ = ::std::any_cast<int32_t>(backlog);
+            backlog_ = ::std::any_cast<::int32_t>(backlog);
         }
 
         inline void setNextEventLoopFn(const NextEventLoopFn& nextEventLoopFn)
@@ -69,12 +69,12 @@ namespace nets::net
 
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);
-        void handleAcceptError(int32_t errNum);
+        void handleAcceptError(::int32_t errNum);
 
     private:
         FdType sockFd_ {socket::InvalidFd};
         FdType idleFd_ {socket::InvalidFd};
-        int32_t backlog_ {0};
+        ::int32_t backlog_ {0};
         ChannelOptionList channelOptions_ {};
         NextEventLoopFn nextEventLoopFn_ {};
         ChannelOptionList childOptions_ {};

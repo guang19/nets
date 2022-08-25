@@ -9,7 +9,7 @@
 
 namespace nets::base
 {
-    LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, uint32_t line)
+    LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, ::uint32_t line)
         : logMessage_(logLevel, file, line)
     {
     }

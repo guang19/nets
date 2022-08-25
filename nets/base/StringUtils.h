@@ -15,20 +15,20 @@ namespace nets::base
     {
         constexpr char Digits[] = {"0123456789"};
         constexpr char HexDigits[] = {"0123456789abcdef"};
-        constexpr uint32_t MaxNumLength = ::std::numeric_limits<uint64_t>::digits10 + 2;
-        constexpr uint32_t MaxFloatLength = ::std::numeric_limits<double>::digits10 + 2;
+        constexpr ::uint32_t MaxNumLength = ::std::numeric_limits<::uint64_t>::digits10 + 2;
+        constexpr ::uint32_t MaxFloatLength = ::std::numeric_limits<double>::digits10 + 2;
     } // namespace
 
     namespace utils
     {
         // Convert the integer to a string and add it to the buffer and return the length of the converted string
         template <typename Int>
-        uint32_t fromInt(char* buffer, Int n)
+        ::uint32_t fromInt(char* buffer, Int n)
         {
             char* tmp = buffer;
             do
             {
-                auto lstIdx = static_cast<uint16_t>(n % 10);
+                auto lstIdx = static_cast<::uint16_t>(n % 10);
                 *tmp = Digits[lstIdx];
                 ++tmp;
                 n /= 10;
@@ -44,7 +44,7 @@ namespace nets::base
 
         // Convert the float to a string and add it to the buffer, and return the length of the converted string
         template <typename Float>
-        uint32_t fromFloat(char* buffer, Float f)
+        ::uint32_t fromFloat(char* buffer, Float f)
         {
             if (::std::isnan(f))
             {
@@ -64,7 +64,7 @@ namespace nets::base
 
         // Convert the hex to a string and add it to the buffer, and return the length of the converted string
         template <typename Hex>
-        uint32_t fromHex(char* buffer, Hex h)
+        ::uint32_t fromHex(char* buffer, Hex h)
         {
             char* tmp = buffer;
             tmp[0] = '0';
@@ -72,7 +72,7 @@ namespace nets::base
             tmp += 2;
             do
             {
-                auto lstIdx = static_cast<uint16_t>(h % 16);
+                auto lstIdx = static_cast<::uint16_t>(h % 16);
                 *tmp = HexDigits[lstIdx];
                 ++tmp;
                 h /= 16;

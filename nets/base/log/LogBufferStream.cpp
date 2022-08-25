@@ -12,49 +12,49 @@ namespace nets::base
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(int8_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int8_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(uint8_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint8_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(int16_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int16_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(uint16_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint16_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(int32_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int32_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(uint32_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint32_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(int64_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int64_t n)
     {
         buffer_.writeInteger(n);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(uint64_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint64_t n)
     {
         buffer_.writeInteger(n);
         return *this;

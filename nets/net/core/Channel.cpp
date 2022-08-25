@@ -92,7 +92,7 @@ namespace nets::net
             {
                 case SockOpt::NBACKLOG:
                 {
-                    setBacklog(::std::any_cast<int32_t>(channelOption.get()));
+                    setBacklog(::std::any_cast<::int32_t>(channelOption.get()));
                     break;
                 }
                 case SockOpt::NREUSE_ADDR:
@@ -117,20 +117,20 @@ namespace nets::net
                 }
                 case SockOpt::NLINGER:
                 {
-                    auto linger = ::std::any_cast<int32_t>(channelOption.get());
+                    auto linger = ::std::any_cast<::int32_t>(channelOption.get());
                     socket::setSockLinger(fd(), {1, linger});
                     break;
                 }
                 case SockOpt::NTCP_SNDBUF:
                 case SockOpt::NUDP_SNDBUF:
                 {
-                    socket::setSockSendBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
+                    socket::setSockSendBuf(fd(), ::std::any_cast<::int32_t>(channelOption.get()));
                     break;
                 }
                 case SockOpt::NTCP_RCVBUF:
                 case SockOpt::NUDP_RCVBUF:
                 {
-                    socket::setSockRecvBuf(fd(), ::std::any_cast<int32_t>(channelOption.get()));
+                    socket::setSockRecvBuf(fd(), ::std::any_cast<::int32_t>(channelOption.get()));
                     break;
                 }
                 case SockOpt::INVALID_SOCKOPT:
@@ -145,7 +145,7 @@ namespace nets::net
         }
     }
 
-    void Channel::setBacklog(int32_t backlog)
+    void Channel::setBacklog(::int32_t backlog)
     {
         THROW_FMT(::std::runtime_error, "Channel does not support setting backlog");
     }

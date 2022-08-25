@@ -106,20 +106,20 @@ namespace nets::net
         void writeBytes(const void* data, SizeType length);
         void writeBytes(const char* data, SizeType length);
         SSizeType writeBytes(const SocketChannel& channel, SizeType length);
-        void writeInt8(int8_t value);
-        void writeInt16(int16_t value);
-        void writeInt32(int32_t value);
-        void writeInt64(int64_t value);
+        void writeInt8(::int8_t value);
+        void writeInt16(::int16_t value);
+        void writeInt32(::int32_t value);
+        void writeInt64(::int64_t value);
         void writeFloat(float value);
         void writeDouble(double value);
 
         bool readBoolean();
         char readByte();
         StringType readBytes(SizeType length);
-        int8_t readInt8();
-        int16_t readInt16();
-        int32_t readInt32();
-        int64_t readInt64();
+        ::int8_t readInt8();
+        ::int16_t readInt16();
+        ::int32_t readInt32();
+        ::int64_t readInt64();
         float readFloat();
         double readDouble();
         StringType toString() const;

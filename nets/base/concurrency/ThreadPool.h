@@ -28,7 +28,7 @@ namespace nets::base
         using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
     public:
-        using IntType = uint32_t;
+        using IntType = ::uint32_t;
         using TimeType = ::time_t;
         using StringType = ::std::string;
         using TaskType = ::std::function<void()>;
