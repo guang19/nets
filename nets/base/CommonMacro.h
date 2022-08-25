@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_COMMONMACRO_H
-#define NETS_BASE_COMMONMACRO_H
+#ifndef NETS_BASE_COMMON_MACRO_H
+#define NETS_BASE_COMMON_MACRO_H
 
 #include <cstdarg>
 #include <cstdio>
@@ -87,4 +87,4 @@ void throwFmt(const char* fmt, ...)
             break;                                                                                                          \
     }
 
-#endif // NETS_BASE_COMMONMACRO_H
+#endif // NETS_BASE_COMMON_MACRO_H

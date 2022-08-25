@@ -29,19 +29,19 @@ ADD_DEFINITIONS(-DLOG_FILE="/tmp/nets/nets.log")
 ADD_DEFINITIONS(-DLOG_FILE_ROLLING_SIZE=24)
 ################################################################################################
 
-IF(NOT CMAKE_BUILD_TYPE)
+IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE "Release")
-ENDIF()
+ENDIF ()
 
-IF(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+IF (${CMAKE_BUILD_TYPE} STREQUAL "Release")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -DNDEBUG")
-ELSE()
+ELSE ()
     OPTION(BUILD_NETS_TESTS "Build nets tests" ON)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
     ENABLE_TESTING()
     SET(GOOGLE_TEST_INC_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/include)
     SET(GOOGLE_TEST_LIB_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/lib)
-ENDIF()
+ENDIF ()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g \
 -Wall \
