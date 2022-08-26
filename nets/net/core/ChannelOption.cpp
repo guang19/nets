@@ -6,11 +6,6 @@
 
 namespace nets::net
 {
-    ::size_t ChannelOption::ChannelOptionHasher::operator()(const ChannelOption& channelOption) const
-    {
-        return ::std::hash<SockOpt>()(channelOption.sockOpt_) ^ ::std::hash<ValueType>()(channelOption.value_);
-    }
-
     ChannelOption::ChannelOption() : sockOpt_(SockOpt::INVALID_SOCKOPT), value_() {}
 
     ChannelOption::ChannelOption(SockOpt sockOpt, const ValueType& value) : sockOpt_(sockOpt), value_(value) {}
@@ -59,16 +54,6 @@ namespace nets::net
     bool ChannelOption::operator!=(const ChannelOption& other) const
     {
         return sockOpt_ != other.sockOpt_ || value_ != other.value_;
-    }
-
-    bool ChannelOption::operator<(const ChannelOption& other) const
-    {
-        return sockOpt_ < other.sockOpt_;
-    }
-
-    bool ChannelOption::operator>(const ChannelOption& other) const
-    {
-        return sockOpt_ > other.sockOpt_;
     }
 
     ::std::any ChannelOption::get() const

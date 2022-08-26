@@ -34,12 +34,6 @@ namespace nets::net
         using ValueType = ::std::variant<bool, ::int32_t>;
 
     public:
-        struct ChannelOptionHasher
-        {
-            ::size_t operator()(const ChannelOption& channelOption) const;
-        };
-
-    public:
         ChannelOption();
         explicit ChannelOption(SockOpt sockOpt, const ValueType& value);
         ~ChannelOption() = default;
@@ -51,8 +45,6 @@ namespace nets::net
 
         bool operator==(const ChannelOption& other) const;
         bool operator!=(const ChannelOption& other) const;
-        bool operator<(const ChannelOption& other) const;
-        bool operator>(const ChannelOption& other) const;
 
     public:
         inline bool valid() const
