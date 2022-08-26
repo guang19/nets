@@ -37,7 +37,7 @@ namespace nets::net
     public:
         inline void setBacklog(::int32_t backlog) override
         {
-            backlog_ = ::std::any_cast<::int32_t>(backlog);
+            backlog_ = backlog;
         }
 
         inline void setNextEventLoopFn(const NextEventLoopFn& nextEventLoopFn)
