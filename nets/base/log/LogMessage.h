@@ -1,12 +1,12 @@
 //
-// Created by YangGuang on 2022/5/7.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_LOG_MESSAGE_H
 #define NETS_BASE_LOG_MESSAGE_H
 
 #include "nets/base/log/LogBufferStream.h"
-#include "nets/base/Timestamp.h"
+#include "nets/base/time/Timestamp.h"
 
 namespace nets::base
 {

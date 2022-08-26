@@ -1,20 +1,19 @@
 //
-// Created by YangGuang on 2022/5/2.
+// Created by guang19
 //
 
 #include <gtest/gtest.h>
 
-#include "nets/base/Timestamp.h"
+#include "nets/base/time/Timestamp.h"
 
 using namespace nets::base;
 
 TEST(TimestampTest, BasicUse)
 {
-    Timestamp now(Timestamp::now());
-    ::time_t tmp = now.secsFromTimestamp();
-    Timestamp now2 = ::std::move(now);
-    ASSERT_EQ(now2.secsFromTimestamp(), tmp);
-    ASSERT_EQ(now.secsFromTimestamp(), 0);
+    Timestamp t1(Timestamp::now());
+    ::printf("%ld\n", t1.seconds());
+    ::printf("%ld\n", t1.microseconds());
+    ::printf("%ld\n", ::time(nullptr));
 }
 
 TEST(TimestampTest, Compare)
@@ -23,9 +22,9 @@ TEST(TimestampTest, Compare)
     ::sleep(1);
     Timestamp end(Timestamp::now());
     ASSERT_GE(end, start);
-    ASSERT_GE((end - start).secsFromTimestamp(), 1);
-    ::printf("%ld\n", (end - start).secsFromTimestamp());
-    ::printf("%u\n", (end - start).microsFromTimestamp());
+    ASSERT_GE((end.seconds() - start.seconds()), 1);
+    ::printf("%ld\n", end.seconds() - start.seconds());
+    ::printf("%ld\n", end.microsPartOfTimestamp() - start.microsPartOfTimestamp());
 }
 
 int main(int argc, char** argv)

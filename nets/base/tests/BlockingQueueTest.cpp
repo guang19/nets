@@ -7,7 +7,7 @@
 #include <thread>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
-#include "nets/base/Timestamp.h"
+#include "nets/base/time/Timestamp.h"
 
 using namespace nets::base;
 
@@ -99,9 +99,9 @@ TEST_F(BlockingQueueTest, PutTimeout)
     blockingQueue->put(5);
     ASSERT_EQ(blockingQueue->size(), 5U);
     ::int32_t takeVal = 0;
-    ::int64_t start = Timestamp::now().secsFromTimestamp();
+    ::int64_t start = Timestamp::now().seconds();
     ASSERT_EQ(blockingQueue->put(takeVal, 3000L), false);
-    ::int64_t end = Timestamp::now().secsFromTimestamp();
+    ::int64_t end = Timestamp::now().seconds();
     ASSERT_GT(end, start);
     ASSERT_GE((end - start), 3);
     ASSERT_EQ(takeVal, 0);
@@ -110,10 +110,10 @@ TEST_F(BlockingQueueTest, PutTimeout)
 TEST_F(BlockingQueueTest, TakeTimeout)
 {
     ::int32_t takeVal = 0;
-    ::int64_t start = Timestamp::now().secsFromTimestamp();
+    ::int64_t start = Timestamp::now().seconds();
     ASSERT_EQ(blockingQueue->isEmpty(), true);
     ASSERT_EQ(blockingQueue->take(takeVal, 3000L), false);
-    ::int64_t end = Timestamp::now().secsFromTimestamp();
+    ::int64_t end = Timestamp::now().seconds();
     ASSERT_GT(end, start);
     ASSERT_GE((end - start), 3);
     ASSERT_EQ(takeVal, 0);

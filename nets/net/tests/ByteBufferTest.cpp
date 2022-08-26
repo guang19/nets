@@ -171,7 +171,7 @@ TEST(ByteBufferTest, Expansion)
     ByteBuffer buffer1(5);
     buffer1.writeBytes("123456", 6);
     ASSERT_STREQ(buffer1.toString().c_str(), "123456");
-    ::printf("%u", buffer1.capacity());
+    ::printf("%lu", buffer1.capacity());
 }
 
 int main(int argc, char** argv)

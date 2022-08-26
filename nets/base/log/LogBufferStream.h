@@ -1,5 +1,5 @@
 //
-// Created by YangGuang on 2022/4/3.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_LOG_BUFFER_STREAM_H

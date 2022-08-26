@@ -1,5 +1,5 @@
 //
-// Created by YangGuang on 2022/4/21.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_LOG_FORMATTER_H
@@ -12,10 +12,14 @@ namespace nets::base
 {
     class ILogFormatter
     {
+    public:
+        using Tm = struct tm;
+
     protected:
         virtual ~ILogFormatter() = default;
 
     public:
+        virtual void formatLogTime(const Timestamp& logTime, LogBufferStream& logBufferStream) = 0;
         virtual void formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream) = 0;
     };
 
@@ -24,6 +28,7 @@ namespace nets::base
         DEFINE_SINGLETON(DefaultLogFormatter);
 
     public:
+        void formatLogTime(const Timestamp& logTime, LogBufferStream& logBufferStream) override;
         void formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream) override;
     };
 

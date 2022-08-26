@@ -1,20 +1,20 @@
 //
-// Created by YangGuang on 2022/5/2.
+// Created by guang19
 //
 
-#include "nets/base/Timestamp.h"
+#include "nets/base/time/Timestamp.h"
 
 #include <sys/time.h>
 #include <utility>
 
 namespace nets::base
 {
-    Timestamp::Timestamp() : timestampSinceEpoch_(0) {}
+    Timestamp::Timestamp() : Timestamp(0) {}
 
-    Timestamp::Timestamp(TimeType timestamp) : timestampSinceEpoch_(timestamp) {}
+    Timestamp::Timestamp(TimeType secondsSinceEpoch) : Timestamp(secondsSinceEpoch, 0) {}
 
-    Timestamp::Timestamp(TimeType secondsSinceEpoch, ::int32_t microseconds)
-        : Timestamp((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
+    Timestamp::Timestamp(TimeType secondsSinceEpoch, TimeType microseconds)
+        : timestampSinceEpoch_((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
     {
     }
 
@@ -55,7 +55,8 @@ namespace nets::base
 
     Timestamp Timestamp::now()
     {
-        struct timeval tmV {};
+        using TimeVal = struct timeval;
+        TimeVal tmV {};
         ::gettimeofday(&tmV, nullptr);
         return Timestamp(tmV.tv_sec, tmV.tv_usec);
     }

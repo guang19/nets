@@ -1,5 +1,5 @@
 //
-// Created by YangGuang on 2022/5/2.
+// Created by guang19
 //
 
 #ifndef NETS_BASE_TIMESTAMP_H
@@ -25,8 +25,8 @@ namespace nets::base
 
     public:
         Timestamp();
-        explicit Timestamp(TimeType timestamp);
-        explicit Timestamp(TimeType secondsSinceEpoch, ::int32_t microseconds);
+        explicit Timestamp(TimeType secondsSinceEpoch);
+        explicit Timestamp(TimeType secondsSinceEpoch, TimeType microseconds);
         ~Timestamp() = default;
 
         Timestamp(const Timestamp& other);
@@ -62,32 +62,27 @@ namespace nets::base
             return timestampSinceEpoch_ >= other.timestampSinceEpoch_;
         }
 
-        inline Timestamp operator-(const Timestamp& other) const
-        {
-            return Timestamp(timestampSinceEpoch_ - other.timestampSinceEpoch_);
-        }
-
-        inline Timestamp operator+(const Timestamp& other) const
-        {
-            return Timestamp(timestampSinceEpoch_ + other.timestampSinceEpoch_);
-        }
-
     public:
         static Timestamp now();
 
-        inline TimeType timestamp() const
-        {
-            return timestampSinceEpoch_;
-        }
-
-        inline TimeType secsFromTimestamp() const
+        inline TimeType seconds() const
         {
             return static_cast<TimeType>(timestampSinceEpoch_ / MicrosecondsPerSecond);
         }
 
-        inline ::int32_t microsFromTimestamp() const
+        inline TimeType milliseconds() const
         {
-            return static_cast<::int32_t>(timestampSinceEpoch_ % MicrosecondsPerSecond);
+            return static_cast<TimeType>(timestampSinceEpoch_ / MillisecondsPerSecond);
+        }
+
+        inline TimeType microseconds() const
+        {
+            return timestampSinceEpoch_;
+        }
+
+        inline TimeType microsPartOfTimestamp() const
+        {
+            return static_cast<TimeType>(timestampSinceEpoch_ % MicrosecondsPerSecond);
         }
 
     private:

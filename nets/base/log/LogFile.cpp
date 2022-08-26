@@ -16,8 +16,8 @@ namespace nets::base
     namespace
     {
         constexpr ::uint32_t MaxFilePathLength = 512;
-        const char* const LogFileNamePattern = "%Y-%m-%d_%H-%M-%S";
-        const char* const LogFileSuffix = ".log";
+        constexpr char const LogFileNamePattern[] = "%Y-%m-%d_%H-%M-%S";
+        constexpr char const LogFileSuffix[] = ".log";
     } // namespace
 
     LogFile::LogFile(const char* file) : fp_(nullptr), dir_(), file_(file), bytes_(0), lastRollTime_(0)
@@ -90,7 +90,8 @@ namespace nets::base
             ::fclose(fp_);
             fp_ = nullptr;
         }
-        struct tm tmS {};
+        using Tm = struct tm;
+        Tm tmS {};
         ::localtime_r(&now, &tmS);
         char newFilename[32] = {0};
         ::strftime(newFilename, sizeof(newFilename), LogFileNamePattern, &tmS);
@@ -149,7 +150,8 @@ namespace nets::base
 
     void LogFile::getFileInfo(SizeType* fileSize, TimeType* createTime)
     {
-        struct stat fileInfo {};
+        using FileState = struct stat;
+        FileState fileInfo {};
         if (0 != ::fstat(::fileno(fp_), &fileInfo))
         {
             return;

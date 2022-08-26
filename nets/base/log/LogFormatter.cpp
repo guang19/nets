@@ -1,10 +1,11 @@
 //
-// Created by YangGuang on 2022/4/21.
+// Created by guang19
 //
 
 #include "nets/base/log/LogFormatter.h"
 
 #include "nets/base/CommonMacro.h"
+#include "nets/base/exception/DateTimeFormatException.h"
 #include "nets/base/ThreadHelper.h"
 
 namespace nets::base
@@ -18,15 +19,14 @@ namespace nets::base
         /**
          * log time cache
          */
-        __thread struct tm CacheTMS {};
+        __thread ILogFormatter::Tm CacheTMS {};
         __thread Timestamp::TimeType CacheSeconds {0};
     } // namespace
 
-    void DefaultLogFormatter::formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream)
+    void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBufferStream& logBufferStream)
     {
-        struct tm tmS {};
-        const Timestamp& logTime = logMessage.getLogTime();
-        Timestamp::TimeType seconds = logTime.secsFromTimestamp();
+        Tm tmS {};
+        Timestamp::TimeType seconds = logTime.seconds();
         if (seconds != CacheSeconds)
         {
             if (nullptr == localtime_r(&seconds, &tmS))
@@ -40,13 +40,18 @@ namespace nets::base
         {
             tmS = CacheTMS;
         }
-        char timeBuf[32] = {0};
+        char timeBuf[27] = {0};
         // check return value to circumvent [-Werror=format-truncation]
-        ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%03d", tmS.tm_year + 1900, tmS.tm_mon + 1,
-                   tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsFromTimestamp()) < 0
-            ? throw ::std::runtime_error("DefaultLogFormatter formatLogMessage snprintf format truncation exception")
+        ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%06ld", tmS.tm_year + 1900, tmS.tm_mon + 1,
+                   tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsPartOfTimestamp()) < 0
+            ? THROW_FMT(DateTimeFormatException, "DefaultLogFormatter format log time")
             : UNUSED(0);
         logBufferStream << timeBuf;
+    }
+
+    void DefaultLogFormatter::formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream)
+    {
+        formatLogTime(logMessage.getLogTime(), logBufferStream);
         logBufferStream << " [" << currentTid() << "] ";
         logBufferStream << LogLevelName[logMessage.getLogLevel()] << ' ';
         logBufferStream << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";

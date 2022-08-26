@@ -1,5 +1,5 @@
 //
-// Created by YangGuang on 2022/4/2.
+// Created by guang19
 //
 
 #include <gtest/gtest.h>
@@ -19,8 +19,8 @@ TEST(LogBufferStreamTest, Append)
     ASSERT_EQ(stream.buffer().writerIndex(), 3U);
     ::int8_t i8 = 8;
     stream << i8 << &i8 << 12345678U << NAN << 123123.5123123F << 123123123.12312312 << "我爱你 I love you";
-    ::printf("%u\n", stream.buffer().writerIndex());
-    ::printf("%u\n", stream.buffer().writableBytes());
+    ::printf("%lu\n", stream.buffer().writerIndex());
+    ::printf("%lu\n", stream.buffer().writableBytes());
 }
 
 TEST(ByteStreamTest, AppendBuffer)
