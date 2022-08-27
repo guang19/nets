@@ -91,10 +91,10 @@ namespace nets::base
             fp_ = nullptr;
         }
         using Tm = struct tm;
-        Tm tmS {};
-        ::localtime_r(&now, &tmS);
+        Tm tms {};
+        ::localtime_r(&now, &tms);
         char newFilename[32] = {0};
-        ::strftime(newFilename, sizeof(newFilename), LogFileNamePattern, &tmS);
+        ::strftime(newFilename, sizeof(newFilename), LogFileNamePattern, &tms);
         ::strcat(newFilename, LogFileSuffix);
         if (!dir_.empty())
         {

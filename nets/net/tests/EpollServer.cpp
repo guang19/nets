@@ -33,7 +33,7 @@ void testWriteV(::int32_t sockFd)
     }
     SSizeType bytes = socket::writev(sockFd, iovecs, count);
     Timestamp end(Timestamp::now());
-    ::printf("expectedBytes=%ld, write bytes=%ld, writeV=%d\n", expectedBytes, bytes, end.microsFromTimestamp() - start.microsFromTimestamp());
+    ::printf("expectedBytes=%ld, write bytes=%ld, writeV=%ld\n", expectedBytes, bytes, end.microsPartOfTimestamp() - start.microsPartOfTimestamp());
 }
 
 ::int32_t main(::int32_t argc, char** argv)

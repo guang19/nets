@@ -19,31 +19,31 @@ namespace nets::base
         /**
          * log time cache
          */
-        __thread ILogFormatter::Tm CacheTMS {};
+        __thread ILogFormatter::Tm CacheTms {};
         __thread Timestamp::TimeType CacheSeconds {0};
     } // namespace
 
     void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBufferStream& logBufferStream)
     {
-        Tm tmS {};
-        Timestamp::TimeType seconds = logTime.seconds();
+        Tm tms {};
+        Timestamp::TimeType seconds = logTime.secondsSinceEpoch();
         if (seconds != CacheSeconds)
         {
-            if (nullptr == localtime_r(&seconds, &tmS))
+            if (nullptr == localtime_r(&seconds, &tms))
             {
-                MEMZERO(&tmS, sizeof(tmS));
+                MEMZERO(&tms, sizeof(tms));
             }
             CacheSeconds = seconds;
-            CacheTMS = tmS;
+            CacheTms = tms;
         }
         else
         {
-            tmS = CacheTMS;
+            tms = CacheTms;
         }
         char timeBuf[27] = {0};
         // check return value to circumvent [-Werror=format-truncation]
-        ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%06ld", tmS.tm_year + 1900, tmS.tm_mon + 1,
-                   tmS.tm_mday, tmS.tm_hour, tmS.tm_min, tmS.tm_sec, logTime.microsPartOfTimestamp()) < 0
+        ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%06ld", tms.tm_year + 1900, tms.tm_mon + 1,
+                   tms.tm_mday, tms.tm_hour, tms.tm_min, tms.tm_sec, logTime.microsPartOfTimestamp()) < 0
             ? THROW_FMT(DateTimeFormatException, "DefaultLogFormatter format log time")
             : UNUSED(0);
         logBufferStream << timeBuf;

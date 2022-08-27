@@ -12,8 +12,8 @@ namespace nets::base
 
     Timer::Timer(TimeType expiredTime) : Timer(expiredTime, false, 0) {}
 
-    Timer::Timer(TimeType expiredTime, bool repeat, TimeType interval)
-        : id_(TimerIdGenerator++), expiredTime_(expiredTime), repeat_(repeat), interval_(interval)
+    Timer::Timer(TimeType expiredTime, ::int32_t repeatTimes, TimeType interval)
+        : id_(TimerIdGenerator++), expiredTime_(expiredTime), repeatTimes_(repeatTimes), interval_(interval)
     {
     }
 } // namespace nets::base

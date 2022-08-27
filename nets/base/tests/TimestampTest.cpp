@@ -8,23 +8,38 @@
 
 using namespace nets::base;
 
-TEST(TimestampTest, BasicUse)
-{
-    Timestamp t1(Timestamp::now());
-    ::printf("%ld\n", t1.seconds());
-    ::printf("%ld\n", t1.microseconds());
-    ::printf("%ld\n", ::time(nullptr));
-}
-
 TEST(TimestampTest, Compare)
 {
     Timestamp start(Timestamp::now());
     ::sleep(1);
     Timestamp end(Timestamp::now());
     ASSERT_GE(end, start);
-    ASSERT_GE((end.seconds() - start.seconds()), 1);
-    ::printf("%ld\n", end.seconds() - start.seconds());
+    ASSERT_GE((end.secondsSinceEpoch() - start.secondsSinceEpoch()), 1);
+    ::printf("%ld\n", end.secondsSinceEpoch() - start.secondsSinceEpoch());
     ::printf("%ld\n", end.microsPartOfTimestamp() - start.microsPartOfTimestamp());
+}
+
+TEST(TimestampTest, PlusTest)
+{
+    Timestamp now(Timestamp::now());
+    ::printf("%ld\n", now.secondsSinceEpoch());
+    Timestamp after = now.plusSeconds(3);
+    ASSERT_EQ((after.secondsSinceEpoch() - now.secondsSinceEpoch()), 3);
+    ::printf("%ld\n", after.secondsSinceEpoch());
+}
+
+TEST(TimestampTest, MinusTest)
+{
+    Timestamp start(Timestamp::now());
+    ::sleep(1);
+    Timestamp end(Timestamp::now());
+    ::printf("%ld\n", start.secondsSinceEpoch());
+    ::printf("%ld\n", end.secondsSinceEpoch());
+    Timestamp diff = end.minusMicroseconds(start.microsecondsSinceEpoch());
+    ASSERT_GE(diff.secondsSinceEpoch(), 1);
+    ASSERT_GE(diff.millisecondsSinceEpoch(), 1000);
+    ASSERT_GE(diff.microsecondsSinceEpoch(), 1000000);
+    ::printf("%ld\n", diff.microsPartOfTimestamp());
 }
 
 int main(int argc, char** argv)

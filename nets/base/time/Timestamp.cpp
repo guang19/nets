@@ -11,29 +11,31 @@ namespace nets::base
 {
     Timestamp::Timestamp() : Timestamp(0) {}
 
-    Timestamp::Timestamp(TimeType secondsSinceEpoch) : Timestamp(secondsSinceEpoch, 0) {}
+    Timestamp::Timestamp(TimeType microsecondsSinceEpoch) : microsecondsSinceEpoch_(microsecondsSinceEpoch) {}
+
+    Timestamp::Timestamp(const TimeVal& tmv) : Timestamp(tmv.tv_sec, tmv.tv_usec) {}
 
     Timestamp::Timestamp(TimeType secondsSinceEpoch, TimeType microseconds)
-        : timestampSinceEpoch_((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
+        : microsecondsSinceEpoch_((secondsSinceEpoch * MicrosecondsPerSecond) + microseconds)
     {
     }
 
     Timestamp::Timestamp(const Timestamp& other)
     {
-        timestampSinceEpoch_ = other.timestampSinceEpoch_;
+        microsecondsSinceEpoch_ = other.microsecondsSinceEpoch_;
     }
 
     Timestamp::Timestamp(Timestamp&& other) noexcept
     {
-        timestampSinceEpoch_ = other.timestampSinceEpoch_;
-        other.timestampSinceEpoch_ = 0;
+        microsecondsSinceEpoch_ = other.microsecondsSinceEpoch_;
+        other.microsecondsSinceEpoch_ = 0;
     }
 
     Timestamp& Timestamp::operator=(const Timestamp& other)
     {
         if (this != &other)
         {
-            timestampSinceEpoch_ = other.timestampSinceEpoch_;
+            microsecondsSinceEpoch_ = other.microsecondsSinceEpoch_;
         }
         return *this;
     }
@@ -42,22 +44,21 @@ namespace nets::base
     {
         if (this != &other)
         {
-            timestampSinceEpoch_ = other.timestampSinceEpoch_;
-            other.timestampSinceEpoch_ = 0;
+            microsecondsSinceEpoch_ = other.microsecondsSinceEpoch_;
+            other.microsecondsSinceEpoch_ = 0;
         }
         return *this;
     }
 
     void Timestamp::swap(Timestamp&& other)
     {
-        ::std::swap(timestampSinceEpoch_, other.timestampSinceEpoch_);
+        ::std::swap(microsecondsSinceEpoch_, other.microsecondsSinceEpoch_);
     }
 
     Timestamp Timestamp::now()
     {
-        using TimeVal = struct timeval;
-        TimeVal tmV {};
-        ::gettimeofday(&tmV, nullptr);
-        return Timestamp(tmV.tv_sec, tmV.tv_usec);
+        TimeVal tmv {};
+        ::gettimeofday(&tmv, nullptr);
+        return Timestamp(tmv);
     }
 } // namespace nets::base
