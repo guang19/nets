@@ -9,7 +9,7 @@
 #include <sys/epoll.h>
 #include <vector>
 
-#include "nets/base/time/Timestamp.h"
+#include "nets/base/Timestamp.h"
 #include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/Socket.h"
 

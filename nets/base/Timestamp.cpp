@@ -2,7 +2,7 @@
 // Created by guang19
 //
 
-#include "nets/base/time/Timestamp.h"
+#include "nets/base/Timestamp.h"
 
 #include <sys/time.h>
 #include <utility>
@@ -20,14 +20,10 @@ namespace nets::base
     {
     }
 
-    Timestamp::Timestamp(const Timestamp& other)
-    {
-        microsecondsSinceEpoch_ = other.microsecondsSinceEpoch_;
-    }
+    Timestamp::Timestamp(const Timestamp& other) : microsecondsSinceEpoch_(other.microsecondsSinceEpoch_) {}
 
-    Timestamp::Timestamp(Timestamp&& other) noexcept
+    Timestamp::Timestamp(Timestamp&& other) noexcept : microsecondsSinceEpoch_(other.microsecondsSinceEpoch_)
     {
-        microsecondsSinceEpoch_ = other.microsecondsSinceEpoch_;
         other.microsecondsSinceEpoch_ = 0;
     }
 

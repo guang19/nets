@@ -6,7 +6,7 @@
 #define NETS_BASE_LOG_MESSAGE_H
 
 #include "nets/base/log/LogBufferStream.h"
-#include "nets/base/time/Timestamp.h"
+#include "nets/base/Timestamp.h"
 
 namespace nets::base
 {

@@ -7,7 +7,7 @@
 #include <thread>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
-#include "nets/base/time/Timestamp.h"
+#include "nets/base/Timestamp.h"
 
 using namespace nets::base;
 
