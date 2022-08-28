@@ -19,6 +19,30 @@ namespace nets::base
         using TimeType = ::time_t;
         using IdType = ::int64_t;
         using TimerCallback = ::std::function<void()>;
+        static constexpr ::int32_t RepeatForever = -1;
+
+    public:
+        class TimerId : public Copyable
+        {
+        public:
+            TimerId();
+            explicit TimerId(IdType key, const Timestamp& value);
+            ~TimerId() = default;
+
+            TimerId(const TimerId& other);
+            TimerId(TimerId&& other) noexcept;
+            TimerId& operator=(const TimerId& other);
+            TimerId& operator=(TimerId&& other) noexcept;
+
+            inline bool operator==(const TimerId& other) const
+            {
+                return key_ == other.key_ && value_ == other.value_;
+            }
+
+        public:
+            IdType key_ {-1};
+            Timestamp value_ {0};
+        };
 
     public:
         Timer();
@@ -26,39 +50,52 @@ namespace nets::base
         explicit Timer(const Timestamp& expiredTime, TimeType interval);
         explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval);
 
-        // in order to allow map store Timer, needs to support move
+        // in order to allow map store timer, needs to support move
         Timer(Timer&& other) noexcept;
         Timer& operator=(Timer&& other) noexcept;
 
         ~Timer() = default;
 
-        IdType id() const
+        inline const TimerId& id() const
         {
             return id_;
         }
 
-        const Timestamp& expiredTime() const
+        inline const Timestamp& expiredTime() const
         {
-            return expiredTime_;
+            return id_.value_;
+        }
+
+        inline void setExpiredTime(const Timestamp& expiredTime)
+        {
+            id_.value_ = expiredTime;
+        }
+
+        inline bool isRepeatable() const
+        {
+            return repeatTimes_ == RepeatForever || repeatTimes_ > 0;
+        }
+
+        inline void setRepeatTimes(::int32_t repeatTimes)
+        {
+            repeatTimes_ = repeatTimes;
+        }
+
+        inline bool isExpired() const
+        {
+            return Timestamp::now() >= id_.value_;
         }
 
         template <typename Fn, typename... Args>
-        void setTimerCallback(Fn&& fn, Args&&... args)
+        inline void setTimerCallback(Fn&& fn, Args&&... args)
         {
             timerCallback_ = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         }
 
-        void onTimer()
-        {
-            if (timerCallback_ != nullptr && (repeatTimes_ > 0 || repeatTimes_ == RepeatForever))
-            {
-                timerCallback_();
-            }
-        }
+        void onTimer();
 
     private:
-        IdType id_ {-1};
-        Timestamp expiredTime_ {0};
+        TimerId id_ {};
         ::int32_t repeatTimes_ {0};
         // unit: milliseconds
         TimeType interval_ {0};
@@ -66,8 +103,6 @@ namespace nets::base
 
         // not thread-safe, because there is usually only one TimerManager to manage Timer
         static ::std::atomic<IdType> TimerIdGenerator;
-
-        static constexpr ::int32_t RepeatForever = -1;
     };
 } // namespace nets::base
 

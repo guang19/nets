@@ -11,10 +11,11 @@
 
 namespace nets::base
 {
+
     class TimerManager : Noncopyable
     {
     public:
-        using IdType = typename Timer::IdType;
+        using TimerId = Timer::TimerId;
         using TimerCallback = typename Timer::TimerCallback;
         using TimeType = typename Timer::TimeType;
         using TimerContainer = ::std::multimap<Timestamp, Timer>;
@@ -25,46 +26,42 @@ namespace nets::base
 
     public:
         template <typename Fn, typename... Args>
-        IdType addTimer(const Timestamp& expiredTime, Fn&& fn, Args&&... args);
+        TimerId addNonRepeatableTimer(const Timestamp& expiredTime, Fn&& fn, Args&&... args);
 
         template <typename Fn, typename... Args>
-        IdType addTimer(const Timestamp& expiredTime, TimeType interval, Fn&& fn, Args&&... args);
+        TimerId addRepeatableTimer(const Timestamp& expiredTime, TimeType interval, Fn&& fn, Args&&... args);
 
         template <typename Fn, typename... Args>
-        IdType addTimer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, Fn&& fn, Args&&... args);
+        TimerId addTimer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, Fn&& fn, Args&&... args);
 
-        template <typename Fn, typename... Args>
-        IdType addTimer(Timer* timer, Fn&& fn, Args&&... args);
-
-        void removeTimer(IdType timerId);
+        void removeTimer(const TimerId& timerId);
+        void update();
 
     private:
         TimerContainer timers_ {};
     };
 
     template <typename Fn, typename... Args>
-    TimerManager::IdType TimerManager::addTimer(const Timestamp& expiredTime, Fn&& fn, Args&&... args)
+    TimerManager::TimerId TimerManager::addNonRepeatableTimer(const Timestamp& expiredTime, Fn&& fn, Args&&... args)
     {
-        return addTimer(new Timer(expiredTime), ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
+        return addTimer(expiredTime, 1, 0, ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
 
     template <typename Fn, typename... Args>
-    TimerManager::IdType TimerManager::addTimer(const Timestamp& expiredTime, TimeType interval, Fn&& fn, Args&&... args)
+    TimerManager::TimerId TimerManager::addRepeatableTimer(const Timestamp& expiredTime, TimeType interval, Fn&& fn, Args&&... args)
     {
-        return addTimer(new Timer(expiredTime, interval), ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
+        return addTimer(expiredTime, Timer::RepeatForever, interval, ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
 
     template <typename Fn, typename... Args>
-    TimerManager::IdType TimerManager::addTimer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval,
+    TimerManager::TimerId TimerManager::addTimer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval,
                                                 Fn&& fn, Args&&... args)
     {
-        return addTimer(new Timer(expiredTime, repeatTimes, interval), ::std::forward<Fn>(fn),
-                        ::std::forward<Args>(args)...);
-    }
-
-    template <typename Fn, typename... Args>
-    TimerManager::IdType TimerManager::addTimer(Timer* timer, Fn&& fn, Args&&... args)
-    {
+        Timer timer(expiredTime, repeatTimes, interval);
+        TimerId timerId = timer.id();
+        timer.setTimerCallback(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
+        timers_.insert(::std::make_pair(expiredTime, ::std::move(timer)));
+        return timerId;
     }
 } // namespace nets::base
 

@@ -80,7 +80,7 @@ namespace nets::base
         }
 
         template <typename Fn, typename... Args>
-        bool execute(Fn&& func, Args&&... args);
+        bool execute(Fn&& fn, Args&&... args);
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Please note that if you need to use the returned future to get the result of the task execution, please use
@@ -107,12 +107,12 @@ namespace nets::base
         template <typename Fn, typename... Args,
                   typename HasRet = typename ::std::enable_if<
                       !::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
-        ::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> submit(Fn&& func, Args&&... args);
+        ::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> submit(Fn&& fn, Args&&... args);
 
         template <typename Fn, typename... Args,
                   typename HasRet = typename ::std::enable_if<
                       ::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
-        ::std::future<void> submit(Fn&& func, Args&&... args);
+        ::std::future<void> submit(Fn&& fn, Args&&... args);
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private:
@@ -168,9 +168,9 @@ namespace nets::base
     };
 
     template <typename Fn, typename... Args>
-    bool ThreadPool::execute(Fn&& func, Args&&... args)
+    bool ThreadPool::execute(Fn&& fn, Args&&... args)
     {
-        TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+        TaskType task = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         IntType ctl = ctl_.load();
         assert(isRunning(ctl));
         if (isShutdown(ctl))
@@ -202,12 +202,12 @@ namespace nets::base
     }
 
     template <typename Fn, typename... Args, typename HasRet>
-    ::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> ThreadPool::submit(Fn&& func, Args&&... args)
+    ::std::future<typename ::std::invoke_result<Fn&&, Args&&...>::type> ThreadPool::submit(Fn&& fn, Args&&... args)
     {
         using RetType = typename ::std::invoke_result<Fn&&, Args&&...>::type;
         auto promise = ::std::make_shared<::std::promise<RetType>>();
         auto future = promise->get_future();
-        ::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+        ::std::function<RetType()> task = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
         {
             assert(promise.use_count() > 0);
@@ -238,11 +238,11 @@ namespace nets::base
     }
 
     template <typename Fn, typename... Args, typename HasRet>
-    ::std::future<void> ThreadPool::submit(Fn&& func, Args&&... args)
+    ::std::future<void> ThreadPool::submit(Fn&& fn, Args&&... args)
     {
         auto promise = ::std::make_shared<::std::promise<void>>();
         auto future = promise->get_future();
-        TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
+        TaskType task = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         TaskType promiseTask = [this, promise, f = ::std::move(task)]() mutable
         {
             try
