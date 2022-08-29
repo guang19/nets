@@ -8,8 +8,8 @@ namespace nets::base
 {
     void TimerManager::removeTimer(const TimerId& timerId)
     {
-        // The timer to be deleted may have already been executed, and it's time may have been incremented, so start searching
-        // from lower
+        // The timer to be deleted may have already been executed, and it's time may have been incremented, so start
+        // searching from lower
         auto lower = timers_.lower_bound(timerId.value_);
         for (auto it = lower; it != timers_.end(); ++it)
         {
@@ -31,13 +31,14 @@ namespace nets::base
         }
         for (auto it = timers_.begin(); it != timers_.end();)
         {
+            Timestamp now(Timestamp::now());
             // if current timer is not expired, following timers do not need to e checked
-            if (!it->second.isExpired())
+            if (!it->second.isExpired(now))
             {
                 return;
             }
             // trigger
-            it->second.onTimer();
+            it->second.onTimer(now);
             // if timer can still trigger next time
             if (it->second.isRepeatable())
             {

@@ -40,23 +40,25 @@ namespace nets::base
         return *this;
     }
 
-    Timer::Timer() : Timer(Timestamp(0)) {}
+    Timer::Timer(const Timestamp& expiredTime) : Timer(expiredTime, 1, 0, false) {}
 
-    Timer::Timer(const Timestamp& expiredTime) : Timer(expiredTime, 1, 0) {}
+    Timer::Timer(const Timestamp& expiredTime, TimeType interval, bool fixedDelay)
+        : Timer(expiredTime, RepeatForever, interval, fixedDelay)
+    {
+    }
 
-    Timer::Timer(const Timestamp& expiredTime, TimeType interval) : Timer(expiredTime, RepeatForever, interval) {}
-
-    Timer::Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval)
-        : id_(TimerIdGenerator++, expiredTime), repeatTimes_(repeatTimes), interval_(interval)
+    Timer::Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay)
+        : id_(TimerIdGenerator++, expiredTime), repeatTimes_(repeatTimes), interval_(interval), fixedDelay_(fixedDelay)
     {
     }
 
     Timer::Timer(Timer&& other) noexcept
-        : id_(::std::move(other.id_)), repeatTimes_(other.repeatTimes_), interval_(other.interval_),
+        : id_(::std::move(other.id_)), repeatTimes_(other.repeatTimes_), interval_(other.interval_), fixedDelay_(other.fixedDelay_),
           timerCallback_(::std::move(other.timerCallback_))
     {
         other.repeatTimes_ = 0;
         other.interval_ = 0;
+        other.fixedDelay_ = false;
     }
 
     Timer& Timer::operator=(Timer&& other) noexcept
@@ -69,16 +71,24 @@ namespace nets::base
             timerCallback_ = ::std::move(other.timerCallback_);
             other.repeatTimes_ = 0;
             other.interval_ = 0;
+            other.fixedDelay_ = false;
         }
         return *this;
     }
 
-    void Timer::onTimer()
+    void Timer::onTimer(const Timestamp& now)
     {
         if (timerCallback_ != nullptr && isRepeatable())
         {
             timerCallback_();
-            id_.value_ = id_.value_.plusMilliseconds(interval_);
+            if (fixedDelay_)
+            {
+                id_.value_ = now.plusMilliseconds(interval_);
+            }
+            else
+            {
+                id_.value_ = id_.value_.plusMilliseconds(interval_);
+            }
             if (repeatTimes_ > 0)
             {
                 --repeatTimes_;

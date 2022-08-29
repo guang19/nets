@@ -2,7 +2,6 @@
 // Created by guang19
 //
 
-
 #include <gtest/gtest.h>
 
 #include "nets/base/timer/TimerManager.h"
@@ -38,24 +37,45 @@ TEST_F(TimerManagerTest, ExecuteNonRepeatable)
     timerManager->addNonRepeatableTimer(Timestamp::now().plusSeconds(2), testFunc);
     while (1)
     {
-        ::sleep(1);
+        ::sleep(2);
         timerManager->update();
     }
 }
 
 TEST_F(TimerManagerTest, ExecuteRepeatable)
 {
-    timerManager->addRepeatableTimer(Timestamp::now().plusMilliseconds(2000), 2000, testFunc);
-    for (::int32_t i = 0; i <= 6; ++i)
+    timerManager->addFixedRateTimer(Timestamp::now().plusMilliseconds(1000), 2000, testFunc);
+    ::sleep(1);
+    for (::int32_t i = 0; i < 6; ++i)
     {
-        ::sleep(2);
         timerManager->update();
+        ::sleep(2);
+    }
+}
+
+void fixedDelayFunc()
+{
+    ::printf("execute fixedDelayFunc start\n");
+    ::fflush(stdout);
+    ::sleep(2);
+    ::printf("execute fixedDelayFunc end\n");
+    ::fflush(stdout);
+}
+
+TEST_F(TimerManagerTest, ExecuteFixedDelay)
+{
+    timerManager->addFixedDelayTimer(Timestamp::now().plusMilliseconds(2000), 3000, fixedDelayFunc);
+    ::sleep(2);
+    for (::int32_t i = 0; i < 6; ++i)
+    {
+        timerManager->update();
+        ::sleep(3);
     }
 }
 
 TEST_F(TimerManagerTest, ExecuteLimitRepeatable)
 {
-    timerManager->addTimer(Timestamp::now().plusMilliseconds(2000), 3, 2000, testFunc);
+    timerManager->addTimer(Timestamp::now().plusMilliseconds(2000), 3, 2000, false, testFunc);
     while (1)
     {
         ::sleep(2);
@@ -65,8 +85,8 @@ TEST_F(TimerManagerTest, ExecuteLimitRepeatable)
 
 void func1()
 {
-        ::printf("execute func1\n");
-        ::fflush(stdout);
+    ::printf("execute func1\n");
+    ::fflush(stdout);
 }
 
 void func2()
@@ -77,16 +97,17 @@ void func2()
 
 TEST_F(TimerManagerTest, Remove)
 {
-    TimerId timerId1 = timerManager->addRepeatableTimer(Timestamp::now().plusMilliseconds(2000), 2000, func1);
-    TimerId timerId2 = timerManager->addRepeatableTimer(Timestamp::now().plusMilliseconds(2000), 2000, func2);
+    timerManager->addFixedRateTimer(Timestamp::now().plusMilliseconds(1000), 2000, func1);
+    TimerId timerId2 = timerManager->addFixedRateTimer(Timestamp::now().plusMilliseconds(1000), 2000, func2);
+    ::sleep(1);
     for (::int32_t i = 0; i < 6; ++i)
     {
-        ::sleep(2);
         timerManager->update();
         if (i == 3)
         {
             timerManager->removeTimer(timerId2);
         }
+        ::sleep(2);
     }
 }
 

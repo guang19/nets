@@ -45,16 +45,14 @@ namespace nets::base
         };
 
     public:
-        Timer();
         explicit Timer(const Timestamp& expiredTime);
-        explicit Timer(const Timestamp& expiredTime, TimeType interval);
-        explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval);
+        explicit Timer(const Timestamp& expiredTime, TimeType interval, bool fixedDelay = false);
+        explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay = false);
+        ~Timer() = default;
 
         // in order to allow map store timer, needs to support move
         Timer(Timer&& other) noexcept;
         Timer& operator=(Timer&& other) noexcept;
-
-        ~Timer() = default;
 
         inline const TimerId& id() const
         {
@@ -81,9 +79,9 @@ namespace nets::base
             repeatTimes_ = repeatTimes;
         }
 
-        inline bool isExpired() const
+        inline bool isExpired(const Timestamp& now) const
         {
-            return Timestamp::now() >= id_.value_;
+            return now >= id_.value_;
         }
 
         template <typename Fn, typename... Args>
@@ -92,13 +90,14 @@ namespace nets::base
             timerCallback_ = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         }
 
-        void onTimer();
+        void onTimer(const Timestamp& now);
 
     private:
         TimerId id_ {};
         ::int32_t repeatTimes_ {0};
         // unit: milliseconds
         TimeType interval_ {0};
+        bool fixedDelay_ {false};
         TimerCallback timerCallback_ {};
 
         // not thread-safe, because there is usually only one TimerManager to manage Timer

@@ -15,6 +15,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
+#include "nets/base/timer/TimerManager.h"
 #include "nets/net/core/NotifyChannel.h"
 
 namespace nets::net
