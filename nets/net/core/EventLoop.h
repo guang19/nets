@@ -38,6 +38,11 @@ namespace nets::net
         using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
         using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
         using PollerPtr = ::std::unique_ptr<Poller>;
+        using TimeType = typename nets::base::TimerManager::TimeType;
+        using Timer = typename nets::base::Timer;
+        using TimerId = typename nets::base::Timer::TimerId;
+        using Timestamp = typename nets::base::Timestamp;
+        using TimerManager = typename nets::base::TimerManager;
         using EventLoopRawPtr = EventLoop*;
 
     public:
@@ -71,7 +76,19 @@ namespace nets::net
                       ::std::is_void<typename ::std::invoke_result<Fn&&, Args&&...>::type>::value>::type>
         ::std::future<void> submit(Fn&& func, Args&&... args);
 
+        // time unit: ms
+        template <typename Fn, typename... Args>
+        TimerId schedule(TimeType delay, Fn&& fn, Args&&... args);
 
+        // time unit: ms
+        template <typename Fn, typename... Args>
+        TimerId scheduleAtFixedRate(TimeType initDelay, TimeType interval, Fn&& fn, Args&&... args);
+
+        // time unit: ms
+        template <typename Fn, typename... Args>
+        TimerId scheduleAtFixedDelay(TimeType initDelay, TimeType delay, Fn&& fn, Args&&... args);
+
+        void cancelScheduleTask(const TimerId& timerId);
 
     private:
         void runPendingTasks();
@@ -83,6 +100,7 @@ namespace nets::net
         ChannelMap channels_ {};
         ChannelList activeChannels_ {nullptr};
         PollerPtr poller_ {nullptr};
+        TimerManager timerManager_ {};
         TaskList pendingTasks_ {};
         MutexType mutex_ {};
     };
@@ -180,6 +198,27 @@ namespace nets::net
         assert(2 == promise.use_count());
         execute(::std::move(promiseTask));
         return future;
+    }
+
+    template <typename Fn, typename... Args>
+    EventLoop::TimerId EventLoop::schedule(TimeType delay, Fn&& fn, Args&&... args)
+    {
+        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(delay), 1, 0, false, ::std::forward<Fn>(fn),
+                                      ::std::forward<Args>(args)...);
+    }
+
+    template <typename Fn, typename... Args>
+    EventLoop::TimerId EventLoop::scheduleAtFixedRate(TimeType initDelay, TimeType interval, Fn&& fn, Args&&... args)
+    {
+        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::RepeatForever, interval, false,
+                                      ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
+    }
+
+    template <typename Fn, typename... Args>
+    EventLoop::TimerId EventLoop::scheduleAtFixedDelay(TimeType initDelay, TimeType delay, Fn&& fn, Args&&... args)
+    {
+        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::RepeatForever, delay, true,
+                                      ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
 } // namespace nets::net
 

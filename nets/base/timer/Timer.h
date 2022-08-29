@@ -45,8 +45,6 @@ namespace nets::base
         };
 
     public:
-        explicit Timer(const Timestamp& expiredTime);
-        explicit Timer(const Timestamp& expiredTime, TimeType interval, bool fixedDelay = false);
         explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay = false);
         ~Timer() = default;
 

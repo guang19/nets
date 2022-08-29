@@ -8,7 +8,7 @@
 
 using namespace nets::base;
 
-using TimerId = Timer::TimerId;
+using TimerId = typename Timer::TimerId;
 
 class TimerManagerTest : public testing::Test
 {
@@ -34,7 +34,7 @@ void testFunc()
 
 TEST_F(TimerManagerTest, ExecuteNonRepeatable)
 {
-    timerManager->addNonRepeatableTimer(Timestamp::now().plusSeconds(2), testFunc);
+    timerManager->addTimer(Timestamp::now().plusSeconds(2), 1, 1000, false, testFunc);
     while (1)
     {
         ::sleep(2);
@@ -44,7 +44,7 @@ TEST_F(TimerManagerTest, ExecuteNonRepeatable)
 
 TEST_F(TimerManagerTest, ExecuteRepeatable)
 {
-    timerManager->addFixedRateTimer(Timestamp::now().plusMilliseconds(1000), 2000, testFunc);
+    timerManager->addTimer(Timestamp::now().plusSeconds(1), Timer::RepeatForever, 2000, false, testFunc);
     ::sleep(1);
     for (::int32_t i = 0; i < 6; ++i)
     {
@@ -64,7 +64,7 @@ void fixedDelayFunc()
 
 TEST_F(TimerManagerTest, ExecuteFixedDelay)
 {
-    timerManager->addFixedDelayTimer(Timestamp::now().plusMilliseconds(2000), 3000, fixedDelayFunc);
+    timerManager->addTimer(Timestamp::now().plusMilliseconds(2000), 6, 3000, true, fixedDelayFunc);
     ::sleep(2);
     for (::int32_t i = 0; i < 6; ++i)
     {
@@ -97,8 +97,9 @@ void func2()
 
 TEST_F(TimerManagerTest, Remove)
 {
-    timerManager->addFixedRateTimer(Timestamp::now().plusMilliseconds(1000), 2000, func1);
-    TimerId timerId2 = timerManager->addFixedRateTimer(Timestamp::now().plusMilliseconds(1000), 2000, func2);
+    timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::RepeatForever, 2000, false, func1);
+    TimerId timerId2 =
+        timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::RepeatForever, 2000, false, func2);
     ::sleep(1);
     for (::int32_t i = 0; i < 6; ++i)
     {

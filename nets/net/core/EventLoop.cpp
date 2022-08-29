@@ -20,7 +20,7 @@ namespace nets::net
 
     EventLoop::EventLoop()
         : running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)),
-          poller_(PollerFactory::getPoller(this))
+          activeChannels_(), poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), mutex_()
     {
         assert(CurrentThreadEventLoop == nullptr);
         // one loop per thread
@@ -100,6 +100,11 @@ namespace nets::net
         poller_->deregisterChannel(channel.get());
         channels_.erase(channel->fd());
         assert(channels_.find(channel->fd()) == channels_.end());
+    }
+
+    void EventLoop::cancelScheduleTask(const TimerId& timerId)
+    {
+        timerManager_.removeTimer(timerId);
     }
 
     void EventLoop::runPendingTasks()

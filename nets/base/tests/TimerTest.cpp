@@ -10,12 +10,12 @@
 
 using namespace nets::base;
 
-using TimerId = Timer::TimerId;
+using TimerId = typename Timer::TimerId;
 
 TEST(TimerTest, CopyMove)
 {
     Timestamp now(Timestamp::now());
-    Timer timer1(now.plusSeconds(3));
+    Timer timer1(now.plusSeconds(3), 1, 1, false);
     Timer timer2(::std::move(timer1));
     ASSERT_EQ(timer1.id().key_, -1);
     ASSERT_EQ(timer1.expiredTime().secondsSinceEpoch(), 0);
@@ -28,19 +28,19 @@ TEST(TimerTest, MultiMapStore)
     Timestamp now(Timestamp::now());
     ::printf("now=%ld\n", now.microsecondsSinceEpoch());
 
-    Timer timer1(now.plusSeconds(1));
+    Timer timer1(now.plusSeconds(1), 1, 1000, false);
     TimerId timerId1 = timer1.id();
     ::printf("%ld\t", timer1.expiredTime().microsecondsSinceEpoch());
 
-    Timer timer2(now.plusSeconds(2));
+    Timer timer2(now.plusSeconds(2), 1, 1000, false);
     TimerId timerId2 = timer2.id();
     ::printf("%ld\t", timer2.expiredTime().microsecondsSinceEpoch());
 
-    Timer timer3(now.plusSeconds(3));
+    Timer timer3(now.plusSeconds(3), 1, 1000, false);
     TimerId timerId3 = timer3.id();
     ::printf("%ld\t", timer3.expiredTime().microsecondsSinceEpoch());
 
-    Timer timer4(now.plusSeconds(3));
+    Timer timer4(now.plusSeconds(3), 1, 1000, false);
     TimerId timerId4 = timer4.id();
     ::printf("%ld\n", timer4.expiredTime().microsecondsSinceEpoch());
 

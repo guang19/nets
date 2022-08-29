@@ -40,13 +40,6 @@ namespace nets::base
         return *this;
     }
 
-    Timer::Timer(const Timestamp& expiredTime) : Timer(expiredTime, 1, 0, false) {}
-
-    Timer::Timer(const Timestamp& expiredTime, TimeType interval, bool fixedDelay)
-        : Timer(expiredTime, RepeatForever, interval, fixedDelay)
-    {
-    }
-
     Timer::Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay)
         : id_(TimerIdGenerator++, expiredTime), repeatTimes_(repeatTimes), interval_(interval), fixedDelay_(fixedDelay)
     {
