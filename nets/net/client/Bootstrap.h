@@ -50,7 +50,7 @@ namespace nets::net
         ChannelInitializationCallback channelInitializationCallback_ {};
 
         // default retry interval
-        static constexpr TimeType DefaultRetryInterval = 1000;
+        static constexpr TimeType DefaultRetryInterval = 2000;
     };
 } // namespace nets::net
 

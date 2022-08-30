@@ -110,14 +110,18 @@ namespace nets::net
             if (totalBytes == static_cast<SizeType>(writtenBytes))
             {
                 writeBuffer_.clear();
-                try
-                {
-                    channelHandlerPipeline_.fireChannelWriteComplete();
-                }
-                catch (const ::std::exception& exception)
-                {
-                    channelHandlerPipeline_.fireExceptionCaught(exception);
-                }
+                eventLoop_->addTask(
+                    [self = ::std::dynamic_pointer_cast<SocketChannel>(shared_from_this())]()
+                    {
+                        try
+                        {
+                            self->channelHandlerPipeline_.fireChannelWriteComplete();
+                        }
+                        catch (const ::std::exception& exception)
+                        {
+                            self->channelHandlerPipeline_.fireExceptionCaught(exception);
+                        }
+                    });
                 if (state_ == ChannelState::HALF_CLOSE)
                 {
                     channelInActive();
@@ -323,14 +327,18 @@ namespace nets::net
         // write complete
         if (remainingBytes == 0)
         {
-            try
-            {
-                channelHandlerPipeline_.fireChannelWriteComplete();
-            }
-            catch (const ::std::exception& exception)
-            {
-                channelHandlerPipeline_.fireExceptionCaught(exception);
-            }
+            eventLoop_->addTask(
+                [self = ::std::dynamic_pointer_cast<SocketChannel>(shared_from_this())]()
+                {
+                    try
+                    {
+                        self->channelHandlerPipeline_.fireChannelWriteComplete();
+                    }
+                    catch (const ::std::exception& exception)
+                    {
+                        self->channelHandlerPipeline_.fireExceptionCaught(exception);
+                    }
+                });
         }
         // tcp send buffer size less than length,only part of it was sent
         else
@@ -501,7 +509,7 @@ namespace nets::net
             {
                 channel->deregister();
                 assert(!channel->isRegistered());
-                assert(channel.use_count() == 1);
+                assert(channel.use_count() > 0);
             });
     }
 

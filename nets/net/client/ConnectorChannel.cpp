@@ -204,5 +204,10 @@ namespace nets::net
         state_ = ConnectionState::DISCONNECTED;
         socket::closeFd(sockFd_);
         // schedule reconnect
+        eventLoop_->schedule(retryInterval_,
+                             [self = ::std::dynamic_pointer_cast<ConnectorChannel>(shared_from_this())]()
+                             {
+                                 self->connect(self->peerAddress_);
+                             });
     }
 } // namespace nets::net
