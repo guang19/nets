@@ -68,15 +68,18 @@ namespace nets::net
         connectorChannel->setRetry(retry_);
         connectorChannel->setRetryInterval(retryInterval_);
 
-        ChannelOptionList channelOptions {::std::move(channelOptions_)};
+        ChannelOptionList channelOptions {};
+        channelOptions.swap(channelOptions_);
         assert(channelOptions_.empty());
         connectorChannel->setChannelOptions(channelOptions);
 
-        ChannelHandlerList channelHandlers {::std::move(channelHandlers_)};
+        ChannelHandlerList channelHandlers {};
+        channelHandlers.swap(channelHandlers_);
         assert(channelHandlers_.empty());
         connectorChannel->setChannelHandlers(channelHandlers);
 
-        ChannelInitializationCallback channelInitializationCallback {::std::move(channelInitializationCallback_)};
+        ChannelInitializationCallback channelInitializationCallback {};
+        channelInitializationCallback.swap(channelInitializationCallback_);
         assert(channelInitializationCallback_ == nullptr);
         connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
     }

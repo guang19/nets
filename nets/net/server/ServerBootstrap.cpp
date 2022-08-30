@@ -90,17 +90,23 @@ namespace nets::net
             {
                 return childLoopGroup_->next();
             });
-        ChannelOptionList channelOptions {::std::move(channelOptions_)};
+        ChannelOptionList channelOptions {};
+        channelOptions.swap(channelOptions_);
         assert(channelOptions_.empty());
         serverSocketChannel->setChannelOptions(channelOptions);
-        ChannelOptionList childOptions {::std::move(childOptions_)};
+
+        ChannelOptionList childOptions {};
+        childOptions.swap(childOptions_);
         assert(childOptions_.empty());
         serverSocketChannel->setChildOptions(childOptions);
 
-        ChannelHandlerList childHandlers {::std::move(childHandlers_)};
+        ChannelHandlerList childHandlers {};
+        childHandlers.swap(childHandlers_);
         assert(childHandlers_.empty());
         serverSocketChannel->setChildHandlers(childHandlers);
-        ChannelInitializationCallback childInitializationCallback {::std::move(childInitializationCallback_)};
+
+        ChannelInitializationCallback childInitializationCallback {};
+        childInitializationCallback.swap(childInitializationCallback_);
         assert(childInitializationCallback_ == nullptr);
         serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
         serverSocketChannel->bind(localAddress);
