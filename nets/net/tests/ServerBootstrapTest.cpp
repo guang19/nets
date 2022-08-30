@@ -2,11 +2,11 @@
 // Created by guang19
 //
 
-#include <limits>
-
 #include "nets/net/server/ServerBootstrap.h"
+#include "nets/base/Timestamp.h"
 
 using namespace nets::net;
+using namespace nets::base;
 
 class TestServerChannelHandler : public ChannelHandler
 {
@@ -17,6 +17,7 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
                    << " client address:" << peerAddress.toString();
+        channelContext.channel().eventLoop()->scheduleAtFixedRate(2000, 2000, ::std::bind(&TestServerChannelHandler::testScheduleTask, this));
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
@@ -38,6 +39,12 @@ public:
     void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
     {
         LOGS_DEBUG << "Server exceptionCaught";
+    }
+
+private:
+    void testScheduleTask()
+    {
+        LOGS_DEBUG << "testScheduleTask, now=" << Timestamp::now().millisecondsSinceEpoch();
     }
 
 private:

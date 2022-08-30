@@ -18,6 +18,7 @@ namespace nets::net
     class Poller : nets::base::Noncopyable
     {
     public:
+        using TimeType = ::time_t;
         using ChannelRawPtr = Channel*;
         using ChannelList = ::std::vector<ChannelRawPtr>;
         using EventLoopRawPtr = EventLoop*;
@@ -27,7 +28,7 @@ namespace nets::net
         virtual ~Poller() = default;
 
     public:
-        virtual void poll(::int32_t timeoutMs, ChannelList& activeChannels) = 0;
+        virtual void poll(TimeType timeoutMs, ChannelList& activeChannels) = 0;
         virtual bool registerChannel(ChannelRawPtr channel) = 0;
         virtual bool modifyChannel(ChannelRawPtr channel) = 0;
         virtual bool deregisterChannel(ChannelRawPtr channel) = 0;

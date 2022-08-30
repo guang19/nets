@@ -24,7 +24,7 @@ namespace nets::net
         ~EpollPoller() override;
 
     public:
-        void poll(::int32_t timeoutMs, ChannelList& activeChannels) override;
+        void poll(TimeType timeoutMs, ChannelList& activeChannels) override;
         bool registerChannel(ChannelRawPtr channel) override;
         bool modifyChannel(ChannelRawPtr channel) override;
         bool deregisterChannel(ChannelRawPtr channel) override;

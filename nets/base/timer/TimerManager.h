@@ -32,6 +32,8 @@ namespace nets::base
         void removeTimer(const TimerId& timerId);
         void update();
 
+        TimeType nearestTimerRemainingExpiredTime();
+
     private:
         TimerContainer timers_ {};
     };

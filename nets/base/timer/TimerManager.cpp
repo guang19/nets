@@ -62,4 +62,22 @@ namespace nets::base
             }
         }
     }
+
+    TimerManager::TimeType TimerManager::nearestTimerRemainingExpiredTime()
+    {
+        auto begin = timers_.begin();
+        if (begin == timers_.end())
+        {
+            return -1;
+        }
+        Timestamp now(Timestamp::now());
+        if (begin->first <= now)
+        {
+            return 0;
+        }
+        else
+        {
+            return begin->first.minusMicroseconds(now.microsecondsSinceEpoch()).millisecondsSinceEpoch();
+        }
+    }
 } // namespace nets::base

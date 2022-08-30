@@ -13,14 +13,15 @@ namespace nets::net
 {
     namespace
     {
-        using TimeType = ::time_t;
-        constexpr TimeType PollTimeout = 5000;
+        constexpr EventLoop::TimeType DefaultPollTimeout = 3000;
+        constexpr EventLoop::TimeType MinimumPollTimeout = 1;
         __thread EventLoop::EventLoopRawPtr CurrentThreadEventLoop = nullptr;
     } // namespace
 
     EventLoop::EventLoop()
         : running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)),
-          activeChannels_(), poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), mutex_()
+          activeChannels_(), poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(),
+          runningPendingTasks_(false), mutex_()
     {
         assert(CurrentThreadEventLoop == nullptr);
         // one loop per thread
@@ -50,13 +51,15 @@ namespace nets::net
         running_ = true;
         while (running_)
         {
+            timerManager_.update();
             runPendingTasks();
-            activeChannels_.clear();
-            poller_->poll(PollTimeout, activeChannels_);
+            TimeType timeout = ::std::min(DefaultPollTimeout, timerManager_.nearestTimerRemainingExpiredTime());
+            poller_->poll(::std::max(MinimumPollTimeout, timeout), activeChannels_);
             for (auto& channel: activeChannels_)
             {
                 channel->handleEvent();
             }
+            activeChannels_.clear();
         }
         assert(!running_);
     }
@@ -110,6 +113,7 @@ namespace nets::net
     void EventLoop::runPendingTasks()
     {
         TaskList tmpTasks {};
+        runningPendingTasks_ = true;
         {
             LockGuardType lock(mutex_);
             tmpTasks.swap(pendingTasks_);
@@ -118,5 +122,6 @@ namespace nets::net
         {
             t();
         }
+        runningPendingTasks_ = false;
     }
 } // namespace nets::net

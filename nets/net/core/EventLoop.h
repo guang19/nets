@@ -54,8 +54,7 @@ namespace nets::net
         void shutdown();
         bool isInCurrentEventLoop() const;
         EventLoopRawPtr currentEventLoop() const;
-
-    public:
+        
         bool registerChannel(const ChannelPtr& channel);
         bool modifyChannel(const ChannelPtr& channel);
         void deregisterChannel(const ChannelPtr& channel);
@@ -102,6 +101,7 @@ namespace nets::net
         PollerPtr poller_ {nullptr};
         TimerManager timerManager_ {};
         TaskList pendingTasks_ {};
+        bool runningPendingTasks_ {false};
         MutexType mutex_ {};
     };
 
@@ -113,25 +113,22 @@ namespace nets::net
             LockGuardType lock(mutex_);
             pendingTasks_.push_back(::std::move(task));
         }
-        notifier_->notify();
+        if (!isInCurrentEventLoop() || runningPendingTasks_)
+        {
+            notifier_->notify();
+        }
     }
 
     template <typename Fn, typename... Args>
     void EventLoop::execute(Fn&& func, Args&&... args)
     {
-        TaskType task = ::std::bind(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
         if (isInCurrentEventLoop())
         {
-            task();
+            ::std::forward<Fn>(func)(::std::forward<Args>(args)...);
         }
         else
         {
-            {
-                LockGuardType lock(mutex_);
-                pendingTasks_.push_back(::std::move(task));
-            }
-            // notify poller
-            notifier_->notify();
+            addTask(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
         }
     }
 

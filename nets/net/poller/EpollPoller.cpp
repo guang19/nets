@@ -33,7 +33,7 @@ namespace nets::net
         socket::closeFd(epollFd_);
     }
 
-    void EpollPoller::poll(::int32_t timeoutMs, ChannelList& activeChannels)
+    void EpollPoller::poll(TimeType timeoutMs, ChannelList& activeChannels)
     {
         SizeType size = events_.size();
         ::int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<::int32_t>(size), timeoutMs);
@@ -53,11 +53,11 @@ namespace nets::net
         }
         else if (numOfReadyEvents < 0)
         {
-//            LOGS_ERROR << "EpollPoller epoll failed";
+            LOGS_ERROR << "EpollPoller epoll error,errNum=" << socket::getSockError(epollFd_) ;
         }
         else
         {
-            // LOGS_DEBUG << "EpollPoller epoll wait no event";
+//            LOGS_DEBUG << "EpollPoller epoll wait no event";
         }
     }
 
