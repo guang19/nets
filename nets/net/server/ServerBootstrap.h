@@ -40,12 +40,18 @@ namespace nets::net
     private:
         void doBind(const InetSockAddress& localAddress);
 
+    protected:
+        void handleSignal(SignalHandler::SignoType signo) override;
+
     private:
         ::std::atomic_bool running_ {false};
         ChannelOptionList childOptions_ {};
         ChannelHandlerList childHandlers_ {};
         ChannelInitializationCallback childInitializationCallback_ {};
         EventLoopGroupPtr childLoopGroup_ {nullptr};
+
+        static constexpr char ChildEventLoopGroupName[] = "ChildLoopGroup";
+        static const IntType DefaultNumbOfChildEventLoops;
     };
 } // namespace nets::net
 

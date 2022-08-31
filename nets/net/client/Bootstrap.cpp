@@ -83,4 +83,19 @@ namespace nets::net
         assert(channelInitializationCallback_ == nullptr);
         connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
     }
+
+    void Bootstrap::handleSignal(base::SignalHandler::SignoType signo)
+    {
+        switch (signo)
+        {
+            case SIGPIPE:
+                break;
+            case SIGHUP:
+            case SIGINT:
+            case SIGQUIT:
+            case SIGTERM:
+                // terminate connection
+                break;
+        }
+    }
 } // namespace nets::net

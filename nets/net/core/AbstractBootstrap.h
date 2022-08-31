@@ -5,6 +5,7 @@
 #ifndef NETS_NET_ABSTRACT_BOOTSTRAP_H
 #define NETS_NET_ABSTRACT_BOOTSTRAP_H
 
+#include "nets/base/SignalHandler.h"
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/EventLoopGroup.h"
 
@@ -15,6 +16,7 @@ namespace nets::net
     {
     public:
         using IntType = typename EventLoopGroup::IntType;
+        using SignalHandler = typename nets::base::SignalHandler;
         using ChannelOptionList = ::std::vector<ChannelOption>;
         using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
 
@@ -22,6 +24,8 @@ namespace nets::net
         explicit AbstractBootstrap() : channelOptions_()
         {
             mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(NumbOfMainEventLoops, MainEventLoopGroupName);
+            SignalHandler::initSignalHandler(
+                ::std::bind(&AbstractBootstrap<B>::handleSignal, this, ::std::placeholders::_1));
         }
 
         ~AbstractBootstrap() = default;
@@ -31,6 +35,12 @@ namespace nets::net
         {
             channelOptions_.emplace_back(channelOption.sockOpt(), value);
             return static_cast<B&>(*this);
+        }
+
+    protected:
+        virtual void handleSignal(SignalHandler::SignoType signo)
+        {
+            LOGS_DEBUG << "AbstractBootstrap handleSignal signo=" << signo;
         }
 
     protected:

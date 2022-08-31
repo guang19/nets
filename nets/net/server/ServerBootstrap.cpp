@@ -4,15 +4,9 @@
 
 #include "nets/net/server/ServerBootstrap.h"
 
-#include <unistd.h>
-
 namespace nets::net
 {
-    namespace
-    {
-        constexpr char ChildEventLoopGroupName[] = "ChildLoopGroup";
-        const ServerBootstrap::IntType DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
-    } // namespace
+    const ServerBootstrap::IntType ServerBootstrap::DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
 
     ServerBootstrap::ServerBootstrap(IntType numOfChildEventLoops)
         : AbstractBootstrap(), running_(false), childOptions_(), childHandlers_(), childInitializationCallback_()
@@ -110,5 +104,20 @@ namespace nets::net
         assert(childInitializationCallback_ == nullptr);
         serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
         serverSocketChannel->bind(localAddress);
+    }
+
+    void ServerBootstrap::handleSignal(SignalHandler::SignoType signo)
+    {
+        switch (signo)
+        {
+            case SIGPIPE:
+                break;
+            case SIGHUP:
+            case SIGINT:
+            case SIGQUIT:
+            case SIGTERM:
+                // terminate server
+                break;
+        }
     }
 } // namespace nets::net
