@@ -17,7 +17,8 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
                    << " client address:" << peerAddress.toString();
-//        timerId_ = channelContext.channel().eventLoop()->scheduleAtFixedRate(2000, 2000, ::std::bind(&TestServerChannelHandler::testScheduleTask, this));
+        //        timerId_ = channelContext.channel().eventLoop()->scheduleAtFixedRate(2000, 2000,
+        //        ::std::bind(&TestServerChannelHandler::testScheduleTask, this));
     }
 
     void channelDisconnect(ChannelContext& channelContext) override
@@ -30,17 +31,17 @@ public:
         LOGS_DEBUG << "Server recv client message is:" << message.toString();
         channelContext.write(message);
         channelContext.write(message);
-//        channelContext.write(message);
-//        if (message.readInt8() == 1)
-//        {
-//            channelContext.channel().eventLoop()->cancelScheduleTask(timerId_);
-//        }
+        //        channelContext.write(message);
+        //        if (message.readInt8() == 1)
+        //        {
+        //            channelContext.channel().eventLoop()->cancelScheduleTask(timerId_);
+        //        }
     }
 
     void channelWriteComplete(ChannelContext& channelContext) override
     {
         LOGS_DEBUG << "Server channelWriteComplete";
-//        channelContext.write("server channelWriteComplete");
+        //        channelContext.write("server channelWriteComplete");
     }
 
     void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
@@ -61,8 +62,8 @@ private:
 
 int main(int argc, char** argv)
 {
-    ServerBootstrap serverBootstrap(8);
-    serverBootstrap.option(NTcpSendBuffer, 1024)
+    ServerBootstrap(8)
+        .option(NTcpSendBuffer, 1024)
         .option(NTcpRecvBuffer, 1024)
         //        .childHandler(new TestServerChannelHandler())
         .childHandler(

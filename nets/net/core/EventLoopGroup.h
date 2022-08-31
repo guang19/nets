@@ -58,6 +58,8 @@ namespace nets::net
             return next()->submit(::std::forward<Fn>(func), ::std::forward<Args>(args)...);
         }
 
+        void shutdown();
+
     private:
         SizeType nextLoop_ {0};
         IntType numOfEventLoops_ {0};

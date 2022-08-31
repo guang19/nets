@@ -62,4 +62,8 @@ namespace nets::net
         }
         return nextEventLoop;
     }
+
+    void EventLoopGroup::shutdown()
+    {
+    }
 } // namespace nets::net

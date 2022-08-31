@@ -46,8 +46,8 @@ namespace nets::base
     }
 
     Timer::Timer(Timer&& other) noexcept
-        : id_(::std::move(other.id_)), repeatTimes_(other.repeatTimes_), interval_(other.interval_), fixedDelay_(other.fixedDelay_),
-          timerCallback_(::std::move(other.timerCallback_))
+        : id_(::std::move(other.id_)), repeatTimes_(other.repeatTimes_), interval_(other.interval_),
+          fixedDelay_(other.fixedDelay_), timerCallback_(::std::move(other.timerCallback_))
     {
         other.repeatTimes_ = 0;
         other.interval_ = 0;

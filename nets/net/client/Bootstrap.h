@@ -43,7 +43,6 @@ namespace nets::net
         void doConnect(const InetSockAddress& serverAddress);
         void initConnectorChannel(::std::shared_ptr<ConnectorChannel>& connectorChannel);
 
-    protected:
         void handleSignal(SignalHandler::SignoType signo) override;
 
     private:

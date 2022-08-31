@@ -41,8 +41,8 @@ namespace nets::net
 
     Bootstrap& Bootstrap::connect(const InetSockAddress& serverAddress)
     {
-        mainLoopGroup_->loopEach();
-        auto future = mainLoopGroup_->submit(
+        mainLoopGroup_.loopEach();
+        auto future = mainLoopGroup_.submit(
             [this, serverAddress]()
             {
                 doConnect(serverAddress);
@@ -53,12 +53,12 @@ namespace nets::net
 
     void Bootstrap::sync()
     {
-        mainLoopGroup_->syncEach();
+        mainLoopGroup_.syncEach();
     }
 
     void Bootstrap::doConnect(const InetSockAddress& serverAddress)
     {
-        auto connectorChannel = ::std::make_shared<ConnectorChannel>(mainLoopGroup_->next());
+        auto connectorChannel = ::std::make_shared<ConnectorChannel>(mainLoopGroup_.next());
         initConnectorChannel(connectorChannel);
         connectorChannel->connect(serverAddress);
     }

@@ -18,12 +18,10 @@ namespace nets::net
         using IntType = typename EventLoopGroup::IntType;
         using SignalHandler = typename nets::base::SignalHandler;
         using ChannelOptionList = ::std::vector<ChannelOption>;
-        using EventLoopGroupPtr = ::std::unique_ptr<EventLoopGroup>;
 
     public:
-        explicit AbstractBootstrap() : channelOptions_()
+        explicit AbstractBootstrap() : channelOptions_(), mainLoopGroup_(NumbOfMainEventLoops, MainEventLoopGroupName)
         {
-            mainLoopGroup_ = ::std::make_unique<EventLoopGroup>(NumbOfMainEventLoops, MainEventLoopGroupName);
             SignalHandler::initSignalHandler(
                 ::std::bind(&AbstractBootstrap<B>::handleSignal, this, ::std::placeholders::_1));
         }
@@ -45,7 +43,7 @@ namespace nets::net
 
     protected:
         ChannelOptionList channelOptions_ {};
-        EventLoopGroupPtr mainLoopGroup_ {nullptr};
+        EventLoopGroup mainLoopGroup_;
 
     private:
         static constexpr IntType NumbOfMainEventLoops = 1;

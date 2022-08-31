@@ -9,10 +9,10 @@ namespace nets::net
     const ServerBootstrap::IntType ServerBootstrap::DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
 
     ServerBootstrap::ServerBootstrap(IntType numOfChildEventLoops)
-        : AbstractBootstrap(), running_(false), childOptions_(), childHandlers_(), childInitializationCallback_()
+        : AbstractBootstrap(), childOptions_(), childHandlers_(), childInitializationCallback_(),
+          childLoopGroup_(numOfChildEventLoops == 0 ? DefaultNumbOfChildEventLoops : numOfChildEventLoops,
+                          ChildEventLoopGroupName)
     {
-        numOfChildEventLoops = numOfChildEventLoops == 0 ? DefaultNumbOfChildEventLoops : numOfChildEventLoops;
-        childLoopGroup_ = ::std::make_unique<EventLoopGroup>(numOfChildEventLoops, ChildEventLoopGroupName);
     }
 
     ServerBootstrap& ServerBootstrap::childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
@@ -53,9 +53,9 @@ namespace nets::net
 
     ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& localAddress)
     {
-        mainLoopGroup_->loopEach();
-        auto future = mainLoopGroup_->submit(
-            [this, localAddress]
+        mainLoopGroup_.loopEach();
+        auto future = mainLoopGroup_.submit(
+            [this, &localAddress]
             {
                 doBind(localAddress);
             });
@@ -65,24 +65,18 @@ namespace nets::net
 
     void ServerBootstrap::sync()
     {
-        if (running_)
-        {
-            LOGS_DEBUG << "ServerBootstrap has started";
-            return;
-        }
-        running_ = true;
-        childLoopGroup_->loopEach();
-        mainLoopGroup_->syncEach();
-        childLoopGroup_->syncEach();
+        childLoopGroup_.loopEach();
+        mainLoopGroup_.syncEach();
+        childLoopGroup_.syncEach();
     }
 
     void ServerBootstrap::doBind(const InetSockAddress& localAddress)
     {
-        auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_->next());
+        auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_.next());
         serverSocketChannel->setNextEventLoopFn(
             [this]() -> EventLoopGroup::EventLoopRawPtr
             {
-                return childLoopGroup_->next();
+                return childLoopGroup_.next();
             });
         ChannelOptionList channelOptions {};
         channelOptions.swap(channelOptions_);
