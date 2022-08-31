@@ -35,10 +35,28 @@ namespace nets::net
             return static_cast<B&>(*this);
         }
 
-    protected:
-        virtual void handleSignal(SignalHandler::SignoType signo)
+        virtual void shutdown() = 0;
+        virtual bool isShutdown() const = 0;
+
+    private:
+        void handleSignal(SignalHandler::SignoType signo)
         {
-            LOGS_DEBUG << "AbstractBootstrap handleSignal signo=" << signo;
+            switch (signo)
+            {
+                case SIGPIPE:
+                    break;
+                case SIGHUP:
+                case SIGINT:
+                case SIGQUIT:
+                case SIGTERM:
+                {
+                    if (!isShutdown())
+                    {
+                        shutdown();
+                    }
+                    break;
+                }
+            }
         }
 
     protected:

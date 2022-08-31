@@ -15,8 +15,7 @@ namespace nets::net
     public:
         using IntType = typename nets::base::ThreadPool::IntType;
         using StringType = ::std::string;
-        using ThreadPoolType = nets::base::ThreadPool;
-        using ThreadPoolPtr = ::std::unique_ptr<ThreadPoolType>;
+        using ThreadPoolType = typename nets::base::ThreadPool;
         using EventLoopRawPtr = EventLoop*;
         using EventLoopPtr = ::std::unique_ptr<EventLoop>;
         using EventLoopList = ::std::vector<EventLoopPtr>;
@@ -59,13 +58,14 @@ namespace nets::net
         }
 
         void shutdown();
+        bool isShutdown() const;
 
     private:
         SizeType nextLoop_ {0};
         IntType numOfEventLoops_ {0};
         EventLoopList eventLoops_ {};
         FutureList futures_ {};
-        ThreadPoolPtr eventLoopThreadPool_ {nullptr};
+        ThreadPoolType eventLoopThreadPool_;
         MutexType mutex_ {};
         ConditionVariableType cv_ {};
     };

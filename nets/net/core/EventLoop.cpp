@@ -42,7 +42,7 @@ namespace nets::net
     {
         deregisterChannel(notifier_);
         CurrentThreadEventLoop = nullptr;
-        LOGS_DEBUG << "EventLoop one event loop is destroyed in thread " << threadId_;
+        LOGS_INFO << "EventLoop one event loop is destroyed in thread " << threadId_;
     }
 
     void EventLoop::run()
@@ -53,7 +53,9 @@ namespace nets::net
         {
             timerManager_.update();
             runPendingTasks();
-            TimeType timeout = ::std::min(DefaultPollTimeout, timerManager_.nearestTimerRemainingExpiredTime());
+            TimeType remainingExpiredTime = timerManager_.nearestTimerRemainingExpiredTime();
+            TimeType timeout =
+                remainingExpiredTime == -1 ? DefaultPollTimeout : ::std::min(remainingExpiredTime, DefaultPollTimeout);
             poller_->poll(::std::max(MinimumPollTimeout, timeout), activeChannels_);
             for (auto& channel: activeChannels_)
             {
@@ -64,7 +66,15 @@ namespace nets::net
         assert(!running_);
     }
 
-    void EventLoop::shutdown() {}
+    void EventLoop::shutdown()
+    {
+        running_ = false;
+    }
+
+    bool EventLoop::isShutdown() const
+    {
+        return !running_;
+    }
 
     bool EventLoop::isInCurrentEventLoop() const
     {

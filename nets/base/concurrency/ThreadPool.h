@@ -164,7 +164,7 @@ namespace nets::base
         // low 30bits represent thread pool active thread size.
         ::std::atomic_uint32_t ctl_ {0};
         MutexType mutex_ {};
-        ConditionVariableType poolCV_ {};
+        ConditionVariableType cv_ {};
     };
 
     template <typename Fn, typename... Args>
@@ -175,7 +175,7 @@ namespace nets::base
         assert(isRunning(ctl));
         if (isShutdown(ctl))
         {
-            LOGS_WARN << "ThreadPool thread pool [" << name_ << "] is shutdown";
+            LOGS_WARN << "ThreadPool thread pool [" << name_ << "] has been shutdown";
             return false;
         }
         // if num of active threads less than num of corePoolSize

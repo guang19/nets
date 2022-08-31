@@ -37,10 +37,11 @@ namespace nets::net
 
         void sync();
 
+        void shutdown() override;
+        bool isShutdown() const override;
+
     private:
         void doBind(const InetSockAddress& localAddress);
-
-        void handleSignal(SignalHandler::SignoType signo) override;
 
     private:
         ChannelOptionList childOptions_ {};

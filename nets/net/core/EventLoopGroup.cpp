@@ -7,22 +7,18 @@
 namespace nets::net
 {
     EventLoopGroup::EventLoopGroup(IntType numOfEventLoops, const StringType& name)
-        : nextLoop_(0), numOfEventLoops_(numOfEventLoops), mutex_(), cv_()
+        : nextLoop_(0), numOfEventLoops_(numOfEventLoops), eventLoopThreadPool_(numOfEventLoops_, numOfEventLoops_, 0, name),
+          mutex_(), cv_()
     {
-        if (numOfEventLoops_ == 0)
-        {
-            THROW_FMT(::std::invalid_argument, "EventLoopGroup numOfEventLoops must be greater than 0,numOfEventLoops=%u", numOfEventLoops_);
-        }
         eventLoops_.reserve(numOfEventLoops_);
         futures_.reserve(numOfEventLoops);
-        eventLoopThreadPool_ = ::std::make_unique<ThreadPoolType>(numOfEventLoops_, numOfEventLoops_, 0, name);
     }
 
     void EventLoopGroup::loopEach()
     {
         for (IntType i = 0; i < numOfEventLoops_; ++i)
         {
-            futures_[i] = eventLoopThreadPool_->submit(
+            futures_[i] = eventLoopThreadPool_.submit(
                 [this]()
                 {
                     auto eventLoop = new EventLoop();
@@ -47,9 +43,9 @@ namespace nets::net
 
     void EventLoopGroup::syncEach()
     {
-        for (IntType i = 0; i < numOfEventLoops_; ++i)
+        for (const auto& future: futures_)
         {
-            futures_[i].wait();
+            future.wait();
         }
     }
 
@@ -65,5 +61,25 @@ namespace nets::net
 
     void EventLoopGroup::shutdown()
     {
+        for (auto& eventLoop: eventLoops_)
+        {
+            if (!eventLoop->isShutdown())
+            {
+                eventLoop->shutdown();
+            }
+        }
+        eventLoopThreadPool_.shutdown();
+    }
+
+    bool EventLoopGroup::isShutdown() const
+    {
+        for (const auto& eventLoop: eventLoops_)
+        {
+            if (!eventLoop->isShutdown())
+            {
+                return false;
+            }
+        }
+        return true;
     }
 } // namespace nets::net

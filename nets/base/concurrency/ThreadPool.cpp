@@ -28,7 +28,7 @@ namespace nets::base
                            TimeType idleKeepAliveTime)
         : corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize), idleKeepAliveTime_(idleKeepAliveTime),
           taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
-          mutex_(), poolCV_()
+          mutex_(), cv_()
     {
         if (corePoolSize_ == 0 || corePoolSize_ > maximumPoolSize_)
         {
@@ -66,7 +66,7 @@ namespace nets::base
         // notify blocking thread
         taskQueue_->notifyBlockingThread();
         UniqueLockType lock(mutex_);
-        poolCV_.wait(lock,
+        cv_.wait(lock,
                      [this]() -> bool
                      {
                          return numOfActiveThreads(ctl_) == 0;
@@ -126,7 +126,7 @@ namespace nets::base
             {
                 threadPool_.erase(it);
                 --ctl_;
-                poolCV_.notify_all();
+                cv_.notify_all();
                 return;
             }
         }
@@ -160,7 +160,7 @@ namespace nets::base
                 else
                 {
                     --ctl_;
-                    poolCV_.notify_all();
+                    cv_.notify_all();
                     return false;
                 }
             }

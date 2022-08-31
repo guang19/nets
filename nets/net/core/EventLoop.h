@@ -31,6 +31,8 @@ namespace nets::net
         using TaskList = ::std::vector<TaskType>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
+        using UniqueLockType = ::std::unique_lock<MutexType>;
+        using ConditionVariableType = ::std::condition_variable;
         using ChannelRawPtr = Channel*;
         using ChannelPtr = ::std::shared_ptr<Channel>;
         // cannot use shared_ptr
@@ -52,6 +54,7 @@ namespace nets::net
     public:
         void run();
         void shutdown();
+        bool isShutdown() const;
         bool isInCurrentEventLoop() const;
         EventLoopRawPtr currentEventLoop() const;
 
@@ -94,7 +97,7 @@ namespace nets::net
 
     private:
         ::std::atomic_bool running_ {false};
-        const ::pid_t threadId_ {0};
+        const ::pid_t threadId_ {-1};
         NotifyChannelPtr notifier_ {nullptr};
         ChannelMap channels_ {};
         ChannelList activeChannels_ {nullptr};
@@ -103,6 +106,7 @@ namespace nets::net
         TaskList pendingTasks_ {};
         bool runningPendingTasks_ {false};
         MutexType mutex_ {};
+        ConditionVariableType cv_ {};
     };
 
     template <typename Fn, typename... Args>

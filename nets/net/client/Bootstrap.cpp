@@ -83,19 +83,14 @@ namespace nets::net
         assert(channelInitializationCallback_ == nullptr);
         connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
     }
-
-    void Bootstrap::handleSignal(base::SignalHandler::SignoType signo)
+    void Bootstrap::shutdown()
     {
-        switch (signo)
-        {
-            case SIGPIPE:
-                break;
-            case SIGHUP:
-            case SIGINT:
-            case SIGQUIT:
-            case SIGTERM:
-                // terminate connection
-                break;
-        }
+        mainLoopGroup_.shutdown();
+        LOGS_INFO << "Bootstrap has been shutdown";
+    }
+
+    bool Bootstrap::isShutdown() const
+    {
+        return mainLoopGroup_.isShutdown();
     }
 } // namespace nets::net

@@ -100,18 +100,15 @@ namespace nets::net
         serverSocketChannel->bind(localAddress);
     }
 
-    void ServerBootstrap::handleSignal(SignalHandler::SignoType signo)
+    void ServerBootstrap::shutdown()
     {
-        switch (signo)
-        {
-            case SIGPIPE:
-                break;
-            case SIGHUP:
-            case SIGINT:
-            case SIGQUIT:
-            case SIGTERM:
-                // terminate server
-                break;
-        }
+        mainLoopGroup_.shutdown();
+        childLoopGroup_.shutdown();
+        LOGS_INFO << "ServerBootstrap has shutdown";
+    }
+
+    bool ServerBootstrap::isShutdown() const
+    {
+        return mainLoopGroup_.isShutdown() && childLoopGroup_.isShutdown();
     }
 } // namespace nets::net
