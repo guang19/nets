@@ -70,6 +70,23 @@ namespace nets::net
         childLoopGroup_.syncEach();
     }
 
+    void ServerBootstrap::shutdown()
+    {
+        if (!mainLoopGroup_.isShutdown())
+        {
+            mainLoopGroup_.shutdown();
+        }
+        if (!childLoopGroup_.isShutdown())
+        {
+            childLoopGroup_.shutdown();
+        }
+    }
+
+    bool ServerBootstrap::isShutdown() const
+    {
+        return mainLoopGroup_.isShutdown() && childLoopGroup_.isShutdown();
+    }
+
     void ServerBootstrap::doBind(const InetSockAddress& localAddress)
     {
         auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_.next());
@@ -98,17 +115,5 @@ namespace nets::net
         assert(childInitializationCallback_ == nullptr);
         serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
         serverSocketChannel->bind(localAddress);
-    }
-
-    void ServerBootstrap::shutdown()
-    {
-        mainLoopGroup_.shutdown();
-        childLoopGroup_.shutdown();
-        LOGS_INFO << "ServerBootstrap has shutdown";
-    }
-
-    bool ServerBootstrap::isShutdown() const
-    {
-        return mainLoopGroup_.isShutdown() && childLoopGroup_.isShutdown();
     }
 } // namespace nets::net

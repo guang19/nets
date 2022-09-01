@@ -35,8 +35,18 @@ namespace nets::net
             return static_cast<B&>(*this);
         }
 
-        virtual void shutdown() = 0;
-        virtual bool isShutdown() const = 0;
+        virtual void shutdown()
+        {
+            if (!mainLoopGroup_.isShutdown())
+            {
+                mainLoopGroup_.shutdown();
+            }
+        }
+
+        virtual bool isShutdown() const
+        {
+            return mainLoopGroup_.isShutdown();
+        }
 
     private:
         void handleSignal(SignalHandler::SignoType signo)
@@ -50,10 +60,7 @@ namespace nets::net
                 case SIGQUIT:
                 case SIGTERM:
                 {
-                    if (!isShutdown())
-                    {
-                        shutdown();
-                    }
+                    shutdown();
                     break;
                 }
             }

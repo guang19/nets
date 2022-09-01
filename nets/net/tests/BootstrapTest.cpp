@@ -88,7 +88,7 @@ int main(int argc, char** argv)
     Bootstrap()
         .option(NTcpSendBuffer, 1024)
         .option(NTcpRecvBuffer, 1024)
-        .retry(false, 3000)
+        .retry(true, 3000)
         //        .channelHandler(new TestClientChannelHandler())
         .channelHandler(
             [](SocketChannel& channel)
@@ -97,4 +97,5 @@ int main(int argc, char** argv)
             })
         .connect("127.0.0.1", 8080)
         .sync();
+    return 0;
 }

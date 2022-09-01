@@ -39,9 +39,6 @@ namespace nets::net
 
         void sync();
 
-        void shutdown() override;
-        bool isShutdown() const override;
-
     private:
         void doConnect(const InetSockAddress& serverAddress);
         void initConnectorChannel(::std::shared_ptr<ConnectorChannel>& connectorChannel);

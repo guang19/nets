@@ -37,11 +37,9 @@ namespace nets::net
         registerChannel(notifier_);
         LOGS_INFO << "EventLoop one event loop is created in thread " << threadId_;
     }
-#include <unistd.h>
 
     EventLoop::~EventLoop()
     {
-        sleep(2);
         deregisterChannel(notifier_);
         CurrentThreadEventLoop = nullptr;
         LOGS_INFO << "EventLoop one event loop is destroyed in thread " << threadId_;

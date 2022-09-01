@@ -86,15 +86,4 @@ namespace nets::net
         assert(channelInitializationCallback_ == nullptr);
         connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
     }
-
-    void Bootstrap::shutdown()
-    {
-        mainLoopGroup_.shutdown();
-        LOGS_INFO << "Bootstrap has been shutdown";
-    }
-
-    bool Bootstrap::isShutdown() const
-    {
-        return mainLoopGroup_.isShutdown();
-    }
 } // namespace nets::net

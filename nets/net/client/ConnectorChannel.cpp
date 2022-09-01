@@ -203,6 +203,7 @@ namespace nets::net
         assert(state_ != ConnectionState::CONNECTED);
         state_ = ConnectionState::DISCONNECTED;
         socket::closeFd(sockFd_);
+        sockFd_ = socket::InvalidFd;
         // schedule reconnect
         eventLoop_->schedule(retryInterval_,
                              [self = ::std::dynamic_pointer_cast<ConnectorChannel>(shared_from_this())]()
