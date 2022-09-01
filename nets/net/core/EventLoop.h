@@ -54,7 +54,7 @@ namespace nets::net
     public:
         void run();
         void shutdown();
-        bool isShutdown() const;
+        bool isRunning() const;
         bool isInCurrentEventLoop() const;
         EventLoopRawPtr currentEventLoop() const;
 

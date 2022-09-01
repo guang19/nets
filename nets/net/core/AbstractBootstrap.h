@@ -26,7 +26,7 @@ namespace nets::net
                 ::std::bind(&AbstractBootstrap<B>::handleSignal, this, ::std::placeholders::_1));
         }
 
-        ~AbstractBootstrap() = default;
+        virtual ~AbstractBootstrap() = default;
 
     public:
         B& option(const ChannelOption& channelOption, const ChannelOption::ValueType& value)

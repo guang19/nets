@@ -63,19 +63,18 @@ namespace nets::net
     {
         for (auto& eventLoop: eventLoops_)
         {
-            if (!eventLoop->isShutdown())
+            if (eventLoop->isRunning())
             {
                 eventLoop->shutdown();
             }
         }
-        eventLoopThreadPool_.shutdown();
     }
 
     bool EventLoopGroup::isShutdown() const
     {
         for (const auto& eventLoop: eventLoops_)
         {
-            if (!eventLoop->isShutdown())
+            if (eventLoop->isRunning())
             {
                 return false;
             }

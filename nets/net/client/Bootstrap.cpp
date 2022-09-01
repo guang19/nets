@@ -6,7 +6,10 @@
 
 namespace nets::net
 {
-    Bootstrap::Bootstrap() : retry_(false), retryInterval_(0), channelHandlers_(), channelInitializationCallback_() {}
+    Bootstrap::Bootstrap()
+        : AbstractBootstrap(), retry_(false), retryInterval_(0), channelHandlers_(), channelInitializationCallback_()
+    {
+    }
 
     Bootstrap& Bootstrap::channelHandler(ChannelHandlerRawPtr channelHandler)
     {
@@ -43,7 +46,7 @@ namespace nets::net
     {
         mainLoopGroup_.loopEach();
         auto future = mainLoopGroup_.submit(
-            [this, serverAddress]()
+            [this, &serverAddress]()
             {
                 doConnect(serverAddress);
             });
@@ -83,6 +86,7 @@ namespace nets::net
         assert(channelInitializationCallback_ == nullptr);
         connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
     }
+
     void Bootstrap::shutdown()
     {
         mainLoopGroup_.shutdown();

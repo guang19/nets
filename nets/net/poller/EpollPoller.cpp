@@ -159,11 +159,11 @@ namespace nets::net
         switch (opt)
         {
             case EPOLL_CTL_ADD:
-                return "add";
+                return "ADD";
             case EPOLL_CTL_MOD:
-                return "mod";
+                return "MOD";
             case EPOLL_CTL_DEL:
-                return "del";
+                return "DEL";
             default:
                 return "unknown epoll ctl operation";
         }
