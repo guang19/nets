@@ -1,6 +1,9 @@
 FILE(GLOB BaseHeaders ${PROJECT_SOURCE_DIR}/nets/base/*.h)
 INSTALL(FILES ${BaseHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base)
 
+FILE(GLOB ConfigReader ${PROJECT_SOURCE_DIR}/nets/base/config/*.h)
+INSTALL(FILES ${ConfigReader} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base/config)
+
 FILE(GLOB ConcurrencyHeaders ${PROJECT_SOURCE_DIR}/nets/base/concurrency/*.h)
 INSTALL(FILES ${ConcurrencyHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base/concurrency)
 
@@ -14,6 +17,7 @@ FILE(GLOB TimerHeaders ${PROJECT_SOURCE_DIR}/nets/base/timer/*.h)
 INSTALL(FILES ${TimerHeaders} DESTINATION ${PROJECT_BINARY_DIR}/include/nets/base/timer)
 
 FILE(GLOB BaseSrcs ${PROJECT_SOURCE_DIR}/nets/base/*.cpp
+        ${PROJECT_SOURCE_DIR}/nets/base/config/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/concurrency/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/exception/*.cpp
         ${PROJECT_SOURCE_DIR}/nets/base/log/*.cpp
