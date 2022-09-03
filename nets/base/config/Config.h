@@ -12,11 +12,13 @@
 
 namespace nets::base
 {
+    // k-v configuration
     class Config : public Copyable
     {
     public:
-        using StringType = ::std::string;
         using IntType = ::int32_t;
+        using LongType = ::int64_t;
+        using StringType = ::std::string;
         using ConfigMap = ::std::map<StringType, StringType>;
 
     public:
@@ -31,13 +33,19 @@ namespace nets::base
         void swap(Config&& other);
 
     public:
+        inline bool isEmpty() const
+        {
+            return config_.empty();
+        }
+
         StringType getString(const StringType& key, const StringType& defaultValue = "");
         IntType getInt(const StringType& key, IntType defaultValue = 0);
+        LongType getLong(const StringType& key, LongType defaultValue = 0L);
         bool getBool(const StringType& key, bool defaultValue = false);
 
     private:
         ConfigMap config_ {};
     };
-}
+} // namespace nets::base
 
 #endif // NETS_BASE_CONFIG_H

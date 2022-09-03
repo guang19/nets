@@ -55,6 +55,16 @@ namespace nets::base
         return defaultValue;
     }
 
+    Config::LongType Config::getLong(const StringType& key, LongType defaultValue)
+    {
+        auto it = config_.find(key);
+        if (it != config_.end())
+        {
+            return ::std::stol(it->second);
+        }
+        return defaultValue;
+    }
+
     bool Config::getBool(const StringType& key, bool defaultValue)
     {
         auto it = config_.find(key);

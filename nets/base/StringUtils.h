@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
+#include <string>
 
 namespace nets::base
 {
@@ -80,6 +82,8 @@ namespace nets::base
             ::std::reverse(buffer + 2, tmp);
             return tmp - buffer;
         }
+
+        void trim(::std::string& str);
     } // namespace utils
 } // namespace nets::base
 

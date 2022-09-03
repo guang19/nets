@@ -1,0 +1,36 @@
+//
+// Created by guang19
+//
+
+#include "nets/base/StringUtils.h"
+
+#include <cwctype>
+
+namespace nets::base
+{
+    namespace utils
+    {
+        void trim(::std::string& str)
+        {
+            if (!str.empty())
+            {
+                for (auto it = str.begin(); it != str.end(); ++it)
+                {
+                    if (!::iswspace(*it))
+                    {
+                        break;
+                    }
+                    str.erase(it);
+                }
+                for (auto it = str.end(); it != str.begin();)
+                {
+                    if (!::iswspace(*(--it)))
+                    {
+                        break;
+                    }
+                    str.erase(it);
+                }
+            }
+        }
+    } // namespace utils
+} // namespace nets::base

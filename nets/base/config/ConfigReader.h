@@ -23,7 +23,7 @@ namespace nets::base
         ~ConfigReader() = default;
 
     public:
-        static Config read(const StringType& file);
+        Config read(const StringType& file);
     };
 } // namespace nets::base
 
