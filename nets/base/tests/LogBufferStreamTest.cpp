@@ -4,9 +4,6 @@
 
 #include <gtest/gtest.h>
 
-#include <algorithm>
-#include <cmath>
-
 #include "nets/base/log/LogBufferStream.h"
 
 using namespace nets::base;
@@ -18,12 +15,13 @@ TEST(LogBufferStreamTest, Append)
     stream << "abc";
     ASSERT_EQ(stream.buffer().writerIndex(), 3U);
     ::int8_t i8 = 8;
-    stream << i8 << &i8 << 12345678U << NAN << 123123.5123123F << 123123123.12312312 << "我爱你 I love you";
+    stream << i8 << &i8 << 12345678U << NAN << 123123.5123123F << 123123123.123123123456 << "我爱你 I love you";
     ::printf("%lu\n", stream.buffer().writerIndex());
     ::printf("%lu\n", stream.buffer().writableBytes());
+    ::printf("%s\n", stream.buffer().array());
 }
 
-TEST(ByteStreamTest, AppendBuffer)
+TEST(LogBufferStreamTest, AppendBuffer)
 {
     LogBufferStream stream {};
     ASSERT_EQ(stream.buffer().writerIndex(), 0U);

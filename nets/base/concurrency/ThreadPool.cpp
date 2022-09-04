@@ -30,7 +30,7 @@ namespace nets::base
           taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
           mutex_(), cv_()
     {
-        if (corePoolSize_ == 0 || corePoolSize_ > maximumPoolSize_)
+        if (corePoolSize_ <= 0 || corePoolSize_ > maximumPoolSize_)
         {
             THROW_FMT(::std::invalid_argument,
                       "ThreadPool corePoolSize must be greater than 0 and maximumPoolSize must be greater than "

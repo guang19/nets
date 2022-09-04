@@ -18,7 +18,7 @@ namespace nets::net
 
     namespace
     {
-        using EventType = ::uint32_t;
+        using EventType = ::int32_t;
         // event type
         constexpr EventType ENoneEvent = 0;
         constexpr EventType EReadEvent = 0x01;

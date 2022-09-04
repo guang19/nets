@@ -25,7 +25,7 @@ namespace nets::net
                     {
                         LockGuardType lock(mutex_);
                         eventLoops_.push_back(::std::unique_ptr<EventLoop>(eventLoop));
-                        if (eventLoops_.size() == numOfEventLoops_)
+                        if (eventLoops_.size() == static_cast<SizeType>(numOfEventLoops_))
                         {
                             cv_.notify_one();
                         }
@@ -37,7 +37,7 @@ namespace nets::net
         cv_.wait(lock,
                  [this]() -> bool
                  {
-                     return eventLoops_.size() == numOfEventLoops_;
+                     return eventLoops_.size() == static_cast<SizeType>(numOfEventLoops_);
                  });
     }
 

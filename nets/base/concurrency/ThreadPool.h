@@ -28,7 +28,7 @@ namespace nets::base
         using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
     public:
-        using IntType = ::uint32_t;
+        using IntType = ::int32_t;
         using TimeType = ::time_t;
         using StringType = ::std::string;
         using TaskType = ::std::function<void()>;
@@ -162,7 +162,7 @@ namespace nets::base
         StringType name_ {};
         // high 2bits represent thread pool status: 00 - shutdown; 01-running.
         // low 30bits represent thread pool active thread size.
-        ::std::atomic_uint32_t ctl_ {0};
+        ::std::atomic<IntType> ctl_ {0};
         MutexType mutex_ {};
         ConditionVariableType cv_ {};
     };

@@ -6,31 +6,28 @@
 
 #include <cwctype>
 
-namespace nets::base
+namespace nets::base::utils
 {
-    namespace utils
+    void trim(::std::string& str)
     {
-        void trim(::std::string& str)
+        if (!str.empty())
         {
-            if (!str.empty())
+            for (auto it = str.begin(); it != str.end(); ++it)
             {
-                for (auto it = str.begin(); it != str.end(); ++it)
+                if (!::iswspace(*it))
                 {
-                    if (!::iswspace(*it))
-                    {
-                        break;
-                    }
-                    str.erase(it);
+                    break;
                 }
-                for (auto it = str.end(); it != str.begin();)
+                str.erase(it);
+            }
+            for (auto it = str.end(); it != str.begin();)
+            {
+                if (!::iswspace(*(--it)))
                 {
-                    if (!::iswspace(*(--it)))
-                    {
-                        break;
-                    }
-                    str.erase(it);
+                    break;
                 }
+                str.erase(it);
             }
         }
-    } // namespace utils
-} // namespace nets::base
+    }
+} // namespace nets::base::utils

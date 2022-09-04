@@ -225,7 +225,7 @@ namespace nets::net
     ::int64_t ByteBuffer::readInt64()
     {
         checkReadableBytes(Int64Bytes);
-        ::int64_t val = 0;
+        ::int64_t val = 0L;
         ::memcpy(&val, &buffer_[readerIndex_], Int64Bytes);
         adjustReaderIndex(Int64Bytes);
         return be64toh(val);

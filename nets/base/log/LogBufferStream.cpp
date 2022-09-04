@@ -6,57 +6,57 @@
 
 namespace nets::base
 {
-    LogBufferStream& LogBufferStream::operator<<(char c)
+    LogBufferStream& LogBufferStream::operator<<(char value)
     {
-        buffer_.writeBytes(&c, 1);
+        buffer_.writeBytes(&value, 1);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int8_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int8_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeInt8(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint8_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint8_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeUint8(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int16_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int16_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeInt16(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint16_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint16_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeUint16(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int32_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int32_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeInt32(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint32_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint32_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeUint32(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int64_t n)
+    LogBufferStream& LogBufferStream::operator<<(::int64_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeInt64(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint64_t n)
+    LogBufferStream& LogBufferStream::operator<<(::uint64_t value)
     {
-        buffer_.writeInteger(n);
+        buffer_.writeUint64(value);
         return *this;
     }
 
@@ -66,15 +66,15 @@ namespace nets::base
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(float f)
+    LogBufferStream& LogBufferStream::operator<<(float value)
     {
-        buffer_.writeFloat(f);
+        buffer_.writeFloat(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(double f)
+    LogBufferStream& LogBufferStream::operator<<(double value)
     {
-        buffer_.writeFloat(f);
+        buffer_.writeDouble(value);
         return *this;
     }
 

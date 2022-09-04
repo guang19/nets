@@ -27,18 +27,18 @@ namespace nets::base
         }
 
     public:
-        LogBufferStream& operator<<(char c);
-        LogBufferStream& operator<<(::int8_t n);
-        LogBufferStream& operator<<(::uint8_t n);
-        LogBufferStream& operator<<(::int16_t n);
-        LogBufferStream& operator<<(::uint16_t n);
-        LogBufferStream& operator<<(::int32_t n);
-        LogBufferStream& operator<<(::uint32_t n);
-        LogBufferStream& operator<<(::int64_t n);
-        LogBufferStream& operator<<(::uint64_t n);
+        LogBufferStream& operator<<(char value);
+        LogBufferStream& operator<<(::int8_t value);
+        LogBufferStream& operator<<(::uint8_t value);
+        LogBufferStream& operator<<(::int16_t value);
+        LogBufferStream& operator<<(::uint16_t value);
+        LogBufferStream& operator<<(::int32_t value);
+        LogBufferStream& operator<<(::uint32_t value);
+        LogBufferStream& operator<<(::int64_t value);
+        LogBufferStream& operator<<(::uint64_t value);
         LogBufferStream& operator<<(const void* ptr);
-        LogBufferStream& operator<<(float f);
-        LogBufferStream& operator<<(double f);
+        LogBufferStream& operator<<(float value);
+        LogBufferStream& operator<<(double value);
         LogBufferStream& operator<<(const char* str);
         LogBufferStream& operator<<(const ::std::string& str);
         LogBufferStream& operator<<(const ::std::string_view& str);

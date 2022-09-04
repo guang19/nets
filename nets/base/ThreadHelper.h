@@ -13,8 +13,8 @@ namespace nets::base
     namespace
     {
         // it‘s too short that the max length that unix/linux posix thread name is 16
-        // constexpr ::uint32_t ThreadNameMaxLength = 16;
-        constexpr ::uint32_t ThreadNameMaxLength = 64;
+        // constexpr ::int32_t ThreadNameMaxLength = 16;
+        constexpr ::int32_t ThreadNameMaxLength = 64;
     } // namespace
 
     ::pid_t currentTid();

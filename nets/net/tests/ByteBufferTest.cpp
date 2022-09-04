@@ -65,7 +65,7 @@ TEST(ByteBufferTest, WriteInt32)
 TEST(ByteBufferTest, WriteInt64)
 {
     ByteBuffer buffer {};
-    ::int64_t n = 65535;
+    ::int64_t n = 65535L;
     buffer.writeInt64(n);
     ASSERT_TRUE(buffer.isReadable());
     ASSERT_EQ(buffer.readableBytes(), sizeof(::int64_t));

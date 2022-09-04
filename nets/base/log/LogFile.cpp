@@ -15,7 +15,7 @@ namespace nets::base
 {
     namespace
     {
-        constexpr ::uint32_t MaxFilePathLength = 512;
+        constexpr ::int32_t MaxFilePathLength = 512;
         constexpr char const LogFileNamePattern[] = "%Y-%m-%d_%H-%M-%S";
         constexpr char const LogFileSuffix[] = ".log";
     } // namespace
@@ -54,12 +54,12 @@ namespace nets::base
 
     void LogFile::write(const char* data, SizeType length)
     {
-        ::uint64_t writtenBytes = 0;
+        SizeType writtenBytes = 0L;
         while (writtenBytes < length)
         {
-            ::uint64_t remain = length - writtenBytes;
+            SizeType remain = length - writtenBytes;
             // not thread-safe
-            ::uint64_t n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
+            SizeType n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
             if (n != remain)
             {
                 ::int32_t errNum = ::ferror(fp_);

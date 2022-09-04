@@ -5,86 +5,11 @@
 #ifndef NETS_BASE_STRING_UTILS_H
 #define NETS_BASE_STRING_UTILS_H
 
-#include <algorithm>
-#include <cmath>
-#include <cstdint>
-#include <cstring>
 #include <string>
 
-namespace nets::base
+namespace nets::base::utils
 {
-    namespace
-    {
-        constexpr char Digits[] = {"0123456789"};
-        constexpr char HexDigits[] = {"0123456789abcdef"};
-        constexpr ::uint32_t MaxNumLength = ::std::numeric_limits<::uint64_t>::digits10 + 2;
-        constexpr ::uint32_t MaxFloatLength = ::std::numeric_limits<double>::digits10 + 2;
-    } // namespace
-
-    namespace utils
-    {
-        // Convert the integer to a string and add it to the buffer and return the length of the converted string
-        template <typename Int>
-        ::uint32_t fromInt(char* buffer, Int n)
-        {
-            char* tmp = buffer;
-            do
-            {
-                auto lstIdx = static_cast<::uint16_t>(n % 10);
-                *tmp = Digits[lstIdx];
-                ++tmp;
-                n /= 10;
-            } while (n > 0);
-            if (n < 0)
-            {
-                *tmp = '-';
-                ++tmp;
-            }
-            ::std::reverse(buffer, tmp);
-            return tmp - buffer;
-        }
-
-        // Convert the float to a string and add it to the buffer, and return the length of the converted string
-        template <typename Float>
-        ::uint32_t fromFloat(char* buffer, Float f)
-        {
-            if (::std::isnan(f))
-            {
-                ::memcpy(buffer, "nan", 3);
-                return 3;
-            }
-            else if (::std::isinf(f))
-            {
-                ::memcpy(buffer, "inf", 3);
-                return 3;
-            }
-            else
-            {
-                return ::snprintf(buffer, MaxFloatLength, "%.17g", f);
-            }
-        }
-
-        // Convert the hex to a string and add it to the buffer, and return the length of the converted string
-        template <typename Hex>
-        ::uint32_t fromHex(char* buffer, Hex h)
-        {
-            char* tmp = buffer;
-            tmp[0] = '0';
-            tmp[1] = 'x';
-            tmp += 2;
-            do
-            {
-                auto lstIdx = static_cast<::uint16_t>(h % 16);
-                *tmp = HexDigits[lstIdx];
-                ++tmp;
-                h /= 16;
-            } while (h > 0);
-            ::std::reverse(buffer + 2, tmp);
-            return tmp - buffer;
-        }
-
-        void trim(::std::string& str);
-    } // namespace utils
-} // namespace nets::base
+    void trim(::std::string& str);
+} // namespace nets::base::utils
 
 #endif // NETS_BASE_STRING_UTILS_H

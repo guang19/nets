@@ -32,7 +32,7 @@ namespace nets::net
 
     void NotifyChannel::notify() const
     {
-        ::int64_t i = 1;
+        ::int64_t i = 1L;
         SSizeType n = socket::write(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
@@ -42,7 +42,7 @@ namespace nets::net
 
     void NotifyChannel::handleReadEvent()
     {
-        ::int64_t i = 0;
+        ::int64_t i = 0L;
         SSizeType n = socket::read(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
