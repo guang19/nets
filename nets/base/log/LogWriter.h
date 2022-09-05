@@ -62,16 +62,12 @@ namespace nets::base
     private:
         using BufferType = StackBuffer<LogBufferPieceSize>;
         using BufferPtr = ::std::unique_ptr<BufferType>;
+        using BufferVectorType = ::std::vector<BufferPtr>;
+        using LogSynchronizerPtr = ::std::shared_ptr<LogSynchronizer>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
         using UniqueLockType = ::std::unique_lock<MutexType>;
         using ConditionVarType = ::std::condition_variable;
-        using LogSynchronizerPtr = ::std::shared_ptr<LogSynchronizer>;
-        using BufferVectorType = ::std::vector<BufferPtr>;
-        using BufferVectorPtr = ::std::unique_ptr<BufferVectorType>;
-        using LogSynchronizeTaskType = ::std::function<void()>;
-        using BlockingQueueType = BoundedBlockingQueue<LogSynchronizeTaskType>;
-        using BlockingQueuePtr = ::std::unique_ptr<BlockingQueueType>;
 
     protected:
         AsyncLogWriter();
@@ -88,21 +84,16 @@ namespace nets::base
 
         void start();
         void swap();
-        void synchronize();
 
     private:
         ::std::atomic_bool running_ {false};
         BufferPtr cacheBuffer_ {nullptr};
         BufferPtr backupCacheBuffer_ {nullptr};
+        BufferVectorType buffers_ {};
         LogSynchronizerPtr logSynchronizer_ {nullptr};
-        // add persistent tasks to the task queue
-        ::std::thread writerTaskProducer {};
-        // take the persistent task from the task queue and execute it
-        ::std::thread writerTaskConsumer {};
+        ::std::thread writerTask {};
         MutexType mutex_ {};
         ConditionVarType cv_ {};
-        BufferVectorPtr buffers_ {};
-        BlockingQueuePtr writerTaskQueue_ {nullptr};
     };
 } // namespace nets::base
 
