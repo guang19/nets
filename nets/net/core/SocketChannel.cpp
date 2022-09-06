@@ -48,14 +48,7 @@ namespace nets::net
         SSizeType bytes = doRead(byteBuffer);
         if (bytes > 0)
         {
-            try
-            {
-                channelHandlerPipeline_.fireChannelRead(byteBuffer);
-            }
-            catch (const ::std::exception& exception)
-            {
-                channelHandlerPipeline_.fireExceptionCaught(exception);
-            }
+            channelHandlerPipeline_.fireChannelRead(byteBuffer);
         }
         else if (bytes == 0)
         {
@@ -113,14 +106,7 @@ namespace nets::net
                 eventLoop_->addTask(
                     [self = ::std::dynamic_pointer_cast<SocketChannel>(shared_from_this())]()
                     {
-                        try
-                        {
-                            self->channelHandlerPipeline_.fireChannelWriteComplete();
-                        }
-                        catch (const ::std::exception& exception)
-                        {
-                            self->channelHandlerPipeline_.fireExceptionCaught(exception);
-                        }
+                        self->channelHandlerPipeline_.fireChannelWriteComplete();
                     });
                 if (state_ == ChannelState::HALF_CLOSE)
                 {
@@ -177,11 +163,6 @@ namespace nets::net
                 deregister();
             }
             LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
-        }
-        // catch fireChannelConnect
-        catch (const ::std::exception& exception)
-        {
-            channelHandlerPipeline_.fireExceptionCaught(exception);
         }
     }
 
@@ -330,14 +311,7 @@ namespace nets::net
             eventLoop_->addTask(
                 [self = ::std::dynamic_pointer_cast<SocketChannel>(shared_from_this())]()
                 {
-                    try
-                    {
-                        self->channelHandlerPipeline_.fireChannelWriteComplete();
-                    }
-                    catch (const ::std::exception& exception)
-                    {
-                        self->channelHandlerPipeline_.fireExceptionCaught(exception);
-                    }
+                    self->channelHandlerPipeline_.fireChannelWriteComplete();
                 });
         }
         // tcp send buffer size less than length,only part of it was sent
@@ -496,14 +470,7 @@ namespace nets::net
     void SocketChannel::channelInActive()
     {
         state_ = ChannelState::INACTIVE;
-        try
-        {
-            channelHandlerPipeline_.fireChannelDisconnect();
-        }
-        catch (const ::std::exception& exception)
-        {
-            channelHandlerPipeline_.fireExceptionCaught(exception);
-        }
+        channelHandlerPipeline_.fireChannelDisconnect();
         eventLoop_->addTask(
             [channel = shared_from_this()]()
             {

@@ -60,7 +60,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
-            channelHandler->channelConnect(channelContext_, localAddress, peerAddress);
+            try
+            {
+                channelHandler->channelConnect(channelContext_, localAddress, peerAddress);
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandler->exceptionCaught(channelContext_, exception);
+            }
         }
     }
 
@@ -68,7 +75,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
-            channelHandler->channelDisconnect(channelContext_);
+            try
+            {
+                channelHandler->channelDisconnect(channelContext_);
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandler->exceptionCaught(channelContext_, exception);
+            }
         }
     }
 
@@ -76,7 +90,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
-            channelHandler->channelRead(channelContext_, message);
+            try
+            {
+                channelHandler->channelRead(channelContext_, message);
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandler->exceptionCaught(channelContext_, exception);
+            }
         }
     }
 
@@ -84,15 +105,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
-            channelHandler->channelWriteComplete(channelContext_);
-        }
-    }
-
-    void ChannelHandlerPipeline::fireExceptionCaught(const ::std::exception& exception)
-    {
-        for (auto& channelHandler: channelHandlers_)
-        {
-            channelHandler->exceptionCaught(channelContext_, exception);
+            try
+            {
+                channelHandler->channelWriteComplete(channelContext_);
+            }
+            catch (const ::std::exception& exception)
+            {
+                channelHandler->exceptionCaught(channelContext_, exception);
+            }
         }
     }
 } // namespace nets::net

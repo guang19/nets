@@ -23,8 +23,8 @@ namespace nets::net
     {
         constexpr FdType InvalidFd = -1;
 
-        FdType createTcpSocket(SockAddrFamily family = AF_INET6);
-        FdType createUdpSocket(SockAddrFamily family = AF_INET6);
+        FdType createTcpSocket(SockAddrFamily family = AF_INET);
+        FdType createUdpSocket(SockAddrFamily family = AF_INET);
         void setSockCloExec(FdType sockFd);
         void closeFd(FdType fd);
         void shutdown(FdType sockFd, ::int32_t how);

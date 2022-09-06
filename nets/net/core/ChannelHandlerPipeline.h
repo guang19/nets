@@ -46,7 +46,6 @@ namespace nets::net
         void fireChannelDisconnect();
         void fireChannelRead(ByteBuffer& message);
         void fireChannelWriteComplete();
-        void fireExceptionCaught(const ::std::exception& exception);
 
     private:
         ChannelContext channelContext_ {nullptr};

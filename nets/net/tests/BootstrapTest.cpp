@@ -72,6 +72,7 @@ public:
     {
         LOGS_DEBUG << "Client channelWriteComplete";
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
+        throw ::std::invalid_argument("channelWriteComplete");
     }
 
     void exceptionCaught(ChannelContext& channelContext, const ::std::exception& exception) override
