@@ -12,11 +12,19 @@ namespace nets::net
     class DatagramChannel : public Channel
     {
     public:
-        explicit DatagramChannel(FdType sockFd, EventLoopRawPtr eventLoop);
+        explicit DatagramChannel(EventLoopRawPtr eventLoop);
         ~DatagramChannel() override;
 
     public:
         FdType fd() const override;
+
+    public:
+        inline void setChannelOptions(const ChannelOptionList& channelOptions)
+        {
+            channelOptions_.insert(channelOptions_.end(), channelOptions.begin(), channelOptions.end());
+        }
+
+        void bind(const InetSockAddress& localAddress);
 
     protected:
         void handleReadEvent() override;
@@ -25,6 +33,7 @@ namespace nets::net
 
     private:
         FdType sockFd_ {socket::InvalidFd};
+        ChannelOptionList channelOptions_ {};
     };
 } // namespace nets::net
 

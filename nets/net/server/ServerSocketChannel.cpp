@@ -40,6 +40,23 @@ namespace nets::net
         return sockFd_;
     }
 
+    void ServerSocketChannel::bind(const InetSockAddress& localAddress)
+    {
+        sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
+        socket::setSockNonBlock(sockFd_, true);
+        for (const auto& channelOption : channelOptions_)
+        {
+            setChannelOption(channelOption);
+        }
+        socket::bind(sockFd_, localAddress.sockAddr());
+        socket::listen(sockFd_, backlog_);
+        addEvent(EReadEvent);
+        if (!registerTo())
+        {
+            THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
+        }
+    }
+
     void ServerSocketChannel::handleReadEvent()
     {
         assert(eventLoop_->isInCurrentEventLoop());
@@ -64,23 +81,6 @@ namespace nets::net
     {
         ::int32_t errNum = socket::getSockError(sockFd_);
         THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
-    }
-
-    void ServerSocketChannel::bind(const InetSockAddress& sockAddress)
-    {
-        sockFd_ = socket::createTcpSocket(sockAddress.ipFamily());
-        socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
-        {
-            setChannelOption(channelOption);
-        }
-        socket::bind(sockFd_, sockAddress.sockAddr());
-        socket::listen(sockFd_, backlog_);
-        addEvent(EReadEvent);
-        if (!registerTo())
-        {
-            THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
-        }
     }
 
     void ServerSocketChannel::initSocketChannel(SocketChannelPtr& socketChannel)

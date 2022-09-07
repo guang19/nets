@@ -14,6 +14,7 @@ namespace nets::net
     class ServerBootstrap : public AbstractBootstrap<ServerBootstrap>
     {
     public:
+        using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
         using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
@@ -43,7 +44,7 @@ namespace nets::net
 
     private:
         void doBind(const InetSockAddress& localAddress);
-        void initServerSocketChannel(::std::shared_ptr<ServerSocketChannel>& serverSocketChannel);
+        void initServerSocketChannel(ServerSocketChannelPtr& serverSocketChannel);
 
     private:
         ChannelOptionList childOptions_ {};

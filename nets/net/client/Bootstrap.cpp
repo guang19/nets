@@ -7,8 +7,7 @@
 namespace nets::net
 {
     Bootstrap::Bootstrap()
-        : AbstractBootstrap(), retry_(false), retryInterval_(0), channelHandlers_(),
-          channelInitializationCallback_()
+        : AbstractBootstrap(), retry_(false), retryInterval_(0), channelHandlers_(), channelInitializationCallback_()
     {
     }
 
@@ -37,13 +36,19 @@ namespace nets::net
 
     Bootstrap& Bootstrap::bind(const char* ip, PortType port, bool ipv6)
     {
-        bind(InetSockAddress(ip, port, ipv6));
-        return *this;
+        return bind(InetSockAddress(ip, port, ipv6));
     }
 
-    Bootstrap& Bootstrap::bind(const InetSockAddress& serverAddress)
+    Bootstrap& Bootstrap::bind(const InetSockAddress& localAddress)
     {
-
+        mainLoopGroup_.loopEach();
+        auto future = mainLoopGroup_.submit(
+            [this, &localAddress]()
+            {
+                doBind(localAddress);
+            });
+        future.wait();
+        return *this;
     }
 
     Bootstrap& Bootstrap::retry(bool retry, TimeType interval)
@@ -105,7 +110,14 @@ namespace nets::net
         assert(channelInitializationCallback_ == nullptr);
     }
 
-    void Bootstrap::doBind(const InetSockAddress& serverAddress)
+    void Bootstrap::doBind(const InetSockAddress& localAddress)
+    {
+        auto datagramChannel = ::std::make_shared<DatagramChannel>(mainLoopGroup_.next());
+        initDatagramChannel(datagramChannel);
+        datagramChannel->bind(localAddress);
+    }
+
+    void Bootstrap::initDatagramChannel(DatagramChannelPtr& datagramChannel)
     {
 
     }

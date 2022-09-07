@@ -28,11 +28,6 @@ namespace nets::net
     public:
         FdType fd() const override;
 
-    protected:
-        void handleReadEvent() override;
-        void handleWriteEvent() override;
-        void handleErrorEvent() override;
-
     public:
         inline ChannelHandlerPipeline& pipeline()
         {
@@ -68,6 +63,10 @@ namespace nets::net
         // shutdown write
         void shutdownWrite();
 
+    protected:
+        void handleReadEvent() override;
+        void handleWriteEvent() override;
+        void handleErrorEvent() override;
 
     private:
         SSizeType doRead(ByteBuffer& byteBuffer);

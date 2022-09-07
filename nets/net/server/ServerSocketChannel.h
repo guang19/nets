@@ -30,10 +30,6 @@ namespace nets::net
     public:
         FdType fd() const override;
 
-    protected:
-        void handleReadEvent() override;
-        void handleErrorEvent() override;
-
     public:
         inline void setBacklog(::int32_t backlog) override
         {
@@ -65,7 +61,11 @@ namespace nets::net
             childInitializationCallback_ = childInitializationCallback;
         }
 
-        void bind(const InetSockAddress& sockAddress);
+        void bind(const InetSockAddress& localAddress);
+
+    protected:
+        void handleReadEvent() override;
+        void handleErrorEvent() override;
 
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);

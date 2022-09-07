@@ -37,6 +37,93 @@ namespace nets::net
         return sockFd_;
     }
 
+    void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
+    {
+        for (const auto& channelOption: channelOptions)
+        {
+            setChannelOption(channelOption);
+        }
+    }
+
+    void SocketChannel::channelActive()
+    {
+        addEvent(EReadEvent);
+        try
+        {
+            if (!registerTo())
+            {
+                THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
+            }
+            state_ = ChannelState::ACTIVE;
+            channelHandlerPipeline_.fireChannelConnect(localAddress_, peerAddress_);
+        }
+        catch (const ChannelRegisterException& exception)
+        {
+            if (isRegistered())
+            {
+                deregister();
+            }
+            LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
+        }
+    }
+
+    void SocketChannel::write(const void* message, SizeType length)
+    {
+        write(StringType(static_cast<const char*>(message), length));
+    }
+
+    void SocketChannel::write(const StringType& message)
+    {
+        if (eventLoop_->isInCurrentEventLoop())
+        {
+            doWrite(message.data(), message.length());
+        }
+        else
+        {
+            eventLoop_->execute(
+                // msg must be value catch
+                [this, msg = message]()
+                {
+                    doWrite(msg.data(), msg.length());
+                });
+        }
+    }
+
+    void SocketChannel::write(const ByteBuffer& message)
+    {
+        if (eventLoop_->isInCurrentEventLoop())
+        {
+            doWrite(message.data(), message.readableBytes());
+        }
+        else
+        {
+            eventLoop_->execute(
+                // msg must be value catch
+                [this, msg = message]()
+                {
+                    doWrite(msg.data(), msg.readableBytes());
+                });
+        }
+    }
+
+    void SocketChannel::shutdown()
+    {
+        shutdown(SHUT_RDWR);
+        channelInActive();
+    }
+
+    void SocketChannel::shutdownRead()
+    {
+        shutdown(SHUT_RD);
+        state_ = ChannelState::HALF_CLOSE;
+    }
+
+    void SocketChannel::shutdownWrite()
+    {
+        shutdown(SHUT_WR);
+        state_ = ChannelState::HALF_CLOSE;
+    }
+
     void SocketChannel::handleReadEvent()
     {
         if (state_ == ChannelState::INACTIVE)
@@ -134,93 +221,6 @@ namespace nets::net
         }
         LOGS_WARN << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
         channelInActive();
-    }
-
-    void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
-    {
-        for (const auto& channelOption: channelOptions)
-        {
-            setChannelOption(channelOption);
-        }
-    }
-
-    void SocketChannel::channelActive()
-    {
-        addEvent(EReadEvent);
-        try
-        {
-            if (!registerTo())
-            {
-                THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
-            }
-            state_ = ChannelState::ACTIVE;
-            channelHandlerPipeline_.fireChannelConnect(localAddress_, peerAddress_);
-        }
-        catch (const ChannelRegisterException& exception)
-        {
-            if (isRegistered())
-            {
-                deregister();
-            }
-            LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
-        }
-    }
-
-    void SocketChannel::write(const void* message, SizeType length)
-    {
-        write(StringType(static_cast<const char*>(message), length));
-    }
-
-    void SocketChannel::write(const StringType& message)
-    {
-        if (eventLoop_->isInCurrentEventLoop())
-        {
-            doWrite(message.data(), message.length());
-        }
-        else
-        {
-            eventLoop_->execute(
-                // msg must be value catch
-                [this, msg = message]()
-                {
-                    doWrite(msg.data(), msg.length());
-                });
-        }
-    }
-
-    void SocketChannel::write(const ByteBuffer& message)
-    {
-        if (eventLoop_->isInCurrentEventLoop())
-        {
-            doWrite(message.data(), message.readableBytes());
-        }
-        else
-        {
-            eventLoop_->execute(
-                // msg must be value catch
-                [this, msg = message]()
-                {
-                    doWrite(msg.data(), msg.readableBytes());
-                });
-        }
-    }
-
-    void SocketChannel::shutdown()
-    {
-        shutdown(SHUT_RDWR);
-        channelInActive();
-    }
-
-    void SocketChannel::shutdownRead()
-    {
-        shutdown(SHUT_RD);
-        state_ = ChannelState::HALF_CLOSE;
-    }
-
-    void SocketChannel::shutdownWrite()
-    {
-        shutdown(SHUT_WR);
-        state_ = ChannelState::HALF_CLOSE;
     }
 
     SSizeType SocketChannel::doRead(ByteBuffer& byteBuffer)

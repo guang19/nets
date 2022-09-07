@@ -41,14 +41,12 @@ namespace nets::net
 
     ServerBootstrap& ServerBootstrap::bind(const char* ip, PortType port, bool ipv6)
     {
-        bind(InetSockAddress(ip, port, ipv6));
-        return *this;
+        return bind(InetSockAddress(ip, port, ipv6));
     }
 
     ServerBootstrap& ServerBootstrap::bind(PortType port, bool ipv6)
     {
-        bind(InetSockAddress::createAnySockAddress(port, ipv6));
-        return *this;
+        return bind(InetSockAddress::createAnySockAddress(port, ipv6));
     }
 
     ServerBootstrap& ServerBootstrap::bind(const InetSockAddress& localAddress)
@@ -94,7 +92,7 @@ namespace nets::net
         serverSocketChannel->bind(localAddress);
     }
 
-    void ServerBootstrap::initServerSocketChannel(::std::shared_ptr<ServerSocketChannel>& serverSocketChannel)
+    void ServerBootstrap::initServerSocketChannel(ServerSocketChannelPtr& serverSocketChannel)
     {
         serverSocketChannel->setNextEventLoopFn(
             [this]() -> EventLoopGroup::EventLoopRawPtr

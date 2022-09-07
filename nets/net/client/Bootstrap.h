@@ -7,6 +7,7 @@
 
 #include "nets/net/client/ConnectorChannel.h"
 #include "nets/net/core/AbstractBootstrap.h"
+#include "nets/net/core/DatagramChannel.h"
 
 namespace nets::net
 {
@@ -14,7 +15,8 @@ namespace nets::net
     {
     public:
         using TimeType = typename ConnectorChannel::TimeType;
-        using ConnectorChannelPtr = typename ConnectorChannel::ConnectorChannelPtr;
+        using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
+        using DatagramChannelPtr = ::std::shared_ptr<DatagramChannel>;
         using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
@@ -33,7 +35,7 @@ namespace nets::net
         Bootstrap& bind();
         // udp server
         Bootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
-        Bootstrap& bind(const InetSockAddress& serverAddress);
+        Bootstrap& bind(const InetSockAddress& localAddress);
 
         // whether to retry after connect failure
         // interval is reconnect interval, unit:milliseconds
@@ -47,8 +49,10 @@ namespace nets::net
 
     private:
         void doConnect(const InetSockAddress& serverAddress);
-        void initConnectorChannel(::std::shared_ptr<ConnectorChannel>& connectorChannel);
-        void doBind(const InetSockAddress& serverAddress);
+        void initConnectorChannel(ConnectorChannelPtr& connectorChannel);
+        void doBind(const InetSockAddress& localAddress);
+        void initDatagramChannel(DatagramChannelPtr& datagramChannel);
+
     private:
         bool retry_ {false};
         TimeType retryInterval_ {0};

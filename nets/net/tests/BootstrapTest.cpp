@@ -20,7 +20,7 @@ public:
         //        channelContext.write(byteBuffer);
 
         channelContext.write("Hello Server");
-        channelContext.shutdown();
+//        channelContext.shutdown();
 
         //        channelContext.write(
         //            "你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你"
