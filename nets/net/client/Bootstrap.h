@@ -22,18 +22,24 @@ namespace nets::net
 
     public:
         Bootstrap();
-        ~Bootstrap() = default;
+        ~Bootstrap() override = default;
 
     public:
         Bootstrap& channelHandler(ChannelHandlerRawPtr channelHandler);
         Bootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
         Bootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
 
+        // udp client
+        Bootstrap& bind();
+        // udp server
+        Bootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
+        Bootstrap& bind(const InetSockAddress& serverAddress);
+
         // whether to retry after connect failure
         // interval is reconnect interval, unit:milliseconds
         // when retry is true, the interval takes effect
         Bootstrap& retry(bool retry = true, TimeType interval = DefaultRetryInterval);
-
+        // tcp client
         Bootstrap& connect(const char* ip, PortType port, bool ipv6 = false);
         Bootstrap& connect(const InetSockAddress& serverAddress);
 
@@ -42,7 +48,7 @@ namespace nets::net
     private:
         void doConnect(const InetSockAddress& serverAddress);
         void initConnectorChannel(::std::shared_ptr<ConnectorChannel>& connectorChannel);
-
+        void doBind(const InetSockAddress& serverAddress);
     private:
         bool retry_ {false};
         TimeType retryInterval_ {0};

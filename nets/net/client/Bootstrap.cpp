@@ -7,7 +7,8 @@
 namespace nets::net
 {
     Bootstrap::Bootstrap()
-        : AbstractBootstrap(), retry_(false), retryInterval_(0), channelHandlers_(), channelInitializationCallback_()
+        : AbstractBootstrap(), retry_(false), retryInterval_(0), channelHandlers_(),
+          channelInitializationCallback_()
     {
     }
 
@@ -27,6 +28,22 @@ namespace nets::net
     {
         channelInitializationCallback_ = channelInitializationCallback;
         return *this;
+    }
+
+    Bootstrap& Bootstrap::bind()
+    {
+        return *this;
+    }
+
+    Bootstrap& Bootstrap::bind(const char* ip, PortType port, bool ipv6)
+    {
+        bind(InetSockAddress(ip, port, ipv6));
+        return *this;
+    }
+
+    Bootstrap& Bootstrap::bind(const InetSockAddress& serverAddress)
+    {
+
     }
 
     Bootstrap& Bootstrap::retry(bool retry, TimeType interval)
@@ -71,19 +88,25 @@ namespace nets::net
         connectorChannel->setRetry(retry_);
         connectorChannel->setRetryInterval(retryInterval_);
 
-        ChannelOptionList channelOptions {};
-        channelOptions.swap(channelOptions_);
-        assert(channelOptions_.empty());
+        ChannelOptionList channelOptions(channelOptions_);
         connectorChannel->setChannelOptions(channelOptions);
+        channelOptions_.clear();
 
-        ChannelHandlerList channelHandlers {};
-        channelHandlers.swap(channelHandlers_);
-        assert(channelHandlers_.empty());
+        ChannelHandlerList channelHandlers(channelHandlers_);
         connectorChannel->setChannelHandlers(channelHandlers);
+        channelHandlers_.clear();
 
-        ChannelInitializationCallback channelInitializationCallback {};
-        channelInitializationCallback.swap(channelInitializationCallback_);
-        assert(channelInitializationCallback_ == nullptr);
+        ChannelInitializationCallback channelInitializationCallback(channelInitializationCallback_);
         connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
+        channelInitializationCallback_ = nullptr;
+
+        assert(channelOptions_.empty());
+        assert(channelHandlers_.empty());
+        assert(channelInitializationCallback_ == nullptr);
+    }
+
+    void Bootstrap::doBind(const InetSockAddress& serverAddress)
+    {
+
     }
 } // namespace nets::net

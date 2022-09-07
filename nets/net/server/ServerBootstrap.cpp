@@ -90,30 +90,36 @@ namespace nets::net
     void ServerBootstrap::doBind(const InetSockAddress& localAddress)
     {
         auto serverSocketChannel = ::std::make_shared<ServerSocketChannel>(mainLoopGroup_.next());
+        initServerSocketChannel(serverSocketChannel);
+        serverSocketChannel->bind(localAddress);
+    }
+
+    void ServerBootstrap::initServerSocketChannel(::std::shared_ptr<ServerSocketChannel>& serverSocketChannel)
+    {
         serverSocketChannel->setNextEventLoopFn(
             [this]() -> EventLoopGroup::EventLoopRawPtr
             {
                 return childLoopGroup_.next();
             });
-        ChannelOptionList channelOptions {};
-        channelOptions.swap(channelOptions_);
-        assert(channelOptions_.empty());
+        ChannelOptionList channelOptions(channelOptions_);
         serverSocketChannel->setChannelOptions(channelOptions);
+        channelOptions_.clear();
 
-        ChannelOptionList childOptions {};
-        childOptions.swap(childOptions_);
-        assert(childOptions_.empty());
+        ChannelOptionList childOptions(childOptions_);
         serverSocketChannel->setChildOptions(childOptions);
+        childOptions_.clear();
 
-        ChannelHandlerList childHandlers {};
-        childHandlers.swap(childHandlers_);
-        assert(childHandlers_.empty());
+        ChannelHandlerList childHandlers(childHandlers_);
         serverSocketChannel->setChildHandlers(childHandlers);
+        childHandlers_.clear();
 
-        ChannelInitializationCallback childInitializationCallback {};
-        childInitializationCallback.swap(childInitializationCallback_);
-        assert(childInitializationCallback_ == nullptr);
+        ChannelInitializationCallback childInitializationCallback(childInitializationCallback_);
         serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
-        serverSocketChannel->bind(localAddress);
+        childInitializationCallback_ = nullptr;
+
+        assert(channelOptions_.empty());
+        assert(childOptions_.empty());
+        assert(childHandlers_.empty());
+        assert(childInitializationCallback_ == nullptr);
     }
 } // namespace nets::net

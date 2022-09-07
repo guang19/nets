@@ -14,14 +14,14 @@ namespace nets::net
     class ServerBootstrap : public AbstractBootstrap<ServerBootstrap>
     {
     public:
-        using ChannelHandlerRawPtr = typename ServerSocketChannel::ChannelHandlerRawPtr;
-        using ChannelHandlerPtr = typename ServerSocketChannel::ChannelHandlerPtr;
-        using ChannelHandlerList = typename ServerSocketChannel::ChannelHandlerList;
+        using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
+        using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
+        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:
         explicit ServerBootstrap(IntType numOfChildEventLoops);
-        ~ServerBootstrap() = default;
+        ~ServerBootstrap() override = default;
 
     public:
         ServerBootstrap& childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value);
@@ -31,6 +31,7 @@ namespace nets::net
         // set the ChannelHandler for each channel
         ServerBootstrap& childHandler(const ChannelInitializationCallback& childInitializationCallback);
 
+        // tcp server
         ServerBootstrap& bind(PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const InetSockAddress& localAddress);
@@ -42,6 +43,7 @@ namespace nets::net
 
     private:
         void doBind(const InetSockAddress& localAddress);
+        void initServerSocketChannel(::std::shared_ptr<ServerSocketChannel>& serverSocketChannel);
 
     private:
         ChannelOptionList childOptions_ {};
