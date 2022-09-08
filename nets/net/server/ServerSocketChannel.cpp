@@ -44,7 +44,7 @@ namespace nets::net
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption : channelOptions_)
+        for (const auto& channelOption: channelOptions_)
         {
             setChannelOption(channelOption);
         }

@@ -56,17 +56,38 @@ namespace nets::net
         channelHandlers_.push_back(channelHandler);
     }
 
+    void ChannelHandlerPipeline::addFirst(SocketChannelHandlerRawPtr channelHandler)
+    {
+        channelHandlers_.push_front(ChannelHandlerPtr(channelHandler));
+    }
+
+    void ChannelHandlerPipeline::addFirst(const SocketChannelHandlerPtr& channelHandler)
+    {
+        channelHandlers_.push_front(channelHandler);
+    }
+
+    void ChannelHandlerPipeline::addLast(SocketChannelHandlerRawPtr channelHandler)
+    {
+        channelHandlers_.push_back(ChannelHandlerPtr(channelHandler));
+    }
+
+    void ChannelHandlerPipeline::addLast(const SocketChannelHandlerPtr& channelHandler)
+    {
+        channelHandlers_.push_back(channelHandler);
+    }
+
     void ChannelHandlerPipeline::fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress)
     {
         for (auto& channelHandler: channelHandlers_)
         {
+            auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
             try
             {
-                channelHandler->channelConnect(channelContext_, localAddress, peerAddress);
+                handler->channelConnect(channelContext_, localAddress, peerAddress);
             }
             catch (const ::std::exception& exception)
             {
-                channelHandler->exceptionCaught(channelContext_, exception);
+                handler->exceptionCaught(channelContext_, exception);
             }
         }
     }
@@ -75,13 +96,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
+            auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
             try
             {
-                channelHandler->channelDisconnect(channelContext_);
+                handler->channelDisconnect(channelContext_);
             }
             catch (const ::std::exception& exception)
             {
-                channelHandler->exceptionCaught(channelContext_, exception);
+                handler->exceptionCaught(channelContext_, exception);
             }
         }
     }
@@ -90,13 +112,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
+            auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
             try
             {
-                channelHandler->channelRead(channelContext_, message);
+                handler->channelRead(channelContext_, message);
             }
             catch (const ::std::exception& exception)
             {
-                channelHandler->exceptionCaught(channelContext_, exception);
+                handler->exceptionCaught(channelContext_, exception);
             }
         }
     }
@@ -105,13 +128,14 @@ namespace nets::net
     {
         for (auto& channelHandler: channelHandlers_)
         {
+            auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
             try
             {
-                channelHandler->channelWriteComplete(channelContext_);
+                handler->channelWriteComplete(channelContext_);
             }
             catch (const ::std::exception& exception)
             {
-                channelHandler->exceptionCaught(channelContext_, exception);
+                handler->exceptionCaught(channelContext_, exception);
             }
         }
     }

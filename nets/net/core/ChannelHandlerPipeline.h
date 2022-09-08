@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "nets/base/Copyable.h"
-#include "nets/net/core/ChannelHandler.h"
+#include "nets/net/core/SocketChannelHandler.h"
 
 namespace nets::net
 {
@@ -17,6 +17,8 @@ namespace nets::net
     {
     public:
         using ChannelRawPtr = ChannelContext::ChannelRawPtr;
+        using SocketChannelHandlerRawPtr = SocketChannelHandler*;
+        using SocketChannelHandlerPtr = ::std::shared_ptr<SocketChannelHandler>;
         using ChannelHandlerRawPtr = ChannelHandler*;
         using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
         using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
@@ -40,6 +42,11 @@ namespace nets::net
         void addFirst(const ChannelHandlerPtr& channelHandler);
         void addLast(ChannelHandlerRawPtr channelHandler);
         void addLast(const ChannelHandlerPtr& channelHandler);
+
+        void addFirst(SocketChannelHandlerRawPtr channelHandler);
+        void addFirst(const SocketChannelHandlerPtr& channelHandler);
+        void addLast(SocketChannelHandlerRawPtr channelHandler);
+        void addLast(const SocketChannelHandlerPtr& channelHandler);
 
     public:
         void fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);

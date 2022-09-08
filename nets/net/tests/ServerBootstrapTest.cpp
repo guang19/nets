@@ -8,7 +8,7 @@
 using namespace nets::net;
 using namespace nets::base;
 
-class TestServerChannelHandler : public ChannelHandler
+class TestServerChannelHandler : public SocketChannelHandler
 {
 public:
     void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
     ServerBootstrap(8)
         .option(NTcpSendBuffer, 1024)
         .option(NTcpRecvBuffer, 1024)
-        //        .childHandler(new TestServerChannelHandler())
+                .childHandler(new TestServerChannelHandler())
         .childHandler(
             [](SocketChannel& channel)
             {
