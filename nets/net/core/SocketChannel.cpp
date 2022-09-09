@@ -28,6 +28,8 @@ namespace nets::net
 
     SocketChannel::~SocketChannel()
     {
+        // if disconnected normally,the status should be Inactive.
+        // if the program is stopped due to external reasons such as interrupt signals,state may not be determined
         assert(state_ == ChannelState::INACTIVE);
         socket::closeFd(sockFd_);
     }

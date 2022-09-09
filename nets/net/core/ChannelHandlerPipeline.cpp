@@ -81,14 +81,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            try
-            {
-                handler->channelConnect(channelContext_, localAddress, peerAddress);
-            }
-            catch (const ::std::exception& exception)
-            {
-                handler->exceptionCaught(channelContext_, exception);
-            }
+            handler->channelConnect(channelContext_, localAddress, peerAddress);
         }
     }
 
@@ -97,14 +90,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            try
-            {
-                handler->channelDisconnect(channelContext_);
-            }
-            catch (const ::std::exception& exception)
-            {
-                handler->exceptionCaught(channelContext_, exception);
-            }
+            handler->channelDisconnect(channelContext_);
         }
     }
 
@@ -113,14 +99,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            try
-            {
-                handler->channelRead(channelContext_, message);
-            }
-            catch (const ::std::exception& exception)
-            {
-                handler->exceptionCaught(channelContext_, exception);
-            }
+            handler->channelRead(channelContext_, message);
         }
     }
 
@@ -129,14 +108,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            try
-            {
-                handler->channelWriteComplete(channelContext_);
-            }
-            catch (const ::std::exception& exception)
-            {
-                handler->exceptionCaught(channelContext_, exception);
-            }
+            handler->channelWriteComplete(channelContext_);
         }
     }
 } // namespace nets::net

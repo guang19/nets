@@ -44,11 +44,6 @@ public:
         //        channelContext.write("server channelWriteComplete");
     }
 
-    void exceptionCaught(ChannelContext& channelContext, const std::exception& exception) override
-    {
-        LOGS_DEBUG << "Server exceptionCaught";
-    }
-
 private:
     void testScheduleTask()
     {
