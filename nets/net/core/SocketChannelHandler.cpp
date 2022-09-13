@@ -24,9 +24,4 @@ namespace nets::net
     {
         LOGS_DEBUG << "SocketChannelHandler::channelRead";
     }
-
-    void SocketChannelHandler::channelWriteComplete(ChannelContext& channelContext)
-    {
-        LOGS_DEBUG << "SocketChannelHandler::channelWriteComplete";
-    }
 } // namespace nets::net

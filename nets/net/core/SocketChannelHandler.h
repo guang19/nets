@@ -23,7 +23,6 @@ namespace nets::net
                                     const InetSockAddress& peerAddress);
         virtual void channelDisconnect(ChannelContext& channelContext);
         virtual void channelRead(ChannelContext& channelContext, ByteBuffer& message);
-        virtual void channelWriteComplete(ChannelContext& channelContext);
     };
 } // namespace nets::net
 

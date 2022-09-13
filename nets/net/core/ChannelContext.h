@@ -5,6 +5,8 @@
 #ifndef NETS_NET_CHANNEL_CONTEXT_H
 #define NETS_NET_CHANNEL_CONTEXT_H
 
+#include <functional>
+
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/ByteBuffer.h"
 
@@ -17,6 +19,7 @@ namespace nets::net
         using ChannelRawPtr = SocketChannel*;
         using SizeType = ::size_t;
         using StringType = ::std::string;
+        using WriteCompleteCallback = ::std::function<void(ChannelContext&)>;
 
     public:
         explicit ChannelContext(ChannelRawPtr channel);
@@ -26,9 +29,9 @@ namespace nets::net
         const InetSockAddress& localAddress() const;
         const InetSockAddress& peerAddress() const;
 
-        void write(const void* message, SizeType length);
-        void write(const StringType& message);
-        void write(const ByteBuffer& message);
+        void write(const void* message, SizeType length, WriteCompleteCallback writeCompleteCallback = nullptr);
+        void write(const StringType& message, WriteCompleteCallback writeCompleteCallback = nullptr);
+        void write(const ByteBuffer& message, WriteCompleteCallback writeCompleteCallback = nullptr);
 
         bool isActive() const;
         void disconnect();

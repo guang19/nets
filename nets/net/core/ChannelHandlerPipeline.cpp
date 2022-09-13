@@ -102,13 +102,4 @@ namespace nets::net
             handler->channelRead(channelContext_, message);
         }
     }
-
-    void ChannelHandlerPipeline::fireChannelWriteComplete()
-    {
-        for (auto& channelHandler: channelHandlers_)
-        {
-            auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            handler->channelWriteComplete(channelContext_);
-        }
-    }
 } // namespace nets::net

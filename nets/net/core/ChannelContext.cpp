@@ -4,6 +4,8 @@
 
 #include "nets/net/core/ChannelContext.h"
 
+#include <utility>
+
 #include "nets/net/core/SocketChannel.h"
 
 namespace nets::net
@@ -20,19 +22,19 @@ namespace nets::net
         return channel_->peerAddress();
     }
 
-    void ChannelContext::write(const void* message, SizeType length)
+    void ChannelContext::write(const void* message, SizeType length, WriteCompleteCallback writeCompleteCallback)
     {
-        channel_->write(message, length);
+        channel_->write(message, length, std::move(writeCompleteCallback));
     }
 
-    void ChannelContext::write(const StringType& message)
+    void ChannelContext::write(const StringType& message, WriteCompleteCallback writeCompleteCallback)
     {
-        channel_->write(message);
+        channel_->write(message, std::move(writeCompleteCallback));
     }
 
-    void ChannelContext::write(const ByteBuffer& message)
+    void ChannelContext::write(const ByteBuffer& message, WriteCompleteCallback writeCompleteCallback)
     {
-        channel_->write(message);
+        channel_->write(message, std::move(writeCompleteCallback));
     }
 
     bool ChannelContext::isActive() const

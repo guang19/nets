@@ -6,6 +6,7 @@
 
 #include <climits>
 #include <thread>
+#include <utility>
 
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/EventLoop.h"
@@ -22,7 +23,7 @@ namespace nets::net
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), writeBuffer_(),
-          state_(ChannelState::INACTIVE), channelHandlerPipeline_(this)
+          state_(ChannelState::INACTIVE), channelHandlerPipeline_(this), writeCompleteCallbacks_()
     {
     }
 
@@ -69,41 +70,41 @@ namespace nets::net
         }
     }
 
-    void SocketChannel::write(const void* message, SizeType length)
+    void SocketChannel::write(const void* message, SizeType length, WriteCompleteCallback writeCompleteCallback)
     {
-        write(StringType(static_cast<const char*>(message), length));
+        write(StringType(static_cast<const char*>(message), length), std::move(writeCompleteCallback));
     }
 
-    void SocketChannel::write(const StringType& message)
+    void SocketChannel::write(const StringType& message, WriteCompleteCallback writeCompleteCallback)
     {
         if (eventLoop_->isInCurrentEventLoop())
         {
-            doWrite(message.data(), message.length());
+            doWrite(message.data(), message.length(), ::std::move(writeCompleteCallback));
         }
         else
         {
             eventLoop_->execute(
                 // msg must be value catch
-                [this, msg = message]()
+                [&, writeCompleteCb = ::std::move(writeCompleteCallback), msg = message]()
                 {
-                    doWrite(msg.data(), msg.length());
+                    doWrite(msg.data(), msg.length(), writeCompleteCb);
                 });
         }
     }
 
-    void SocketChannel::write(const ByteBuffer& message)
+    void SocketChannel::write(const ByteBuffer& message, WriteCompleteCallback writeCompleteCallback)
     {
         if (eventLoop_->isInCurrentEventLoop())
         {
-            doWrite(message.data(), message.readableBytes());
+            doWrite(message.data(), message.readableBytes(), ::std::move(writeCompleteCallback));
         }
         else
         {
             eventLoop_->execute(
                 // msg must be value catch
-                [this, msg = message]()
+                [this, writeCompleteCb = ::std::move(writeCompleteCallback), msg = message]()
                 {
-                    doWrite(msg.data(), msg.readableBytes());
+                    doWrite(msg.data(), msg.readableBytes(), writeCompleteCb);
                 });
         }
     }
@@ -192,11 +193,16 @@ namespace nets::net
             if (totalBytes == static_cast<SizeType>(writtenBytes))
             {
                 writeBuffer_.clear();
-                eventLoop_->addTask(
-                    [self = ::std::dynamic_pointer_cast<SocketChannel>(shared_from_this())]()
-                    {
-                        self->channelHandlerPipeline_.fireChannelWriteComplete();
-                    });
+                WriteCompleteCallback writeCompleteCallback = writeCompleteCallbacks_.front();
+                writeCompleteCallbacks_.pop();
+                if (writeCompleteCallback != nullptr)
+                {
+                    eventLoop_->addTask(
+                        [this, writeCompleteCb = ::std::move(writeCompleteCallback)]()
+                        {
+                            writeCompleteCb(channelHandlerPipeline_.context());
+                        });
+                }
                 if (state_ == ChannelState::HALF_CLOSE)
                 {
                     channelInActive();
@@ -266,7 +272,7 @@ namespace nets::net
         return static_cast<SSizeType>(byteBuffer.readableBytes());
     }
 
-    void SocketChannel::doWrite(const void* data, SizeType length)
+    void SocketChannel::doWrite(const void* data, SizeType length, WriteCompleteCallback writeCompleteCallback)
     {
         if (state_ == ChannelState::INACTIVE)
         {
@@ -281,15 +287,16 @@ namespace nets::net
         if (!writeBuffer_.empty())
         {
             appendBuffer(data, length);
+            writeCompleteCallbacks_.push(::std::move(writeCompleteCallback));
         }
         else
         {
             // write directly
-            doWriteDirectly(data, length);
+            doWriteDirectly(data, length, std::move(writeCompleteCallback));
         }
     }
 
-    void SocketChannel::doWriteDirectly(const void* data, SizeType length)
+    void SocketChannel::doWriteDirectly(const void* data, SizeType length, WriteCompleteCallback writeCompleteCallback)
     {
         SSizeType bytes = socket::write(sockFd_, data, length);
         if (bytes < 0)
@@ -310,16 +317,20 @@ namespace nets::net
         // write complete
         if (remainingBytes == 0)
         {
-            eventLoop_->addTask(
-                [self = ::std::dynamic_pointer_cast<SocketChannel>(shared_from_this())]()
-                {
-                    self->channelHandlerPipeline_.fireChannelWriteComplete();
-                });
+            if (writeCompleteCallback != nullptr)
+            {
+                eventLoop_->addTask(
+                    [this, writeCompleteCb = ::std::move(writeCompleteCallback)]()
+                    {
+                        writeCompleteCb(channelHandlerPipeline_.context());
+                    });
+            }
         }
         // tcp send buffer size less than length,only part of it was sent
         else
         {
             appendBuffer(static_cast<const char*>(data) + bytes, remainingBytes);
+            writeCompleteCallbacks_.push(::std::move(writeCompleteCallback));
         }
     }
 

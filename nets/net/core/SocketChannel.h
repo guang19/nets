@@ -8,17 +8,19 @@
 #include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/Channel.h"
 #include "nets/net/core/ChannelHandlerPipeline.h"
+#include <queue>
 
 namespace nets::net
 {
     class ByteBuffer;
-
     class SocketChannel : public Channel
     {
     public:
         using SizeType = ByteBuffer::SizeType;
         using StringType = ::std::string;
         using IoVecList = ::std::vector<IoVec>;
+        using WriteCompleteCallback = ChannelContext::WriteCompleteCallback;
+        using WriteCompleteCallbackQueue = ::std::queue<WriteCompleteCallback>;
 
     public:
         explicit SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -52,9 +54,9 @@ namespace nets::net
         void setChannelOptions(const ChannelOptionList& channelOptions);
         void channelActive();
 
-        void write(const void* message, SizeType length);
-        void write(const StringType& message);
-        void write(const ByteBuffer& message);
+        void write(const void* message, SizeType length, WriteCompleteCallback writeCompleteCallback);
+        void write(const StringType& message, WriteCompleteCallback writeCompleteCallback);
+        void write(const ByteBuffer& message, WriteCompleteCallback writeCompleteCallback);
 
         // shutdown both
         void shutdown();
@@ -70,8 +72,8 @@ namespace nets::net
 
     private:
         SSizeType doRead(ByteBuffer& byteBuffer);
-        void doWrite(const void* data, SizeType length);
-        void doWriteDirectly(const void* data, SizeType length);
+        void doWrite(const void* data, SizeType length, WriteCompleteCallback writeCompleteCallback);
+        void doWriteDirectly(const void* data, SizeType length, WriteCompleteCallback writeCompleteCallback);
         void appendBuffer(const void* data, SizeType length);
         bool writeBufferLastCanAppend(SizeType length);
         SSizeType writev(const IoVecList& iovecs, ::int32_t count) const;
@@ -96,6 +98,7 @@ namespace nets::net
         };
         ChannelState state_ {ChannelState::INACTIVE};
         ChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
+        WriteCompleteCallbackQueue writeCompleteCallbacks_ {};
     };
 } // namespace nets::net
 
