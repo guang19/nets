@@ -23,7 +23,7 @@ namespace nets::net
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
                                  EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(sockFd), localAddress_(localAddress), peerAddress_(peerAddress), writeBuffer_(),
-          state_(ChannelState::INACTIVE), channelHandlerPipeline_(this), writeCompleteCallbacks_()
+          state_(ChannelState::INACTIVE), channelHandlerPipeline_(new SocketChannelContext(this)), writeCompleteCallbacks_()
     {
     }
 
@@ -200,7 +200,7 @@ namespace nets::net
                     eventLoop_->addTask(
                         [this, writeCompleteCb = ::std::move(writeCompleteCallback)]()
                         {
-                            writeCompleteCb(channelHandlerPipeline_.context());
+                            writeCompleteCb(dynamic_cast<SocketChannelContext&>(channelHandlerPipeline_.context()));
                         });
                 }
                 if (state_ == ChannelState::HALF_CLOSE)
@@ -322,7 +322,7 @@ namespace nets::net
                 eventLoop_->addTask(
                     [this, writeCompleteCb = ::std::move(writeCompleteCallback)]()
                     {
-                        writeCompleteCb(channelHandlerPipeline_.context());
+                        writeCompleteCb(dynamic_cast<SocketChannelContext&>(channelHandlerPipeline_.context()));
                     });
             }
         }

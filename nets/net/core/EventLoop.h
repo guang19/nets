@@ -31,7 +31,6 @@ namespace nets::net
         using TaskList = ::std::vector<TaskType>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
-        using UniqueLockType = ::std::unique_lock<MutexType>;
         using ConditionVariableType = ::std::condition_variable;
         using ChannelRawPtr = Channel*;
         using ChannelPtr = ::std::shared_ptr<Channel>;

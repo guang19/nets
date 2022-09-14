@@ -8,7 +8,7 @@
 #include <list>
 #include <memory>
 
-#include "nets/base/Copyable.h"
+#include "nets/net/core/ChannelContext.h"
 #include "nets/net/core/SocketChannelHandler.h"
 
 namespace nets::net
@@ -16,7 +16,8 @@ namespace nets::net
     class ChannelHandlerPipeline : nets::base::Copyable
     {
     public:
-        using ChannelRawPtr = ChannelContext::ChannelRawPtr;
+        using ChannelContextRawPtr = ChannelContext*;
+        using ChannelContextPtr = ::std::unique_ptr<ChannelContext>;
         using SocketChannelHandlerRawPtr = SocketChannelHandler*;
         using SocketChannelHandlerPtr = ::std::shared_ptr<SocketChannelHandler>;
         using ChannelHandlerRawPtr = ChannelHandler*;
@@ -24,7 +25,7 @@ namespace nets::net
         using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
 
     public:
-        explicit ChannelHandlerPipeline(ChannelRawPtr channel);
+        explicit ChannelHandlerPipeline(ChannelContextRawPtr channelContext);
         ~ChannelHandlerPipeline() = default;
 
         ChannelHandlerPipeline(const ChannelHandlerPipeline& other);
@@ -35,7 +36,7 @@ namespace nets::net
     public:
         inline ChannelContext& context()
         {
-            return channelContext_;
+            return *channelContext_;
         }
 
         void addFirst(ChannelHandlerRawPtr channelHandler);
@@ -54,7 +55,7 @@ namespace nets::net
         void fireChannelRead(ByteBuffer& message);
 
     private:
-        ChannelContext channelContext_ {nullptr};
+        ChannelContextPtr channelContext_ {};
         ChannelHandlerList channelHandlers_ {};
     };
 } // namespace nets::net

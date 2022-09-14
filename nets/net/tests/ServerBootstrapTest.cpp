@@ -11,7 +11,7 @@ using namespace nets::base;
 class TestServerChannelHandler : public SocketChannelHandler
 {
 public:
-    void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+    void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                         const InetSockAddress& peerAddress) override
     {
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
@@ -21,17 +21,17 @@ public:
         //            2000, 2000, ::std::bind(&TestServerChannelHandler::testScheduleTask, this));
     }
 
-    void channelDisconnect(ChannelContext& channelContext) override
+    void channelDisconnect(SocketChannelContext& channelContext) override
     {
         LOGS_DEBUG << "Server channelDisconnect:" << channelContext.peerAddress().toString();
     }
 
-    void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
+    void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
     {
         LOGS_DEBUG << "Server recv client message is:" << message.toString();
         //        channelContext.write(message);
         channelContext.write(message,
-                             [this](ChannelContext& ctx)
+                             [this](SocketChannelContext& ctx)
                              {
                                  writeComplete(ctx);
                              });
@@ -41,7 +41,7 @@ public:
         //        }
     }
 
-    void writeComplete(ChannelContext& channelContext)
+    void writeComplete(SocketChannelContext& channelContext)
     {
         LOGS_DEBUG << "Server writeComplete";
         channelContext.write("server writeComplete");

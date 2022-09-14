@@ -5,13 +5,11 @@
 #ifndef NETS_NET_SOCKET_CHANNEL_HANDLER_H
 #define NETS_NET_SOCKET_CHANNEL_HANDLER_H
 
-#include "nets/net/core/ChannelContext.h"
 #include "nets/net/core/ChannelHandler.h"
-#include "nets/net/core/InetSockAddress.h"
+#include "nets/net/core/SocketChannelContext.h"
 
 namespace nets::net
 {
-    class ByteBuffer;
     class SocketChannelHandler : public ChannelHandler
     {
     public:
@@ -19,10 +17,10 @@ namespace nets::net
         virtual ~SocketChannelHandler() override = default;
 
     public:
-        virtual void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+        virtual void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                     const InetSockAddress& peerAddress);
-        virtual void channelDisconnect(ChannelContext& channelContext);
-        virtual void channelRead(ChannelContext& channelContext, ByteBuffer& message);
+        virtual void channelDisconnect(SocketChannelContext& channelContext);
+        virtual void channelRead(SocketChannelContext& channelContext, ByteBuffer& message);
     };
 } // namespace nets::net
 

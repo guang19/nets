@@ -9,7 +9,7 @@ using namespace nets::net;
 class TestClientChannelHandler : public SocketChannelHandler
 {
 public:
-    void channelConnect(ChannelContext& channelContext, const InetSockAddress& localAddress,
+    void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                         const InetSockAddress& peerAddress) override
     {
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
@@ -61,18 +61,18 @@ public:
             "结尾");
     }
 
-    void channelDisconnect(ChannelContext& channelContext) override
+    void channelDisconnect(SocketChannelContext& channelContext) override
     {
         LOGS_DEBUG << "Client channelDisconnect:" << channelContext.peerAddress().toString();
     }
 
-    void channelRead(ChannelContext& channelContext, ByteBuffer& message) override
+    void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
     {
         LOGS_DEBUG << "Client recv server message is:" << message.toString();
         //        channelContext.write(message);
     }
 
-    void writeComplete(ChannelContext& channelContext)
+    void writeComplete(SocketChannelContext& channelContext)
     {
         LOGS_DEBUG << "Client writeComplete";
         LOGS_DEBUG << "isActive=" << channelContext.isActive();

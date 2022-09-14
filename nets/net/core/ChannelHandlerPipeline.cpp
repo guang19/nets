@@ -4,9 +4,14 @@
 
 #include "nets/net/core/ChannelHandlerPipeline.h"
 
+#include "nets/net/core/SocketChannelContext.h"
+
 namespace nets::net
 {
-    ChannelHandlerPipeline::ChannelHandlerPipeline(ChannelRawPtr channel) : channelContext_(channel), channelHandlers_() {}
+    ChannelHandlerPipeline::ChannelHandlerPipeline(ChannelContextRawPtr channelContext)
+        : channelContext_(channelContext), channelHandlers_()
+    {
+    }
 
     ChannelHandlerPipeline::ChannelHandlerPipeline(const ChannelHandlerPipeline& other)
     {
@@ -81,7 +86,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            handler->channelConnect(channelContext_, localAddress, peerAddress);
+            handler->channelConnect(dynamic_cast<SocketChannelContext&>(*channelContext_), localAddress, peerAddress);
         }
     }
 
@@ -90,7 +95,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            handler->channelDisconnect(channelContext_);
+            handler->channelDisconnect(dynamic_cast<SocketChannelContext&>(*channelContext_));
         }
     }
 
@@ -99,7 +104,7 @@ namespace nets::net
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
-            handler->channelRead(channelContext_, message);
+            handler->channelRead(dynamic_cast<SocketChannelContext&>(*channelContext_), message);
         }
     }
 } // namespace nets::net
