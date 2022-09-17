@@ -2,11 +2,12 @@
 // Created by guang19
 //
 
-#include "nets/net/server/ServerBootstrap.h"
 #include "nets/base/Timestamp.h"
+#include "nets/net/server/ServerBootstrap.h"
 
 using namespace nets::net;
 using namespace nets::base;
+
 
 class TestServerChannelHandler : public SocketChannelHandler
 {
@@ -17,8 +18,8 @@ public:
         LOGS_DEBUG << "isActive=" << channelContext.isActive();
         LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
                    << " client address:" << peerAddress.toString();
-        //        timerId_ = channelContext.channel().eventLoop()->scheduleAtFixedRate(
-        //            2000, 2000, ::std::bind(&TestServerChannelHandler::testScheduleTask, this));
+        timerId_ = channelContext.channel().eventLoop()->scheduleAtFixedRate(
+            2000, 2000, ::std::bind(&TestServerChannelHandler::testScheduleTask, this));
     }
 
     void channelDisconnect(SocketChannelContext& channelContext) override
@@ -28,23 +29,10 @@ public:
 
     void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
     {
-        LOGS_DEBUG << "Server recv client message is:" << message.toString();
-        //        channelContext.write(message);
-        channelContext.write(message,
-                             [this](SocketChannelContext& ctx)
-                             {
-                                 writeComplete(ctx);
-                             });
-        //        if (message.readInt8() == 1)
-        //        {
-        //            channelContext.channel().eventLoop()->cancelScheduleTask(timerId_);
-        //        }
-    }
-
-    void writeComplete(SocketChannelContext& channelContext)
-    {
-        LOGS_DEBUG << "Server writeComplete";
-        channelContext.write("server writeComplete");
+        if (message.readInt8() == 1)
+        {
+            channelContext.channel().eventLoop()->cancelScheduleTask(timerId_);
+        }
     }
 
 private:
@@ -54,7 +42,6 @@ private:
     }
 
 private:
-    ::int32_t sharedNum_ = 0;
     Timer::TimerId timerId_ {};
 };
 
