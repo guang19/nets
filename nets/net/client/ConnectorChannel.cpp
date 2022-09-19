@@ -102,16 +102,28 @@ namespace nets::net
 
     void ConnectorChannel::initSocketChannel(SocketChannelPtr& socketChannel)
     {
-        socketChannel->setChannelOptions(channelOptions_);
-        for (const auto& channelHandler: channelHandlers_)
+        if (!channelOptions_.empty())
         {
-            assert(channelHandler.use_count() == 1);
-            socketChannel->pipeline().addLast(channelHandler);
+            socketChannel->setChannelOptions(channelOptions_);
+            channelOptions_.clear();
+        }
+        if (!channelHandlers_.empty())
+        {
+            for (const auto& channelHandler: channelHandlers_)
+            {
+                assert(channelHandler.use_count() == 1);
+                socketChannel->pipeline().addLast(channelHandler);
+            }
+            channelHandlers_.clear();
         }
         if (channelInitializationCallback_ != nullptr)
         {
             channelInitializationCallback_(*socketChannel);
+            channelInitializationCallback_ = nullptr;
         }
+        assert(channelOptions_.empty());
+        assert(channelHandlers_.empty());
+        assert(channelInitializationCallback_ == nullptr);
     }
 
     void ConnectorChannel::newSocketChannel()

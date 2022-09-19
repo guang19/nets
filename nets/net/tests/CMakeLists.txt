@@ -27,3 +27,9 @@ TARGET_LINK_LIBRARIES(TcpServerScheduleTaskTest nets_net)
 
 ADD_EXECUTABLE(TcpClientTest TcpClientTest.cpp)
 TARGET_LINK_LIBRARIES(TcpClientTest nets_net)
+
+ADD_EXECUTABLE(UdpServerTest UdpServerTest.cpp)
+TARGET_LINK_LIBRARIES(UdpServerTest nets_net)
+
+ADD_EXECUTABLE(UdpClientTest UdpClientTest.cpp)
+TARGET_LINK_LIBRARIES(UdpClientTest nets_net)

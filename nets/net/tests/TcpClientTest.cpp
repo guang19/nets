@@ -59,9 +59,9 @@ public:
 //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
 //            "发来的消息这是客户端发来的消息"
 //            "结尾");
-        ByteBuffer buffer;
-        buffer.writeInt8(1);
-        channelContext.write(buffer);
+//        ByteBuffer buffer;
+//        buffer.writeInt8(1);
+//        channelContext.write(buffer);
     }
 
     void channelDisconnect(SocketChannelContext& channelContext) override

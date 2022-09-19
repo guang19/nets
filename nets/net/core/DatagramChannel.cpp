@@ -5,16 +5,12 @@
 #include "nets/net/core/DatagramChannel.h"
 
 #include "nets/base/CommonMacro.h"
+#include "nets/base/log/Logging.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
 namespace nets::net
 {
-    DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), channelOptions_()
-    {
-        channelOptions_.push_back(NReuseAddr);
-        channelOptions_.push_back(NReusePort);
-    }
+    DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop), sockFd_(socket::InvalidFd) {}
 
     DatagramChannel::~DatagramChannel()
     {
@@ -26,19 +22,35 @@ namespace nets::net
         return sockFd_;
     }
 
+    void DatagramChannel::setChannelOptions(const ChannelOptionList& channelOptions)
+    {
+        for (const auto& channelOption: channelOptions)
+        {
+            setChannelOption(channelOption);
+        }
+    }
+
     void DatagramChannel::bind(const InetSockAddress& localAddress)
     {
         sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
-        {
-            setChannelOption(channelOption);
-        }
         socket::bind(sockFd_, localAddress.sockAddr());
         addEvent(EReadEvent);
-        if (!registerTo())
+        try
         {
-            THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
+            if (!registerTo())
+            {
+                THROW_FMT(ChannelRegisterException, "DatagramChannel register failed");
+            }
+        }
+        catch (const ChannelRegisterException& exception)
+        {
+            THROW_FMT(ChannelRegisterException, "DatagramChannel register failed");
+            if (isRegistered())
+            {
+                deregister();
+            }
+            LOGS_ERROR << "DatagramChannel channelActive failed,cause " << exception.what();
         }
     }
 

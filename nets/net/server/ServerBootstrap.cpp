@@ -99,21 +99,29 @@ namespace nets::net
             {
                 return childLoopGroup_.next();
             });
-        ChannelOptionList channelOptions(channelOptions_);
-        serverSocketChannel->setChannelOptions(channelOptions);
-        channelOptions_.clear();
+        if (!channelOptions_.empty())
+        {
+            serverSocketChannel->setChannelOptions(channelOptions_);
+            channelOptions_.clear();
+        }
 
-        ChannelOptionList childOptions(childOptions_);
-        serverSocketChannel->setChildOptions(childOptions);
-        childOptions_.clear();
+        if (!childOptions_.empty())
+        {
+            serverSocketChannel->setChildOptions(childOptions_);
+            childOptions_.clear();
+        }
 
-        ChannelHandlerList childHandlers(childHandlers_);
-        serverSocketChannel->setChildHandlers(childHandlers);
-        childHandlers_.clear();
+        if (!childHandlers_.empty())
+        {
+            serverSocketChannel->setChildHandlers(childHandlers_);
+            childHandlers_.clear();
+        }
 
-        ChannelInitializationCallback childInitializationCallback(childInitializationCallback_);
-        serverSocketChannel->setChildInitializationCallback(childInitializationCallback);
-        childInitializationCallback_ = nullptr;
+        if (childInitializationCallback_ != nullptr)
+        {
+            serverSocketChannel->setChildInitializationCallback(childInitializationCallback_);
+            childInitializationCallback_ = nullptr;
+        }
 
         assert(channelOptions_.empty());
         assert(childOptions_.empty());

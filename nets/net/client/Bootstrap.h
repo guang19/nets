@@ -22,7 +22,9 @@ namespace nets::net
         using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
         using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
         using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
-        using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
+        using SocketChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
+        using DatagramChannelInitializationCallback = ::std::function<void(DatagramChannel& channel)>;
+        using ChannelInitializationCallback = ::std::any;
 
     public:
         Bootstrap();
@@ -31,7 +33,8 @@ namespace nets::net
     public:
         Bootstrap& channelHandler(ChannelHandlerRawPtr channelHandler);
         Bootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
-        Bootstrap& channelHandler(const ChannelInitializationCallback& channelInitializationCallback);
+        Bootstrap& channelHandler(const SocketChannelInitializationCallback& channelInitializationCallback);
+        Bootstrap& channelHandler(const DatagramChannelInitializationCallback& channelInitializationCallback);
 
         // udp client
         Bootstrap& bind();

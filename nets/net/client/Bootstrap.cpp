@@ -23,7 +23,13 @@ namespace nets::net
         return *this;
     }
 
-    Bootstrap& Bootstrap::channelHandler(const ChannelInitializationCallback& channelInitializationCallback)
+    Bootstrap& Bootstrap::channelHandler(const SocketChannelInitializationCallback& channelInitializationCallback)
+    {
+        channelInitializationCallback_ = channelInitializationCallback;
+        return *this;
+    }
+
+    Bootstrap& Bootstrap::channelHandler(const DatagramChannelInitializationCallback& channelInitializationCallback)
     {
         channelInitializationCallback_ = channelInitializationCallback;
         return *this;
@@ -93,21 +99,28 @@ namespace nets::net
         connectorChannel->setRetry(retry_);
         connectorChannel->setRetryInterval(retryInterval_);
 
-        ChannelOptionList channelOptions(channelOptions_);
-        connectorChannel->setChannelOptions(channelOptions);
-        channelOptions_.clear();
+        if (!channelOptions_.empty())
+        {
+            connectorChannel->setChannelOptions(channelOptions_);
+            channelOptions_.clear();
+        }
 
-        ChannelHandlerList channelHandlers(channelHandlers_);
-        connectorChannel->setChannelHandlers(channelHandlers);
-        channelHandlers_.clear();
+        if (!channelHandlers_.empty())
+        {
+            connectorChannel->setChannelHandlers(channelHandlers_);
+            channelHandlers_.clear();
+        }
 
-        ChannelInitializationCallback channelInitializationCallback(channelInitializationCallback_);
-        connectorChannel->setChannelInitializationCallback(channelInitializationCallback);
-        channelInitializationCallback_ = nullptr;
+        if (channelInitializationCallback_.has_value())
+        {
+            connectorChannel->setChannelInitializationCallback(
+                ::std::any_cast<SocketChannelInitializationCallback>(::std::move(channelInitializationCallback_)));
+            channelInitializationCallback_.reset();
+        }
 
         assert(channelOptions_.empty());
         assert(channelHandlers_.empty());
-        assert(channelInitializationCallback_ == nullptr);
+        assert(!channelInitializationCallback_.has_value());
     }
 
     void Bootstrap::doBind(const InetSockAddress& localAddress)
@@ -119,6 +132,29 @@ namespace nets::net
 
     void Bootstrap::initDatagramChannel(DatagramChannelPtr& datagramChannel)
     {
+        if (!channelOptions_.empty())
+        {
+            datagramChannel->setChannelOptions(channelOptions_);
+            channelOptions_.clear();
+        }
 
+        if (!channelHandlers_.empty())
+        {
+            for (const auto& childHandler: channelHandlers_)
+            {
+                assert(childHandler.use_count() == 1);
+                datagramChannel->pipeline().addLast(childHandler);
+            }
+            channelHandlers_.clear();
+        }
+
+        if (channelInitializationCallback_.has_value())
+        {
+            ::std::any_cast<DatagramChannelInitializationCallback>(channelInitializationCallback_)(*datagramChannel);
+            channelInitializationCallback_.reset();
+        }
+        assert(channelOptions_.empty());
+        assert(channelHandlers_.empty());
+        assert(!channelInitializationCallback_.has_value());
     }
 } // namespace nets::net

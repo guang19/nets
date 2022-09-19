@@ -6,6 +6,7 @@
 #define NETS_NET_DATAGRAM_CHANNEL_H
 
 #include "nets/net/core/Channel.h"
+#include "nets/net/core/ChannelHandlerPipeline.h"
 
 namespace nets::net
 {
@@ -19,10 +20,12 @@ namespace nets::net
         FdType fd() const override;
 
     public:
-        inline void setChannelOptions(const ChannelOptionList& channelOptions)
+        inline ChannelHandlerPipeline& pipeline()
         {
-            channelOptions_.insert(channelOptions_.end(), channelOptions.begin(), channelOptions.end());
+            return channelHandlerPipeline_;
         }
+
+        void setChannelOptions(const ChannelOptionList& channelOptions);
 
         void bind(const InetSockAddress& localAddress);
 
@@ -33,7 +36,7 @@ namespace nets::net
 
     private:
         FdType sockFd_ {socket::InvalidFd};
-        ChannelOptionList channelOptions_ {};
+        ChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
     };
 } // namespace nets::net
 
