@@ -10,6 +10,11 @@
 
 namespace nets::net
 {
+    class Datagram : public nets::base::Copyable
+    {
+
+    };
+
     class DatagramChannel : public Channel
     {
     public:
