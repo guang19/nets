@@ -4,6 +4,9 @@ LINK_DIRECTORIES(${GOOGLE_TEST_LIB_DIR})
 ADD_EXECUTABLE(ByteBufferTest ByteBufferTest.cpp)
 TARGET_LINK_LIBRARIES(ByteBufferTest nets_net libgtest.a)
 
+ADD_EXECUTABLE(DatagramPacketTest DatagramPacketTest.cpp)
+TARGET_LINK_LIBRARIES(DatagramPacketTest nets_net libgtest.a)
+
 ADD_EXECUTABLE(InetSockAddressTest InetSockAddressTest.cpp)
 TARGET_LINK_LIBRARIES(InetSockAddressTest nets_net libgtest.a)
 

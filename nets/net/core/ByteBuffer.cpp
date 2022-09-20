@@ -53,11 +53,9 @@ namespace nets::net
     }
 
     ByteBuffer::ByteBuffer(ByteBuffer&& other) noexcept
+        : buffer_(::std::move(other.buffer_)), readerIndex_(other.readerIndex_), writerIndex_(other.writerIndex_),
+          capacity_(other.capacity_)
     {
-        readerIndex_ = other.readerIndex_;
-        writerIndex_ = other.writerIndex_;
-        capacity_ = other.capacity_;
-        buffer_ = ::std::move(other.buffer_);
         assert(other.buffer_ == nullptr);
         other.readerIndex_ = 0;
         other.writerIndex_ = 0;
