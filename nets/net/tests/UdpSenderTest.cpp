@@ -6,18 +6,31 @@
 
 using namespace nets::net;
 
+class TestUdpSenderHandler : public DatagramChannelHandler
+{
+public:
+    void channelActive(DatagramChannelContext& channelContext) override
+    {
+        LOGS_DEBUG << "TestUdpSenderHandler::channelActive";
+    }
+
+    void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
+    {
+        LOGS_DEBUG << "TestUdpSenderHandler::channelRead";
+    }
+};
+
 int main(int argc, char** argv)
 {
-//    Bootstrap()
-//        .option(NTcpSendBuffer, 1024)
-//        .option(NTcpRecvBuffer, 1024)
-//        .retry(true, 3000)
-//        //        .channelHandler(new TestClientChannelHandler())
-//        .channelHandler(
-//            [](SocketChannel& channel)
-//            {
-//            })
-//        .bind("127.0.0.1", 8080)
-//        .sync();
+    Bootstrap()
+        .option(NTcpRecvBuffer, 1024)
+        //        .channelHandler(new TestUdpSenderHandler())
+        .channelHandler(
+            [](DatagramChannel& channel)
+            {
+                channel.pipeline().addLast(new TestUdpSenderHandler);
+            })
+        .bind("127.0.0.1", 8080)
+        .sync();
     return 0;
 }

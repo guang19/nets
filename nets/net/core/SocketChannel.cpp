@@ -58,6 +58,7 @@ namespace nets::net
                 THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
             }
             state_ = ChannelState::ACTIVE;
+            channelHandlerPipeline_.fireSocketChannelConnect(localAddress_, peerAddress_);
         }
         catch (const ChannelRegisterException& exception)
         {
@@ -67,7 +68,6 @@ namespace nets::net
             }
             LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
         }
-        channelHandlerPipeline_.fireSocketChannelConnect(localAddress_, peerAddress_);
     }
 
     void SocketChannel::write(const void* message, SizeType length, WriteCompleteCallback writeCompleteCallback)

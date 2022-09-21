@@ -48,6 +48,8 @@ namespace nets::net
         {
             setChannelOption(channelOption);
         }
+        channelOptions_.clear();
+        assert(channelOptions_.empty());
         socket::bind(sockFd_, localAddress.sockAddr());
         socket::listen(sockFd_, backlog_);
         addEvent(EReadEvent);

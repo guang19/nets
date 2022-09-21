@@ -25,7 +25,10 @@ namespace nets::net
             return channelHandlerPipeline_;
         }
 
-        void setChannelOptions(const ChannelOptionList& channelOptions);
+        inline void setChannelOptions(const ChannelOptionList& channelOptions)
+        {
+            channelOptions_.insert(channelOptions_.end(), channelOptions.begin(), channelOptions.end());
+        }
 
         void bind(const InetSockAddress& localAddress);
 
@@ -37,6 +40,7 @@ namespace nets::net
     private:
         FdType sockFd_ {socket::InvalidFd};
         ChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
+        ChannelOptionList channelOptions_ {};
     };
 } // namespace nets::net
 
