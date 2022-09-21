@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "nets/net/core/ChannelContext.h"
+#include "nets/net/core/DatagramChannelHandler.h"
 #include "nets/net/core/SocketChannelHandler.h"
 
 namespace nets::net
@@ -50,9 +51,12 @@ namespace nets::net
         void addLast(const SocketChannelHandlerPtr& channelHandler);
 
     public:
-        void fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
-        void fireChannelDisconnect();
-        void fireChannelRead(ByteBuffer& message);
+        void fireSocketChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
+        void fireSocketChannelDisconnect();
+        void fireSocketChannelRead(ByteBuffer& message);
+
+        void fireDatagramChannelActive();
+        void fireDatagramChannelRead(DatagramPacket& message);
 
     private:
         ChannelContextPtr channelContext_ {};

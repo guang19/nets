@@ -82,6 +82,7 @@ namespace nets::net
         StringType ip() const;
         PortType port() const;
         StringType toString() const;
+        bool isInValid() const;
 
     private:
         union

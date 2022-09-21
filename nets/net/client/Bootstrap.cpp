@@ -37,7 +37,7 @@ namespace nets::net
 
     Bootstrap& Bootstrap::bind()
     {
-        return *this;
+        return bind(InetSockAddress());
     }
 
     Bootstrap& Bootstrap::bind(const char* ip, PortType port, bool ipv6)

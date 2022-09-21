@@ -6,10 +6,11 @@
 #define NETS_NET_DATAGRAM_CHANNEL_CONTEXT_H
 
 #include "nets/net/core/ChannelContext.h"
-#include "nets/net/core/DatagramChannel.h"
+#include "nets/net/core/DatagramPacket.h"
 
 namespace nets::net
 {
+    class DatagramChannel;
     class DatagramChannelContext : public ChannelContext
     {
     public:

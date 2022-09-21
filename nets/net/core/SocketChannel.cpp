@@ -58,7 +58,6 @@ namespace nets::net
                 THROW_FMT(ChannelRegisterException, "SocketChannel register failed");
             }
             state_ = ChannelState::ACTIVE;
-            channelHandlerPipeline_.fireChannelConnect(localAddress_, peerAddress_);
         }
         catch (const ChannelRegisterException& exception)
         {
@@ -68,6 +67,7 @@ namespace nets::net
             }
             LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
         }
+        channelHandlerPipeline_.fireSocketChannelConnect(localAddress_, peerAddress_);
     }
 
     void SocketChannel::write(const void* message, SizeType length, WriteCompleteCallback writeCompleteCallback)
@@ -138,7 +138,7 @@ namespace nets::net
         SSizeType bytes = doRead(byteBuffer);
         if (bytes > 0)
         {
-            channelHandlerPipeline_.fireChannelRead(byteBuffer);
+            channelHandlerPipeline_.fireSocketChannelRead(byteBuffer);
         }
         else if (bytes == 0)
         {
@@ -483,7 +483,7 @@ namespace nets::net
     void SocketChannel::channelInActive()
     {
         state_ = ChannelState::INACTIVE;
-        channelHandlerPipeline_.fireChannelDisconnect();
+        channelHandlerPipeline_.fireSocketChannelDisconnect();
         eventLoop_->addTask(
             [channel = shared_from_this()]()
             {

@@ -51,6 +51,15 @@ TEST(InetSockAddressTest, CopyAndMove)
     ASSERT_STREQ(sockAddress2.toString().c_str(), "");
 }
 
+TEST(InetSockAddressTest, Valid)
+{
+    InetSockAddress address1("127.0.0.1", 8080, false);
+    ASSERT_FALSE(address1.isInValid());
+
+    InetSockAddress address2;
+    ASSERT_TRUE(address2.isInValid());
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

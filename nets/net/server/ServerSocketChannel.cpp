@@ -69,6 +69,7 @@ namespace nets::net
             socket::getLocalAddress(connFd, localAddr.sockAddr6());
             auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
             initSocketChannel(socketChannel);
+            socketChannel->channelActive();
         }
         else
         {
@@ -95,7 +96,6 @@ namespace nets::net
         {
             childInitializationCallback_(*socketChannel);
         }
-        socketChannel->channelActive();
     }
 
     void ServerSocketChannel::handleAcceptError(::int32_t errNum)

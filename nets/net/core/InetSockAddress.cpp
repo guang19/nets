@@ -212,4 +212,9 @@ namespace nets::net
         }
         return buffer;
     }
+
+    bool InetSockAddress::isInValid() const
+    {
+        return addr_.sa_family == AF_UNSPEC;
+    }
 } // namespace nets::net

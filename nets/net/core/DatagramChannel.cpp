@@ -10,7 +10,10 @@
 
 namespace nets::net
 {
-    DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop) : Channel(eventLoop), sockFd_(socket::InvalidFd) {}
+    DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
+        : Channel(eventLoop), sockFd_(socket::InvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this))
+    {
+    }
 
     DatagramChannel::~DatagramChannel()
     {
@@ -32,9 +35,17 @@ namespace nets::net
 
     void DatagramChannel::bind(const InetSockAddress& localAddress)
     {
-        sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
-        socket::setSockNonBlock(sockFd_, true);
-        socket::bind(sockFd_, localAddress.sockAddr());
+        if (localAddress.isInValid())
+        {
+            sockFd_ = socket::createUdpSocket();
+            socket::setSockNonBlock(sockFd_, true);
+        }
+        else
+        {
+            sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
+            socket::setSockNonBlock(sockFd_, true);
+            socket::bind(sockFd_, localAddress.sockAddr());
+        }
         addEvent(EReadEvent);
         try
         {
@@ -52,6 +63,7 @@ namespace nets::net
             }
             LOGS_ERROR << "DatagramChannel channelActive failed,cause " << exception.what();
         }
+        channelHandlerPipeline_.fireDatagramChannelActive();
     }
 
     void DatagramChannel::handleReadEvent() {}

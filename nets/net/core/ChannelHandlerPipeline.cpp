@@ -4,8 +4,6 @@
 
 #include "nets/net/core/ChannelHandlerPipeline.h"
 
-#include "nets/net/core/SocketChannelContext.h"
-
 namespace nets::net
 {
     ChannelHandlerPipeline::ChannelHandlerPipeline(ChannelContextRawPtr channelContext)
@@ -81,7 +79,8 @@ namespace nets::net
         channelHandlers_.push_back(channelHandler);
     }
 
-    void ChannelHandlerPipeline::fireChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress)
+    void ChannelHandlerPipeline::fireSocketChannelConnect(const InetSockAddress& localAddress,
+                                                          const InetSockAddress& peerAddress)
     {
         for (auto& channelHandler: channelHandlers_)
         {
@@ -90,7 +89,7 @@ namespace nets::net
         }
     }
 
-    void ChannelHandlerPipeline::fireChannelDisconnect()
+    void ChannelHandlerPipeline::fireSocketChannelDisconnect()
     {
         for (auto& channelHandler: channelHandlers_)
         {
@@ -99,12 +98,30 @@ namespace nets::net
         }
     }
 
-    void ChannelHandlerPipeline::fireChannelRead(ByteBuffer& message)
+    void ChannelHandlerPipeline::fireSocketChannelRead(ByteBuffer& message)
     {
         for (auto& channelHandler: channelHandlers_)
         {
             auto handler = ::std::dynamic_pointer_cast<SocketChannelHandler>(channelHandler);
             handler->channelRead(dynamic_cast<SocketChannelContext&>(*channelContext_), message);
+        }
+    }
+
+    void ChannelHandlerPipeline::fireDatagramChannelActive()
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            auto handler = ::std::dynamic_pointer_cast<DatagramChannelHandler>(channelHandler);
+            handler->channelActive(dynamic_cast<DatagramChannelContext&>(*channelContext_));
+        }
+    }
+
+    void ChannelHandlerPipeline::fireDatagramChannelRead(DatagramPacket& message)
+    {
+        for (auto& channelHandler: channelHandlers_)
+        {
+            auto handler = ::std::dynamic_pointer_cast<DatagramChannelHandler>(channelHandler);
+            handler->channelRead(dynamic_cast<DatagramChannelContext&>(*channelContext_), message);
         }
     }
 } // namespace nets::net

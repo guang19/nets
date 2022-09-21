@@ -36,9 +36,9 @@ namespace nets::net
         Bootstrap& channelHandler(const SocketChannelInitializationCallback& channelInitializationCallback);
         Bootstrap& channelHandler(const DatagramChannelInitializationCallback& channelInitializationCallback);
 
-        // udp client
+        // udp does not bind addr
         Bootstrap& bind();
-        // udp server
+        // udp bind addr
         Bootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
         Bootstrap& bind(const InetSockAddress& localAddress);
 
