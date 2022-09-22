@@ -34,16 +34,17 @@ namespace nets::net
         FdType createIdleFd();
         void dealwithEMFILE(FdType& idleFd, FdType sockFd);
 
-        void bind(FdType sockFd, const SockAddr* sockAddr);
+        void bind(FdType sockFd, const SockAddr* localAddr);
         void listen(FdType sockFd, ::int32_t backlog);
-        FdType accept(FdType sockFd, SockAddr6* sockAddr);
-        ::int32_t connect(FdType sockFd, const SockAddr* sockAddr);
+        FdType accept(FdType sockFd, SockAddr6* peerAddr);
+        ::int32_t connect(FdType sockFd, const SockAddr* peerAddr);
 
         SSizeType read(FdType fd, void* buf, SizeType n);
         SSizeType readv(FdType fd, const IoVec* iov, ::int32_t iovcnt);
         SSizeType write(FdType fd, const void* buf, SizeType n);
         SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt);
 
+        SSizeType sendTo(FdType fd, const void* buf, SizeType n, const SockAddr* destAddr);
 
         void getLocalAddress(FdType fd, SockAddr6* sockAddr);
         void getPeerAddress(FdType fd, SockAddr6* sockAddr);

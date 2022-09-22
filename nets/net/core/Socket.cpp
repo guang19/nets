@@ -102,10 +102,10 @@ namespace nets::net::socket
         idleFd = createIdleFd();
     }
 
-    void bind(FdType sockFd, const SockAddr* sockAddr)
+    void bind(FdType sockFd, const SockAddr* localAddr)
     {
-        auto length = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
-        if (0 != ::bind(sockFd, sockAddr, length))
+        auto length = static_cast<SockLenType>((localAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
+        if (0 != ::bind(sockFd, localAddr, length))
         {
             THROW_FMT(SocketOperationException, "socket bind failed");
         }
@@ -119,16 +119,16 @@ namespace nets::net::socket
         }
     }
 
-    FdType accept(FdType sockFd, SockAddr6* sockAddr)
+    FdType accept(FdType sockFd, SockAddr6* peerAddr)
     {
         auto length = static_cast<SockLenType>(sizeof(SockAddr6));
-        return ::accept4(sockFd, reinterpret_cast<SockAddr*>(sockAddr), &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
+        return ::accept4(sockFd, reinterpret_cast<SockAddr*>(peerAddr), &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
     }
 
-    ::int32_t connect(FdType sockFd, const SockAddr* sockAddr)
+    ::int32_t connect(FdType sockFd, const SockAddr* peerAddr)
     {
-        auto length = static_cast<SockLenType>((sockAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
-        return ::connect(sockFd, sockAddr, length);
+        auto length = static_cast<SockLenType>((peerAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
+        return ::connect(sockFd, peerAddr, length);
     }
 
     SSizeType read(FdType fd, void* buf, SizeType n)
@@ -149,6 +149,12 @@ namespace nets::net::socket
     SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt)
     {
         return ::writev(fd, iov, iovcnt);
+    }
+
+    SSizeType sendTo(FdType fd, const void* buf, SizeType n, const SockAddr* destAddr)
+    {
+        auto length = static_cast<SockLenType>((destAddr->sa_family == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
+        return ::sendto(fd, buf, n, 0, destAddr, length);
     }
 
     void getLocalAddress(FdType fd, SockAddr6* sockAddr)

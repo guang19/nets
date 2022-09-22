@@ -22,15 +22,18 @@ public:
 
 int main(int argc, char** argv)
 {
-    Bootstrap()
-        .option(SO_TcpRecvBuffer, 1024)
-        //        .channelHandler(new TestUdpSenderHandler())
-        .channelHandler(
-            [](DatagramChannel& channel)
-            {
-                channel.pipeline().addLast(new TestUdpSenderHandler);
-            })
-        .bind()
-        .sync();
+    ::printf("%ld\n", sizeof(SockAddr));
+    ::printf("%ld\n", sizeof(SockAddr4));
+    ::printf("%ld\n", sizeof(SockAddr6));
+//    Bootstrap()
+//        .option(SO_TcpRecvBuffer, 1024)
+//        //        .channelHandler(new TestUdpSenderHandler())
+//        .channelHandler(
+//            [](DatagramChannel& channel)
+//            {
+//                channel.pipeline().addLast(new TestUdpSenderHandler);
+//            })
+//        .bind()
+//        .sync();
     return 0;
 }

@@ -13,6 +13,9 @@ namespace nets::net
     class DatagramChannel : public Channel
     {
     public:
+        using StringType = ::std::string;
+
+    public:
         explicit DatagramChannel(EventLoopRawPtr eventLoop);
         ~DatagramChannel() override;
 
@@ -32,13 +35,25 @@ namespace nets::net
 
         void bind(const InetSockAddress& localAddress);
 
+        void write(const void* message, SizeType length, const InetSockAddress& recipient);
+        void write(const StringType& message, const InetSockAddress& recipient);
+        void write(const ByteBuffer& message, const InetSockAddress& recipient);
+        void write(const DatagramPacket& message);
+
     protected:
         void handleReadEvent() override;
         void handleWriteEvent() override;
         void handleErrorEvent() override;
 
     private:
+        void doWrite(const void* data, SizeType length, const InetSockAddress& recipient);
+        void doWriteDirectly(const void* data, SizeType length, const InetSockAddress& recipient);
+
+    private:
         FdType sockFd_ {socket::InvalidFd};
+        using DatagramPacketList = ::std::vector<DatagramPacket>;
+        DatagramPacketList writeBuffer_ {};
+
         DatagramChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
         ChannelOptionList channelOptions_ {};
     };
