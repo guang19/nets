@@ -44,8 +44,8 @@ public:
 int main(int argc, char** argv)
 {
     ServerBootstrap(8)
-        .option(NTcpSendBuffer, 1024)
-        .option(NTcpRecvBuffer, 1024)
+        .option(SO_TcpSendBuffer, 1024)
+        .option(SO_TcpRecvBuffer, 1024)
         //                .childHandler(new TestServerChannelHandler())
         .childHandler(
             [](SocketChannel& channel)

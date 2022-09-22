@@ -23,14 +23,14 @@ public:
 int main(int argc, char** argv)
 {
     Bootstrap()
-        .option(NTcpRecvBuffer, 1024)
+        .option(SO_TcpRecvBuffer, 1024)
         //        .channelHandler(new TestUdpSenderHandler())
         .channelHandler(
             [](DatagramChannel& channel)
             {
                 channel.pipeline().addLast(new TestUdpSenderHandler);
             })
-        .bind("127.0.0.1", 8080)
+        .bind()
         .sync();
     return 0;
 }

@@ -11,8 +11,8 @@ using namespace nets::net;
 int main(int argc, char** argv)
 {
     //    Bootstrap()
-    //        .option(NTcpSendBuffer, 1024)
-    //        .option(NTcpRecvBuffer, 1024)
+    //        .option(SO_TcpSendBuffer, 1024)
+    //        .option(SO_TcpRecvBuffer, 1024)
     //        .retry(true, 3000)
     //        //        .channelHandler(new TestClientChannelHandler())
     //        .channelHandler(

@@ -62,7 +62,7 @@ namespace nets::net
 
     void DatagramChannelHandlerPipeline::fireDatagramChannelActive()
     {
-        for (auto& channelHandler: channelHandlers_)
+        for (auto& channelHandler : channelHandlers_)
         {
             channelHandler->channelActive(*channelContext_);
         }
@@ -70,7 +70,7 @@ namespace nets::net
 
     void DatagramChannelHandlerPipeline::fireDatagramChannelRead(DatagramPacket& message)
     {
-        for (auto& channelHandler: channelHandlers_)
+        for (auto& channelHandler : channelHandlers_)
         {
             channelHandler->channelRead(*channelContext_, message);
         }

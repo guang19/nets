@@ -16,16 +16,17 @@ namespace nets::net
     enum SockOpt
     {
         INVALID_SOCKOPT = -1,
-        NBACKLOG = 0,
-        NREUSE_ADDR,
-        NREUSE_PORT,
-        NKEEP_ALIVE,
-        NTCP_NODELAY,
-        NLINGER,
-        NTCP_SNDBUF,
-        NTCP_RCVBUF,
-        NUDP_SNDBUF,
-        NUDP_RCVBUF,
+        BACKLOG = 0,
+        REUSE_ADDR,
+        REUSE_PORT,
+        KEEP_ALIVE,
+        TCP_NODELAY,
+        LINGER,
+        BROADCAST,
+        TCP_SNDBUF,
+        TCP_RCVBUF,
+        UDP_SNDBUF,
+        UDP_RCVBUF,
     };
 
     class ChannelOption : nets::base::Copyable
@@ -71,16 +72,17 @@ namespace nets::net
 
     namespace
     {
-        const ChannelOption NReuseAddr {SockOpt::NREUSE_ADDR, true};
-        const ChannelOption NReusePort {SockOpt::NREUSE_PORT, true};
-        const ChannelOption NKeepAlive {SockOpt::NKEEP_ALIVE, false};
-        const ChannelOption NTcpNoDelay {SockOpt::NTCP_NODELAY, false};
-        const ChannelOption NLinger {SockOpt::NLINGER, DefaultSockLinger};
-        const ChannelOption NBackLog {SockOpt::NBACKLOG, DefaultMaximumOfBackLog};
-        const ChannelOption NTcpSendBuffer {SockOpt::NTCP_SNDBUF, DefaultTcpSockSendBufferSize};
-        const ChannelOption NTcpRecvBuffer {SockOpt::NTCP_RCVBUF, DefaultTcpSockRecvBufferSize};
-        const ChannelOption NUdpSendBuffer {SockOpt::NUDP_SNDBUF, DefaultUdpSockSendBufferSize};
-        const ChannelOption NUdpRecvBuffer {SockOpt::NUDP_RCVBUF, DefaultUdpSockRecvBufferSize};
+        const ChannelOption SO_BackLog {SockOpt::BACKLOG, DefaultMaximumOfBackLog};
+        const ChannelOption SO_ReuseAddr {SockOpt::REUSE_ADDR, true};
+        const ChannelOption SO_ReusePort {SockOpt::REUSE_PORT, true};
+        const ChannelOption SO_KeepAlive {SockOpt::KEEP_ALIVE, false};
+        const ChannelOption SO_TcpNoDelay {SockOpt::TCP_NODELAY, false};
+        const ChannelOption SO_Linger {SockOpt::LINGER, DefaultSockLinger};
+        const ChannelOption SO_BroadCast {SockOpt::BROADCAST, true};
+        const ChannelOption SO_TcpSendBuffer {SockOpt::TCP_SNDBUF, DefaultTcpSockSendBufferSize};
+        const ChannelOption SO_TcpRecvBuffer {SockOpt::TCP_RCVBUF, DefaultTcpSockRecvBufferSize};
+        const ChannelOption SO_UdpSendBuffer {SockOpt::UDP_SNDBUF, DefaultUdpSockSendBufferSize};
+        const ChannelOption SO_UdpRecvBuffer {SockOpt::UDP_RCVBUF, DefaultUdpSockRecvBufferSize};
     } // namespace
 } // namespace nets::net
 

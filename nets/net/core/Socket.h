@@ -62,13 +62,13 @@ namespace nets::net
         OptValType getTcpSockRecvBuf();
         OptValType getUdpSockSendBuf();
         OptValType getUdpSockRecvBuf();
-
         void setSockReuseAddr(FdType sockFd, bool enable = true);
         void setSockReusePort(FdType sockFd, bool enable = true);
         void setSockKeepAlive(FdType sockFd, bool enable = true);
         void setTcpNoDelay(FdType sockFd, bool enable = true);
         void setSockNonBlock(FdType sockFd, bool enable = true);
         void setSockLinger(FdType sockFd, const SockLinger& linger);
+        void setSockBroadCast(FdType sockFd, bool enable = true);
     } // namespace socket
 
     namespace

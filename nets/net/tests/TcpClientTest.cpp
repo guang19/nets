@@ -24,7 +24,7 @@ public:
                              {
                                  writeComplete(ctx);
                              });
-        channelContext.shutdown();
+        //        channelContext.shutdown();
 
         //        channelContext.write(
         //            "你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你"
@@ -85,8 +85,8 @@ public:
 int main(int argc, char** argv)
 {
     Bootstrap()
-        .option(NTcpSendBuffer, 1024)
-        .option(NTcpRecvBuffer, 1024)
+        .option(SO_TcpSendBuffer, 1024)
+        .option(SO_TcpRecvBuffer, 1024)
         .retry(true, 3000)
         //        .channelHandler(new TestClientChannelHandler())
         .channelHandler(

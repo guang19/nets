@@ -91,45 +91,50 @@ namespace nets::net
         {
             switch (sockOpt)
             {
-                case SockOpt::NBACKLOG:
+                case SockOpt::BACKLOG:
                 {
                     setBacklog(::std::any_cast<::int32_t>(channelOption.get()));
                     break;
                 }
-                case SockOpt::NREUSE_ADDR:
+                case SockOpt::REUSE_ADDR:
                 {
                     socket::setSockReuseAddr(sockFd, ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case SockOpt::NREUSE_PORT:
+                case SockOpt::REUSE_PORT:
                 {
                     socket::setSockReusePort(sockFd, ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case SockOpt::NKEEP_ALIVE:
+                case SockOpt::KEEP_ALIVE:
                 {
                     socket::setSockKeepAlive(sockFd, ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case SockOpt::NTCP_NODELAY:
+                case SockOpt::TCP_NODELAY:
                 {
                     socket::setTcpNoDelay(sockFd, ::std::any_cast<bool>(channelOption.get()));
                     break;
                 }
-                case SockOpt::NLINGER:
+                case SockOpt::LINGER:
                 {
                     auto linger = ::std::any_cast<::int32_t>(channelOption.get());
                     socket::setSockLinger(sockFd, {1, linger});
                     break;
                 }
-                case SockOpt::NTCP_SNDBUF:
-                case SockOpt::NUDP_SNDBUF:
+                case SockOpt::BROADCAST:
+                {
+                    socket::setSockBroadCast(sockFd, ::std::any_cast<bool>(channelOption.get()));
+                    break;
+                }
+                case SockOpt::TCP_SNDBUF:
+                case SockOpt::UDP_SNDBUF:
                 {
                     socket::setSockSendBuf(sockFd, ::std::any_cast<::int32_t>(channelOption.get()));
                     break;
                 }
-                case SockOpt::NTCP_RCVBUF:
-                case SockOpt::NUDP_RCVBUF:
+                case SockOpt::TCP_RCVBUF:
+                case SockOpt::UDP_RCVBUF:
                 {
                     socket::setSockRecvBuf(sockFd, ::std::any_cast<::int32_t>(channelOption.get()));
                     break;

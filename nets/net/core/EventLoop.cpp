@@ -58,7 +58,7 @@ namespace nets::net
             TimeType timeout =
                 remainingExpiredTime == -1 ? DefaultPollTimeout : ::std::min(remainingExpiredTime, DefaultPollTimeout);
             poller_->poll(::std::max(MinimumPollTimeout, timeout), activeChannels_);
-            for (auto& channel: activeChannels_)
+            for (auto& channel : activeChannels_)
             {
                 channel->handleEvent();
             }
@@ -132,7 +132,7 @@ namespace nets::net
             LockGuardType lock(mutex_);
             tmpTasks.swap(pendingTasks_);
         }
-        for (const auto& t: tmpTasks)
+        for (const auto& t : tmpTasks)
         {
             t();
         }

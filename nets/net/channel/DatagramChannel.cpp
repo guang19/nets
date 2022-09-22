@@ -16,8 +16,8 @@ namespace nets::net
         : Channel(eventLoop), sockFd_(socket::InvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
           channelOptions_()
     {
-        channelOptions_.push_back(NReuseAddr);
-        channelOptions_.push_back(NReusePort);
+        channelOptions_.push_back(SO_ReuseAddr);
+        channelOptions_.push_back(SO_ReusePort);
     }
 
     DatagramChannel::~DatagramChannel()
@@ -43,7 +43,7 @@ namespace nets::net
             sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
         }
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
+        for (const auto& channelOption : channelOptions_)
         {
             setChannelOption(channelOption);
         }

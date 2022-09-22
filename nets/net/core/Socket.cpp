@@ -288,14 +288,6 @@ namespace nets::net::socket
         }
     }
 
-    void setSockLinger(FdType sockFd, const SockLinger& linger)
-    {
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
-        {
-            LOGS_ERROR << "socket setSockLinger failed";
-        }
-    }
-
     void setSockNonBlock(FdType sockFd, bool enable)
     {
         ::int32_t flags = ::fcntl(sockFd, F_GETFL, 0);
@@ -310,6 +302,23 @@ namespace nets::net::socket
         if (-1 == ::fcntl(sockFd, F_SETFL, flags))
         {
             LOGS_ERROR << "socket setSockNonBlock failed";
+        }
+    }
+
+    void setSockLinger(FdType sockFd, const SockLinger& linger)
+    {
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
+        {
+            LOGS_ERROR << "socket setSockLinger failed";
+        }
+    }
+
+    void setSockBroadCast(FdType sockFd, bool enable)
+    {
+        OptValType broadcast = enable ? 1 : 0;
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(broadcast))))
+        {
+            LOGS_ERROR << "socket setSockBroadCast failed";
         }
     }
 } // namespace nets::net::socket
