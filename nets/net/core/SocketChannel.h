@@ -7,7 +7,7 @@
 
 #include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/Channel.h"
-#include "nets/net/core/ChannelHandlerPipeline.h"
+#include "nets/net/core/SocketChannelHandlerPipeline.h"
 #include <queue>
 
 namespace nets::net
@@ -31,7 +31,7 @@ namespace nets::net
         FdType fd() const override;
 
     public:
-        inline ChannelHandlerPipeline& pipeline()
+        inline SocketChannelHandlerPipeline& pipeline()
         {
             return channelHandlerPipeline_;
         }
@@ -97,7 +97,7 @@ namespace nets::net
             HALF_CLOSE,
         };
         ChannelState state_ {ChannelState::INACTIVE};
-        ChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
+        SocketChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
         WriteCompleteCallbackQueue writeCompleteCallbacks_ {};
     };
 } // namespace nets::net

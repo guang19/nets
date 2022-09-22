@@ -17,23 +17,27 @@ namespace nets::net
         using TimeType = typename ConnectorChannel::TimeType;
         using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using DatagramChannelPtr = ::std::shared_ptr<DatagramChannel>;
-        using SocketChannelHandlerRawPtr = typename ChannelHandlerPipeline::SocketChannelHandlerRawPtr;
-        using SocketChannelHandlerPtr = typename ChannelHandlerPipeline::SocketChannelHandlerPtr;
-        using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
-        using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
-        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
+        using SocketChannelHandlerRawPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerRawPtr;
+        using SocketChannelHandlerPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerPtr;
+        using SocketChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
         using SocketChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
+
+        using DatagramChannelHandlerRawPtr = typename DatagramChannelHandlerPipeline::DatagramChannelHandlerRawPtr;
+        using DatagramChannelHandlerPtr = typename DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr;
+        using DatagramChannelHandlerList = typename DatagramChannelHandlerPipeline::DatagramChannelHandlerList;
         using DatagramChannelInitializationCallback = ::std::function<void(DatagramChannel& channel)>;
-        using ChannelInitializationCallback = ::std::any;
 
     public:
         Bootstrap();
         ~Bootstrap() override = default;
 
     public:
-        Bootstrap& channelHandler(ChannelHandlerRawPtr channelHandler);
-        Bootstrap& channelHandler(const ChannelHandlerPtr& channelHandler);
+        Bootstrap& channelHandler(SocketChannelHandlerRawPtr channelHandler);
+        Bootstrap& channelHandler(const SocketChannelHandlerPtr& channelHandler);
         Bootstrap& channelHandler(const SocketChannelInitializationCallback& channelInitializationCallback);
+
+        Bootstrap& channelHandler(DatagramChannelHandlerRawPtr channelHandler);
+        Bootstrap& channelHandler(const DatagramChannelHandlerPtr& channelHandler);
         Bootstrap& channelHandler(const DatagramChannelInitializationCallback& channelInitializationCallback);
 
         // udp does not bind addr
@@ -61,8 +65,10 @@ namespace nets::net
     private:
         bool retry_ {false};
         TimeType retryInterval_ {0};
-        ChannelHandlerList channelHandlers_ {};
-        ChannelInitializationCallback channelInitializationCallback_ {};
+        SocketChannelHandlerList socketChannelHandlers_ {};
+        DatagramChannelHandlerList datagramChannelHandlers_ {};
+        SocketChannelInitializationCallback socketChannelInitializationCallback_ {};
+        DatagramChannelInitializationCallback datagramChannelInitializationCallback_ {};
 
         // default retry interval
         static constexpr TimeType DefaultRetryInterval = 2000;

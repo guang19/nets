@@ -5,13 +5,12 @@
 #ifndef NETS_NET_DATAGRAM_CHANNEL_CONTEXT_H
 #define NETS_NET_DATAGRAM_CHANNEL_CONTEXT_H
 
-#include "nets/net/core/ChannelContext.h"
 #include "nets/net/core/DatagramPacket.h"
 
 namespace nets::net
 {
     class DatagramChannel;
-    class DatagramChannelContext : public ChannelContext
+    class DatagramChannelContext
     {
     public:
         using DatagramChannelRawPtr = DatagramChannel*;

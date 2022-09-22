@@ -8,7 +8,6 @@
 using namespace nets::net;
 using namespace nets::base;
 
-
 class TestServerChannelHandler : public SocketChannelHandler
 {
 public:

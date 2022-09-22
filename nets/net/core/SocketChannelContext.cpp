@@ -59,4 +59,4 @@ namespace nets::net
     {
         channel_->shutdownWrite();
     }
-}
+} // namespace nets::net

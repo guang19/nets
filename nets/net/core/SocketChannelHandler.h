@@ -5,16 +5,15 @@
 #ifndef NETS_NET_SOCKET_CHANNEL_HANDLER_H
 #define NETS_NET_SOCKET_CHANNEL_HANDLER_H
 
-#include "nets/net/core/ChannelHandler.h"
 #include "nets/net/core/SocketChannelContext.h"
 
 namespace nets::net
 {
-    class SocketChannelHandler : public ChannelHandler
+    class SocketChannelHandler
     {
     public:
         SocketChannelHandler() = default;
-        virtual ~SocketChannelHandler() override = default;
+        virtual ~SocketChannelHandler() = default;
 
     public:
         virtual void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,

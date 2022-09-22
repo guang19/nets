@@ -18,7 +18,7 @@ namespace nets::net
     public:
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
-        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
+        using ChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:

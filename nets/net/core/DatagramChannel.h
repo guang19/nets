@@ -6,7 +6,7 @@
 #define NETS_NET_DATAGRAM_CHANNEL_H
 
 #include "nets/net/core/Channel.h"
-#include "nets/net/core/ChannelHandlerPipeline.h"
+#include "nets/net/core/DatagramChannelHandlerPipeline.h"
 
 namespace nets::net
 {
@@ -20,7 +20,7 @@ namespace nets::net
         FdType fd() const override;
 
     public:
-        inline ChannelHandlerPipeline& pipeline()
+        inline DatagramChannelHandlerPipeline& pipeline()
         {
             return channelHandlerPipeline_;
         }
@@ -39,7 +39,7 @@ namespace nets::net
 
     private:
         FdType sockFd_ {socket::InvalidFd};
-        ChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
+        DatagramChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
         ChannelOptionList channelOptions_ {};
     };
 } // namespace nets::net

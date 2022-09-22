@@ -16,7 +16,7 @@ namespace nets::net
     public:
         using TimeType = ::time_t;
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
-        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
+        using ChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:

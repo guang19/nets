@@ -6,7 +6,6 @@
 #define NETS_NET_SERVER_BOOTSTRAP_H
 
 #include "nets/net/core/AbstractBootstrap.h"
-#include "nets/net/core/ChannelHandler.h"
 #include "nets/net/server/ServerSocketChannel.h"
 
 namespace nets::net
@@ -15,9 +14,9 @@ namespace nets::net
     {
     public:
         using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
-        using ChannelHandlerRawPtr = typename ChannelHandlerPipeline::ChannelHandlerRawPtr;
-        using ChannelHandlerPtr = typename ChannelHandlerPipeline::ChannelHandlerPtr;
-        using ChannelHandlerList = typename ChannelHandlerPipeline::ChannelHandlerList;
+        using ChannelHandlerRawPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerRawPtr;
+        using ChannelHandlerPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerPtr;
+        using ChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:

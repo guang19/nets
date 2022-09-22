@@ -8,11 +8,10 @@
 #include <functional>
 
 #include "nets/net/core/ByteBuffer.h"
-#include "nets/net/core/ChannelContext.h"
 
 namespace nets::net
 {
-    class SocketChannelContext : public ChannelContext
+    class SocketChannelContext
     {
     public:
         using SocketChannelRawPtr = SocketChannel*;
