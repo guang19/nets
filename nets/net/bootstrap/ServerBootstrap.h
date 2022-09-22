@@ -5,8 +5,8 @@
 #ifndef NETS_NET_SERVER_BOOTSTRAP_H
 #define NETS_NET_SERVER_BOOTSTRAP_H
 
-#include "nets/net/core/AbstractBootstrap.h"
-#include "nets/net/server/ServerSocketChannel.h"
+#include "nets/net/bootstrap/AbstractBootstrap.h"
+#include "nets/net/channel/ServerSocketChannel.h"
 
 namespace nets::net
 {

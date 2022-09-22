@@ -2,7 +2,7 @@
 // Created by guang19
 //
 
-#include "nets/net/core/NotifyChannel.h"
+#include "nets/net/channel/NotifyChannel.h"
 
 #include <stdexcept>
 #include <sys/eventfd.h>

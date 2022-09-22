@@ -2,7 +2,7 @@
 // Created by guang19
 //
 
-#include "nets/net/client/ConnectorChannel.h"
+#include "nets/net/channel/ConnectorChannel.h"
 
 #include <cassert>
 

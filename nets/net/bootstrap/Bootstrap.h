@@ -5,9 +5,9 @@
 #ifndef NETS_NET_BOOTSTRAP_H
 #define NETS_NET_BOOTSTRAP_H
 
-#include "nets/net/client/ConnectorChannel.h"
-#include "nets/net/core/AbstractBootstrap.h"
-#include "nets/net/core/DatagramChannel.h"
+#include "nets/net/bootstrap/AbstractBootstrap.h"
+#include "nets/net/channel/ConnectorChannel.h"
+#include "nets/net/channel/DatagramChannel.h"
 
 namespace nets::net
 {

@@ -3,7 +3,7 @@
 //
 
 #include "nets/base/Timestamp.h"
-#include "nets/net/server/ServerBootstrap.h"
+#include "nets/net/bootstrap/ServerBootstrap.h"
 
 using namespace nets::net;
 using namespace nets::base;

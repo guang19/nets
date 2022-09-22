@@ -5,10 +5,11 @@
 #ifndef NETS_NET_SOCKET_CHANNEL_H
 #define NETS_NET_SOCKET_CHANNEL_H
 
-#include "nets/net/core/ByteBuffer.h"
-#include "nets/net/core/Channel.h"
-#include "nets/net/core/SocketChannelHandlerPipeline.h"
 #include <queue>
+
+#include "nets/net/channel/Channel.h"
+#include "nets/net/core/ByteBuffer.h"
+#include "nets/net/core/SocketChannelHandlerPipeline.h"
 
 namespace nets::net
 {

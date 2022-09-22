@@ -4,7 +4,7 @@
 
 #include "nets/net/core/SocketChannelContext.h"
 
-#include "nets/net/core/SocketChannel.h"
+#include "nets/net/channel/SocketChannel.h"
 
 namespace nets::net
 {

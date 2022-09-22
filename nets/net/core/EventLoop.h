@@ -16,7 +16,7 @@
 #include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
 #include "nets/base/timer/TimerManager.h"
-#include "nets/net/core/NotifyChannel.h"
+#include "nets/net/channel/NotifyChannel.h"
 
 namespace nets::net
 {

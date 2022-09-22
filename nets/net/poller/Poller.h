@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/Channel.h"
+#include "nets/net/channel/Channel.h"
 
 namespace nets::net
 {

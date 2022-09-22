@@ -2,7 +2,7 @@
 // Created by guang19
 //
 
-#include "nets/net/client/Bootstrap.h"
+#include "nets/net/bootstrap/Bootstrap.h"
 
 #include <iostream>
 

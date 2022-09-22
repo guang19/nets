@@ -5,7 +5,7 @@
 #ifndef NETS_NET_NOTIFY_CHANNEL_H
 #define NETS_NET_NOTIFY_CHANNEL_H
 
-#include "nets/net/core/Channel.h"
+#include "nets/net/channel/Channel.h"
 
 namespace nets::net
 {

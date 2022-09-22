@@ -7,9 +7,9 @@
 
 #include <functional>
 
-#include "nets/net/core/Channel.h"
+#include "nets/net/channel/Channel.h"
 #include "nets/net/core/InetSockAddress.h"
-#include "nets/net/core/SocketChannel.h"
+#include "SocketChannel.h"
 
 namespace nets::net
 {
