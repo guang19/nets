@@ -35,24 +35,22 @@ namespace nets::net
 
         void bind(const InetSockAddress& localAddress);
 
-        void write(const void* message, SizeType length, const InetSockAddress& recipient);
-        void write(const StringType& message, const InetSockAddress& recipient);
-        void write(const ByteBuffer& message, const InetSockAddress& recipient);
-        void write(const DatagramPacket& message);
+        // return the number of bytes sent. Otherwise, -1 shall be returned and errno set to indicate the error.
+        SSizeType write(const void* message, SizeType length, const InetSockAddress& recipient);
+        SSizeType write(const StringType& message, const InetSockAddress& recipient);
+        SSizeType write(const ByteBuffer& message, const InetSockAddress& recipient);
+        SSizeType write(const DatagramPacket& message);
 
     protected:
         void handleReadEvent() override;
-        void handleWriteEvent() override;
         void handleErrorEvent() override;
 
     private:
-        void doWrite(const void* data, SizeType length, const InetSockAddress& recipient);
-        void doWriteDirectly(const void* data, SizeType length, const InetSockAddress& recipient);
+        SSizeType doWrite(const void* data, SizeType length, const InetSockAddress& recipient);
 
     private:
         FdType sockFd_ {socket::InvalidFd};
         using DatagramPacketList = ::std::vector<DatagramPacket>;
-        DatagramPacketList writeBuffer_ {};
 
         DatagramChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
         ChannelOptionList channelOptions_ {};

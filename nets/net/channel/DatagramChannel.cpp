@@ -61,39 +61,44 @@ namespace nets::net
         channelHandlerPipeline_.fireDatagramChannelActive();
     }
 
-    void DatagramChannel::write(const void* message, SizeType length, const InetSockAddress& recipient)
+    SSizeType DatagramChannel::write(const void* message, SizeType length, const InetSockAddress& recipient)
     {
-        doWrite(message, length, recipient);
+        return doWrite(message, length, recipient);
     }
 
-    void DatagramChannel::write(const StringType& message, const InetSockAddress& recipient) {}
+    SSizeType DatagramChannel::write(const StringType& message, const InetSockAddress& recipient)
+    {
+        return doWrite(message.data(), message.length(), recipient);
+    }
 
-    void DatagramChannel::write(const ByteBuffer& message, const InetSockAddress& recipient) {}
+    SSizeType DatagramChannel::write(const ByteBuffer& message, const InetSockAddress& recipient)
+    {
+        return doWrite(message.data(), message.readableBytes(), recipient);
+    }
 
-    void DatagramChannel::write(const DatagramPacket& message) {}
+    SSizeType DatagramChannel::write(const DatagramPacket& message)
+    {
+        return doWrite(message.data(), message.length(), message.recipient());
+    }
 
     void DatagramChannel::handleReadEvent() {}
 
-    void DatagramChannel::handleWriteEvent() {}
+    void DatagramChannel::handleErrorEvent()
+    {
+        LOGS_ERROR << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
+    }
 
-    void DatagramChannel::handleErrorEvent() {}
-
-    void DatagramChannel::doWrite(const void* data, SizeType length, const InetSockAddress& recipient)
+    SSizeType DatagramChannel::doWrite(const void* data, SizeType length, const InetSockAddress& recipient)
     {
         if (length == 0 || recipient.isInValid())
         {
-            return;
+            return 0;
         }
-        // the writeBuffer has residual data waiting to be sent, append the data to the end of the writeBuffer
-        if (!writeBuffer_.empty())
+        SSizeType bytes = socket::sendTo(sockFd_, data, length, recipient);
+        if (bytes < 0)
         {
+            LOGS_ERROR << "DatagramChannel sendTo unexpected error,errno=" << errno;
         }
-        else
-        {
-            // write directly
-            doWriteDirectly(data, length, recipient);
-        }
+        return bytes;
     }
-
-    void DatagramChannel::doWriteDirectly(const void* data, SizeType length, const InetSockAddress& recipient) {}
 } // namespace nets::net

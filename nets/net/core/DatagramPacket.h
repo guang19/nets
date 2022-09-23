@@ -21,14 +21,29 @@ namespace nets::net
         DatagramPacket& operator=(DatagramPacket&& other) noexcept;
 
     public:
-        inline ByteBuffer data()
+        inline ByteBuffer byteBuffer()
         {
             return data_;
         }
 
-        inline const ByteBuffer& data() const
+        inline const ByteBuffer& byteBuffer() const
         {
             return data_;
+        }
+
+        inline const char* data()
+        {
+            return data_.data();
+        }
+
+        inline const char* data() const
+        {
+            return data_.data();
+        }
+
+        inline ByteBuffer::SizeType length() const
+        {
+            return data_.readableBytes();
         }
 
         inline InetSockAddress recipient()
@@ -45,6 +60,6 @@ namespace nets::net
         ByteBuffer data_ {};
         InetSockAddress recipient_ {};
     };
-}
+} // namespace nets::net
 
 #endif // NETS_NET_DATAGRAM_PACKET_H

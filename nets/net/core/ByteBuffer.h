@@ -84,7 +84,7 @@ namespace nets::net
             return capacity_;
         }
 
-        inline char* data()
+        inline const char* data()
         {
             return &buffer_[readerIndex_];
         }
