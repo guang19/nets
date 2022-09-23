@@ -34,27 +34,27 @@ namespace nets::net
         FdType createIdleFd();
         void dealwithEMFILE(FdType& idleFd, FdType sockFd);
 
-        void bind(FdType sockFd, const SockAddr* localAddr);
+        void bind(FdType sockFd, const InetSockAddress& localAddr);
         void listen(FdType sockFd, ::int32_t backlog);
-        FdType accept(FdType sockFd, SockAddr6* peerAddr);
-        ::int32_t connect(FdType sockFd, const SockAddr* peerAddr);
+        FdType accept(FdType sockFd, InetSockAddress& localAddr);
+        ::int32_t connect(FdType sockFd, const InetSockAddress& peerAddr);
 
         SSizeType read(FdType fd, void* buf, SizeType n);
         SSizeType readv(FdType fd, const IoVec* iov, ::int32_t iovcnt);
         SSizeType write(FdType fd, const void* buf, SizeType n);
         SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt);
 
-        SSizeType sendTo(FdType fd, const void* buf, SizeType n, const SockAddr* destAddr);
+        SSizeType sendTo(FdType fd, const void* buf, SizeType n, const InetSockAddress& destAddr);
 
-        void getLocalAddress(FdType fd, SockAddr6* sockAddr);
-        void getPeerAddress(FdType fd, SockAddr6* sockAddr);
+        void getLocalAddress(FdType fd, InetSockAddress& sockAddr);
+        void getPeerAddress(FdType fd, InetSockAddress& sockAddr);
 
         OptValType getSockError(FdType sockFd);
 
-        // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and rmem_default
-        // TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x
-        // note:UDP has no send buffer,for UDP,SO_SNDBUF just sets the maximum size of a single datagram sent
-        // UDP SO_SNDBUF default value is 212992 bytes on linux which kernel version is 5.10.x
+        // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
+        // rmem_default TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x note:UDP has no
+        // send buffer,for UDP,SO_SNDBUF just sets the maximum size of a single datagram sent UDP SO_SNDBUF default value is
+        // 212992 bytes on linux which kernel version is 5.10.x
         void setSockSendBuf(FdType sockFd, OptValType sendBufLen);
         // TCP SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
         // UDP SO_RCVBUF default value is 212992 bytes on linux which kernel version is 5.10.x
@@ -82,7 +82,7 @@ namespace nets::net
 
         const ::int32_t DefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
         const ::int32_t DefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
-    }
+    } // namespace
 } // namespace nets::net
 
 #endif // NETS_NET_SOCKET_H

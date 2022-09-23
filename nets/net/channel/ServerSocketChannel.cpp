@@ -49,7 +49,7 @@ namespace nets::net
         }
         channelOptions_.clear();
         assert(channelOptions_.empty());
-        socket::bind(sockFd_, localAddress.sockAddr());
+        socket::bind(sockFd_, localAddress);
         socket::listen(sockFd_, backlog_);
         addEvent(EReadEvent);
         if (!registerTo())
@@ -63,11 +63,11 @@ namespace nets::net
         assert(eventLoop_->isInCurrentEventLoop());
         InetSockAddress peerAddr {};
         FdType connFd = socket::InvalidFd;
-        if ((connFd = socket::accept(sockFd_, peerAddr.sockAddr6())) >= 0)
+        if ((connFd = socket::accept(sockFd_, peerAddr)) >= 0)
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
             InetSockAddress localAddr {};
-            socket::getLocalAddress(connFd, localAddr.sockAddr6());
+            socket::getLocalAddress(connFd, localAddr);
             auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
             initSocketChannel(socketChannel);
             socketChannel->channelActive();

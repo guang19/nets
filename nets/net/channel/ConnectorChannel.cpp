@@ -86,7 +86,7 @@ namespace nets::net
     {
         sockFd_ = socket::createTcpSocket(serverAddress.ipFamily());
         socket::setSockNonBlock(sockFd_);
-        ::int32_t ret = socket::connect(sockFd_, serverAddress.sockAddr());
+        ::int32_t ret = socket::connect(sockFd_, serverAddress);
         peerAddress_ = serverAddress;
         assert(state_ == ConnectionState::DISCONNECTED);
         if (ret == 0)
@@ -129,7 +129,7 @@ namespace nets::net
     void ConnectorChannel::newSocketChannel()
     {
         assert(state_ != ConnectionState::CONNECTED);
-        socket::getLocalAddress(sockFd_, localAddress_.sockAddr6());
+        socket::getLocalAddress(sockFd_, localAddress_);
         auto socketChannel = ::std::make_shared<SocketChannel>(sockFd_, localAddress_, peerAddress_, eventLoop_);
         initSocketChannel(socketChannel);
         // must remove self from EventLoop before socketChannel register

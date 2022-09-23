@@ -51,7 +51,7 @@ namespace nets::net
         assert(channelOptions_.empty());
         if (needBind)
         {
-            socket::bind(sockFd_, localAddress.sockAddr());
+            socket::bind(sockFd_, localAddress);
         }
         addEvent(EReadEvent);
         if (!registerTo())
