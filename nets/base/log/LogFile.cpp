@@ -36,8 +36,7 @@ namespace nets::base
         }
         if (nullptr == (fp_ = ::fopen(file, "ae")))
         {
-            ::int32_t errNum = errno;
-            THROW_FILE_OPEN_EXCEPTION(errNum)
+            THROW_FILE_OPEN_EXCEPTION(errno)
         }
         getFileInfo(&bytes_, &lastRollTime_);
         ::setbuffer(fp_, buffer_, FileIoBufferSize);
@@ -109,8 +108,7 @@ namespace nets::base
         }
         if (nullptr == (fp_ = ::fopen(file_.c_str(), "ae")))
         {
-            ::int32_t errNum = errno;
-            THROW_FILE_OPEN_EXCEPTION(errNum)
+            THROW_FILE_OPEN_EXCEPTION(errno)
         }
         getFileInfo(&bytes_, nullptr);
         lastRollTime_ = now;
@@ -140,8 +138,7 @@ namespace nets::base
                 {
                     if (0 != ::mkdir(path, 0775))
                     {
-                        ::int32_t errNum = errno;
-                        THROW_FILE_CREATE_EXCEPTION(errNum)
+                        THROW_FILE_CREATE_EXCEPTION(errno)
                     }
                 }
             }

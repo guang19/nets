@@ -74,8 +74,7 @@ namespace nets::net
         }
         else
         {
-            ::int32_t errNum = errno;
-            handleAcceptError(errNum);
+            handleAcceptError(errno);
         }
     }
 
@@ -112,7 +111,7 @@ namespace nets::net
             case EINTR:
             case EPROTO:
             case ECONNABORTED:
-                LOGS_ERROR << "ServerSocketChannel occurred expected exception occurred while accepting,errno=" << errNum;
+                LOGS_ERROR << "ServerSocketChannel occurred expected exception while accepting,errno=" << errNum;
                 break;
             // the per-process limit on the number of open file descriptors has been reached
             case EMFILE:

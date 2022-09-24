@@ -95,8 +95,7 @@ namespace nets::net
         }
         else
         {
-            ::int32_t errNum = errno;
-            handleConnectError(errNum);
+            handleConnectError(errno);
         }
     }
 
@@ -179,7 +178,7 @@ namespace nets::net
             case ENOTSOCK:
             case EPROTOTYPE:
             default:
-                LOGS_ERROR << "ConnectorChannel occurred unexpected exception occurred while connecting,errno=" << errNum;
+                LOGS_ERROR << "ConnectorChannel occurred unexpected exception while connecting,errno=" << errNum;
                 break;
         }
     }

@@ -12,28 +12,27 @@ public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
         LOGS_DEBUG << "TestUdpSenderHandler::channelActive";
+        channelContext.write("Hello UdpRecipient", InetSockAddress("127.0.0.1", 8080));
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
-        LOGS_DEBUG << "TestUdpSenderHandler::channelRead";
+        LOGS_DEBUG << "TestUdpSenderHandler::channelRead recv from " << message.recipient().toString()
+                   << "\nmessage is:" << message.byteBuffer().toString();
     }
 };
 
 int main(int argc, char** argv)
 {
-    ::printf("%ld\n", sizeof(SockAddr));
-    ::printf("%ld\n", sizeof(SockAddr4));
-    ::printf("%ld\n", sizeof(SockAddr6));
-//    Bootstrap()
-//        .option(SO_TcpRecvBuffer, 1024)
-//        //        .channelHandler(new TestUdpSenderHandler())
-//        .channelHandler(
-//            [](DatagramChannel& channel)
-//            {
-//                channel.pipeline().addLast(new TestUdpSenderHandler);
-//            })
-//        .bind()
-//        .sync();
+    Bootstrap()
+        .option(SO_UdpRecvBuffer, 1024)
+        .option(SO_BroadCast, true)
+        .channelHandler(
+            [](DatagramChannel& channel)
+            {
+                channel.pipeline().addLast(new TestUdpSenderHandler);
+            })
+        .bind()
+        .sync();
     return 0;
 }

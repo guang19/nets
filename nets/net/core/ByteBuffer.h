@@ -14,6 +14,7 @@
 namespace nets::net
 {
     class SocketChannel;
+    class DatagramChannel;
 
     class ByteBuffer : public nets::base::Copyable
     {
@@ -84,7 +85,7 @@ namespace nets::net
             return capacity_;
         }
 
-        inline const char* data()
+        inline char* data()
         {
             return &buffer_[readerIndex_];
         }
@@ -106,6 +107,7 @@ namespace nets::net
         void writeBytes(const void* data, SizeType length);
         void writeBytes(const char* data, SizeType length);
         SSizeType writeBytes(const SocketChannel& channel, SizeType length);
+        SSizeType writeBytes(const DatagramChannel& channel, SizeType length, InetSockAddress& srcAddr);
         void writeInt8(::int8_t value);
         void writeInt16(::int16_t value);
         void writeInt32(::int32_t value);

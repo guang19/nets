@@ -47,6 +47,7 @@ namespace nets::net
 
     private:
         SSizeType doWrite(const void* data, SizeType length, const InetSockAddress& recipient);
+        void handleReadError(::int32_t errNum);
 
     private:
         FdType sockFd_ {socket::InvalidFd};

@@ -11,6 +11,11 @@ namespace nets::net
     {
     }
 
+    DatagramPacket::DatagramPacket(ByteBuffer&& data, InetSockAddress&& recipient)
+        : data_(::std::move(data)), recipient_(::std::move(recipient))
+    {
+    }
+
     DatagramPacket::DatagramPacket(const DatagramPacket& other) : DatagramPacket(other.data_, other.recipient_) {}
 
     DatagramPacket::DatagramPacket(DatagramPacket&& other) noexcept

@@ -12,7 +12,7 @@
 
 namespace nets::net
 {
-    class SocketChannelHandlerPipeline
+    class SocketChannelHandlerPipeline : public nets::base::Copyable
     {
     public:
         using SocketChannelContextRawPtr = SocketChannelContext*;

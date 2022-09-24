@@ -4,22 +4,34 @@
 
 #include "nets/net/bootstrap/Bootstrap.h"
 
-#include <iostream>
-
 using namespace nets::net;
+
+class TestUdpRecipientHandler : public DatagramChannelHandler
+{
+public:
+    void channelActive(DatagramChannelContext& channelContext) override
+    {
+        LOGS_DEBUG << "TestUdpRecipientHandler::channelActive";
+    }
+
+    void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
+    {
+        LOGS_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
+                   << "\nmessage is:" << message.byteBuffer().toString();
+    }
+};
 
 int main(int argc, char** argv)
 {
-    //    Bootstrap()
-    //        .option(SO_TcpSendBuffer, 1024)
-    //        .option(SO_TcpRecvBuffer, 1024)
-    //        .retry(true, 3000)
-    //        //        .channelHandler(new TestClientChannelHandler())
-    //        .channelHandler(
-    //            [](SocketChannel& channel)
-    //            {
-    //            })
-    //        .bind("127.0.0.1", 8080)
-    //        .sync();
+    Bootstrap()
+        .option(SO_UdpRecvBuffer, 1024)
+        .option(SO_BroadCast, true)
+        .channelHandler(
+            [](DatagramChannel& channel)
+            {
+                channel.pipeline().addLast(new TestUdpRecipientHandler);
+            })
+        .bind("127.0.0.1", 8080)
+        .sync();
     return 0;
 }

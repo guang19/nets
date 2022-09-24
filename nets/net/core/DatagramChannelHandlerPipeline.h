@@ -12,7 +12,7 @@
 
 namespace nets::net
 {
-    class DatagramChannelHandlerPipeline
+    class DatagramChannelHandlerPipeline : public nets::base::Copyable
     {
     public:
         using DatagramChannelContextRawPtr = DatagramChannelContext*;

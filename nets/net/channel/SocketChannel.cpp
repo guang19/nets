@@ -16,7 +16,7 @@ namespace nets::net
 {
     namespace
     {
-        const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 1;
+        const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 2;
         constexpr ::int32_t MaxCountOfWriteVOnce = IOV_MAX >> 2;
     } // namespace
 
@@ -159,8 +159,7 @@ namespace nets::net
         }
         else
         {
-            ::int32_t errNum = errno;
-            handleReadError(errNum);
+            handleReadError(errno);
         }
     }
 
@@ -185,8 +184,7 @@ namespace nets::net
         SSizeType writtenBytes = writev(ioves, static_cast<::int32_t>(size));
         if (writtenBytes < 0)
         {
-            ::int32_t errNum = errno;
-            handleWriteError(errNum);
+            handleWriteError(errno);
         }
         else
         {

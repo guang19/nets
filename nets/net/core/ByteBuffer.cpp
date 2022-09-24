@@ -9,6 +9,7 @@
 
 #include "nets/base/CommonMacro.h"
 #include "nets/base/exception/OutOfMemoryException.h"
+#include "nets/net/channel/DatagramChannel.h"
 #include "nets/net/channel/SocketChannel.h"
 
 namespace nets::net
@@ -125,8 +126,18 @@ namespace nets::net
     SSizeType ByteBuffer::writeBytes(const SocketChannel& channel, SizeType length)
     {
         ensureWritable(length);
-        SSizeType bytes = 0;
-        bytes = socket::read(channel.fd(), &buffer_[writerIndex_], length);
+        SSizeType bytes = socket::read(channel.fd(), &buffer_[writerIndex_], length);
+        if (bytes > 0)
+        {
+            writerIndex_ += bytes;
+        }
+        return bytes;
+    }
+
+    SSizeType ByteBuffer::writeBytes(const DatagramChannel& channel, SizeType length, InetSockAddress& srcAddr)
+    {
+        ensureWritable(length);
+        SSizeType bytes = socket::recvFrom(channel.fd(), &buffer_[writerIndex_], length, srcAddr);
         if (bytes > 0)
         {
             writerIndex_ += bytes;

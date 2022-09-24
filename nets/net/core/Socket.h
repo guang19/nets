@@ -45,6 +45,7 @@ namespace nets::net
         SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt);
 
         SSizeType sendTo(FdType fd, const void* buf, SizeType n, const InetSockAddress& destAddr);
+        SSizeType recvFrom(FdType fd, void* buf, SizeType n, InetSockAddress& srcAddr);
 
         void getLocalAddress(FdType fd, InetSockAddress& sockAddr);
         void getPeerAddress(FdType fd, InetSockAddress& sockAddr);

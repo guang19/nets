@@ -157,6 +157,12 @@ namespace nets::net::socket
         return ::sendto(fd, buf, n, 0, destAddr.sockAddr(), length);
     }
 
+    SSizeType recvFrom(FdType fd, void* buf, SizeType n, InetSockAddress& srcAddr)
+    {
+        auto length = static_cast<SockLenType>(sizeof(SockAddr6));
+        return ::recvfrom(fd, buf, n, 0, srcAddr.sockAddr(), &length);
+    }
+
     void getLocalAddress(FdType fd, InetSockAddress& sockAddr)
     {
         auto length = static_cast<SockLenType>(sizeof(SockAddr6));

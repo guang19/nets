@@ -12,9 +12,14 @@
 
 namespace nets::net
 {
+    namespace
+    {
+        const ByteBuffer::SizeType RecvPacketSize = DefaultUdpSockRecvBufferSize >> 2;
+    } // namespace
+
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), writeBuffer_(),
-          channelHandlerPipeline_(new DatagramChannelContext(this)), channelOptions_()
+        : Channel(eventLoop), sockFd_(socket::InvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
+          channelOptions_()
     {
         channelOptions_.push_back(SO_ReuseAddr);
         channelOptions_.push_back(SO_ReusePort);
@@ -81,11 +86,29 @@ namespace nets::net
         return doWrite(message.data(), message.length(), message.recipient());
     }
 
-    void DatagramChannel::handleReadEvent() {}
+    void DatagramChannel::handleReadEvent()
+    {
+        ByteBuffer byteBuffer(RecvPacketSize);
+        InetSockAddress srcAddr {};
+        SSizeType bytes = byteBuffer.writeBytes(*this, byteBuffer.writableBytes(), srcAddr);
+        if (bytes > 0)
+        {
+            DatagramPacket datagramPacket(::std::move(byteBuffer), ::std::move(srcAddr));
+            channelHandlerPipeline_.fireDatagramChannelRead(datagramPacket);
+        }
+        else if (bytes < 0)
+        {
+            handleReadError(errno);
+        }
+        else
+        {
+            LOGS_WARN << "DatagramChannel handleReadEvent read 0 bytes";
+        }
+    }
 
     void DatagramChannel::handleErrorEvent()
     {
-        LOGS_ERROR << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
+        LOGS_ERROR << "DatagramChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
     }
 
     SSizeType DatagramChannel::doWrite(const void* data, SizeType length, const InetSockAddress& recipient)
@@ -95,10 +118,38 @@ namespace nets::net
             return 0;
         }
         SSizeType bytes = socket::sendTo(sockFd_, data, length, recipient);
-        if (bytes < 0)
+        if (bytes <= 0)
         {
-            LOGS_ERROR << "DatagramChannel sendTo unexpected error,errno=" << errno;
+            LOGS_ERROR << "DatagramChannel occurred unexpected exception while sendto,errno=" << errno;
         }
         return bytes;
+    }
+
+    void DatagramChannel::handleReadError(::int32_t errNum)
+    {
+        switch (errNum)
+        {
+            // EAGAIN/EWOULDBLOCK is not an error
+            // EWOULDBLOCK
+            case EAGAIN:
+            case EINTR:
+                break;
+            // error
+            case EBADF:
+            case ECONNRESET:
+            case EINVAL:
+            case EIO:
+            case EPERM:
+            case EISDIR:
+            case ENOBUFS:
+            case ENOMEM:
+            case ENOTCONN:
+            case ENOTSOCK:
+            case EOPNOTSUPP:
+            case ETIMEDOUT:
+            default:
+                LOGS_ERROR << "DatagramChannel handleReadError unexpected error,errno=" << errNum;
+                break;
+        }
     }
 } // namespace nets::net

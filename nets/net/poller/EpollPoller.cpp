@@ -53,11 +53,11 @@ namespace nets::net
         }
         else if (numOfReadyEvents < 0)
         {
-            LOGS_ERROR << "EpollPoller epoll error,errNum=" << socket::getSockError(epollFd_) ;
+            LOGS_ERROR << "EpollPoller epoll error,errNum=" << socket::getSockError(epollFd_);
         }
         else
         {
-//            LOGS_DEBUG << "EpollPoller epoll wait no event";
+            LOGS_DEBUG << "EpollPoller epoll wait no event";
         }
     }
 
@@ -69,9 +69,10 @@ namespace nets::net
             activeChannels.push_back(channel);
             EventType revents = events_[i].events;
             channel->setReadyEvents(ENoneEvent);
-            LOGS_DEBUG << "revents=" << revents << " revents & EPOLLIN=" << (revents & EPOLLIN) << " revents & EPOLLERR=" << (revents & EPOLLERR)
-                        << " revents & EPOLLHUP=" << (revents & EPOLLHUP) << " revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
-                        << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT);
+            LOGS_DEBUG << "revents=" << revents << " revents & EPOLLIN=" << (revents & EPOLLIN)
+                       << " revents & EPOLLERR=" << (revents & EPOLLERR) << " revents & EPOLLHUP=" << (revents & EPOLLHUP)
+                       << " revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
+                       << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT);
             // local may shutdown connection or read/write error
             if (revents & EPOLLIN && revents & (EPOLLERR | EPOLLHUP))
             {

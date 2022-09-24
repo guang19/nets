@@ -7,11 +7,12 @@
 
 #include <functional>
 
+#include "nets/base/Noncopyable.h"
 #include "nets/net/core/ByteBuffer.h"
 
 namespace nets::net
 {
-    class SocketChannelContext
+    class SocketChannelContext : nets::base::Noncopyable
     {
     public:
         using SocketChannelRawPtr = SocketChannel*;
@@ -24,6 +25,11 @@ namespace nets::net
         ~SocketChannelContext() = default;
 
     public:
+        inline SocketChannel& channel()
+        {
+            return *channel_;
+        }
+
         const InetSockAddress& localAddress() const;
         const InetSockAddress& peerAddress() const;
 
@@ -39,12 +45,6 @@ namespace nets::net
         void shutdownRead();
         // shutdown write
         void shutdownWrite();
-
-    public:
-        inline SocketChannel& channel()
-        {
-            return *channel_;
-        }
 
     private:
         SocketChannelRawPtr channel_ {nullptr};

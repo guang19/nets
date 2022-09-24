@@ -5,7 +5,6 @@
 #include <gtest/gtest.h>
 
 #include <any>
-#include <iostream>
 #include <map>
 #include <set>
 #include <unordered_map>

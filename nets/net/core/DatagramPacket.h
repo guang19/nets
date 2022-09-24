@@ -13,6 +13,7 @@ namespace nets::net
     {
     public:
         DatagramPacket(const ByteBuffer& data, const InetSockAddress& recipient);
+        DatagramPacket(ByteBuffer&& data, InetSockAddress&& recipient);
         ~DatagramPacket() = default;
 
         DatagramPacket(const DatagramPacket& other);
