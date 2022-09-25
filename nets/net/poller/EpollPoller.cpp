@@ -55,10 +55,6 @@ namespace nets::net
         {
             LOGS_ERROR << "EpollPoller epoll error,errNum=" << socket::getSockError(epollFd_);
         }
-        else
-        {
-            LOGS_DEBUG << "EpollPoller epoll wait no event";
-        }
     }
 
     void EpollPoller::prepareChannelReadyEvents(::int32_t numOfReadyEvents, ChannelList& activeChannels)

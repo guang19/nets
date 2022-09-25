@@ -19,6 +19,7 @@ public:
     {
         LOGS_DEBUG << "TestUdpSenderHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
+        channelContext.write(message);
     }
 };
 
