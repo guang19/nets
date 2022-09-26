@@ -30,3 +30,6 @@ TARGET_LINK_LIBRARIES(UdpUniCastTest nets_net libgtest.a)
 
 ADD_EXECUTABLE(UdpBroadCastTest UdpBroadCastTest.cpp)
 TARGET_LINK_LIBRARIES(UdpBroadCastTest nets_net libgtest.a)
+
+ADD_EXECUTABLE(UdpMultiCastTest UdpMultiCastTest.cpp)
+TARGET_LINK_LIBRARIES(UdpMultiCastTest nets_net libgtest.a)

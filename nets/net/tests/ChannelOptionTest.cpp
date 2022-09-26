@@ -13,31 +13,26 @@
 
 using namespace nets::net;
 
+using ValueType = ::std::variant<bool, int, SockLinger>;
+
 TEST(ChannelOptionTest, BasicUse)
 {
-    ChannelOption A(nets::net::NREUSE_ADDR, true);
-    ChannelOption B(nets::net::NBACKLOG, 5);
-    ChannelOption C(nets::net::NBACKLOG, 6);
-    ASSERT_EQ(::std::any_cast<bool>(A.get()), true);
-    ASSERT_EQ(::std::any_cast<::int32_t>(B.get()), 5);
-    ASSERT_EQ(::std::any_cast<::int32_t>(C.get()), 6);
-}
-
-TEST(ChannelOptionTest, Equal)
-{
-    ASSERT_TRUE(NLinger == NLinger);
-    ASSERT_FALSE(NLinger == NBackLog);
-}
-
-TEST(ChannelOptionTest, CopyMove)
-{
-    ChannelOption A(nets::net::NREUSE_ADDR, true);
-    ChannelOption B(nets::net::NBACKLOG, 5);
-    A = B;
-    ASSERT_EQ(A, B);
-
-    A = ::std::move(B);
-    ASSERT_FALSE(B.valid());
+    ::std::unordered_map<int, ValueType> map;
+    map[0] = false;
+    map[0] = true;
+    map[1] = 5;
+    ::std::for_each(map.begin(), map.end(),
+                    [&](const auto& item)
+                    {
+                        if (item.first == 0)
+                        {
+                            printf("map[0] = %d\n", ::std::get<bool>(item.second));
+                        }
+                        else if (item.first == 1)
+                        {
+                            printf("map[1] = %d\n", ::std::get<int>(item.second));
+                        }
+                    });
 }
 
 int main(int argc, char** argv)

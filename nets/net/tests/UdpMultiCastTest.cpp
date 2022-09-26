@@ -23,7 +23,7 @@ public:
     }
 };
 
-TEST(UdpBroadCastTest, UdpBroadCastRepient1)
+TEST(UdpMultiCastTest, UdpMultiCastRepient1)
 {
     Bootstrap()
         .option(SO_BroadCast, true)
@@ -36,7 +36,7 @@ TEST(UdpBroadCastTest, UdpBroadCastRepient1)
         .sync();
 }
 
-TEST(UdpBroadCastTest, UdpBroadCastRepient2)
+TEST(UdpMultiCastTest, UdpMultiCastRepient2)
 {
     Bootstrap()
         .option(SO_BroadCast, true)
@@ -49,14 +49,12 @@ TEST(UdpBroadCastTest, UdpBroadCastRepient2)
         .sync();
 }
 
-class TestUdpBroadCastSenderHandler : public DatagramChannelHandler
+class TestUdpMultiCastSenderHandler : public DatagramChannelHandler
 {
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
         LOGS_DEBUG << "TestUdpRecipientHandler::channelActive";
-        // broadcast address, such as 192.168.223.255
-        channelContext.write("Hello UdpRecipient", InetSockAddress("xx.xx.xx.255", 8080));
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
@@ -66,14 +64,14 @@ public:
     }
 };
 
-TEST(UdpBroadCastTest, UdpBroadCastSender)
+TEST(UdpMultiCastTest, UdpMultiCastSender)
 {
     Bootstrap()
         .option(SO_BroadCast, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpBroadCastSenderHandler);
+                channel.pipeline().addLast(new TestUdpMultiCastSenderHandler);
             })
         .bind()
         .sync();
