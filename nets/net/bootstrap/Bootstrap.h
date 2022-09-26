@@ -43,6 +43,7 @@ namespace nets::net
         // udp does not bind addr
         Bootstrap& bind();
         // udp bind addr
+        Bootstrap& bind(PortType port, bool ipv6 = false);
         Bootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
         Bootstrap& bind(const InetSockAddress& localAddress);
 

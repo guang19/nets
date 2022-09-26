@@ -2,9 +2,61 @@
 // Created by guang19
 //
 
+#include <gtest/gtest.h>
+
 #include "nets/net/bootstrap/Bootstrap.h"
+#include "nets/net/bootstrap/ServerBootstrap.h"
 
 using namespace nets::net;
+
+class TestServerChannelHandler : public SocketChannelHandler
+{
+public:
+    void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
+                        const InetSockAddress& peerAddress) override
+    {
+        LOGS_DEBUG << "isActive=" << channelContext.isActive();
+        LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
+                   << " client address:" << peerAddress.toString();
+    }
+
+    void channelDisconnect(SocketChannelContext& channelContext) override
+    {
+        LOGS_DEBUG << "Server channelDisconnect:" << channelContext.peerAddress().toString();
+    }
+
+    void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
+    {
+        LOGS_DEBUG << "Server recv client message is:" << message.toString();
+        //        channelContext.write(message);
+        channelContext.write(message,
+                             [this](SocketChannelContext& ctx)
+                             {
+                                 writeComplete(ctx);
+                             });
+    }
+
+    void writeComplete(SocketChannelContext& channelContext)
+    {
+        LOGS_DEBUG << "Server writeComplete";
+        channelContext.write("server writeComplete");
+    }
+};
+
+TEST(TcpServerBootstrapTest, TcpServer)
+{
+    ServerBootstrap(8)
+        .option(SO_TcpSendBuffer, 1024)
+        .option(SO_TcpRecvBuffer, 1024)
+        //                .childHandler(new TestServerChannelHandler())
+        .childHandler(
+            [](SocketChannel& channel)
+            {
+                channel.pipeline().addLast(new TestServerChannelHandler());
+            })
+        .bind(8080)
+        .sync();
+}
 
 class TestClientChannelHandler : public SocketChannelHandler
 {
@@ -82,7 +134,7 @@ public:
     }
 };
 
-int main(int argc, char** argv)
+TEST(TcpServerBootstrapTest, TcpClient)
 {
     Bootstrap()
         .option(SO_TcpSendBuffer, 1024)
@@ -96,5 +148,10 @@ int main(int argc, char** argv)
             })
         .connect("127.0.0.1", 8080)
         .sync();
-    return 0;
+}
+
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }

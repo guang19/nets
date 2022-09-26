@@ -53,6 +53,11 @@ namespace nets::net
         return bind(InetSockAddress());
     }
 
+    Bootstrap& Bootstrap::bind(PortType port, bool ipv6)
+    {
+        return bind(InetSockAddress::createAnySockAddress(port, ipv6));
+    }
+
     Bootstrap& Bootstrap::bind(const char* ip, PortType port, bool ipv6)
     {
         return bind(InetSockAddress(ip, port, ipv6));
@@ -152,7 +157,7 @@ namespace nets::net
 
         if (!datagramChannelHandlers_.empty())
         {
-            for (const auto& childHandler : datagramChannelHandlers_)
+            for (const auto& childHandler: datagramChannelHandlers_)
             {
                 assert(childHandler.use_count() == 1);
                 datagramChannel->pipeline().addLast(childHandler);

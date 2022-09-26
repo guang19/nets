@@ -16,23 +16,17 @@ TARGET_LINK_LIBRARIES(SocketTest nets_net libgtest.a)
 ADD_EXECUTABLE(ChannelOptionTest ChannelOptionTest.cpp)
 TARGET_LINK_LIBRARIES(ChannelOptionTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(EpollServer EpollServer.cpp)
-TARGET_LINK_LIBRARIES(EpollServer nets_net)
+ADD_EXECUTABLE(SocketServerClientTest SocketServerClientTest.cpp)
+TARGET_LINK_LIBRARIES(SocketServerClientTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(EpollClient EpollClient.cpp)
-TARGET_LINK_LIBRARIES(EpollClient nets_net)
+ADD_EXECUTABLE(EpollServerClientTest EpollServerClientTest.cpp)
+TARGET_LINK_LIBRARIES(EpollServerClientTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(TcpServerTest TcpServerTest.cpp)
-TARGET_LINK_LIBRARIES(TcpServerTest nets_net)
+ADD_EXECUTABLE(TcpServerBootstrapTest TcpServerBootstrapTest.cpp)
+TARGET_LINK_LIBRARIES(TcpServerBootstrapTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(TcpServerScheduleTaskTest TcpServerScheduleTaskTest.cpp)
-TARGET_LINK_LIBRARIES(TcpServerScheduleTaskTest nets_net)
+ADD_EXECUTABLE(UdpUniCastTest UdpUniCastTest.cpp)
+TARGET_LINK_LIBRARIES(UdpUniCastTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(TcpClientTest TcpClientTest.cpp)
-TARGET_LINK_LIBRARIES(TcpClientTest nets_net)
-
-ADD_EXECUTABLE(UdpRecipientTest UdpRecipientTest.cpp)
-TARGET_LINK_LIBRARIES(UdpRecipientTest nets_net)
-
-ADD_EXECUTABLE(UdpSenderTest UdpSenderTest.cpp)
-TARGET_LINK_LIBRARIES(UdpSenderTest nets_net)
+ADD_EXECUTABLE(UdpBroadCastTest UdpBroadCastTest.cpp)
+TARGET_LINK_LIBRARIES(UdpBroadCastTest nets_net libgtest.a)

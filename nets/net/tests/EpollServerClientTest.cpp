@@ -2,11 +2,13 @@
 // Created by guang19
 //
 
+#include <gtest/gtest.h>
+
 #include <cstdint>
 #include <cstring>
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <unistd.h>
 #include <vector>
 
 #include "nets/base/Timestamp.h"
@@ -20,7 +22,7 @@ void testWriteV(::int32_t sockFd)
 {
     Timestamp start(Timestamp::now());
     const ::int32_t count = 5;
-    const char* strArr[count] = {"hello client\n",          "this is first message\n",  "this is second message\n",
+    const char* strArr[count] = {"hello client\n", "this is first message\n", "this is second message\n",
                                  "this is third message\n", "this is fourth message\n"};
     SSizeType expectedBytes = 0;
     IoVec iovecs[count];
@@ -33,20 +35,21 @@ void testWriteV(::int32_t sockFd)
     }
     SSizeType bytes = socket::writev(sockFd, iovecs, count);
     Timestamp end(Timestamp::now());
-    ::printf("expectedBytes=%ld, write bytes=%ld, writeV=%ld\n", expectedBytes, bytes, end.microsPartOfTimestamp() - start.microsPartOfTimestamp());
+    ::printf("expectedBytes=%ld, write bytes=%ld, writeV=%ld\n", expectedBytes, bytes,
+             end.microsPartOfTimestamp() - start.microsPartOfTimestamp());
 }
 
-::int32_t main(::int32_t argc, char** argv)
+TEST(EpollServerClienTest, EpollServer)
 {
     FdType listenFd = socket::createTcpSocket(AF_INET);
 
     ::std::vector<struct epoll_event> epollEvents(20);
     InetSockAddress serverAddr = InetSockAddress::createAnySockAddress(8080);
-    socket::bind(listenFd, serverAddr.sockAddr());
+    socket::bind(listenFd, serverAddr);
     socket::listen(listenFd, 1024);
 
     FdType epollFd = ::epoll_create1(EPOLL_CLOEXEC);
-    struct epoll_event accpetEpollEvent{};
+    struct epoll_event accpetEpollEvent {};
     accpetEpollEvent.data.fd = listenFd;
     accpetEpollEvent.events = EPOLLIN;
     epoll_ctl(epollFd, EPOLL_CTL_ADD, listenFd, &accpetEpollEvent);
@@ -70,7 +73,7 @@ void testWriteV(::int32_t sockFd)
                 {
                     ::printf("listen listenFd\n");
                     InetSockAddress clientAddr;
-                    FdType connFd = socket::accept(listenFd, clientAddr.sockAddr6());
+                    FdType connFd = socket::accept(listenFd, clientAddr);
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
                     struct epoll_event epollEvent {};
@@ -118,5 +121,31 @@ void testWriteV(::int32_t sockFd)
             }
         }
     }
-    return 0;
+}
+
+TEST(EpollServerClienTest, EpollClient)
+{
+    FdType sockFd = socket::createTcpSocket(AF_INET);
+    InetSockAddress serverAddr("127.0.0.1", 8080);
+    socket::connect(sockFd, serverAddr);
+    char buf[1024] = "Hello Server";
+    size_t n = ::strlen(buf);
+    socket::write(sockFd, buf, n);
+    char recvBuf[1024] = {0};
+    while (true)
+    {
+        SSizeType bytes = socket::read(sockFd, recvBuf, sizeof(recvBuf));
+        if (bytes > 0)
+        {
+            printf("recv message bytes=%ld, content is:%s", bytes, recvBuf);
+            break;
+        }
+    }
+    socket::closeFd(sockFd);
+}
+
+::int32_t main(::int32_t argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
