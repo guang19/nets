@@ -184,7 +184,7 @@ namespace nets::net::socket
     OptValType getSockError(FdType sockFd)
     {
         OptValType optVal = 0;
-        auto length = static_cast<SockLenType>(sizeof(optVal));
+        auto length = static_cast<SockLenType>(sizeof(OptValType));
         if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &length))
         {
             LOGS_ERROR << "socket getSockError failed";
@@ -196,78 +196,10 @@ namespace nets::net::socket
         }
     }
 
-    void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
-    {
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sendBufLen)))
-        {
-            LOGS_ERROR << "socket setSockSendBuf failed";
-        }
-    }
-
-    void setSockRecvBuf(FdType sockFd, OptValType recvBufLen)
-    {
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(recvBufLen)))
-        {
-            LOGS_ERROR << "socket setSockRecvBuf failed";
-        }
-    }
-
-    OptValType getTcpSockSendBuf()
-    {
-        FdType sockFd = socket::createTcpSocket(AF_INET);
-        OptValType optVal = 0;
-        auto length = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
-        {
-            LOGS_ERROR << "socket getTcpSockSendBuf failed";
-        }
-        socket::closeFd(sockFd);
-        return optVal;
-    }
-
-    OptValType getTcpSockRecvBuf()
-    {
-        FdType sockFd = socket::createTcpSocket(AF_INET);
-        OptValType optVal = 0;
-        auto length = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
-        {
-            LOGS_ERROR << "socket getTcpSockRecvBuf failed";
-        }
-        socket::closeFd(sockFd);
-        return optVal;
-    }
-
-    OptValType getUdpSockSendBuf()
-    {
-        FdType sockFd = socket::createUdpSocket(AF_INET);
-        OptValType optVal = 0;
-        auto length = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
-        {
-            LOGS_ERROR << "socket getUdpSockSendBuf failed";
-        }
-        socket::closeFd(sockFd);
-        return optVal;
-    }
-
-    OptValType getUdpSockRecvBuf()
-    {
-        FdType sockFd = socket::createUdpSocket(AF_INET);
-        OptValType optVal = 0;
-        auto length = static_cast<SockLenType>(sizeof(optVal));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
-        {
-            LOGS_ERROR << "socket getUdpSockRecvBuf failed";
-        }
-        socket::closeFd(sockFd);
-        return optVal;
-    }
-
     void setSockReuseAddr(FdType sockFd, bool enable)
     {
         OptValType reuse = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(reuse))))
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(OptValType))))
         {
             LOGS_ERROR << "socket setSockAddrReuse failed";
         }
@@ -276,7 +208,7 @@ namespace nets::net::socket
     void setSockReusePort(FdType sockFd, bool enable)
     {
         OptValType reuse = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(reuse))))
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(OptValType))))
         {
             LOGS_ERROR << "socket setSockPortReuse failed";
         }
@@ -285,16 +217,40 @@ namespace nets::net::socket
     void setSockKeepAlive(FdType sockFd, bool enable)
     {
         OptValType keepAlive = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, static_cast<SockLenType>(sizeof(keepAlive))))
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, static_cast<SockLenType>(sizeof(OptValType))))
         {
             LOGS_ERROR << "socket setSockKeepAlive failed";
+        }
+    }
+
+    void setSockKeepIdle(FdType sockFd, OptValType idleTime)
+    {
+        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPIDLE, &idleTime, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockKeepIdle failed";
+        }
+    }
+
+    void setSockKeepCnt(FdType sockFd, OptValType cnt)
+    {
+        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPCNT, &cnt, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockKeepCnt failed";
+        }
+    }
+
+    void setSockKeepIntvl(FdType sockFd, OptValType interval)
+    {
+        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPINTVL, &interval, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockKeepIntvl failed";
         }
     }
 
     void setTcpNoDelay(FdType sockFd, bool enable)
     {
         OptValType noDelay = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(noDelay))))
+        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(OptValType))))
         {
             LOGS_ERROR << "socket setTcpNoDelay failed";
         }
@@ -328,9 +284,77 @@ namespace nets::net::socket
     void setSockBroadCast(FdType sockFd, bool enable)
     {
         OptValType broadcast = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(broadcast))))
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(OptValType))))
         {
             LOGS_ERROR << "socket setSockBroadCast failed";
         }
+    }
+
+    void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
+    {
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockSendBuf failed";
+        }
+    }
+
+    void setSockRecvBuf(FdType sockFd, OptValType recvBufLen)
+    {
+        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockRecvBuf failed";
+        }
+    }
+
+    OptValType getTcpSockSendBuf()
+    {
+        FdType sockFd = socket::createTcpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto length = static_cast<SockLenType>(sizeof(OptValType));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
+        {
+            LOGS_ERROR << "socket getTcpSockSendBuf failed";
+        }
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    OptValType getTcpSockRecvBuf()
+    {
+        FdType sockFd = socket::createTcpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto length = static_cast<SockLenType>(sizeof(OptValType));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
+        {
+            LOGS_ERROR << "socket getTcpSockRecvBuf failed";
+        }
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    OptValType getUdpSockSendBuf()
+    {
+        FdType sockFd = socket::createUdpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto length = static_cast<SockLenType>(sizeof(OptValType));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
+        {
+            LOGS_ERROR << "socket getUdpSockSendBuf failed";
+        }
+        socket::closeFd(sockFd);
+        return optVal;
+    }
+
+    OptValType getUdpSockRecvBuf()
+    {
+        FdType sockFd = socket::createUdpSocket(AF_INET);
+        OptValType optVal = 0;
+        auto length = static_cast<SockLenType>(sizeof(OptValType));
+        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
+        {
+            LOGS_ERROR << "socket getUdpSockRecvBuf failed";
+        }
+        socket::closeFd(sockFd);
+        return optVal;
     }
 } // namespace nets::net::socket

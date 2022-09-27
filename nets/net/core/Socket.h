@@ -52,6 +52,17 @@ namespace nets::net
 
         OptValType getSockError(FdType sockFd);
 
+        void setSockReuseAddr(FdType sockFd, bool enable = true);
+        void setSockReusePort(FdType sockFd, bool enable = true);
+        void setSockKeepAlive(FdType sockFd, bool enable = true);
+        void setSockKeepIdle(FdType sockFd, OptValType idleTime);
+        void setSockKeepCnt(FdType sockFd, OptValType cnt);
+        void setSockKeepIntvl(FdType sockFd, OptValType interval);
+        void setTcpNoDelay(FdType sockFd, bool enable = true);
+        void setSockNonBlock(FdType sockFd, bool enable = true);
+        void setSockLinger(FdType sockFd, const SockLinger& linger);
+        void setSockBroadCast(FdType sockFd, bool enable = true);
+
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
         // rmem_default TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x note:UDP has no
         // send buffer,for UDP,SO_SNDBUF just sets the maximum size of a single datagram sent UDP SO_SNDBUF default value is
@@ -64,13 +75,6 @@ namespace nets::net
         OptValType getTcpSockRecvBuf();
         OptValType getUdpSockSendBuf();
         OptValType getUdpSockRecvBuf();
-        void setSockReuseAddr(FdType sockFd, bool enable = true);
-        void setSockReusePort(FdType sockFd, bool enable = true);
-        void setSockKeepAlive(FdType sockFd, bool enable = true);
-        void setTcpNoDelay(FdType sockFd, bool enable = true);
-        void setSockNonBlock(FdType sockFd, bool enable = true);
-        void setSockLinger(FdType sockFd, const SockLinger& linger);
-        void setSockBroadCast(FdType sockFd, bool enable = true);
     } // namespace socket
 
     namespace

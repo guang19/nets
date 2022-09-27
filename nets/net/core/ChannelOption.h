@@ -5,7 +5,6 @@
 #ifndef NETS_NET_CHANNEL_OPTION_H
 #define NETS_NET_CHANNEL_OPTION_H
 
-#include <any>
 #include <variant>
 
 #include "nets/base/Noncopyable.h"
@@ -20,6 +19,9 @@ namespace nets::net
         REUSE_ADDR,  // bool
         REUSE_PORT,  // bool
         KEEP_ALIVE,  // bool
+        KEEP_IDLE,   // int32_t, unit:seconds
+        KEEP_CNT,    // int32_t
+        KEEP_INTVL,  // int32_t, unit:seconds
         TCP_NODELAY, // bool
         LINGER,      // struct linger
         BROADCAST,   // bool
@@ -29,7 +31,7 @@ namespace nets::net
 
     namespace ChannelOption
     {
-        using ValueType = ::std::variant<bool, ::int32_t, SockLinger>;
+        using ValueType = ::std::variant<bool, OptValType, SockLinger>;
     }
 } // namespace nets::net
 

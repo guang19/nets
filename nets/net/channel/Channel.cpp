@@ -110,6 +110,21 @@ namespace nets::net
                     socket::setSockKeepAlive(sockFd, ::std::get<bool>(value));
                     break;
                 }
+                case SockOption::KEEP_IDLE:
+                {
+                    socket::setSockKeepIdle(sockFd, ::std::get<OptValType>(value));
+                    break;
+                }
+                case SockOption::KEEP_CNT:
+                {
+                    socket::setSockKeepCnt(sockFd, ::std::get<OptValType>(value));
+                    break;
+                }
+                case SockOption::KEEP_INTVL:
+                {
+                    socket::setSockKeepIntvl(sockFd, ::std::get<OptValType>(value));
+                    break;
+                }
                 case SockOption::TCP_NODELAY:
                 {
                     socket::setTcpNoDelay(sockFd, ::std::get<bool>(value));
@@ -127,12 +142,12 @@ namespace nets::net
                 }
                 case SockOption::SNDBUF:
                 {
-                    socket::setSockSendBuf(sockFd, ::std::get<::int32_t>(value));
+                    socket::setSockSendBuf(sockFd, ::std::get<OptValType>(value));
                     break;
                 }
                 case SockOption::RCVBUF:
                 {
-                    socket::setSockRecvBuf(sockFd, ::std::get<::int32_t>(value));
+                    socket::setSockRecvBuf(sockFd, ::std::get<OptValType>(value));
                     break;
                 }
                 case SockOption::INVALID_SOCKOPT:
