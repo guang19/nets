@@ -4,6 +4,7 @@
 
 #include "nets/net/core/Socket.h"
 
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/tcp.h>
 #include <sys/uio.h>
@@ -287,6 +288,62 @@ namespace nets::net::socket
         if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(OptValType))))
         {
             LOGS_ERROR << "socket setSockBroadCast failed";
+        }
+    }
+
+    void setSockMultiCast4If(FdType sockFd, const ::std::string& multicastAddr, bool ipv6)
+    {
+        InAddr inf {0};
+        ::inet_pton(AF_INET, multicastAddr.data(), &inf.s_addr);
+        if (0 != ::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))))
+        {
+            LOGS_ERROR << "socket setSockMultiCast4If failed";
+        }
+    }
+
+    void setSockMultiCast4Ttl(FdType sockFd, OptValType ttl)
+    {
+        if (0 != ::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockMultiCast4Ttl failed";
+        }
+    }
+
+    void setSockMultiCast4Loop(FdType sockFd, bool enable)
+    {
+        OptValType multicastLoop = enable ? 1 : 0;
+        if (0 != ::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicastLoop,
+                              static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockMultiCast4Loop failed";
+        }
+    }
+
+    void setSockMultiCast6If(FdType sockFd, const ::std::string& multicastAddr)
+    {
+        InAddr inf {0};
+        ::inet_pton(AF_INET6, multicastAddr.data(), &inf.s_addr);
+        if (0 != ::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))))
+        {
+            LOGS_ERROR << "socket setSockMultiCast6If failed";
+        }
+    }
+
+    void setSockMultiCast6Ttl(FdType sockFd, OptValType ttl)
+    {
+        if (0 != ::setsockopt(sockFd, IPPROTO_IPV6, IP_MULTICAST_TTL, &ttl, static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockMultiCast6Ttl failed";
+        }
+    }
+
+    void setSockMultiCast6Loop(FdType sockFd, bool enable)
+    {
+        OptValType multicastLoop = enable ? 1 : 0;
+        if (0 != ::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &multicastLoop,
+                              static_cast<SockLenType>(sizeof(OptValType))))
+        {
+            LOGS_ERROR << "socket setSockMultiCast6Loop failed";
         }
     }
 

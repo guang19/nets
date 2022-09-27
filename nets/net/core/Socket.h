@@ -15,6 +15,7 @@ namespace nets::net
         using OptValType = ::int32_t;
         using SockLinger = struct linger;
         using IoVec = struct iovec;
+        using InAddr = struct in_addr;
         using SizeType = ::size_t;
         using SSizeType = ::ssize_t;
     } // namespace
@@ -61,7 +62,16 @@ namespace nets::net
         void setTcpNoDelay(FdType sockFd, bool enable = true);
         void setSockNonBlock(FdType sockFd, bool enable = true);
         void setSockLinger(FdType sockFd, const SockLinger& linger);
+
         void setSockBroadCast(FdType sockFd, bool enable = true);
+
+        void setSockMultiCast4If(FdType sockFd, const ::std::string& multicastAddr);
+        void setSockMultiCast4Ttl(FdType sockFd, OptValType ttl);
+        void setSockMultiCast4Loop(FdType sockFd, bool enable = true);
+
+        void setSockMultiCast6If(FdType sockFd, const ::std::string& multicastAddr);
+        void setSockMultiCast6Ttl(FdType sockFd, OptValType ttl);
+        void setSockMultiCast6Loop(FdType sockFd, bool enable = true);
 
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
         // rmem_default TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x note:UDP has no
