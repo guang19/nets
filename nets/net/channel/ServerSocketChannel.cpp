@@ -22,10 +22,10 @@ namespace nets::net
             THROW_FMT(::std::runtime_error, "ServerSocketChannel createIdleFd failed");
         }
         // default options
-        channelOptions_.push_back(SO_ReuseAddr);
-        channelOptions_.push_back(SO_ReusePort);
-        childOptions_.push_back(SO_ReuseAddr);
-        childOptions_.push_back(SO_ReusePort);
+        channelOptions_[SockOption::REUSE_ADDR] = true;
+        channelOptions_[SockOption::REUSE_PORT] = true;
+        childOptions_[SockOption::REUSE_ADDR] = true;
+        childOptions_[SockOption::REUSE_PORT] = true;
     }
 
     ServerSocketChannel::~ServerSocketChannel()
@@ -43,9 +43,9 @@ namespace nets::net
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption : channelOptions_)
+        for (const auto& channelOption: channelOptions_)
         {
-            setChannelOption(channelOption);
+            setChannelOption(channelOption.first, channelOption.second);
         }
         channelOptions_.clear();
         assert(channelOptions_.empty());
@@ -87,7 +87,7 @@ namespace nets::net
     void ServerSocketChannel::initSocketChannel(SocketChannelPtr& socketChannel)
     {
         socketChannel->setChannelOptions(childOptions_);
-        for (const auto& childHandler : childHandlers_)
+        for (const auto& childHandler: childHandlers_)
         {
             assert(childHandler.use_count() == 1);
             socketChannel->pipeline().addLast(childHandler);

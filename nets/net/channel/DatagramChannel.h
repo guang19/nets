@@ -5,6 +5,8 @@
 #ifndef NETS_NET_DATAGRAM_CHANNEL_H
 #define NETS_NET_DATAGRAM_CHANNEL_H
 
+#include <vector>
+
 #include "nets/net/channel/Channel.h"
 #include "nets/net/core/DatagramChannelHandlerPipeline.h"
 
@@ -30,7 +32,7 @@ namespace nets::net
 
         inline void setChannelOptions(const ChannelOptionList& channelOptions)
         {
-            channelOptions_.insert(channelOptions_.end(), channelOptions.begin(), channelOptions.end());
+            channelOptions_.insert(channelOptions.begin(), channelOptions.end());
         }
 
         void bind(const InetSockAddress& localAddress);

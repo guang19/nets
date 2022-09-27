@@ -42,9 +42,9 @@ namespace nets::net
 
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
     {
-        for (const auto& channelOption : channelOptions)
+        for (const auto& channelOption: channelOptions)
         {
-            setChannelOption(channelOption);
+            setChannelOption(channelOption.first, channelOption.second);
         }
     }
 

@@ -6,7 +6,7 @@
 #define NETS_NET_CHANNEL_H
 
 #include <memory>
-#include <vector>
+#include <unordered_map>
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/ChannelOption.h"
@@ -30,7 +30,7 @@ namespace nets::net
     {
     public:
         using EventLoopRawPtr = EventLoop*;
-        using ChannelOptionList = ::std::vector<ChannelOption>;
+        using ChannelOptionList = ::std::unordered_map<SockOption, ChannelOption::ValueType>;
 
     public:
         explicit Channel(EventLoopRawPtr eventLoop);
@@ -57,7 +57,7 @@ namespace nets::net
         void setRegistered(bool registered);
 
     public:
-        void setChannelOption(const ChannelOption& channelOption);
+        void setChannelOption(SockOption sockOption, const ChannelOption::ValueType& value);
         virtual void setBacklog(::int32_t backlog);
 
     public:

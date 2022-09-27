@@ -26,7 +26,7 @@ public:
 TEST(UdpUniCastRecipientTest, UdpUniCastRecipient)
 {
     Bootstrap()
-        .option(SO_BroadCast, true)
+        .option(SockOption::BROADCAST, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {
@@ -42,7 +42,7 @@ public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
         LOGS_DEBUG << "TestUdpSenderHandler::channelActive";
-        channelContext.write("Hello UdpRecipient", InetSockAddress("172.30.212.19", 8080));
+        channelContext.write("Hello UdpRecipient", InetSockAddress("127.0.0.1", 8080));
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
@@ -56,7 +56,7 @@ public:
 TEST(UdpUniCastSenderTest, UdpUniCastSender)
 {
     Bootstrap()
-        .option(SO_BroadCast, true)
+        .option(SockOption::BROADCAST, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {

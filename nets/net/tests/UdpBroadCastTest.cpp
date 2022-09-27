@@ -26,7 +26,7 @@ public:
 TEST(UdpBroadCastTest, UdpBroadCastRepient1)
 {
     Bootstrap()
-        .option(SO_BroadCast, true)
+        .option(SockOption::BROADCAST, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {
@@ -39,7 +39,7 @@ TEST(UdpBroadCastTest, UdpBroadCastRepient1)
 TEST(UdpBroadCastTest, UdpBroadCastRepient2)
 {
     Bootstrap()
-        .option(SO_BroadCast, true)
+        .option(SockOption::BROADCAST, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {
@@ -69,7 +69,7 @@ public:
 TEST(UdpBroadCastTest, UdpBroadCastSender)
 {
     Bootstrap()
-        .option(SO_BroadCast, true)
+        .option(SockOption::BROADCAST, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {

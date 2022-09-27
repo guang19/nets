@@ -83,69 +83,65 @@ namespace nets::net
         isRegistered_ = registered;
     }
 
-    void Channel::setChannelOption(const ChannelOption& channelOption)
+    void Channel::setChannelOption(SockOption sockOption, const ChannelOption::ValueType& value)
     {
-        SockOpt sockOpt = channelOption.sockOpt();
         FdType sockFd = fd();
         try
         {
-            switch (sockOpt)
+            switch (sockOption)
             {
-                case SockOpt::BACKLOG:
+                case SockOption::BACKLOG:
                 {
-                    setBacklog(::std::any_cast<::int32_t>(channelOption.get()));
+                    setBacklog(::std::get<::int32_t>(value));
                     break;
                 }
-                case SockOpt::REUSE_ADDR:
+                case SockOption::REUSE_ADDR:
                 {
-                    socket::setSockReuseAddr(sockFd, ::std::any_cast<bool>(channelOption.get()));
+                    socket::setSockReuseAddr(sockFd, ::std::get<bool>(value));
                     break;
                 }
-                case SockOpt::REUSE_PORT:
+                case SockOption::REUSE_PORT:
                 {
-                    socket::setSockReusePort(sockFd, ::std::any_cast<bool>(channelOption.get()));
+                    socket::setSockReusePort(sockFd, ::std::get<bool>(value));
                     break;
                 }
-                case SockOpt::KEEP_ALIVE:
+                case SockOption::KEEP_ALIVE:
                 {
-                    socket::setSockKeepAlive(sockFd, ::std::any_cast<bool>(channelOption.get()));
+                    socket::setSockKeepAlive(sockFd, ::std::get<bool>(value));
                     break;
                 }
-                case SockOpt::TCP_NODELAY:
+                case SockOption::TCP_NODELAY:
                 {
-                    socket::setTcpNoDelay(sockFd, ::std::any_cast<bool>(channelOption.get()));
+                    socket::setTcpNoDelay(sockFd, ::std::get<bool>(value));
                     break;
                 }
-                case SockOpt::LINGER:
+                case SockOption::LINGER:
                 {
-                    auto linger = ::std::any_cast<::int32_t>(channelOption.get());
-                    socket::setSockLinger(sockFd, {1, linger});
+                    socket::setSockLinger(sockFd, ::std::get<SockLinger>(value));
                     break;
                 }
-                case SockOpt::BROADCAST:
+                case SockOption::BROADCAST:
                 {
-                    socket::setSockBroadCast(sockFd, ::std::any_cast<bool>(channelOption.get()));
+                    socket::setSockBroadCast(sockFd, ::std::get<bool>(value));
                     break;
                 }
-                case SockOpt::TCP_SNDBUF:
-                case SockOpt::UDP_SNDBUF:
+                case SockOption::SNDBUF:
                 {
-                    socket::setSockSendBuf(sockFd, ::std::any_cast<::int32_t>(channelOption.get()));
+                    socket::setSockSendBuf(sockFd, ::std::get<::int32_t>(value));
                     break;
                 }
-                case SockOpt::TCP_RCVBUF:
-                case SockOpt::UDP_RCVBUF:
+                case SockOption::RCVBUF:
                 {
-                    socket::setSockRecvBuf(sockFd, ::std::any_cast<::int32_t>(channelOption.get()));
+                    socket::setSockRecvBuf(sockFd, ::std::get<::int32_t>(value));
                     break;
                 }
-                case SockOpt::INVALID_SOCKOPT:
+                case SockOption::INVALID_SOCKOPT:
                 default:
                     THROW_FMT(::std::invalid_argument, "Channel set invalid ChannelOption");
                     break;
             }
         }
-        catch (const ::std::bad_any_cast& e)
+        catch (const ::std::bad_variant_access& e)
         {
             THROW_FMT(::std::invalid_argument, "Channel set invalid ChannelOption,cause %s", e.what());
         }

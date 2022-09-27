@@ -46,8 +46,8 @@ public:
 TEST(TcpServerBootstrapTest, TcpServer)
 {
     ServerBootstrap(8)
-        .option(SO_TcpSendBuffer, 1024)
-        .option(SO_TcpRecvBuffer, 1024)
+        .option(SockOption::SNDBUF, 1024)
+        .option(SockOption::RCVBUF, 1024)
         //                .childHandler(new TestServerChannelHandler())
         .childHandler(
             [](SocketChannel& channel)
@@ -137,8 +137,8 @@ public:
 TEST(TcpServerBootstrapTest, TcpClient)
 {
     Bootstrap()
-        .option(SO_TcpSendBuffer, 1024)
-        .option(SO_TcpRecvBuffer, 1024)
+        .option(SockOption::SNDBUF, 1024)
+        .option(SockOption::RCVBUF, 1024)
         .retry(true, 3000)
         //        .channelHandler(new TestClientChannelHandler())
         .channelHandler(

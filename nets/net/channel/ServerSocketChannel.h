@@ -7,9 +7,8 @@
 
 #include <functional>
 
-#include "nets/net/channel/Channel.h"
+#include "nets/net/channel/SocketChannel.h"
 #include "nets/net/core/InetSockAddress.h"
-#include "SocketChannel.h"
 
 namespace nets::net
 {
@@ -41,12 +40,12 @@ namespace nets::net
 
         inline void setChannelOptions(const ChannelOptionList& channelOptions)
         {
-            channelOptions_.insert(channelOptions_.end(), channelOptions.begin(), channelOptions.end());
+            channelOptions_.insert(channelOptions.begin(), channelOptions.end());
         }
 
         inline void setChildOptions(const ChannelOptionList& childOptions)
         {
-            childOptions_.insert(childOptions_.end(), childOptions.begin(), childOptions.end());
+            childOptions_.insert(childOptions.begin(), childOptions.end());
         }
 
         inline void setChildHandlers(const ChannelHandlerList& childHandlers)

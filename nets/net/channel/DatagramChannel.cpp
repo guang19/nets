@@ -21,8 +21,8 @@ namespace nets::net
         : Channel(eventLoop), sockFd_(socket::InvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
           channelOptions_()
     {
-        channelOptions_.push_back(SO_ReuseAddr);
-        channelOptions_.push_back(SO_ReusePort);
+        channelOptions_[SockOption::REUSE_ADDR] = true;
+        channelOptions_[SockOption::REUSE_PORT] = true;
     }
 
     DatagramChannel::~DatagramChannel()
@@ -50,7 +50,7 @@ namespace nets::net
         socket::setSockNonBlock(sockFd_, true);
         for (const auto& channelOption: channelOptions_)
         {
-            setChannelOption(channelOption);
+            setChannelOption(channelOption.first, channelOption.second);
         }
         channelOptions_.clear();
         assert(channelOptions_.empty());

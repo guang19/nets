@@ -24,7 +24,7 @@ namespace nets::net
         ~ServerBootstrap() override = default;
 
     public:
-        ServerBootstrap& childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value);
+        ServerBootstrap& childOption(SockOption sockOption, const ChannelOption::ValueType& value);
         // set the ChannelHandler shared by all channels
         ServerBootstrap& childHandler(ChannelHandlerRawPtr childHandler);
         ServerBootstrap& childHandler(const ChannelHandlerPtr& childHandler);

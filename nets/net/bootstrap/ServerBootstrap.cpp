@@ -15,9 +15,9 @@ namespace nets::net
     {
     }
 
-    ServerBootstrap& ServerBootstrap::childOption(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
+    ServerBootstrap& ServerBootstrap::childOption(SockOption sockOption, const ChannelOption::ValueType& value)
     {
-        childOptions_.emplace_back(channelOption.sockOpt(), value);
+        childOptions_[sockOption] = value;
         return *this;
     }
 

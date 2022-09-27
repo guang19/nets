@@ -17,7 +17,7 @@ namespace nets::net
     public:
         using IntType = typename EventLoopGroup::IntType;
         using SignalHandler = typename nets::base::SignalHandler;
-        using ChannelOptionList = ::std::vector<ChannelOption>;
+        using ChannelOptionList = Channel::ChannelOptionList;
 
     public:
         explicit AbstractBootstrap() : channelOptions_(), mainLoopGroup_(NumbOfMainEventLoops, MainEventLoopGroupName)
@@ -29,9 +29,9 @@ namespace nets::net
         virtual ~AbstractBootstrap() = default;
 
     public:
-        B& option(const ChannelOption& channelOption, const ChannelOption::ValueType& value)
+        B& option(SockOption sockOption, const ChannelOption::ValueType& value)
         {
-            channelOptions_.emplace_back(channelOption.sockOpt(), value);
+            channelOptions_[sockOption] = value;
             return static_cast<B&>(*this);
         }
 
