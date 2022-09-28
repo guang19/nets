@@ -7,8 +7,8 @@
 namespace nets::net
 {
     EventLoopGroup::EventLoopGroup(IntType numOfEventLoops, const StringType& name)
-        : nextLoop_(0), numOfEventLoops_(numOfEventLoops), eventLoopThreadPool_(numOfEventLoops_, numOfEventLoops_, 0, name),
-          mutex_(), cv_()
+        : nextLoop_(0), numOfEventLoops_(numOfEventLoops), eventLoops_(), futures_(),
+          eventLoopThreadPool_(numOfEventLoops_, numOfEventLoops_, 0, name), mutex_(), cv_()
     {
         eventLoops_.reserve(numOfEventLoops_);
         futures_.reserve(numOfEventLoops_);
@@ -18,7 +18,7 @@ namespace nets::net
     {
         for (IntType i = 0; i < numOfEventLoops_; ++i)
         {
-            futures_[i] = eventLoopThreadPool_.submit(
+            futures_.emplace_back(eventLoopThreadPool_.submit(
                 [this]()
                 {
                     auto eventLoop = new EventLoop();
@@ -31,7 +31,7 @@ namespace nets::net
                         }
                     }
                     eventLoop->run();
-                });
+                }));
         }
         UniqueLockType lock(mutex_);
         cv_.wait(lock,
