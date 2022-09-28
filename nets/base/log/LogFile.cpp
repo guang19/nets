@@ -134,9 +134,9 @@ namespace nets::base
             {
                 ::strcat(path, "/");
                 ::strcat(path, spStr);
-                if (0 != ::access(path, F_OK))
+                if (::access(path, F_OK) == -1)
                 {
-                    if (0 != ::mkdir(path, 0775))
+                    if (::mkdir(path, 0775) == -1)
                     {
                         THROW_FILE_CREATE_EXCEPTION(errno)
                     }
@@ -149,17 +149,16 @@ namespace nets::base
     {
         using FileState = struct stat;
         FileState fileInfo {};
-        if (0 != ::fstat(::fileno(fp_), &fileInfo))
+        if (::fstat(::fileno(fp_), &fileInfo) != -1)
         {
-            return;
-        }
-        if (fileSize != nullptr)
-        {
-            *fileSize = fileInfo.st_size;
-        }
-        if (createTime != nullptr)
-        {
-            *createTime = fileInfo.st_ctime;
+            if (fileSize != nullptr)
+            {
+                *fileSize = fileInfo.st_size;
+            }
+            if (createTime != nullptr)
+            {
+                *createTime = fileInfo.st_ctime;
+            }
         }
     }
 } // namespace nets::base
