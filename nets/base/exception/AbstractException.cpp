@@ -10,7 +10,7 @@ namespace nets::base
 {
     namespace
     {
-        constexpr size_t MaxAddressSize = 128;
+        constexpr size_t gMaxAddressSize = 128;
     }
 
     AbstractException::AbstractException() : cause_()
@@ -25,8 +25,8 @@ namespace nets::base
 
     void AbstractException::backTrace() noexcept
     {
-        void* addrList[MaxAddressSize];
-        ::int32_t addrLen = ::backtrace(addrList, MaxAddressSize);
+        void* addrList[gMaxAddressSize];
+        ::int32_t addrLen = ::backtrace(addrList, gMaxAddressSize);
         if (addrLen == 0)
         {
             return;

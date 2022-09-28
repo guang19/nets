@@ -58,8 +58,8 @@ namespace nets::base
 
     public:
         explicit ThreadPool(IntType corePoolSize, IntType maxPoolSize, IntType maxQueueSize,
-                            const StringType& name = DefaultThreadPoolName,
-                            TimeType keepAliveTime = DefaultIdleKeepAliveTime);
+                            const StringType& name = gDefaultThreadPoolName,
+                            TimeType keepAliveTime = gDefaultIdleKeepAliveTime);
         ~ThreadPool();
 
         void shutdown();
@@ -122,32 +122,32 @@ namespace nets::base
 
         inline bool isRunning(IntType ctl) const
         {
-            return (ctl & ~CountMask) == Running;
+            return (ctl & ~gCountMask) == gRunning;
         }
 
         inline bool isShutdown(IntType ctl) const
         {
-            return (ctl & ~CountMask) == Shutdown;
+            return (ctl & ~gCountMask) == gShutdown;
         }
 
         inline IntType numOfActiveThreads(IntType ctl) const
         {
-            return ctl & CountMask;
+            return ctl & gCountMask;
         }
 
     private:
-        static constexpr IntType Int32Bits = 32;
-        static constexpr IntType CountBits = Int32Bits - 2;
+        static constexpr IntType gInt32Bits = 32;
+        static constexpr IntType gCountBits = gInt32Bits - 2;
         // maximum active thread size
         // 00,111111111111111111111111111111
-        static constexpr IntType CountMask = (1 << CountBits) - 1;
+        static constexpr IntType gCountMask = (1 << gCountBits) - 1;
         // 01,000000000000000000000000000000
-        static constexpr IntType Running = 1 << CountBits;
+        static constexpr IntType gRunning = 1 << gCountBits;
         // 00,000000000000000000000000000000
-        static constexpr IntType Shutdown = 0 << CountBits;
+        static constexpr IntType gShutdown = 0 << gCountBits;
 
-        static constexpr TimeType DefaultIdleKeepAliveTime = 30000;
-        static constexpr char DefaultThreadPoolName[] = "NetsThreadPool";
+        static constexpr TimeType gDefaultIdleKeepAliveTime = 30000;
+        static constexpr char gDefaultThreadPoolName[] = "NetsThreadPool";
 
     private:
         // the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
@@ -168,7 +168,7 @@ namespace nets::base
     };
 
     template <typename Fn, typename... Args>
-    bool ThreadPool::execute(Fn&& fn, Args&&... args)
+    bool ThreadPool:: execute(Fn&& fn, Args&&... args)
     {
         TaskType task = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         IntType ctl = ctl_.load();

@@ -11,7 +11,7 @@ namespace nets::net
           mutex_(), cv_()
     {
         eventLoops_.reserve(numOfEventLoops_);
-        futures_.reserve(numOfEventLoops);
+        futures_.reserve(numOfEventLoops_);
     }
 
     void EventLoopGroup::loopEach()
@@ -43,7 +43,7 @@ namespace nets::net
 
     void EventLoopGroup::syncEach()
     {
-        for (const auto& future: futures_)
+        for (const auto& future : futures_)
         {
             future.wait();
         }
@@ -61,7 +61,7 @@ namespace nets::net
 
     void EventLoopGroup::shutdown()
     {
-        for (auto& eventLoop: eventLoops_)
+        for (auto& eventLoop : eventLoops_)
         {
             if (eventLoop->isRunning())
             {
@@ -72,7 +72,7 @@ namespace nets::net
 
     bool EventLoopGroup::isShutdown() const
     {
-        for (const auto& eventLoop: eventLoops_)
+        for (const auto& eventLoop : eventLoops_)
         {
             if (eventLoop->isRunning())
             {

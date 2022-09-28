@@ -76,8 +76,8 @@ private:                                                                        
     static void _INIT(Args&&... args)                                                                                       \
     {                                                                                                                       \
         CHECK_CLASS_COMPLETE_TYPE(CLASS_NAME);                                                                              \
-        _INSTANCE = ::std::shared_ptr<CLASS_NAME>(new CLASS_NAME(::std::forward<Args>(args)...), &CLASS_NAME::_DESTROY);    \
-        _CALL_AFTER_INIT<CLASS_NAME>(_INSTANCE.get());                                                                      \
+        gINSTANCE = ::std::shared_ptr<CLASS_NAME>(new CLASS_NAME(::std::forward<Args>(args)...), &CLASS_NAME::_DESTROY);    \
+        _CALL_AFTER_INIT<CLASS_NAME>(gINSTANCE.get());                                                                      \
     }                                                                                                                       \
                                                                                                                             \
 public:                                                                                                                     \
@@ -85,24 +85,26 @@ public:                                                                         
     static inline ::std::shared_ptr<CLASS_NAME> getInstance(Args&&... args)                                                 \
     {                                                                                                                       \
         ::std::call_once(                                                                                                   \
-            _ONCE_FLAG,                                                                                                     \
+            gONCE_FLAG,                                                                                                     \
             [](Args&&... args0)                                                                                             \
             {                                                                                                               \
-                if (nullptr == _INSTANCE)                                                                                   \
+                if (nullptr == gINSTANCE)                                                                                   \
                 {                                                                                                           \
                     CLASS_NAME::_INIT(::std::forward<Args>(args0)...);                                                      \
                 }                                                                                                           \
             },                                                                                                              \
             ::std::forward<Args>(args)...);                                                                                 \
-        return _INSTANCE;                                                                                                   \
+        return gINSTANCE;                                                                                                   \
     }                                                                                                                       \
                                                                                                                             \
 private:                                                                                                                    \
-    static ::std::shared_ptr<CLASS_NAME> _INSTANCE;                                                                         \
-    static ::std::once_flag _ONCE_FLAG
+    static ::std::shared_ptr<CLASS_NAME> gINSTANCE;                                                                         \
+    static ::std::once_flag gONCE_FLAG
 
 #define INIT_SINGLETON(CLASS_NAME)                                                                                          \
-    ::std::shared_ptr<CLASS_NAME> CLASS_NAME::_INSTANCE {nullptr};                                                          \
-    ::std::once_flag CLASS_NAME::_ONCE_FLAG {}
+    ::std::shared_ptr<CLASS_NAME> CLASS_NAME::gINSTANCE {nullptr};                                                          \
+    ::std::once_flag CLASS_NAME::gONCE_FLAG                                                                                 \
+    {                                                                                                                       \
+    }
 
 #endif // NETS_BASE_SINGLETON_H

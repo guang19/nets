@@ -85,7 +85,7 @@ namespace nets::net
         void shutdown(::int32_t how);
 
     private:
-        FdType sockFd_ {socket::InvalidFd};
+        FdType sockFd_ {socket::gInvalidFd};
         InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};
         using BufferList = ::std::vector<ByteBuffer>;

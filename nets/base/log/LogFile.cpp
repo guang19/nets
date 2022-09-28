@@ -15,17 +15,17 @@ namespace nets::base
 {
     namespace
     {
-        constexpr ::int32_t MaxFilePathLength = 512;
-        constexpr char const LogFileNamePattern[] = "%Y-%m-%d_%H-%M-%S";
-        constexpr char const LogFileSuffix[] = ".log";
+        constexpr ::int32_t gMaxFilePathLength = 512;
+        constexpr char const gLogFileNamePattern[] = "%Y-%m-%d_%H-%M-%S";
+        constexpr char const gLogFileSuffix[] = ".log";
     } // namespace
 
     LogFile::LogFile(const char* file) : fp_(nullptr), dir_(), file_(file), bytes_(0), lastRollTime_(0)
     {
         SizeType filePathLength = file_.length();
-        if (filePathLength > MaxFilePathLength || filePathLength == 0)
+        if (filePathLength > gMaxFilePathLength || filePathLength == 0)
         {
-            THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLength, MaxFilePathLength);
+            THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLength, gMaxFilePathLength);
         }
         SizeType lastIndex = file_.find_last_of('/');
         if (lastIndex != StringType::npos)
@@ -39,7 +39,7 @@ namespace nets::base
             THROW_FILE_OPEN_EXCEPTION(errno)
         }
         getFileInfo(&bytes_, &lastRollTime_);
-        ::setbuffer(fp_, buffer_, FileIoBufferSize);
+        ::setbuffer(fp_, buffer_, gFileIoBufferSize);
     }
 
     LogFile::~LogFile()
@@ -93,11 +93,11 @@ namespace nets::base
         Tm tms {};
         ::localtime_r(&now, &tms);
         char newFilename[32] = {0};
-        ::strftime(newFilename, sizeof(newFilename), LogFileNamePattern, &tms);
-        ::strcat(newFilename, LogFileSuffix);
+        ::strftime(newFilename, sizeof(newFilename), gLogFileNamePattern, &tms);
+        ::strcat(newFilename, gLogFileSuffix);
         if (!dir_.empty())
         {
-            char tmpFile[MaxFilePathLength] = {0};
+            char tmpFile[gMaxFilePathLength] = {0};
             ::strcat(tmpFile, dir_.c_str());
             ::strcat(tmpFile, newFilename);
             ::rename(file_.c_str(), tmpFile);
@@ -121,11 +121,11 @@ namespace nets::base
             return;
         }
         SizeType length = ::strlen(multiLevelDir);
-        char tmpDir[MaxFilePathLength] = {0};
+        char tmpDir[gMaxFilePathLength] = {0};
         char* dirPtr = tmpDir;
-        char path[MaxFilePathLength] = {0};
-        MEMZERO(tmpDir, MaxFilePathLength);
-        MEMZERO(path, MaxFilePathLength);
+        char path[gMaxFilePathLength] = {0};
+        MEMZERO(tmpDir, gMaxFilePathLength);
+        MEMZERO(path, gMaxFilePathLength);
         ::memcpy(tmpDir, multiLevelDir, length);
         char* spStr = nullptr;
         while (nullptr != (spStr = ::strsep(&dirPtr, "/")))

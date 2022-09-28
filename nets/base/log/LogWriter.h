@@ -39,7 +39,7 @@ namespace nets::base
     namespace
     {
         // Log buffer cache 2M
-        constexpr ::size_t LogBufferPieceSize = 1024 * 1024 << 1;
+        constexpr ::size_t gLogBufferPieceSize = 1024 * 1024 << 1;
     } // namespace
 
     class LogWriter
@@ -60,7 +60,7 @@ namespace nets::base
         DEFINE_SINGLETON(AsyncLogWriter);
 
     private:
-        using BufferType = StackBuffer<LogBufferPieceSize>;
+        using BufferType = StackBuffer<gLogBufferPieceSize>;
         using BufferPtr = ::std::unique_ptr<BufferType>;
         using BufferVectorType = ::std::vector<BufferPtr>;
         using LogSynchronizerPtr = ::std::shared_ptr<LogSynchronizer>;

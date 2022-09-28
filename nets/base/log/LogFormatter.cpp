@@ -14,31 +14,31 @@ namespace nets::base
 
     namespace
     {
-        const char* const LogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+        const char* const gLogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
         /**
          * log time cache
          */
-        __thread ILogFormatter::Tm CacheTms {};
-        __thread Timestamp::TimeType CacheSeconds {0};
+        __thread ILogFormatter::Tm gCacheTms {};
+        __thread Timestamp::TimeType gCacheSeconds {0};
     } // namespace
 
     void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBufferStream& logBufferStream)
     {
         Tm tms {};
         Timestamp::TimeType seconds = logTime.secondsSinceEpoch();
-        if (seconds != CacheSeconds)
+        if (seconds != gCacheSeconds)
         {
             if (nullptr == localtime_r(&seconds, &tms))
             {
                 MEMZERO(&tms, sizeof(tms));
             }
-            CacheSeconds = seconds;
-            CacheTms = tms;
+            gCacheSeconds = seconds;
+            gCacheTms = tms;
         }
         else
         {
-            tms = CacheTms;
+            tms = gCacheTms;
         }
         char timeBuf[27] = {0};
         // check return value to circumvent [-Werror=format-truncation]
@@ -53,7 +53,7 @@ namespace nets::base
     {
         formatLogTime(logMessage.getLogTime(), logBufferStream);
         logBufferStream << " [" << currentTid() << "] ";
-        logBufferStream << LogLevelName[logMessage.getLogLevel()] << ' ';
+        logBufferStream << gLogLevelName[logMessage.getLogLevel()] << ' ';
         logBufferStream << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
         logBufferStream << logMessage.getStream();
     }

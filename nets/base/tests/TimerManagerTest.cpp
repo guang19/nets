@@ -44,7 +44,7 @@ TEST_F(TimerManagerTest, ExecuteNonRepeatable)
 
 TEST_F(TimerManagerTest, ExecuteRepeatable)
 {
-    timerManager->addTimer(Timestamp::now().plusSeconds(1), Timer::RepeatForever, 2000, false, testFunc);
+    timerManager->addTimer(Timestamp::now().plusSeconds(1), Timer::gRepeatForever, 2000, false, testFunc);
     ::sleep(1);
     for (::int32_t i = 0; i < 6; ++i)
     {
@@ -97,9 +97,9 @@ void func2()
 
 TEST_F(TimerManagerTest, Remove)
 {
-    timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::RepeatForever, 2000, false, func1);
+    timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::gRepeatForever, 2000, false, func1);
     TimerId timerId2 =
-        timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::RepeatForever, 2000, false, func2);
+        timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::gRepeatForever, 2000, false, func2);
     ::sleep(1);
     for (::int32_t i = 0; i < 6; ++i)
     {

@@ -14,9 +14,9 @@ namespace nets::base
 {
     namespace
     {
-        constexpr ::int32_t MillisecondsPerSecond = 1000;
-        constexpr ::int32_t MicrosecondsPerMillisecond = 1000;
-        constexpr ::int32_t MicrosecondsPerSecond = 1000000;
+        constexpr ::int32_t gMillisecondsPerSecond = 1000;
+        constexpr ::int32_t gMicrosecondsPerMillisecond = 1000;
+        constexpr ::int32_t gMicrosecondsPerSecond = 1000000;
     } // namespace
 
     class Timestamp : public Copyable
@@ -70,12 +70,12 @@ namespace nets::base
 
         inline Timestamp plusSeconds(TimeType seconds) const
         {
-            return Timestamp(microsecondsSinceEpoch_ + (seconds * MicrosecondsPerSecond));
+            return Timestamp(microsecondsSinceEpoch_ + (seconds * gMicrosecondsPerSecond));
         }
 
         inline Timestamp plusMilliseconds(TimeType milliseconds) const
         {
-            return Timestamp(microsecondsSinceEpoch_ + (milliseconds * MicrosecondsPerMillisecond));
+            return Timestamp(microsecondsSinceEpoch_ + (milliseconds * gMicrosecondsPerMillisecond));
         }
 
         inline Timestamp plusMicroseconds(TimeType microseconds) const
@@ -85,12 +85,12 @@ namespace nets::base
 
         inline Timestamp minusSeconds(TimeType seconds) const
         {
-            return Timestamp(microsecondsSinceEpoch_ - (seconds * MicrosecondsPerSecond));
+            return Timestamp(microsecondsSinceEpoch_ - (seconds * gMicrosecondsPerSecond));
         }
 
         inline Timestamp minusMilliseconds(TimeType milliseconds) const
         {
-            return Timestamp(microsecondsSinceEpoch_ - (milliseconds * MicrosecondsPerMillisecond));
+            return Timestamp(microsecondsSinceEpoch_ - (milliseconds * gMicrosecondsPerMillisecond));
         }
 
         inline Timestamp minusMicroseconds(TimeType microseconds) const
@@ -100,12 +100,12 @@ namespace nets::base
 
         inline TimeType secondsSinceEpoch() const
         {
-            return static_cast<TimeType>(microsecondsSinceEpoch_ / MicrosecondsPerSecond);
+            return static_cast<TimeType>(microsecondsSinceEpoch_ / gMicrosecondsPerSecond);
         }
 
         inline TimeType millisecondsSinceEpoch() const
         {
-            return static_cast<TimeType>(microsecondsSinceEpoch_ / MillisecondsPerSecond);
+            return static_cast<TimeType>(microsecondsSinceEpoch_ / gMillisecondsPerSecond);
         }
 
         inline TimeType microsecondsSinceEpoch() const
@@ -115,7 +115,7 @@ namespace nets::base
 
         inline TimeType microsPartOfTimestamp() const
         {
-            return static_cast<TimeType>(microsecondsSinceEpoch_ % MicrosecondsPerSecond);
+            return static_cast<TimeType>(microsecondsSinceEpoch_ % gMicrosecondsPerSecond);
         }
 
     private:

@@ -27,7 +27,7 @@ namespace nets::base
     ThreadPool::ThreadPool(IntType corePoolSize, IntType maximumPoolSize, IntType maxQueueSize, const StringType& name,
                            TimeType idleKeepAliveTime)
         : corePoolSize_(corePoolSize), maximumPoolSize_(maximumPoolSize), idleKeepAliveTime_(idleKeepAliveTime),
-          taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(Running),
+          taskQueue_(::std::make_unique<BlockingQueueType>(maxQueueSize)), threadPool_(), name_(name), ctl_(gRunning),
           mutex_(), cv_()
     {
         if (corePoolSize_ <= 0 || corePoolSize_ > maximumPoolSize_)
@@ -58,7 +58,7 @@ namespace nets::base
         {
             IntType ctl = ctl_.load();
             // set state to shutdown
-            if (ctl_.compare_exchange_strong(ctl, (Shutdown | (ctl & CountMask))))
+            if (ctl_.compare_exchange_strong(ctl, (gShutdown | (ctl & gCountMask))))
             {
                 break;
             }
@@ -152,8 +152,8 @@ namespace nets::base
                 if (isRunning(ctl_))
                 {
                     // set thread name
-                    char threadName[ThreadNameMaxLength] = {0};
-                    ::snprintf(threadName, ThreadNameMaxLength, "%s-Thread-%u", name_.c_str(), numOfActiveThreads(ctl_));
+                    char threadName[gThreadNameMaxLength] = {0};
+                    ::snprintf(threadName, gThreadNameMaxLength, "%s-Thread-%u", name_.c_str(), numOfActiveThreads(ctl_));
                     threadPool_.emplace_back(new ThreadWrapper(threadName, isCore, task, this));
                     return true;
                 }

@@ -18,7 +18,7 @@ namespace nets::net
     } // namespace
 
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
+        : Channel(eventLoop), sockFd_(socket::gInvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
           channelOptions_()
     {
         channelOptions_[SockOption::REUSE_ADDR] = true;
@@ -48,7 +48,7 @@ namespace nets::net
             sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
         }
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
+        for (const auto& channelOption : channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
@@ -58,7 +58,7 @@ namespace nets::net
         {
             socket::bind(sockFd_, localAddress);
         }
-        addEvent(EReadEvent);
+        addEvent(gReadEvent);
         if (!registerTo())
         {
             THROW_FMT(ChannelRegisterException, "DatagramChannel register failed");

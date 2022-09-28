@@ -8,11 +8,11 @@
 
 namespace nets::base
 {
-    SignalHandler::SignalHandlerType SignalHandler::_SignalHandler = nullptr;
+    SignalHandler::SignalHandlerType SignalHandler::gSignalHandler = nullptr;
 
     void SignalHandler::initSignalHandler(const SignalHandlerType& signalHandler)
     {
-        _SignalHandler = signalHandler;
+        gSignalHandler = signalHandler;
         Sigaction act {};
         MEMZERO(&act, sizeof(Sigaction));
         act.sa_handler = SignalHandler::handleSignal;

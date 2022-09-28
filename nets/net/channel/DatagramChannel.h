@@ -52,7 +52,7 @@ namespace nets::net
         void handleReadError(::int32_t errNum);
 
     private:
-        FdType sockFd_ {socket::InvalidFd};
+        FdType sockFd_ {socket::gInvalidFd};
         using DatagramPacketList = ::std::vector<DatagramPacket>;
 
         DatagramChannelHandlerPipeline channelHandlerPipeline_ {nullptr};

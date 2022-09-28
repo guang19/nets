@@ -17,13 +17,13 @@ namespace nets::base
     {
         // if you want to test DAILY_FILE LogWriter, you need to adjust this
         // constant for short intervals, not for the whole day
-        constexpr ::time_t SecondsPerDay = 60 * 60 * 24;
+        constexpr ::time_t gSecondsPerDay = 60 * 60 * 24;
         // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
         // constexpr ::time_t SecondsPerDay = 30;
 
         // if you want to test ROLLING_FILE LogWriter, you need to adjust this
         // constant  as small as possible
-        constexpr ::size_t LogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
+        constexpr ::size_t gLogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
         // Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
         // constexpr ::size_t LogFileRollingSize = 200;
     } // namespace
@@ -58,7 +58,7 @@ namespace nets::base
 
     void DailyLogFileSynchronizer::synchronize(const char* data, SizeType length, TimeType now)
     {
-        if (now - logFile_->lastRollTime() >= SecondsPerDay)
+        if (now - logFile_->lastRollTime() >= gSecondsPerDay)
         {
             logFile_->renameByNowTime(now);
         }
@@ -74,7 +74,7 @@ namespace nets::base
 
     void RollingLogFileSynchronizer::synchronize(const char* data, SizeType length, TimeType now)
     {
-        if (logFile_->size() + length > LogFileRollingSize)
+        if (logFile_->size() + length > gLogFileRollingSize)
         {
             logFile_->renameByNowTime(now);
         }

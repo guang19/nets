@@ -69,8 +69,8 @@ namespace nets::net
         void handleAcceptError(::int32_t errNum);
 
     private:
-        FdType sockFd_ {socket::InvalidFd};
-        FdType idleFd_ {socket::InvalidFd};
+        FdType sockFd_ {socket::gInvalidFd};
+        FdType idleFd_ {socket::gInvalidFd};
         ::int32_t backlog_ {0};
         ChannelOptionList channelOptions_ {};
         NextEventLoopFn nextEventLoopFn_ {};

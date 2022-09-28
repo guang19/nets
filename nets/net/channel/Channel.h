@@ -18,12 +18,12 @@ namespace nets::net
 
     namespace
     {
-        using EventType = ::int32_t;
+        using EventType = ::uint32_t;
         // event type
-        constexpr EventType ENoneEvent = 0;
-        constexpr EventType EReadEvent = 0x01;
-        constexpr EventType EWriteEvent = 0x01 << 1;
-        constexpr EventType EErrorEvent = 0x01 << 2;
+        constexpr EventType gNoneEvent = 0;
+        constexpr EventType gReadEvent = 0x01;
+        constexpr EventType gWriteEvent = 0x01 << 1;
+        constexpr EventType gErrorEvent = 0x01 << 2;
     } // namespace
 
     class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
@@ -71,8 +71,8 @@ namespace nets::net
 
     protected:
         // channel unique identifier per EventLoop thread
-        EventType events_ {ENoneEvent};
-        EventType readyEvents_ {ENoneEvent};
+        EventType events_ {gNoneEvent};
+        EventType readyEvents_ {gNoneEvent};
         bool isRegistered_ {false};
         EventLoopRawPtr eventLoop_ {nullptr};
     };

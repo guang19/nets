@@ -22,7 +22,7 @@ namespace nets::net
 
     namespace socket
     {
-        constexpr FdType InvalidFd = -1;
+        constexpr FdType gInvalidFd = -1;
 
         FdType createTcpSocket(SockAddrFamily family = AF_INET);
         FdType createUdpSocket(SockAddrFamily family = AF_INET);

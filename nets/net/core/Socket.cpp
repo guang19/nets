@@ -88,7 +88,7 @@ namespace nets::net::socket
         if (idleFd < 0)
         {
             LOGS_ERROR << "socket createIdleFd failed";
-            return socket::InvalidFd;
+            return socket::gInvalidFd;
         }
         return idleFd;
     }

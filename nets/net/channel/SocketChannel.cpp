@@ -16,8 +16,8 @@ namespace nets::net
 {
     namespace
     {
-        const SocketChannel::SizeType RecvBufferSize = DefaultTcpSockRecvBufferSize >> 2;
-        constexpr ::int32_t MaxCountOfWriteVOnce = IOV_MAX >> 2;
+        const SocketChannel::SizeType gRecvBufferSize = DefaultTcpSockRecvBufferSize >> 2;
+        constexpr ::int32_t gMaxCountOfWriteVOnce = IOV_MAX >> 2;
     } // namespace
 
     SocketChannel::SocketChannel(FdType sockFd, const InetSockAddress& localAddress, const InetSockAddress& peerAddress,
@@ -42,7 +42,7 @@ namespace nets::net
 
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
     {
-        for (const auto& channelOption: channelOptions)
+        for (const auto& channelOption : channelOptions)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
@@ -50,7 +50,7 @@ namespace nets::net
 
     void SocketChannel::channelActive()
     {
-        addEvent(EReadEvent);
+        addEvent(gReadEvent);
         try
         {
             if (!registerTo())
@@ -134,7 +134,7 @@ namespace nets::net
             LOGS_WARN << "SocketChannel handleReadEvent,but wrong state " << state_;
             return;
         }
-        ByteBuffer byteBuffer(RecvBufferSize);
+        ByteBuffer byteBuffer(gRecvBufferSize);
         SSizeType bytes = doRead(byteBuffer);
         if (bytes > 0)
         {
@@ -153,7 +153,7 @@ namespace nets::net
             else
             {
                 shutdownRead();
-                setEvents(EWriteEvent);
+                setEvents(gWriteEvent);
                 modify();
             }
         }
@@ -207,7 +207,7 @@ namespace nets::net
                 }
                 else
                 {
-                    setEvents(EReadEvent);
+                    setEvents(gReadEvent);
                     modify();
                 }
             }
@@ -345,7 +345,7 @@ namespace nets::net
         }
         if (!hasWriteEvent())
         {
-            addEvent(EWriteEvent);
+            addEvent(gWriteEvent);
             modify();
         }
     }
@@ -368,7 +368,7 @@ namespace nets::net
             SSizeType bytes = 0;
             SizeType expectedWriteLen = 0;
             // if leftBlocks less than CountOfWriteVOnce
-            if (leftBlocks < MaxCountOfWriteVOnce)
+            if (leftBlocks < gMaxCountOfWriteVOnce)
             {
                 for (::int32_t i = writtenBlocks; i < leftBlocks; ++i)
                 {
@@ -379,12 +379,12 @@ namespace nets::net
             }
             else
             {
-                for (::int32_t i = writtenBlocks; i < MaxCountOfWriteVOnce; ++i)
+                for (::int32_t i = writtenBlocks; i < gMaxCountOfWriteVOnce; ++i)
                 {
                     expectedWriteLen += iovecs[i].iov_len;
                 }
-                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], MaxCountOfWriteVOnce);
-                writtenBlocks += MaxCountOfWriteVOnce;
+                bytes = socket::writev(sockFd_, &iovecs[writtenBlocks], gMaxCountOfWriteVOnce);
+                writtenBlocks += gMaxCountOfWriteVOnce;
             }
             if (bytes < 0)
             {

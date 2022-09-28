@@ -14,7 +14,7 @@
 namespace nets::net
 {
     ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), idleFd_(socket::createIdleFd()), backlog_(0), channelOptions_(),
+        : Channel(eventLoop), sockFd_(socket::gInvalidFd), idleFd_(socket::createIdleFd()), backlog_(0), channelOptions_(),
           nextEventLoopFn_(), childOptions_(), childHandlers_(), childInitializationCallback_()
     {
         if (idleFd_ < 0)
@@ -43,7 +43,7 @@ namespace nets::net
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
+        for (const auto& channelOption : channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
@@ -51,7 +51,7 @@ namespace nets::net
         assert(channelOptions_.empty());
         socket::bind(sockFd_, localAddress);
         socket::listen(sockFd_, backlog_);
-        addEvent(EReadEvent);
+        addEvent(gReadEvent);
         if (!registerTo())
         {
             THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
@@ -62,7 +62,7 @@ namespace nets::net
     {
         assert(eventLoop_->isInCurrentEventLoop());
         InetSockAddress peerAddr {};
-        FdType connFd = socket::InvalidFd;
+        FdType connFd = socket::gInvalidFd;
         if ((connFd = socket::accept(sockFd_, peerAddr)) >= 0)
         {
             LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
@@ -87,7 +87,7 @@ namespace nets::net
     void ServerSocketChannel::initSocketChannel(SocketChannelPtr& socketChannel)
     {
         socketChannel->setChannelOptions(childOptions_);
-        for (const auto& childHandler: childHandlers_)
+        for (const auto& childHandler : childHandlers_)
         {
             assert(childHandler.use_count() == 1);
             socketChannel->pipeline().addLast(childHandler);

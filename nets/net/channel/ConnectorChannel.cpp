@@ -14,7 +14,7 @@
 namespace nets::net
 {
     ConnectorChannel::ConnectorChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::InvalidFd), localAddress_(), peerAddress_(),
+        : Channel(eventLoop), sockFd_(socket::gInvalidFd), localAddress_(), peerAddress_(),
           state_(ConnectionState::DISCONNECTED), retry_(false), retryInterval_(0)
     {
     }
@@ -185,7 +185,7 @@ namespace nets::net
 
     void ConnectorChannel::waitConnect()
     {
-        addEvent(EWriteEvent);
+        addEvent(gWriteEvent);
         try
         {
             if (!registerTo())
@@ -214,7 +214,7 @@ namespace nets::net
         assert(state_ != ConnectionState::CONNECTED);
         state_ = ConnectionState::DISCONNECTED;
         socket::closeFd(sockFd_);
-        sockFd_ = socket::InvalidFd;
+        sockFd_ = socket::gInvalidFd;
         // schedule reconnect
         eventLoop_->schedule(retryInterval_,
                              [self = ::std::dynamic_pointer_cast<ConnectorChannel>(shared_from_this())]()

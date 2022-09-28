@@ -50,7 +50,7 @@ TEST(TimerTest, MultiMapStore)
     map.insert(::std::make_pair(timer3.expiredTime(), ::std::move(timer3)));
     map.insert(::std::make_pair(timer4.expiredTime(), ::std::move(timer4)));
 
-    for (const auto& it: map)
+    for (const auto& it : map)
     {
         ::printf("%ld\t%ld\n", it.second.id().key_, it.first.microsecondsSinceEpoch());
     }

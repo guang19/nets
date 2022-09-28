@@ -50,7 +50,7 @@ namespace nets::net
         // whether to retry after connect failure
         // interval is reconnect interval, unit:milliseconds
         // when retry is true, the interval takes effect
-        Bootstrap& retry(bool retry = true, TimeType interval = DefaultRetryInterval);
+        Bootstrap& retry(bool retry = true, TimeType interval = gDefaultRetryInterval);
         // tcp client
         Bootstrap& connect(const char* ip, PortType port, bool ipv6 = false);
         Bootstrap& connect(const InetSockAddress& serverAddress);
@@ -72,7 +72,7 @@ namespace nets::net
         DatagramChannelInitializationCallback datagramChannelInitializationCallback_ {};
 
         // default retry interval
-        static constexpr TimeType DefaultRetryInterval = 2000;
+        static constexpr TimeType gDefaultRetryInterval = 2000;
     };
 } // namespace nets::net
 

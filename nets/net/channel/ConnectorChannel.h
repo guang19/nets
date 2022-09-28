@@ -66,7 +66,7 @@ namespace nets::net
         void reconnect();
 
     private:
-        FdType sockFd_ {socket::InvalidFd};
+        FdType sockFd_ {socket::gInvalidFd};
         InetSockAddress localAddress_ {};
         InetSockAddress peerAddress_ {};
 

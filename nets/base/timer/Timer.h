@@ -19,7 +19,7 @@ namespace nets::base
         using TimeType = ::time_t;
         using IdType = ::int64_t;
         using TimerCallback = ::std::function<void()>;
-        static constexpr ::int32_t RepeatForever = -1;
+        static constexpr ::int32_t gRepeatForever = -1;
 
     public:
         class TimerId : public Copyable
@@ -69,7 +69,7 @@ namespace nets::base
 
         inline bool isRepeatable() const
         {
-            return repeatTimes_ == RepeatForever || repeatTimes_ > 0;
+            return repeatTimes_ == gRepeatForever || repeatTimes_ > 0;
         }
 
         inline void setRepeatTimes(::int32_t repeatTimes)
@@ -99,7 +99,7 @@ namespace nets::base
         TimerCallback timerCallback_ {};
 
         // not thread-safe, because there is usually only one TimerManager to manage Timer
-        static ::std::atomic<IdType> TimerIdGenerator;
+        static ::std::atomic<IdType> gTimerIdGenerator;
     };
 } // namespace nets::base
 

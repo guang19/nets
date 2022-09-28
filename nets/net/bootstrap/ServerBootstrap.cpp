@@ -6,12 +6,12 @@
 
 namespace nets::net
 {
-    const ServerBootstrap::IntType ServerBootstrap::DefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
+    const ServerBootstrap::IntType ServerBootstrap::gDefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
 
     ServerBootstrap::ServerBootstrap(IntType numOfChildEventLoops)
         : AbstractBootstrap(), childOptions_(), childHandlers_(), childInitializationCallback_(),
-          childLoopGroup_(numOfChildEventLoops == 0 ? DefaultNumbOfChildEventLoops : numOfChildEventLoops,
-                          ChildEventLoopGroupName)
+          childLoopGroup_(numOfChildEventLoops == 0 ? gDefaultNumbOfChildEventLoops : numOfChildEventLoops,
+                          gChildEventLoopGroupName)
     {
     }
 
