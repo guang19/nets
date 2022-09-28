@@ -29,4 +29,4 @@ ADD_EXECUTABLE(LoggingTest LoggingTest.cpp)
 TARGET_LINK_LIBRARIES(LoggingTest nets_base_shared libgtest.a)
 
 ADD_EXECUTABLE(ConfigTest ConfigTest.cpp)
-TARGET_LINK_LIBRARIES(ConfigTest nets_base libgtest.a)
+TARGET_LINK_LIBRARIES(ConfigTest nets_base_shared libgtest.a)

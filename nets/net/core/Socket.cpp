@@ -6,6 +6,7 @@
 
 #include <arpa/inet.h>
 #include <fcntl.h>
+#include <net/if.h>
 #include <netinet/tcp.h>
 #include <sys/uio.h>
 #include <unistd.h>
@@ -21,7 +22,7 @@ namespace nets::net::socket
         FdType sockFd = ::socket(family, SOCK_STREAM, IPPROTO_TCP);
         if (sockFd < 0)
         {
-            THROW_FMT(SocketCreationException, "socket createTcpSocket failed");
+            THROW_FMT(SocketCreationException, "socket createTcpSocket failed,errno=%d", errno);
         }
         setSockCloExec(sockFd);
         return sockFd;
@@ -32,7 +33,7 @@ namespace nets::net::socket
         FdType sockFd = ::socket(family, SOCK_DGRAM, IPPROTO_UDP);
         if (sockFd < 0)
         {
-            THROW_FMT(SocketCreationException, "socket createUdpSocket failed");
+            THROW_FMT(SocketCreationException, "socket createUdpSocket failed,errno=%d", errno);
         }
         setSockCloExec(sockFd);
         return sockFd;
@@ -42,9 +43,9 @@ namespace nets::net::socket
     {
         ::int32_t flags = ::fcntl(sockFd, F_GETFD, 0);
         flags |= FD_CLOEXEC;
-        if (-1 == ::fcntl(sockFd, F_SETFD, flags))
+        if (::fcntl(sockFd, F_SETFD, flags) == -1)
         {
-            THROW_FMT(SocketOperationException, "socket set FD_CLOEXEC failed");
+            THROW_FMT(SocketOperationException, "socket set FD_CLOEXEC failed,errno=%d", errno);
         }
     }
 
@@ -52,18 +53,18 @@ namespace nets::net::socket
     {
         if (fd >= 0)
         {
-            if (0 != ::close(fd))
+            if (::close(fd) == -1)
             {
-                LOGS_ERROR << "socket closeFd " << fd << " failed";
+                LOGS_ERROR << "socket closeFd " << fd << " failed,errno=" << errno;
             }
         }
     }
 
     void shutdown(FdType sockFd, ::int32_t how)
     {
-        if (0 != ::shutdown(sockFd, how))
+        if (::shutdown(sockFd, how) == -1)
         {
-            LOGS_ERROR << "socket shutdown " << shutdownHowToString(how) << " failed";
+            LOGS_ERROR << "socket shutdown " << shutdownHowToString(how) << " failed,errno=" << errno;
         }
     }
 
@@ -87,7 +88,7 @@ namespace nets::net::socket
         FdType idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
         if (idleFd < 0)
         {
-            LOGS_ERROR << "socket createIdleFd failed";
+            LOGS_ERROR << "socket createIdleFd failed,errno=" << errno;
             return socket::gInvalidFd;
         }
         return idleFd;
@@ -106,17 +107,17 @@ namespace nets::net::socket
     void bind(FdType sockFd, const InetSockAddress& localAddr)
     {
         auto length = static_cast<SockLenType>((localAddr.ipFamily() == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
-        if (0 != ::bind(sockFd, localAddr.sockAddr(), length))
+        if (::bind(sockFd, localAddr.sockAddr(), length) == -1)
         {
-            THROW_FMT(SocketOperationException, "socket bind failed");
+            THROW_FMT(SocketOperationException, "socket bind failed,errno=%d", errno);
         }
     }
 
     void listen(FdType sockFd, ::int32_t backlog)
     {
-        if (0 != ::listen(sockFd, backlog))
+        if (::listen(sockFd, backlog) == -1)
         {
-            THROW_FMT(SocketOperationException, "socket listen failed");
+            THROW_FMT(SocketOperationException, "socket listen failed,errno=%d", errno);
         }
     }
 
@@ -167,18 +168,18 @@ namespace nets::net::socket
     void getLocalAddress(FdType fd, InetSockAddress& sockAddr)
     {
         auto length = static_cast<SockLenType>(sizeof(SockAddr6));
-        if (0 != ::getsockname(fd, sockAddr.sockAddr(), &length))
+        if (::getsockname(fd, sockAddr.sockAddr(), &length) == -1)
         {
-            LOGS_ERROR << "socket getLocalAddress failed";
+            LOGS_ERROR << "socket getLocalAddress failed,errno=" << errno;
         }
     }
 
     void getPeerAddress(FdType fd, InetSockAddress& sockAddr)
     {
         auto length = static_cast<SockLenType>(sizeof(SockAddr6));
-        if (0 != ::getpeername(fd, sockAddr.sockAddr(), &length))
+        if (::getpeername(fd, sockAddr.sockAddr(), &length) == -1)
         {
-            LOGS_ERROR << "socket getPeerAddress failed";
+            LOGS_ERROR << "socket getPeerAddress failed,errno=" << errno;
         }
     }
 
@@ -186,10 +187,11 @@ namespace nets::net::socket
     {
         OptValType optVal = 0;
         auto length = static_cast<SockLenType>(sizeof(OptValType));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &length))
+        if (::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getSockError failed";
-            return errno;
+            int32_t errNum = errno;
+            LOGS_ERROR << "socket getSockError failed,errno=" << errNum;
+            return errNum;
         }
         else
         {
@@ -200,60 +202,58 @@ namespace nets::net::socket
     void setSockReuseAddr(FdType sockFd, bool enable)
     {
         OptValType reuse = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockAddrReuse failed";
+            LOGS_ERROR << "socket setSockAddrReuse failed,errno=" << errno;
         }
     }
 
     void setSockReusePort(FdType sockFd, bool enable)
     {
         OptValType reuse = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockPortReuse failed";
+            LOGS_ERROR << "socket setSockPortReuse failed,errno=" << errno;
         }
     }
 
     void setSockKeepAlive(FdType sockFd, bool enable)
     {
-        OptValType keepAlive = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepAlive, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepAlive failed";
+            LOGS_ERROR << "socket setSockKeepAlive failed,errno=" << errno;
         }
     }
 
     void setSockKeepIdle(FdType sockFd, OptValType idleTime)
     {
-        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPIDLE, &idleTime, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPIDLE, &idleTime, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepIdle failed";
+            LOGS_ERROR << "socket setSockKeepIdle failed,errno=" << errno;
         }
     }
 
     void setSockKeepCnt(FdType sockFd, OptValType cnt)
     {
-        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPCNT, &cnt, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPCNT, &cnt, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepCnt failed";
+            LOGS_ERROR << "socket setSockKeepCnt failed,errno=" << errno;
         }
     }
 
     void setSockKeepIntvl(FdType sockFd, OptValType interval)
     {
-        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPINTVL, &interval, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPINTVL, &interval, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepIntvl failed";
+            LOGS_ERROR << "socket setSockKeepIntvl failed,errno=" << errno;
         }
     }
 
     void setTcpNoDelay(FdType sockFd, bool enable)
     {
-        OptValType noDelay = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setTcpNoDelay failed";
+            LOGS_ERROR << "socket setTcpNoDelay failed,errno=" << errno;
         }
     }
 
@@ -268,98 +268,170 @@ namespace nets::net::socket
         {
             flags &= ~O_NONBLOCK;
         }
-        if (-1 == ::fcntl(sockFd, F_SETFL, flags))
+        if (::fcntl(sockFd, F_SETFL, flags) == -1)
         {
-            LOGS_ERROR << "socket setSockNonBlock failed";
+            LOGS_ERROR << "socket setSockNonBlock failed,errno=" << errno;
+            ;
         }
     }
 
     void setSockLinger(FdType sockFd, const SockLinger& linger)
     {
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))) == -1)
         {
-            LOGS_ERROR << "socket setSockLinger failed";
+            LOGS_ERROR << "socket setSockLinger failed,errno=" << errno;
         }
     }
 
     void setSockBroadCast(FdType sockFd, bool enable)
     {
-        OptValType broadcast = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setSockBroadCast failed";
+            LOGS_ERROR << "socket setSockBroadCast failed,errno=" << errno;
         }
     }
 
-    void setSockMultiCast4If(FdType sockFd, const ::std::string& multicastAddr, bool ipv6)
+    void setIpMultiCastIf(FdType sockFd, const ::std::string& multicastAddr)
     {
         InAddr inf {0};
         ::inet_pton(AF_INET, multicastAddr.data(), &inf.s_addr);
-        if (0 != ::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))))
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))) == -1)
         {
-            LOGS_ERROR << "socket setSockMultiCast4If failed";
+            LOGS_ERROR << "socket setIpMultiCastIf failed,errno=" << errno;
         }
     }
 
-    void setSockMultiCast4Ttl(FdType sockFd, OptValType ttl)
+    void setIpv6MultiCastIf(FdType sockFd, const ::std::string& ifName)
     {
-        if (0 != ::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_TTL, &ttl, static_cast<SockLenType>(sizeof(OptValType))))
+        uint32_t ifIndex = ::if_nametoindex(ifName.data());
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifIndex, static_cast<SockLenType>(sizeof(uint32_t))) ==
+            -1)
         {
-            LOGS_ERROR << "socket setSockMultiCast4Ttl failed";
+            LOGS_ERROR << "socket setIpv6MultiCastIf failed,errno=" << errno;
         }
     }
 
-    void setSockMultiCast4Loop(FdType sockFd, bool enable)
+    void setIpMultiCastTTL(FdType sockFd, uint8_t ttl)
     {
-        OptValType multicastLoop = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_LOOP, &multicastLoop,
-                              static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &ttl, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
         {
-            LOGS_ERROR << "socket setSockMultiCast4Loop failed";
+            LOGS_ERROR << "socket setIpMultiCastTTL failed,errno=" << errno;
         }
     }
 
-    void setSockMultiCast6If(FdType sockFd, const ::std::string& multicastAddr)
+    void setIpv6MultiCastHops(FdType sockFd, uint8_t hops)
     {
-        InAddr inf {0};
-        ::inet_pton(AF_INET6, multicastAddr.data(), &inf.s_addr);
-        if (0 != ::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))))
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
         {
-            LOGS_ERROR << "socket setSockMultiCast6If failed";
+            LOGS_ERROR << "socket setIpv6MultiCastHops failed,errno=" << errno;
         }
     }
 
-    void setSockMultiCast6Ttl(FdType sockFd, OptValType ttl)
+    void setIpMultiCastLoop(FdType sockFd, bool enable)
     {
-        if (0 != ::setsockopt(sockFd, IPPROTO_IPV6, IP_MULTICAST_TTL, &ttl, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setSockMultiCast6Ttl failed";
+            LOGS_ERROR << "socket setIpMultiCastLoop failed,errno=" << errno;
         }
     }
 
-    void setSockMultiCast6Loop(FdType sockFd, bool enable)
+    void setIpv6MultiCastLoop(FdType sockFd, bool enable)
     {
-        OptValType multicastLoop = enable ? 1 : 0;
-        if (0 != ::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &multicastLoop,
-                              static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setSockMultiCast6Loop failed";
+            LOGS_ERROR << "socket setIpv6MultiCastLoop failed,errno=" << errno;
+        }
+    }
+
+    void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr)
+    {
+        IpMreqn group {};
+        ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
+        ::inet_pton(AF_INET, localAddr.data(), &group.imr_address.s_addr);
+        // find internet interface index
+        group.imr_ifindex = 0;
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
+        {
+            LOGS_ERROR << "socket addIpMemberShipByLocalAddr failed,errno=" << errno;
+        }
+    }
+
+    void addIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    {
+        IpMreqn group {};
+        ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
+        group.imr_address.s_addr = htonl(INADDR_ANY);
+        // find internet interface index
+        group.imr_ifindex = static_cast<int32_t>(::if_nametoindex(inf.data()));
+        if (::setsockopt(sockFd, IPPROTO_IP, IPV6_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
+        {
+            LOGS_ERROR << "socket addIpMemberShipByIfIndex failed,errno=" << errno;
+        }
+    }
+
+    void addIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    {
+        Ipv6Mreq group {};
+        ::inet_pton(AF_INET6, multicastAddr.data(), &group.ipv6mr_multiaddr);
+        group.ipv6mr_interface = ::if_nametoindex(inf.data());
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_JOIN_GROUP /*IPV6_ADD_MEMBERSHIP*/, &group,
+                         static_cast<SockLenType>(sizeof(Ipv6Mreq))) == -1)
+        {
+            LOGS_ERROR << "socket addIpv6MemberShip failed,errno=" << errno;
+        }
+    }
+
+    void dropIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr)
+    {
+        IpMreqn group {};
+        ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
+        ::inet_pton(AF_INET, localAddr.data(), &group.imr_address.s_addr);
+        // find internet interface index
+        group.imr_ifindex = 0;
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
+        {
+            LOGS_ERROR << "socket dropIpMemberShipByLocalAddr failed,errno=" << errno;
+        }
+    }
+
+    void dropIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    {
+        IpMreqn group {};
+        ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
+        group.imr_address.s_addr = htonl(INADDR_ANY);
+        // find internet interface index
+        group.imr_ifindex = static_cast<int32_t>(::if_nametoindex(inf.data()));
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
+        {
+            LOGS_ERROR << "socket dropIpMemberShipByIfIndex failed,errno=" << errno;
+        }
+    }
+
+    void dropIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    {
+        Ipv6Mreq group {};
+        ::inet_pton(AF_INET6, multicastAddr.data(), &group.ipv6mr_multiaddr);
+        group.ipv6mr_interface = ::if_nametoindex(inf.data());
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_LEAVE_GROUP /*IPV6_DROP_MEMBERSHIP*/, &group,
+                         static_cast<SockLenType>(sizeof(Ipv6Mreq))) == -1)
+        {
+            LOGS_ERROR << "socket dropIpv6MemberShip failed,errno=" << errno;
         }
     }
 
     void setSockSendBuf(FdType sockFd, OptValType sendBufLen)
     {
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockSendBuf failed";
+            LOGS_ERROR << "socket setSockSendBuf failed,errno=" << errno;
         }
     }
 
     void setSockRecvBuf(FdType sockFd, OptValType recvBufLen)
     {
-        if (0 != ::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(sizeof(OptValType))))
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockRecvBuf failed";
+            LOGS_ERROR << "socket setSockRecvBuf failed,errno=" << errno;
         }
     }
 
@@ -368,9 +440,9 @@ namespace nets::net::socket
         FdType sockFd = socket::createTcpSocket(AF_INET);
         OptValType optVal = 0;
         auto length = static_cast<SockLenType>(sizeof(OptValType));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
+        if (::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getTcpSockSendBuf failed";
+            LOGS_ERROR << "socket getTcpSockSendBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;
@@ -381,9 +453,9 @@ namespace nets::net::socket
         FdType sockFd = socket::createTcpSocket(AF_INET);
         OptValType optVal = 0;
         auto length = static_cast<SockLenType>(sizeof(OptValType));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
+        if (::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getTcpSockRecvBuf failed";
+            LOGS_ERROR << "socket getTcpSockRecvBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;
@@ -394,9 +466,9 @@ namespace nets::net::socket
         FdType sockFd = socket::createUdpSocket(AF_INET);
         OptValType optVal = 0;
         auto length = static_cast<SockLenType>(sizeof(OptValType));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length))
+        if (::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getUdpSockSendBuf failed";
+            LOGS_ERROR << "socket getUdpSockSendBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;
@@ -407,9 +479,9 @@ namespace nets::net::socket
         FdType sockFd = socket::createUdpSocket(AF_INET);
         OptValType optVal = 0;
         auto length = static_cast<SockLenType>(sizeof(OptValType));
-        if (0 != ::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length))
+        if (::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getUdpSockRecvBuf failed";
+            LOGS_ERROR << "socket getUdpSockRecvBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;

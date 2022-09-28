@@ -85,7 +85,7 @@ namespace nets::net
     void ConnectorChannel::connect(const InetSockAddress& serverAddress)
     {
         sockFd_ = socket::createTcpSocket(serverAddress.ipFamily());
-        socket::setSockNonBlock(sockFd_);
+        socket::setSockNonBlock(sockFd_, true);
         ::int32_t ret = socket::connect(sockFd_, serverAddress);
         peerAddress_ = serverAddress;
         assert(state_ == ConnectionState::DISCONNECTED);

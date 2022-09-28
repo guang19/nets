@@ -31,7 +31,7 @@ namespace nets::net
         InetSockAddress();
         explicit InetSockAddress(const SockAddr4& addr4);
         explicit InetSockAddress(const SockAddr6& addr6);
-        explicit InetSockAddress(const char* ip, PortType port, bool ipv6 = false);
+        explicit InetSockAddress(const StringType& ip, PortType port, bool ipv6 = false);
         ~InetSockAddress() = default;
 
         InetSockAddress(const InetSockAddress& other);

@@ -29,25 +29,25 @@ namespace nets::net
         addr6_ = addr6;
     }
 
-    InetSockAddress::InetSockAddress(const char* ip, PortType port, bool ipv6)
+    InetSockAddress::InetSockAddress(const StringType& ip, PortType port, bool ipv6)
     {
         MEMZERO(&addr6_, sizeof(SockAddr6));
         if (ipv6)
         {
             addr6_.sin6_family = AF_INET6;
             addr6_.sin6_port = htobe16(port);
-            if (1 != ::inet_pton(AF_INET6, ip, &addr6_.sin6_addr))
+            if (::inet_pton(AF_INET6, ip.data(), &addr6_.sin6_addr) == -1)
             {
-                THROW_FMT(InetSockAddressException, "InetSockAddress inet_pton AF_INET6,ip=%s", ip);
+                THROW_FMT(InetSockAddressException, "InetSockAddress inet_pton AF_INET6,ip=%s", ip.data());
             }
         }
         else
         {
             addr4_.sin_family = AF_INET;
             addr4_.sin_port = htobe16(port);
-            if (1 != ::inet_pton(AF_INET, ip, &(addr4_.sin_addr)))
+            if (::inet_pton(AF_INET, ip.data(), &(addr4_.sin_addr)) == -1)
             {
-                THROW_FMT(InetSockAddressException, "InetSockAddress inet_pton AF_INET,ip=%s", ip);
+                THROW_FMT(InetSockAddressException, "InetSockAddress inet_pton AF_INET,ip=%s", ip.data());
             }
         }
     }

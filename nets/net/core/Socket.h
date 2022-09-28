@@ -16,6 +16,8 @@ namespace nets::net
         using SockLinger = struct linger;
         using IoVec = struct iovec;
         using InAddr = struct in_addr;
+        using IpMreqn = struct ip_mreqn;
+        using Ipv6Mreq = struct ipv6_mreq;
         using SizeType = ::size_t;
         using SSizeType = ::ssize_t;
     } // namespace
@@ -53,25 +55,39 @@ namespace nets::net
 
         OptValType getSockError(FdType sockFd);
 
-        void setSockReuseAddr(FdType sockFd, bool enable = true);
-        void setSockReusePort(FdType sockFd, bool enable = true);
-        void setSockKeepAlive(FdType sockFd, bool enable = true);
+        void setSockReuseAddr(FdType sockFd, bool enable);
+        void setSockReusePort(FdType sockFd, bool enable);
+        void setSockKeepAlive(FdType sockFd, bool enable);
         void setSockKeepIdle(FdType sockFd, OptValType idleTime);
         void setSockKeepCnt(FdType sockFd, OptValType cnt);
         void setSockKeepIntvl(FdType sockFd, OptValType interval);
-        void setTcpNoDelay(FdType sockFd, bool enable = true);
-        void setSockNonBlock(FdType sockFd, bool enable = true);
+        void setTcpNoDelay(FdType sockFd, bool enable);
+        void setSockNonBlock(FdType sockFd, bool enable);
         void setSockLinger(FdType sockFd, const SockLinger& linger);
 
-        void setSockBroadCast(FdType sockFd, bool enable = true);
+        void setSockBroadCast(FdType sockFd, bool enable);
 
-        void setSockMultiCast4If(FdType sockFd, const ::std::string& multicastAddr);
-        void setSockMultiCast4Ttl(FdType sockFd, OptValType ttl);
-        void setSockMultiCast4Loop(FdType sockFd, bool enable = true);
+        // set multicast address or multicast interface
+        void setIpMultiCastIf(FdType sockFd, const ::std::string& multicastAddr);
+        void setIpv6MultiCastIf(FdType sockFd, const ::std::string& ifName);
 
-        void setSockMultiCast6If(FdType sockFd, const ::std::string& multicastAddr);
-        void setSockMultiCast6Ttl(FdType sockFd, OptValType ttl);
-        void setSockMultiCast6Loop(FdType sockFd, bool enable = true);
+        // set multicast TTL
+        void setIpMultiCastTTL(FdType sockFd, uint8_t ttl);
+        void setIpv6MultiCastHops(FdType sockFd, uint8_t hops);
+
+        // set multicast send loop enable
+        void setIpMultiCastLoop(FdType sockFd, bool enable);
+        void setIpv6MultiCastLoop(FdType sockFd, bool enable);
+
+        // join group
+        void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr);
+        void addIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
+        void addIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
+
+        // leave group
+        void dropIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr);
+        void dropIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
+        void dropIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
 
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
         // rmem_default TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x note:UDP has no
