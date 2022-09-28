@@ -19,13 +19,13 @@ namespace nets::base
         // constant for short intervals, not for the whole day
         constexpr ::time_t gSecondsPerDay = 60 * 60 * 24;
         // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-        // constexpr ::time_t SecondsPerDay = 30;
+        // constexpr ::time_t gSecondsPerDay = 30;
 
         // if you want to test ROLLING_FILE LogWriter, you need to adjust this
         // constant  as small as possible
         constexpr ::size_t gLogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
         // Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-        // constexpr ::size_t LogFileRollingSize = 200;
+        // constexpr ::size_t gLogFileRollingSize = 200;
     } // namespace
 
     void StdoutLogSynchronizer::synchronize(const char* data, SizeType length, TimeType persistTime)

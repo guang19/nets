@@ -14,7 +14,7 @@ namespace nets::net
 {
     namespace
     {
-        const ByteBuffer::SizeType RecvPacketSize = DefaultUdpSockRecvBufferSize >> 2;
+        const ByteBuffer::SizeType gRecvPacketSize = DefaultUdpSockRecvBufferSize >> 2;
     } // namespace
 
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
@@ -88,7 +88,7 @@ namespace nets::net
 
     void DatagramChannel::handleReadEvent()
     {
-        ByteBuffer byteBuffer(RecvPacketSize);
+        ByteBuffer byteBuffer(gRecvPacketSize);
         InetSockAddress srcAddr {};
         SSizeType bytes = byteBuffer.writeBytes(*this, byteBuffer.writableBytes(), srcAddr);
         if (bytes > 0)
