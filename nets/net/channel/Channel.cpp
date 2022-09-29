@@ -142,32 +142,32 @@ namespace nets::net
                 }
                 case SockOption::IP4_MULTICAST_IF:
                 {
-                    socket::setIpMultiCastIf(sockFd, ::std::get<StringType>(value));
+                    socket::setIpMulticastIf(sockFd, ::std::get<StringType>(value));
                     break;
                 }
                 case SockOption::IP6_MULTICAST_IF:
                 {
-                    socket::setIpv6MultiCastIf(sockFd, ::std::get<StringType>(value));
+                    socket::setIpv6MulticastIf(sockFd, ::std::get<StringType>(value));
                     break;
                 }
                 case SockOption::IP4_MULTICAST_TTL:
                 {
-                    socket::setIpMultiCastTTL(sockFd, ::std::get<uint8_t>(value));
+                    socket::setIpMulticastTTL(sockFd, ::std::get<uint8_t>(value));
                     break;
                 }
                 case SockOption::IP6_MULTICAST_HOPS:
                 {
-                    socket::setIpv6MultiCastHops(sockFd, ::std::get<uint8_t>(value));
+                    socket::setIpv6MulticastHops(sockFd, ::std::get<uint8_t>(value));
                     break;
                 }
                 case SockOption::IP4_MULTICAST_LOOP:
                 {
-                    socket::setIpMultiCastLoop(sockFd, ::std::get<bool>(value));
+                    socket::setIpMulticastLoop(sockFd, ::std::get<bool>(value));
                     break;
                 }
                 case SockOption::IP6_MULTICAST_LOOP:
                 {
-                    socket::setIpv6MultiCastLoop(sockFd, ::std::get<bool>(value));
+                    socket::setIpv6MulticastLoop(sockFd, ::std::get<bool>(value));
                     break;
                 }
                 case SockOption::SNDBUF:

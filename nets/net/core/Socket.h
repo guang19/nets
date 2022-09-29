@@ -69,24 +69,24 @@ namespace nets::net
         void setSockBroadCast(FdType sockFd, bool enable);
 
         // set multicast interface
-        void setIpMultiCastIf(FdType sockFd, const StringType& ifAddr /** interface address**/);
-        void setIpv6MultiCastIf(FdType sockFd, const StringType& ifName);
+        void setIpMulticastIf(FdType sockFd, const StringType& ifAddr /** interface address**/);
+        void setIpv6MulticastIf(FdType sockFd, const StringType& ifName);
 
         // set multicast TTL
-        void setIpMultiCastTTL(FdType sockFd, uint8_t ttl);
-        void setIpv6MultiCastHops(FdType sockFd, uint8_t hops);
+        void setIpMulticastTTL(FdType sockFd, uint8_t ttl);
+        void setIpv6MulticastHops(FdType sockFd, uint8_t hops);
 
         // set multicast send loop enable
-        void setIpMultiCastLoop(FdType sockFd, bool enable);
-        void setIpv6MultiCastLoop(FdType sockFd, bool enable);
+        void setIpMulticastLoop(FdType sockFd, bool enable);
+        void setIpv6MulticastLoop(FdType sockFd, bool enable);
 
         // join group
-        void addIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
+        void addIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
         void addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
         void addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
 
         // leave group
-        void dropIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& localAddr);
+        void dropIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
         void dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
         void dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
 

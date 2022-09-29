@@ -290,59 +290,59 @@ namespace nets::net::socket
         }
     }
 
-    void setIpMultiCastIf(FdType sockFd, const StringType& ifAddr)
+    void setIpMulticastIf(FdType sockFd, const StringType& ifAddr)
     {
         InAddr inf {0};
         ::inet_pton(AF_INET, ifAddr.data(), &inf.s_addr);
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))) == -1)
         {
-            LOGS_ERROR << "socket setIpMultiCastIf failed,errno=" << errno;
+            LOGS_ERROR << "socket setIpMulticastIf failed,errno=" << errno;
         }
     }
 
-    void setIpv6MultiCastIf(FdType sockFd, const StringType& ifName)
+    void setIpv6MulticastIf(FdType sockFd, const StringType& ifName)
     {
         uint32_t ifIndex = ::if_nametoindex(ifName.data());
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifIndex, static_cast<SockLenType>(sizeof(uint32_t))) ==
             -1)
         {
-            LOGS_ERROR << "socket setIpv6MultiCastIf failed,errno=" << errno;
+            LOGS_ERROR << "socket setIpv6MulticastIf failed,errno=" << errno;
         }
     }
 
-    void setIpMultiCastTTL(FdType sockFd, uint8_t ttl)
+    void setIpMulticastTTL(FdType sockFd, uint8_t ttl)
     {
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &ttl, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
         {
-            LOGS_ERROR << "socket setIpMultiCastTTL failed,errno=" << errno;
+            LOGS_ERROR << "socket setIpMulticastTTL failed,errno=" << errno;
         }
     }
 
-    void setIpv6MultiCastHops(FdType sockFd, uint8_t hops)
+    void setIpv6MulticastHops(FdType sockFd, uint8_t hops)
     {
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
         {
-            LOGS_ERROR << "socket setIpv6MultiCastHops failed,errno=" << errno;
+            LOGS_ERROR << "socket setIpv6MulticastHops failed,errno=" << errno;
         }
     }
 
-    void setIpMultiCastLoop(FdType sockFd, bool enable)
+    void setIpMulticastLoop(FdType sockFd, bool enable)
     {
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setIpMultiCastLoop failed,errno=" << errno;
+            LOGS_ERROR << "socket setIpMulticastLoop failed,errno=" << errno;
         }
     }
 
-    void setIpv6MultiCastLoop(FdType sockFd, bool enable)
+    void setIpv6MulticastLoop(FdType sockFd, bool enable)
     {
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setIpv6MultiCastLoop failed,errno=" << errno;
+            LOGS_ERROR << "socket setIpv6MulticastLoop failed,errno=" << errno;
         }
     }
 
-    void addIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
+    void addIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -351,7 +351,7 @@ namespace nets::net::socket
         group.imr_ifindex = 0;
         if (::setsockopt(sockFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
-            LOGS_ERROR << "socket addIpMemberShipByLocalAddr failed,errno=" << errno;
+            LOGS_ERROR << "socket addIpMemberShipByIfAddr failed,errno=" << errno;
         }
     }
 
@@ -380,16 +380,16 @@ namespace nets::net::socket
         }
     }
 
-    void dropIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& localAddr)
+    void dropIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
-        ::inet_pton(AF_INET, localAddr.data(), &group.imr_address.s_addr);
+        ::inet_pton(AF_INET, ifAddr.data(), &group.imr_address.s_addr);
         // find internet interface index
         group.imr_ifindex = 0;
         if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
-            LOGS_ERROR << "socket dropIpMemberShipByLocalAddr failed,errno=" << errno;
+            LOGS_ERROR << "socket dropIpMemberShipByIfAddr failed,errno=" << errno;
         }
     }
 

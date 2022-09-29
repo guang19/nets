@@ -25,11 +25,11 @@ TARGET_LINK_LIBRARIES(EpollServerClientTest nets_net libgtest.a)
 ADD_EXECUTABLE(TcpServerBootstrapTest TcpServerBootstrapTest.cpp)
 TARGET_LINK_LIBRARIES(TcpServerBootstrapTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(UdpUniCastTest UdpUniCastTest.cpp)
-TARGET_LINK_LIBRARIES(UdpUniCastTest nets_net libgtest.a)
+ADD_EXECUTABLE(UdpUnicastTest UdpUnicastTest.cpp)
+TARGET_LINK_LIBRARIES(UdpUnicastTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(UdpBroadCastTest UdpBroadCastTest.cpp)
-TARGET_LINK_LIBRARIES(UdpBroadCastTest nets_net libgtest.a)
+ADD_EXECUTABLE(UdpBroadcastTest UdpBroadcastTest.cpp)
+TARGET_LINK_LIBRARIES(UdpBroadcastTest nets_net libgtest.a)
 
-ADD_EXECUTABLE(UdpMultiCastTest UdpMultiCastTest.cpp)
-TARGET_LINK_LIBRARIES(UdpMultiCastTest nets_net libgtest.a)
+ADD_EXECUTABLE(UdpMulticastTest UdpMulticastTest.cpp)
+TARGET_LINK_LIBRARIES(UdpMulticastTest nets_net libgtest.a)

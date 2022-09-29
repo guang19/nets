@@ -8,16 +8,16 @@
 
 using namespace nets::net;
 
-const StringType MultiCastIp = "224.1.1.1";
+const StringType MulticastIp = "224.1.1.1";
 
-TEST(UdpMultiCastTest, SockRecipient1)
+TEST(UdpMulticastTest, SockRecipient1)
 {
     FdType sockFd = socket::createUdpSocket();
     socket::setSockReuseAddr(sockFd, true);
     socket::setSockReusePort(sockFd, true);
     InetSockAddress localAddr(InetSockAddress::createAnySockAddress(12333));
     socket::bind(sockFd, localAddr);
-    socket::addIpMemberShipByLocalAddr(sockFd, MultiCastIp, "192.168.24.128");
+    socket::addIpMemberShipByIfAddr(sockFd, MulticastIp, "192.168.24.128");
     char buf[64] = {0};
     while (true)
     {
@@ -26,20 +26,20 @@ TEST(UdpMultiCastTest, SockRecipient1)
         ::fflush(stdout);
         InetSockAddress sourceAddr;
         socket::recvFrom(sockFd, buf, sizeof(buf), sourceAddr);
-        printf("UdpMultiCastTest SockRecipient1 recv message=%s\n", buf);
+        printf("UdpMulticastTest SockRecipient1 recv message=%s\n", buf);
         ::fflush(stdout);
     }
     socket::closeFd(sockFd);
 }
 
-TEST(UdpMultiCastTest, SockRecipient2)
+TEST(UdpMulticastTest, SockRecipient2)
 {
     FdType sockFd = socket::createUdpSocket();
     socket::setSockReuseAddr(sockFd, true);
     socket::setSockReusePort(sockFd, true);
     InetSockAddress localAddr(InetSockAddress::createAnySockAddress(12333));
     socket::bind(sockFd, localAddr);
-    socket::addIpMemberShipByIfIndex(sockFd, MultiCastIp, "ens33");
+    socket::addIpMemberShipByIfIndex(sockFd, MulticastIp, "ens33");
     char buf[64] = {0};
     while (true)
     {
@@ -48,18 +48,18 @@ TEST(UdpMultiCastTest, SockRecipient2)
         ::fflush(stdout);
         InetSockAddress sourceAddr;
         socket::recvFrom(sockFd, buf, sizeof(buf), sourceAddr);
-        printf("UdpMultiCastTest SockRecipient2 recv message=%s\n", buf);
+        printf("UdpMulticastTest SockRecipient2 recv message=%s\n", buf);
         ::fflush(stdout);
     }
     socket::closeFd(sockFd);
 }
 
-TEST(UdpMultiCastTest, SockSender)
+TEST(UdpMulticastTest, SockSender)
 {
 
     FdType sockFd = socket::createUdpSocket();
-    socket::setIpMultiCastIf(sockFd, "192.168.24.128");
-    InetSockAddress recipients(MultiCastIp, 12333);
+    socket::setIpMulticastIf(sockFd, "192.168.24.128");
+    InetSockAddress recipients(MulticastIp, 12333);
     socket::sendTo(sockFd, "This is a multicast message", ::strlen("This is a multicast message"), recipients);
     socket::closeFd(sockFd);
 }
@@ -79,7 +79,7 @@ public:
     }
 };
 
-TEST(UdpMultiCastTest, UdpMultiCastRepient1)
+TEST(UdpMulticastTest, UdpMulticastRepient1)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -92,7 +92,7 @@ TEST(UdpMultiCastTest, UdpMultiCastRepient1)
         .sync();
 }
 
-TEST(UdpMultiCastTest, UdpMultiCastRepient2)
+TEST(UdpMulticastTest, UdpMulticastRepient2)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -105,7 +105,7 @@ TEST(UdpMultiCastTest, UdpMultiCastRepient2)
         .sync();
 }
 
-class TestUdpMultiCastSenderHandler : public DatagramChannelHandler
+class TestUdpMulticastSenderHandler : public DatagramChannelHandler
 {
 public:
     void channelActive(DatagramChannelContext& channelContext) override
@@ -120,7 +120,7 @@ public:
     }
 };
 
-TEST(UdpMultiCastTest, UdpMultiCastSender)
+TEST(UdpMulticastTest, UdpMulticastSender)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -128,7 +128,7 @@ TEST(UdpMultiCastTest, UdpMultiCastSender)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpMultiCastSenderHandler);
+                channel.pipeline().addLast(new TestUdpMulticastSenderHandler);
             })
         .bind()
         .sync();

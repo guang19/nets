@@ -23,7 +23,7 @@ public:
     }
 };
 
-TEST(UdpUniCastRecipientTest, UdpUniCastRecipient)
+TEST(UdpUnicastRecipientTest, UdpUnicastRecipient)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -53,7 +53,7 @@ public:
     }
 };
 
-TEST(UdpUniCastSenderTest, UdpUniCastSender)
+TEST(UdpUnicastSenderTest, UdpUnicastSender)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)

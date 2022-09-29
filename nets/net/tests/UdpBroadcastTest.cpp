@@ -23,7 +23,7 @@ public:
     }
 };
 
-TEST(UdpBroadCastTest, UdpBroadCastRepient1)
+TEST(UdpBroadcastTest, UdpBroadcastRepient1)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -36,7 +36,7 @@ TEST(UdpBroadCastTest, UdpBroadCastRepient1)
         .sync();
 }
 
-TEST(UdpBroadCastTest, UdpBroadCastRepient2)
+TEST(UdpBroadcastTest, UdpBroadcastRepient2)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -49,7 +49,7 @@ TEST(UdpBroadCastTest, UdpBroadCastRepient2)
         .sync();
 }
 
-class TestUdpBroadCastSenderHandler : public DatagramChannelHandler
+class TestUdpBroadcastSenderHandler : public DatagramChannelHandler
 {
 public:
     void channelActive(DatagramChannelContext& channelContext) override
@@ -66,14 +66,14 @@ public:
     }
 };
 
-TEST(UdpBroadCastTest, UdpBroadCastSender)
+TEST(UdpBroadcastTest, UdpBroadcastSender)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpBroadCastSenderHandler);
+                channel.pipeline().addLast(new TestUdpBroadcastSenderHandler);
             })
         .bind()
         .sync();

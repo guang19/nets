@@ -48,7 +48,7 @@ namespace nets::net
             sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
         }
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption : channelOptions_)
+        for (const auto& channelOption: channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
@@ -84,6 +84,21 @@ namespace nets::net
     SSizeType DatagramChannel::write(const DatagramPacket& message)
     {
         return doWrite(message.data(), message.length(), message.recipient());
+    }
+
+    void DatagramChannel::joinIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr)
+    {
+        socket::addIpMemberShipByIfAddr(sockFd_, multicastAddr, ifAddr);
+    }
+
+    void DatagramChannel::joinIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf)
+    {
+        socket::addIpMemberShipByIfIndex(sockFd_, multicastAddr, inf);
+    }
+
+    void DatagramChannel::joinIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf)
+    {
+        socket::addIpv6MemberShip(sockFd_, multicastAddr, inf);
     }
 
     void DatagramChannel::handleReadEvent()
