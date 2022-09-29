@@ -271,7 +271,6 @@ namespace nets::net::socket
         if (::fcntl(sockFd, F_SETFL, flags) == -1)
         {
             LOGS_ERROR << "socket setSockNonBlock failed,errno=" << errno;
-            ;
         }
     }
 

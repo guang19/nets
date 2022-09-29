@@ -17,7 +17,7 @@ TEST(UdpMultiCastTest, SockRecipient1)
     socket::setSockReusePort(sockFd, true);
     InetSockAddress localAddr(InetSockAddress::createAnySockAddress(12333));
     socket::bind(sockFd, localAddr);
-    socket::addIpMemberShipByLocalAddr(sockFd, MultiCastIp, "172.30.208.26");
+    socket::addIpMemberShipByLocalAddr(sockFd, MultiCastIp, "192.168.24.128");
     char buf[64] = {0};
     while (true)
     {
@@ -35,7 +35,7 @@ TEST(UdpMultiCastTest, SockRecipient2)
     socket::setSockReusePort(sockFd, true);
     InetSockAddress localAddr(InetSockAddress::createAnySockAddress(12333));
     socket::bind(sockFd, localAddr);
-    socket::addIpMemberShipByIfIndex(sockFd, MultiCastIp, "eth0");
+    socket::addIpMemberShipByIfIndex(sockFd, MultiCastIp, "ens33");
     char buf[64] = {0};
     while (true)
     {

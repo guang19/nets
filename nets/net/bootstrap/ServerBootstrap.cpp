@@ -39,7 +39,7 @@ namespace nets::net
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::bind(const char* ip, PortType port, bool ipv6)
+    ServerBootstrap& ServerBootstrap::bind(const ::std::string& ip, PortType port, bool ipv6)
     {
         return bind(InetSockAddress(ip, port, ipv6));
     }

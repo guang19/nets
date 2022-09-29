@@ -33,7 +33,7 @@ namespace nets::net
 
         // tcp server
         ServerBootstrap& bind(PortType port, bool ipv6 = false);
-        ServerBootstrap& bind(const char* ip, PortType port, bool ipv6 = false);
+        ServerBootstrap& bind(const ::std::string& ip, PortType port, bool ipv6 = false);
         ServerBootstrap& bind(const InetSockAddress& localAddress);
 
         void sync();
