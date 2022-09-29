@@ -8,7 +8,7 @@
 
 using namespace nets::net;
 
-const ::std::string MultiCastIp = "226.1.1.1";
+const ::std::string MultiCastIp = "224.1.1.1";
 
 TEST(UdpMultiCastTest, SockRecipient1)
 {
@@ -22,8 +22,12 @@ TEST(UdpMultiCastTest, SockRecipient1)
     while (true)
     {
         ::memset(buf, 0, sizeof(buf));
-        ::recvfrom(sockFd, buf, sizeof(buf), 0, nullptr, nullptr);
+        printf("recvFrom...\n");
+        ::fflush(stdout);
+        InetSockAddress sourceAddr;
+        socket::recvFrom(sockFd, buf, sizeof(buf), sourceAddr);
         printf("UdpMultiCastTest SockRecipient1 recv message=%s\n", buf);
+        ::fflush(stdout);
     }
     socket::closeFd(sockFd);
 }
@@ -40,8 +44,12 @@ TEST(UdpMultiCastTest, SockRecipient2)
     while (true)
     {
         ::memset(buf, 0, sizeof(buf));
-        ::recvfrom(sockFd, buf, sizeof(buf), 0, nullptr, nullptr);
+        printf("recvFrom...\n");
+        ::fflush(stdout);
+        InetSockAddress sourceAddr;
+        socket::recvFrom(sockFd, buf, sizeof(buf), sourceAddr);
         printf("UdpMultiCastTest SockRecipient2 recv message=%s\n", buf);
+        ::fflush(stdout);
     }
     socket::closeFd(sockFd);
 }
@@ -50,9 +58,8 @@ TEST(UdpMultiCastTest, SockSender)
 {
 
     FdType sockFd = socket::createUdpSocket();
-    socket::setIpMultiCastIf(sockFd, MultiCastIp);
+    socket::setIpMultiCastIf(sockFd, "192.168.24.128");
     InetSockAddress recipients(MultiCastIp, 12333);
-    socket::sendTo(sockFd, "This is a multicast message", ::strlen("This is a multicast message"), recipients);
     socket::sendTo(sockFd, "This is a multicast message", ::strlen("This is a multicast message"), recipients);
     socket::closeFd(sockFd);
 }

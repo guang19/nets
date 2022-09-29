@@ -290,10 +290,10 @@ namespace nets::net::socket
         }
     }
 
-    void setIpMultiCastIf(FdType sockFd, const ::std::string& multicastAddr)
+    void setIpMultiCastIf(FdType sockFd, const ::std::string& ifAddr)
     {
         InAddr inf {0};
-        ::inet_pton(AF_INET, multicastAddr.data(), &inf.s_addr);
+        ::inet_pton(AF_INET, ifAddr.data(), &inf.s_addr);
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))) == -1)
         {
             LOGS_ERROR << "socket setIpMultiCastIf failed,errno=" << errno;
@@ -342,11 +342,11 @@ namespace nets::net::socket
         }
     }
 
-    void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr)
+    void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& ifAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
-        ::inet_pton(AF_INET, localAddr.data(), &group.imr_address.s_addr);
+        ::inet_pton(AF_INET, ifAddr.data(), &group.imr_address.s_addr);
         // find internet interface index
         group.imr_ifindex = 0;
         if (::setsockopt(sockFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)

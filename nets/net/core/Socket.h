@@ -67,8 +67,8 @@ namespace nets::net
 
         void setSockBroadCast(FdType sockFd, bool enable);
 
-        // set multicast address or multicast interface
-        void setIpMultiCastIf(FdType sockFd, const ::std::string& multicastAddr);
+        // set multicast interface
+        void setIpMultiCastIf(FdType sockFd, const ::std::string& ifAddr /** interface address**/);
         void setIpv6MultiCastIf(FdType sockFd, const ::std::string& ifName);
 
         // set multicast TTL
@@ -80,7 +80,7 @@ namespace nets::net
         void setIpv6MultiCastLoop(FdType sockFd, bool enable);
 
         // join group
-        void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr);
+        void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& ifAddr);
         void addIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
         void addIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
 
