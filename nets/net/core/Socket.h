@@ -20,6 +20,7 @@ namespace nets::net
         using Ipv6Mreq = struct ipv6_mreq;
         using SizeType = ::size_t;
         using SSizeType = ::ssize_t;
+        using StringType = std::string;
     } // namespace
 
     namespace socket
@@ -68,8 +69,8 @@ namespace nets::net
         void setSockBroadCast(FdType sockFd, bool enable);
 
         // set multicast interface
-        void setIpMultiCastIf(FdType sockFd, const ::std::string& ifAddr /** interface address**/);
-        void setIpv6MultiCastIf(FdType sockFd, const ::std::string& ifName);
+        void setIpMultiCastIf(FdType sockFd, const StringType& ifAddr /** interface address**/);
+        void setIpv6MultiCastIf(FdType sockFd, const StringType& ifName);
 
         // set multicast TTL
         void setIpMultiCastTTL(FdType sockFd, uint8_t ttl);
@@ -80,14 +81,14 @@ namespace nets::net
         void setIpv6MultiCastLoop(FdType sockFd, bool enable);
 
         // join group
-        void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& ifAddr);
-        void addIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
-        void addIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
+        void addIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
+        void addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
+        void addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
 
         // leave group
-        void dropIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr);
-        void dropIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
-        void dropIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf);
+        void dropIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& localAddr);
+        void dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
+        void dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
 
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
         // rmem_default TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x note:UDP has no

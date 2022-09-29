@@ -58,7 +58,7 @@ namespace nets::net
         return bind(InetSockAddress::createAnySockAddress(port, ipv6));
     }
 
-    Bootstrap& Bootstrap::bind(const ::std::string& ip, PortType port, bool ipv6)
+    Bootstrap& Bootstrap::bind(const StringType& ip, PortType port, bool ipv6)
     {
         return bind(InetSockAddress(ip, port, ipv6));
     }
@@ -82,7 +82,7 @@ namespace nets::net
         return *this;
     }
 
-    Bootstrap& Bootstrap::connect(const ::std::string& ip, PortType port, bool ipv6)
+    Bootstrap& Bootstrap::connect(const StringType& ip, PortType port, bool ipv6)
     {
         connect(InetSockAddress(ip, port, ipv6));
         return *this;

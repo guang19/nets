@@ -18,7 +18,6 @@ namespace nets::net
     {
     public:
         using SizeType = ByteBuffer::SizeType;
-        using StringType = ::std::string;
         using IoVecList = ::std::vector<IoVec>;
         using WriteCompleteCallback = SocketChannelContext::WriteCompleteCallback;
         using WriteCompleteCallbackQueue = ::std::queue<WriteCompleteCallback>;

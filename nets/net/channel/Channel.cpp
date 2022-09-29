@@ -140,6 +140,36 @@ namespace nets::net
                     socket::setSockBroadCast(sockFd, ::std::get<bool>(value));
                     break;
                 }
+                case SockOption::IP4_MULTICAST_IF:
+                {
+                    socket::setIpMultiCastIf(sockFd, ::std::get<StringType>(value));
+                    break;
+                }
+                case SockOption::IP6_MULTICAST_IF:
+                {
+                    socket::setIpv6MultiCastIf(sockFd, ::std::get<StringType>(value));
+                    break;
+                }
+                case SockOption::IP4_MULTICAST_TTL:
+                {
+                    socket::setIpMultiCastTTL(sockFd, ::std::get<uint8_t>(value));
+                    break;
+                }
+                case SockOption::IP6_MULTICAST_HOPS:
+                {
+                    socket::setIpv6MultiCastHops(sockFd, ::std::get<uint8_t>(value));
+                    break;
+                }
+                case SockOption::IP4_MULTICAST_LOOP:
+                {
+                    socket::setIpMultiCastLoop(sockFd, ::std::get<bool>(value));
+                    break;
+                }
+                case SockOption::IP6_MULTICAST_LOOP:
+                {
+                    socket::setIpv6MultiCastLoop(sockFd, ::std::get<bool>(value));
+                    break;
+                }
                 case SockOption::SNDBUF:
                 {
                     socket::setSockSendBuf(sockFd, ::std::get<OptValType>(value));
@@ -150,7 +180,6 @@ namespace nets::net
                     socket::setSockRecvBuf(sockFd, ::std::get<OptValType>(value));
                     break;
                 }
-                case SockOption::INVALID_SOCKOPT:
                 default:
                     THROW_FMT(::std::invalid_argument, "Channel set invalid ChannelOption");
                     break;

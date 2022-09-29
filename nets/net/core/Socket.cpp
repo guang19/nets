@@ -290,7 +290,7 @@ namespace nets::net::socket
         }
     }
 
-    void setIpMultiCastIf(FdType sockFd, const ::std::string& ifAddr)
+    void setIpMultiCastIf(FdType sockFd, const StringType& ifAddr)
     {
         InAddr inf {0};
         ::inet_pton(AF_INET, ifAddr.data(), &inf.s_addr);
@@ -300,7 +300,7 @@ namespace nets::net::socket
         }
     }
 
-    void setIpv6MultiCastIf(FdType sockFd, const ::std::string& ifName)
+    void setIpv6MultiCastIf(FdType sockFd, const StringType& ifName)
     {
         uint32_t ifIndex = ::if_nametoindex(ifName.data());
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifIndex, static_cast<SockLenType>(sizeof(uint32_t))) ==
@@ -342,7 +342,7 @@ namespace nets::net::socket
         }
     }
 
-    void addIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& ifAddr)
+    void addIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -355,7 +355,7 @@ namespace nets::net::socket
         }
     }
 
-    void addIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    void addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -368,7 +368,7 @@ namespace nets::net::socket
         }
     }
 
-    void addIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    void addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         Ipv6Mreq group {};
         ::inet_pton(AF_INET6, multicastAddr.data(), &group.ipv6mr_multiaddr);
@@ -380,7 +380,7 @@ namespace nets::net::socket
         }
     }
 
-    void dropIpMemberShipByLocalAddr(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& localAddr)
+    void dropIpMemberShipByLocalAddr(FdType sockFd, const StringType& multicastAddr, const StringType& localAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -393,7 +393,7 @@ namespace nets::net::socket
         }
     }
 
-    void dropIpMemberShipByIfIndex(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    void dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -406,7 +406,7 @@ namespace nets::net::socket
         }
     }
 
-    void dropIpv6MemberShip(FdType sockFd, const ::std::string& multicastAddr, const ::std::string& inf)
+    void dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         Ipv6Mreq group {};
         ::inet_pton(AF_INET6, multicastAddr.data(), &group.ipv6mr_multiaddr);

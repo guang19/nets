@@ -15,9 +15,6 @@ namespace nets::net
     class DatagramChannel : public Channel
     {
     public:
-        using StringType = ::std::string;
-
-    public:
         explicit DatagramChannel(EventLoopRawPtr eventLoop);
         ~DatagramChannel() override;
 

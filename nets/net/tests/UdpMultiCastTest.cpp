@@ -8,7 +8,7 @@
 
 using namespace nets::net;
 
-const ::std::string MultiCastIp = "224.1.1.1";
+const StringType MultiCastIp = "224.1.1.1";
 
 TEST(UdpMultiCastTest, SockRecipient1)
 {
@@ -124,6 +124,7 @@ TEST(UdpMultiCastTest, UdpMultiCastSender)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
+        .option(SockOption::IP4_MULTICAST_IF, "192.168.24.128")
         .channelHandler(
             [](DatagramChannel& channel)
             {

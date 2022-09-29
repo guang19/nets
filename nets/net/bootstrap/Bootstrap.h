@@ -44,7 +44,7 @@ namespace nets::net
         Bootstrap& bind();
         // udp bind addr
         Bootstrap& bind(PortType port, bool ipv6 = false);
-        Bootstrap& bind(const ::std::string& ip, PortType port, bool ipv6 = false);
+        Bootstrap& bind(const StringType& ip, PortType port, bool ipv6 = false);
         Bootstrap& bind(const InetSockAddress& localAddress);
 
         // whether to retry after connect failure
@@ -52,7 +52,7 @@ namespace nets::net
         // when retry is true, the interval takes effect
         Bootstrap& retry(bool retry = true, TimeType interval = gDefaultRetryInterval);
         // tcp client
-        Bootstrap& connect(const ::std::string& ip, PortType port, bool ipv6 = false);
+        Bootstrap& connect(const StringType& ip, PortType port, bool ipv6 = false);
         Bootstrap& connect(const InetSockAddress& serverAddress);
 
         void sync();

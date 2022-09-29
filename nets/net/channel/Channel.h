@@ -29,6 +29,7 @@ namespace nets::net
     class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
     {
     public:
+        using StringType = std::string;
         using EventLoopRawPtr = EventLoop*;
         using ChannelOptionList = ::std::unordered_map<SockOption, ChannelOption::ValueType>;
 

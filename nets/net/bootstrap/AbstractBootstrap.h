@@ -16,6 +16,7 @@ namespace nets::net
     {
     public:
         using IntType = typename EventLoopGroup::IntType;
+        using StringType = ::std::string;
         using SignalHandler = typename nets::base::SignalHandler;
         using ChannelOptionList = Channel::ChannelOptionList;
 

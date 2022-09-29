@@ -9,7 +9,8 @@
 
 namespace nets::base::utils
 {
-    void trim(::std::string& str);
+    using StringType = std::string;
+    void trim(StringType& str);
 } // namespace nets::base::utils
 
 #endif // NETS_BASE_STRING_UTILS_H

@@ -8,7 +8,7 @@
 
 namespace nets::base::utils
 {
-    void trim(::std::string& str)
+    void trim(StringType& str)
     {
         if (!str.empty())
         {
