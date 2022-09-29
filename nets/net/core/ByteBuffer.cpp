@@ -37,6 +37,8 @@ namespace nets::net
         MEMZERO(&buffer_[0], capacity_);
     }
 
+    ByteBuffer::ByteBuffer(const char* data) : ByteBuffer(data, ::strlen(data)) {}
+
     ByteBuffer::ByteBuffer(const void* data, SizeType length)
         : buffer_(nullptr), readerIndex_(0), writerIndex_(0), capacity_(0)
     {
@@ -111,9 +113,14 @@ namespace nets::net
         writeBytes(&value, gCharSize);
     }
 
+    void ByteBuffer::writeBytes(const char* data)
+    {
+        writeBytes(data, ::strlen(data));
+    }
+
     void ByteBuffer::writeBytes(const void* data, SizeType length)
     {
-        writeBytes(reinterpret_cast<const char*>(data), length);
+        writeBytes(static_cast<const char*>(data), length);
     }
 
     void ByteBuffer::writeBytes(const char* data, SizeType length)

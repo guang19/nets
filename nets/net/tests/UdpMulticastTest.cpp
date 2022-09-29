@@ -8,16 +8,19 @@
 
 using namespace nets::net;
 
-const StringType MulticastIp = "224.1.1.1";
+const StringType gMulticastIp = "224.1.1.1";
+const StringType gMulticastInterface = "eth0";
+const StringType gMulticastLocalAddr = "172.30.212.179"; // my eth0 addr
+const int32_t gMulticastPort = 12333;
 
 TEST(UdpMulticastTest, SockRecipient1)
 {
     FdType sockFd = socket::createUdpSocket();
     socket::setSockReuseAddr(sockFd, true);
     socket::setSockReusePort(sockFd, true);
-    InetSockAddress localAddr(InetSockAddress::createAnySockAddress(12333));
+    InetSockAddress localAddr(InetSockAddress::createAnySockAddress(gMulticastPort));
     socket::bind(sockFd, localAddr);
-    socket::addIpMemberShipByIfAddr(sockFd, MulticastIp, "192.168.24.128");
+    socket::addIpMemberShipByIfAddr(sockFd, gMulticastIp, gMulticastLocalAddr);
     char buf[64] = {0};
     while (true)
     {
@@ -37,9 +40,9 @@ TEST(UdpMulticastTest, SockRecipient2)
     FdType sockFd = socket::createUdpSocket();
     socket::setSockReuseAddr(sockFd, true);
     socket::setSockReusePort(sockFd, true);
-    InetSockAddress localAddr(InetSockAddress::createAnySockAddress(12333));
+    InetSockAddress localAddr(InetSockAddress::createAnySockAddress(gMulticastPort));
     socket::bind(sockFd, localAddr);
-    socket::addIpMemberShipByIfIndex(sockFd, MulticastIp, "ens33");
+    socket::addIpMemberShipByIfIndex(sockFd, gMulticastIp, gMulticastInterface);
     char buf[64] = {0};
     while (true)
     {
@@ -58,8 +61,8 @@ TEST(UdpMulticastTest, SockSender)
 {
 
     FdType sockFd = socket::createUdpSocket();
-    socket::setIpMulticastIf(sockFd, "192.168.24.128");
-    InetSockAddress recipients(MulticastIp, 12333);
+    socket::setIpMulticastIf(sockFd, gMulticastLocalAddr);
+    InetSockAddress recipients(gMulticastIp, gMulticastPort);
     socket::sendTo(sockFd, "This is a multicast message", ::strlen("This is a multicast message"), recipients);
     socket::closeFd(sockFd);
 }
@@ -69,14 +72,28 @@ class TestUdpRecipientHandler : public DatagramChannelHandler
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
-        LOGS_DEBUG << "TestUdpRecipientHandler::channelActive";
+        if (channelContext.joinIpv4MulticastGroupByIfAddr(gMulticastIp, gMulticastLocalAddr))
+        {
+            LOGS_DEBUG << "TestUdpRecipientHandler::channelActive joinIpv4MulticastGroupByIfAddr success";
+        }
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
         LOGS_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
+        count_++;
+        if (count_ == 5)
+        {
+            if (channelContext.leaveIpv4MulticastGroupByIfAddr(gMulticastIp, gMulticastLocalAddr))
+            {
+                LOGS_DEBUG << "TestUdpRecipientHandler::channelActive leaveIpv4MulticastGroupByIfAddr success";
+            }
+        }
     }
+
+private:
+    int count_ = 0;
 };
 
 TEST(UdpMulticastTest, UdpMulticastRepient1)
@@ -88,7 +105,7 @@ TEST(UdpMulticastTest, UdpMulticastRepient1)
             {
                 channel.pipeline().addLast(new TestUdpRecipientHandler);
             })
-        .bind(8080)
+        .bind(gMulticastPort)
         .sync();
 }
 
@@ -101,7 +118,7 @@ TEST(UdpMulticastTest, UdpMulticastRepient2)
             {
                 channel.pipeline().addLast(new TestUdpRecipientHandler);
             })
-        .bind(8080)
+        .bind(gMulticastPort)
         .sync();
 }
 
@@ -111,12 +128,13 @@ public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
         LOGS_DEBUG << "TestUdpRecipientHandler::channelActive";
-    }
-
-    void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
-    {
-        LOGS_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
-                   << "\nmessage is:" << message.byteBuffer().toString();
+        channelContext.channel().eventLoop()->scheduleAtFixedDelay(2000, 2000,
+                                                                   [&]()
+                                                                   {
+                                                                       channelContext.write(
+                                                                           ByteBuffer("this is a multicast message"),
+                                                                           InetSockAddress(gMulticastIp, gMulticastPort));
+                                                                   });
     }
 };
 
@@ -124,7 +142,7 @@ TEST(UdpMulticastTest, UdpMulticastSender)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
-        .option(SockOption::IP4_MULTICAST_IF, "192.168.24.128")
+        .option(SockOption::IP4_MULTICAST_IF, gMulticastLocalAddr)
         .channelHandler(
             [](DatagramChannel& channel)
             {

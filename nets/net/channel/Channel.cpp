@@ -137,7 +137,7 @@ namespace nets::net
                 }
                 case SockOption::BROADCAST:
                 {
-                    socket::setSockBroadCast(sockFd, ::std::get<bool>(value));
+                    socket::setSockBroadcast(sockFd, ::std::get<bool>(value));
                     break;
                 }
                 case SockOption::IP4_MULTICAST_IF:

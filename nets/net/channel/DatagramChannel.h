@@ -40,9 +40,15 @@ namespace nets::net
         SSizeType write(const ByteBuffer& message, const InetSockAddress& recipient);
         SSizeType write(const DatagramPacket& message);
 
-        void joinIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr);
-        void joinIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf);
-        void joinIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf);
+        // join multicast group
+        bool joinIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr);
+        bool joinIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf);
+        bool joinIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf);
+
+        // leave multicast group
+        bool leaveIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr);
+        bool leaveIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf);
+        bool leaveIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf);
 
     protected:
         void handleReadEvent() override;

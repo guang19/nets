@@ -66,7 +66,7 @@ namespace nets::net
         void setSockNonBlock(FdType sockFd, bool enable);
         void setSockLinger(FdType sockFd, const SockLinger& linger);
 
-        void setSockBroadCast(FdType sockFd, bool enable);
+        void setSockBroadcast(FdType sockFd, bool enable);
 
         // set multicast interface
         void setIpMulticastIf(FdType sockFd, const StringType& ifAddr /** interface address**/);
@@ -81,14 +81,14 @@ namespace nets::net
         void setIpv6MulticastLoop(FdType sockFd, bool enable);
 
         // join group
-        void addIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
-        void addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
-        void addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
+        bool addIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
+        bool addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
+        bool addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
 
         // leave group
-        void dropIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
-        void dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
-        void dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
+        bool dropIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr);
+        bool dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
+        bool dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf);
 
         // usually, newer os all support dynamic sock buffer resizing, so dont require manual set wmem_default and
         // rmem_default TCP SO_SNDBUF default value is 16384 bytes on linux which kernel version is 5.10.x note:UDP has no

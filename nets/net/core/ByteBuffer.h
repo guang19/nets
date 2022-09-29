@@ -26,6 +26,7 @@ namespace nets::net
     public:
         ByteBuffer();
         explicit ByteBuffer(SizeType initialCapacity);
+        explicit ByteBuffer(const char* data);
         explicit ByteBuffer(const void* data, SizeType length);
         ~ByteBuffer() = default;
 
@@ -104,6 +105,7 @@ namespace nets::net
         void swap(ByteBuffer&& other);
         void writeBoolean(bool value);
         void writeByte(char value);
+        void writeBytes(const char* data);
         void writeBytes(const void* data, SizeType length);
         void writeBytes(const char* data, SizeType length);
         SSizeType writeBytes(const SocketChannel& channel, SizeType length);

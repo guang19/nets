@@ -86,19 +86,34 @@ namespace nets::net
         return doWrite(message.data(), message.length(), message.recipient());
     }
 
-    void DatagramChannel::joinIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr)
+    bool DatagramChannel::joinIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr)
     {
-        socket::addIpMemberShipByIfAddr(sockFd_, multicastAddr, ifAddr);
+        return socket::addIpMemberShipByIfAddr(sockFd_, multicastAddr, ifAddr);
     }
 
-    void DatagramChannel::joinIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf)
+    bool DatagramChannel::joinIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf)
     {
-        socket::addIpMemberShipByIfIndex(sockFd_, multicastAddr, inf);
+        return socket::addIpMemberShipByIfIndex(sockFd_, multicastAddr, inf);
     }
 
-    void DatagramChannel::joinIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf)
+    bool DatagramChannel::joinIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf)
     {
-        socket::addIpv6MemberShip(sockFd_, multicastAddr, inf);
+        return socket::addIpv6MemberShip(sockFd_, multicastAddr, inf);
+    }
+
+    bool DatagramChannel::leaveIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr)
+    {
+        return socket::dropIpMemberShipByIfAddr(sockFd_, multicastAddr, ifAddr);
+    }
+
+    bool DatagramChannel::leaveIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf)
+    {
+        return socket::dropIpMemberShipByIfIndex(sockFd_, multicastAddr, inf);
+    }
+
+    bool DatagramChannel::leaveIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf)
+    {
+        return socket::dropIpv6MemberShip(sockFd_, multicastAddr, inf);
     }
 
     void DatagramChannel::handleReadEvent()

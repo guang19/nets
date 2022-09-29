@@ -219,7 +219,8 @@ namespace nets::net::socket
 
     void setSockKeepAlive(FdType sockFd, bool enable)
     {
-        if (::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
+        OptValType keepalive = enable ? 1 : 0;
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepalive, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
             LOGS_ERROR << "socket setSockKeepAlive failed,errno=" << errno;
         }
@@ -251,7 +252,8 @@ namespace nets::net::socket
 
     void setTcpNoDelay(FdType sockFd, bool enable)
     {
-        if (::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
+        OptValType noDelay = enable ? 1 : 0;
+        if (::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
             LOGS_ERROR << "socket setTcpNoDelay failed,errno=" << errno;
         }
@@ -282,11 +284,12 @@ namespace nets::net::socket
         }
     }
 
-    void setSockBroadCast(FdType sockFd, bool enable)
+    void setSockBroadcast(FdType sockFd, bool enable)
     {
-        if (::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
+        OptValType broadcast = enable ? 1 : 0;
+        if (::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockBroadCast failed,errno=" << errno;
+            LOGS_ERROR << "socket setSockBroadcast failed,errno=" << errno;
         }
     }
 
@@ -342,7 +345,7 @@ namespace nets::net::socket
         }
     }
 
-    void addIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
+    bool addIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -352,10 +355,12 @@ namespace nets::net::socket
         if (::setsockopt(sockFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
             LOGS_ERROR << "socket addIpMemberShipByIfAddr failed,errno=" << errno;
+            return false;
         }
+        return true;
     }
 
-    void addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
+    bool addIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -365,10 +370,12 @@ namespace nets::net::socket
         if (::setsockopt(sockFd, IPPROTO_IP, IPV6_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
             LOGS_ERROR << "socket addIpMemberShipByIfIndex failed,errno=" << errno;
+            return false;
         }
+        return true;
     }
 
-    void addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
+    bool addIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         Ipv6Mreq group {};
         ::inet_pton(AF_INET6, multicastAddr.data(), &group.ipv6mr_multiaddr);
@@ -377,10 +384,12 @@ namespace nets::net::socket
                          static_cast<SockLenType>(sizeof(Ipv6Mreq))) == -1)
         {
             LOGS_ERROR << "socket addIpv6MemberShip failed,errno=" << errno;
+            return false;
         }
+        return true;
     }
 
-    void dropIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
+    bool dropIpMemberShipByIfAddr(FdType sockFd, const StringType& multicastAddr, const StringType& ifAddr)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -390,10 +399,12 @@ namespace nets::net::socket
         if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
             LOGS_ERROR << "socket dropIpMemberShipByIfAddr failed,errno=" << errno;
+            return false;
         }
+        return true;
     }
 
-    void dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
+    bool dropIpMemberShipByIfIndex(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         IpMreqn group {};
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
@@ -403,10 +414,12 @@ namespace nets::net::socket
         if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
             LOGS_ERROR << "socket dropIpMemberShipByIfIndex failed,errno=" << errno;
+            return false;
         }
+        return true;
     }
 
-    void dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
+    bool dropIpv6MemberShip(FdType sockFd, const StringType& multicastAddr, const StringType& inf)
     {
         Ipv6Mreq group {};
         ::inet_pton(AF_INET6, multicastAddr.data(), &group.ipv6mr_multiaddr);
@@ -415,7 +428,9 @@ namespace nets::net::socket
                          static_cast<SockLenType>(sizeof(Ipv6Mreq))) == -1)
         {
             LOGS_ERROR << "socket dropIpv6MemberShip failed,errno=" << errno;
+            return false;
         }
+        return true;
     }
 
     void setSockSendBuf(FdType sockFd, OptValType sendBufLen)

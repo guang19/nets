@@ -29,4 +29,34 @@ namespace nets::net
     {
         return channel_->write(message);
     }
+
+    bool DatagramChannelContext::joinIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr)
+    {
+        return channel_->joinIpv4MulticastGroupByIfAddr(multicastAddr, ifAddr);
+    }
+
+    bool DatagramChannelContext::joinIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf)
+    {
+        return channel_->joinIpv4MulticastGroupByIfIndex(multicastAddr, inf);
+    }
+
+    bool DatagramChannelContext::joinIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf)
+    {
+        return channel_->joinIpv6MulticastGroup(multicastAddr, inf);
+    }
+
+    bool DatagramChannelContext::leaveIpv4MulticastGroupByIfAddr(const StringType& multicastAddr, const StringType& ifAddr)
+    {
+        return channel_->leaveIpv4MulticastGroupByIfAddr(multicastAddr, ifAddr);
+    }
+
+    bool DatagramChannelContext::leaveIpv4MulticastGroupByIfIndex(const StringType& multicastAddr, const StringType& inf)
+    {
+        return channel_->leaveIpv4MulticastGroupByIfIndex(multicastAddr, inf);
+    }
+
+    bool DatagramChannelContext::leaveIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf)
+    {
+        return channel_->leaveIpv6MulticastGroup(multicastAddr, inf);
+    }
 } // namespace nets::net
