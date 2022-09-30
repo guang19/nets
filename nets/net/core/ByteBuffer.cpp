@@ -8,6 +8,7 @@
 #include <stdexcept>
 
 #include "nets/base/CommonMacro.h"
+#include "nets/base/exception/IndexOutOfBoundsException.h"
 #include "nets/base/exception/OutOfMemoryException.h"
 #include "nets/net/channel/DatagramChannel.h"
 #include "nets/net/channel/SocketChannel.h"
@@ -339,7 +340,7 @@ namespace nets::net
     {
         if (readableBytes() < bytes)
         {
-            THROW_FMT(nets::base::OutOfMemoryException, "ByteBuffer readableBytes less than bytes %u", bytes);
+            THROW_FMT(nets::base::IndexOutOfBoundsException, "ByteBuffer readableBytes less than bytes %u", bytes);
         }
     }
 
