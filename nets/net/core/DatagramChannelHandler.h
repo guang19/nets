@@ -5,10 +5,11 @@
 #ifndef NETS_NET_DATAGRAM_CHANNEL_HANDLER_H
 #define NETS_NET_DATAGRAM_CHANNEL_HANDLER_H
 
-#include "nets/net/core/DatagramChannelContext.h"
+#include "nets/net/core/DatagramPacket.h"
 
 namespace nets::net
 {
+    class DatagramChannelContext;
     class DatagramChannelHandler
     {
     public:

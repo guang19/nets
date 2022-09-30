@@ -13,7 +13,6 @@
 
 namespace nets::net
 {
-    class ByteBuffer;
     class SocketChannel : public Channel
     {
     public:

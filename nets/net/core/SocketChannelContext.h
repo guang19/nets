@@ -6,12 +6,15 @@
 #define NETS_NET_SOCKET_CHANNEL_CONTEXT_H
 
 #include <functional>
+#include <string>
 
 #include "nets/base/Noncopyable.h"
-#include "nets/net/core/ByteBuffer.h"
+#include "nets/net/core/InetSockAddress.h"
 
 namespace nets::net
 {
+    class ByteBuffer;
+    class SocketChannel;
     class SocketChannelContext : nets::base::Noncopyable
     {
     public:

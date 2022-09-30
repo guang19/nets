@@ -5,10 +5,12 @@
 #ifndef NETS_NET_SOCKET_CHANNEL_HANDLER_H
 #define NETS_NET_SOCKET_CHANNEL_HANDLER_H
 
-#include "nets/net/core/SocketChannelContext.h"
+#include "nets/net/core/InetSockAddress.h"
 
 namespace nets::net
 {
+    class ByteBuffer;
+    class SocketChannelContext;
     class SocketChannelHandler
     {
     public:

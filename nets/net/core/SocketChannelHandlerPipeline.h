@@ -6,6 +6,7 @@
 #define NETS_NET_SOCKET_CHANNEL_HANDLER_PIPELINE_H
 
 #include <list>
+#include <memory>
 
 #include "nets/net/core/SocketChannelContext.h"
 #include "nets/net/core/SocketChannelHandler.h"
