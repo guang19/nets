@@ -65,10 +65,10 @@ namespace nets::net
             activeChannels.push_back(channel);
             EventType revents = events_[i].events;
             channel->setReadyEvents(gNoneEvent);
-            LOGS_DEBUG << "revents=" << revents << " revents & EPOLLIN=" << (revents & EPOLLIN)
-                       << " revents & EPOLLERR=" << (revents & EPOLLERR) << " revents & EPOLLHUP=" << (revents & EPOLLHUP)
-                       << " revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
-                       << " revents & EPOLLPRI=" << (revents & EPOLLPRI) << " revents & EPOLLOUT=" << (revents & EPOLLOUT);
+            LOGS_DEBUG << "revents=" << revents << " [revents & EPOLLIN=" << (revents & EPOLLIN)
+                       << "] [revents & EPOLLERR=" << (revents & EPOLLERR) << "] [revents & EPOLLHUP=" << (revents & EPOLLHUP)
+                       << "] [revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
+                       << "] [revents & EPOLLPRI=" << (revents & EPOLLPRI) << "] [revents & EPOLLOUT=" << (revents & EPOLLOUT) << ']';
             // local may shutdown connection or read/write error
             if (revents & EPOLLIN && revents & (EPOLLERR | EPOLLHUP))
             {

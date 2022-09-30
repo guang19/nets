@@ -25,6 +25,9 @@ TARGET_LINK_LIBRARIES(EpollServerClientTest nets_net libgtest.a)
 ADD_EXECUTABLE(TcpServerBootstrapTest TcpServerBootstrapTest.cpp)
 TARGET_LINK_LIBRARIES(TcpServerBootstrapTest nets_net libgtest.a)
 
+ADD_EXECUTABLE(ScheduleTaskTest ScheduleTaskTest.cpp)
+TARGET_LINK_LIBRARIES(ScheduleTaskTest nets_net libgtest.a)
+
 ADD_EXECUTABLE(UdpUnicastTest UdpUnicastTest.cpp)
 TARGET_LINK_LIBRARIES(UdpUnicastTest nets_net libgtest.a)
 

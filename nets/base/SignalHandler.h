@@ -5,8 +5,8 @@
 #ifndef NETS_BASE_SIGNAL_HANDLER_H
 #define NETS_BASE_SIGNAL_HANDLER_H
 
-#include <functional>
 #include <csignal>
+#include <functional>
 
 #include "nets/base/Noncopyable.h"
 
@@ -17,7 +17,8 @@ namespace nets::base
     public:
         using SignoType = ::int32_t;
         using Sigaction = struct sigaction;
-        using SignalHandlerType = ::std::function<void(SignoType signo)>;
+        using SigInfo = siginfo_t;
+        using SignalHandlerType = ::std::function<void(SignoType signo, SigInfo* info, void* context)>;
 
     public:
         explicit SignalHandler() = default;
@@ -26,11 +27,11 @@ namespace nets::base
     public:
         static void initSignalHandler(const SignalHandlerType& signalHandler);
 
-        static void handleSignal(SignoType signo)
+        static void handleSignal(SignoType signo, SigInfo* info, void* context)
         {
             if (gSignalHandler != nullptr)
             {
-                gSignalHandler(signo);
+                gSignalHandler(signo, info, context);
             }
         }
 

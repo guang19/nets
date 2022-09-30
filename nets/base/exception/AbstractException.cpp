@@ -4,42 +4,11 @@
 
 #include "nets/base/exception/AbstractException.h"
 
-#include <execinfo.h>
+#include "nets/base/CommonMacro.h"
 
 namespace nets::base
 {
-    namespace
-    {
-        constexpr size_t gMaxAddressSize = 128;
-    }
+    AbstractException::AbstractException() : cause_(), backtraceInfo_(STACK_TRACE) {}
 
-    AbstractException::AbstractException() : cause_()
-    {
-        backTrace();
-    }
-
-    AbstractException::AbstractException(const StringType& cause) : cause_(cause)
-    {
-        backTrace();
-    }
-
-    void AbstractException::backTrace() noexcept
-    {
-        void* addrList[gMaxAddressSize];
-        ::int32_t addrLen = ::backtrace(addrList, gMaxAddressSize);
-        if (addrLen == 0)
-        {
-            return;
-        }
-        char** symbolList = ::backtrace_symbols(addrList, addrLen);
-        if (symbolList != nullptr)
-        {
-            for (::int32_t i = 1; i < addrLen; ++i)
-            {
-                stackTrace_.append(symbolList[i]);
-                stackTrace_.push_back('\n');
-            }
-            free(symbolList);
-        }
-    }
+    AbstractException::AbstractException(const StringType& cause) : cause_(cause), backtraceInfo_(STACK_TRACE) {}
 } // namespace nets::base

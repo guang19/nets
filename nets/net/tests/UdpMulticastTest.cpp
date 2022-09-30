@@ -9,8 +9,8 @@
 using namespace nets::net;
 
 const StringType gMulticastIp = "224.1.1.1";
-const StringType gMulticastInterface = "eth0";
-const StringType gMulticastLocalAddr = "172.30.212.179"; // my eth0 addr
+const StringType gMulticastInterface = "ens33";
+const StringType gMulticastLocalAddr = "192.168.24.128"; // my ens33 addr
 const int32_t gMulticastPort = 12333;
 
 TEST(UdpMulticastTest, SockRecipient1)

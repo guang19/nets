@@ -28,17 +28,14 @@ namespace nets::base
             return cause_.c_str();
         }
 
-        inline const StringType& stackTrace() const noexcept
+        inline const StringType& backtrace() const noexcept
         {
-            return stackTrace_;
+            return backtraceInfo_;
         }
-
-    private:
-        void backTrace() noexcept;
 
     protected:
         StringType cause_ {};
-        StringType stackTrace_ {};
+        StringType backtraceInfo_ {};
     };
 } // namespace nets::base
 

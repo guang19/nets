@@ -15,11 +15,13 @@ namespace nets::base
         gSignalHandler = signalHandler;
         Sigaction act {};
         MEMZERO(&act, sizeof(Sigaction));
-        act.sa_handler = SignalHandler::handleSignal;
+        act.sa_sigaction = SignalHandler::handleSignal;
+        act.sa_flags = SA_SIGINFO | SA_RESTART;
         sigaction(SIGPIPE, &act, nullptr);
         sigaction(SIGHUP, &act, nullptr);
         sigaction(SIGINT, &act, nullptr);
         sigaction(SIGQUIT, &act, nullptr);
         sigaction(SIGTERM, &act, nullptr);
+        sigaction(SIGSEGV, &act, nullptr);
     }
-}
+} // namespace nets::base

@@ -5,6 +5,7 @@
 #ifndef NETS_NET_ABSTRACT_BOOTSTRAP_H
 #define NETS_NET_ABSTRACT_BOOTSTRAP_H
 
+#include "nets/base/exception/SegmentationFaultException.h"
 #include "nets/base/SignalHandler.h"
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/EventLoopGroup.h"
@@ -23,8 +24,8 @@ namespace nets::net
     public:
         explicit AbstractBootstrap() : channelOptions_(), mainLoopGroup_(gNumbOfMainEventLoops, gMainEventLoopGroupName)
         {
-            SignalHandler::initSignalHandler(
-                ::std::bind(&AbstractBootstrap<B>::handleSignal, this, ::std::placeholders::_1));
+            SignalHandler::initSignalHandler(::std::bind(&AbstractBootstrap<B>::handleSignal, this, ::std::placeholders::_1,
+                                                         ::std::placeholders::_2, ::std::placeholders::_3));
         }
 
         virtual ~AbstractBootstrap() = default;
@@ -50,8 +51,9 @@ namespace nets::net
         }
 
     private:
-        void handleSignal(SignalHandler::SignoType signo)
+        void handleSignal(SignalHandler::SignoType signo, SignalHandler::SigInfo* info, void* context)
         {
+            UNUSED(context);
             switch (signo)
             {
                 case SIGPIPE:
@@ -62,6 +64,13 @@ namespace nets::net
                 case SIGTERM:
                 {
                     shutdown();
+                    break;
+                }
+                case SIGSEGV:
+                {
+                    LOGS_ERROR << "handleSignal SIGSEGV backtrace info:\n" << STACK_TRACE;
+                    THROW_FMT(nets::base::SegmentationFaultException, "segmentation fault,errno=%d,si_uid=%d,si_pid=%d",
+                              info->si_errno, info->si_uid, info->si_pid);
                     break;
                 }
             }

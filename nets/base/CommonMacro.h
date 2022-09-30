@@ -12,6 +12,24 @@
 #include "nets/base/exception/FileCreateException.h"
 #include "nets/base/exception/FileOpenException.h"
 
+namespace nets::base
+{
+    using StringType = ::std::string;
+
+    StringType stackTrace();
+
+    template <class E>
+    void throwFmt(const char* fmt, ...)
+    {
+        char msgBuf[255] = {0};
+        va_list vl;
+        va_start(vl, fmt);
+        ::vsnprintf(msgBuf, sizeof(msgBuf), fmt, vl);
+        va_end(vl);
+        throw E(msgBuf);
+    }
+} // namespace nets::base
+
 #define UNUSED(X) ((void) (X))
 
 #define MEMZERO(P, LEN) (::memset((P), 0, (LEN)))
@@ -24,18 +42,9 @@
         UNUSED(jugg);                                                                                                       \
     } while (0)
 
-template <class E>
-void throwFmt(const char* fmt, ...)
-{
-    char msgBuf[255] = {0};
-    va_list vl;
-    va_start(vl, fmt);
-    ::vsnprintf(msgBuf, sizeof(msgBuf), fmt, vl);
-    va_end(vl);
-    throw E(msgBuf);
-}
+#define STACK_TRACE (nets::base::stackTrace())
 
-#define THROW_FMT(EXCEPTION, FMT, ...) (throwFmt<EXCEPTION>(FMT, ##__VA_ARGS__))
+#define THROW_FMT(EXCEPTION, FMT, ...) (nets::base::throwFmt<EXCEPTION>(FMT, ##__VA_ARGS__))
 
 #define THROW_FILE_OPEN_EXCEPTION(ERRNUM)                                                                                   \
     switch (ERRNUM)                                                                                                         \
