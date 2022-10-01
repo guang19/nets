@@ -8,7 +8,7 @@
 #include "nets/base/exception/DateTimeFormatException.h"
 #include "nets/base/ThreadHelper.h"
 
-namespace nets::base
+namespace nets
 {
     INIT_SINGLETON(DefaultLogFormatter);
 
@@ -62,4 +62,4 @@ namespace nets::base
     {
         return DefaultLogFormatter::getInstance();
     }
-} // namespace nets::base
+} // namespace nets

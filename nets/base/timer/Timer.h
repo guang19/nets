@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_TIMER_H
-#define NETS_BASE_TIMER_H
+#ifndef NETS_TIMER_H
+#define NETS_TIMER_H
 
 #include <atomic>
 #include <functional>
@@ -11,7 +11,7 @@
 #include "nets/base/Noncopyable.h"
 #include "nets/base/Timestamp.h"
 
-namespace nets::base
+namespace nets
 {
     class Timer : Noncopyable
     {
@@ -101,6 +101,6 @@ namespace nets::base
         // not thread-safe, because there is usually only one TimerManager to manage Timer
         static ::std::atomic<IdType> gTimerIdGenerator;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_TIMER_H
+#endif // NETS_TIMER_H

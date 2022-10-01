@@ -9,7 +9,7 @@
 
 #include "nets/base/log/Logging.h"
 
-namespace nets::net
+namespace nets
 {
     NotifyChannel::NotifyChannel(EventLoopRawPtr eventLoop)
         : Channel(eventLoop), eventFd_(::eventfd(0, EFD_CLOEXEC | EFD_NONBLOCK))
@@ -49,4 +49,4 @@ namespace nets::net
             LOGS_ERROR << "NotifyChannel read failed";
         }
     }
-} // namespace nets::net
+} // namespace nets

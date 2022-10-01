@@ -2,23 +2,22 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_ABSTRACT_BOOTSTRAP_H
-#define NETS_NET_ABSTRACT_BOOTSTRAP_H
+#ifndef NETS_ABSTRACT_BOOTSTRAP_H
+#define NETS_ABSTRACT_BOOTSTRAP_H
 
 #include "nets/base/exception/SegmentationFaultException.h"
 #include "nets/base/SignalHandler.h"
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/EventLoopGroup.h"
 
-namespace nets::net
+namespace nets
 {
     template <class B>
-    class AbstractBootstrap : nets::base::Noncopyable
+    class AbstractBootstrap : Noncopyable
     {
     public:
         using IntType = typename EventLoopGroup::IntType;
         using StringType = ::std::string;
-        using SignalHandler = typename nets::base::SignalHandler;
         using ChannelOptionList = Channel::ChannelOptionList;
 
     public:
@@ -69,8 +68,8 @@ namespace nets::net
                 case SIGSEGV:
                 {
                     LOGS_ERROR << "handleSignal SIGSEGV backtrace info:\n" << STACK_TRACE;
-                    THROW_FMT(nets::base::SegmentationFaultException, "segmentation fault,errno=%d,si_uid=%d,si_pid=%d",
-                              info->si_errno, info->si_uid, info->si_pid);
+                    THROW_FMT(SegmentationFaultException, "segmentation fault,errno=%d,si_uid=%d,si_pid=%d", info->si_errno,
+                              info->si_uid, info->si_pid);
                     break;
                 }
             }
@@ -84,6 +83,6 @@ namespace nets::net
         static constexpr IntType gNumbOfMainEventLoops = 1;
         static constexpr char gMainEventLoopGroupName[] = "MainLoopGroup";
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_ABSTRACT_BOOTSTRAP_H
+#endif // NETS_ABSTRACT_BOOTSTRAP_H

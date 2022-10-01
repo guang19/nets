@@ -4,7 +4,7 @@
 
 #include "nets/net/bootstrap/ServerBootstrap.h"
 
-namespace nets::net
+namespace nets
 {
     const ServerBootstrap::IntType ServerBootstrap::gDefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
 
@@ -128,4 +128,4 @@ namespace nets::net
         assert(childHandlers_.empty());
         assert(childInitializationCallback_ == nullptr);
     }
-} // namespace nets::net
+} // namespace nets

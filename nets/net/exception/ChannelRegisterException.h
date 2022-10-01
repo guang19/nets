@@ -2,20 +2,20 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_CHANNEL_REGISTER_EXCEPTION_H
-#define NETS_NET_CHANNEL_REGISTER_EXCEPTION_H
+#ifndef NETS_CHANNEL_REGISTER_EXCEPTION_H
+#define NETS_CHANNEL_REGISTER_EXCEPTION_H
 
 #include "nets/base/exception/AbstractException.h"
 
-namespace nets::net
+namespace nets
 {
-    class ChannelRegisterException : public nets::base::AbstractException
+    class ChannelRegisterException : public AbstractException
     {
     public:
         ChannelRegisterException() : AbstractException() {}
         explicit ChannelRegisterException(const StringType& cause) : AbstractException(cause) {}
         ~ChannelRegisterException() override = default;
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_CHANNEL_REGISTER_EXCEPTION_H
+#endif // NETS_CHANNEL_REGISTER_EXCEPTION_H

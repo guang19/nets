@@ -4,7 +4,7 @@
 
 #include "nets/base/timer/TimerManager.h"
 
-namespace nets::base
+namespace nets
 {
     void TimerManager::removeTimer(const TimerId& timerId)
     {
@@ -80,4 +80,4 @@ namespace nets::base
             return begin->first.minusMicroseconds(now.microsecondsSinceEpoch()).millisecondsSinceEpoch();
         }
     }
-} // namespace nets::base
+} // namespace nets

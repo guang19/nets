@@ -6,9 +6,9 @@
 
 #include "nets/base/CommonMacro.h"
 
-namespace nets::base
+namespace nets
 {
     AbstractException::AbstractException() : cause_(), backtraceInfo_(STACK_TRACE) {}
 
     AbstractException::AbstractException(const StringType& cause) : cause_(cause), backtraceInfo_(STACK_TRACE) {}
-} // namespace nets::base
+} // namespace nets

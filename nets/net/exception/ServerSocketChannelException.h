@@ -2,20 +2,20 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SERVER_SOCKET_CHANNEL_EXCEPTION_H
-#define NETS_NET_SERVER_SOCKET_CHANNEL_EXCEPTION_H
+#ifndef NETS_SERVER_SOCKET_CHANNEL_EXCEPTION_H
+#define NETS_SERVER_SOCKET_CHANNEL_EXCEPTION_H
 
 #include "nets/base/exception/AbstractException.h"
 
-namespace nets::net
+namespace nets
 {
-    class ServerSocketChannelException : public nets::base::AbstractException
+    class ServerSocketChannelException : public AbstractException
     {
     public:
         ServerSocketChannelException() : AbstractException() {}
         explicit ServerSocketChannelException(const StringType& cause) : AbstractException(cause) {}
         ~ServerSocketChannelException() override = default;
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SERVER_SOCKET_CHANNEL_EXCEPTION_H
+#endif // NETS_SERVER_SOCKET_CHANNEL_EXCEPTION_H

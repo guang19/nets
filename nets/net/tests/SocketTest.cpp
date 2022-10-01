@@ -6,8 +6,8 @@
 
 #include "nets/net/core/Socket.h"
 
-using namespace nets::net;
-using namespace nets::net::socket;
+using namespace nets;
+using namespace nets::socket;
 
 TEST(SocketTest, CreateSocket)
 {

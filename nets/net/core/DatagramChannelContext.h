@@ -2,16 +2,16 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_DATAGRAM_CHANNEL_CONTEXT_H
-#define NETS_NET_DATAGRAM_CHANNEL_CONTEXT_H
+#ifndef NETS_DATAGRAM_CHANNEL_CONTEXT_H
+#define NETS_DATAGRAM_CHANNEL_CONTEXT_H
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/DatagramPacket.h"
 
-namespace nets::net
+namespace nets
 {
     class DatagramChannel;
-    class DatagramChannelContext : nets::base::Noncopyable
+    class DatagramChannelContext : Noncopyable
     {
     public:
         using StringType = ::std::string;
@@ -43,6 +43,6 @@ namespace nets::net
     private:
         DatagramChannelRawPtr channel_ {nullptr};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_DATAGRAM_CHANNEL_CONTEXT_H
+#endif // NETS_DATAGRAM_CHANNEL_CONTEXT_H

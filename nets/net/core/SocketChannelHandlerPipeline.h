@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SOCKET_CHANNEL_HANDLER_PIPELINE_H
-#define NETS_NET_SOCKET_CHANNEL_HANDLER_PIPELINE_H
+#ifndef NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
+#define NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
 
 #include <list>
 #include <memory>
@@ -11,9 +11,9 @@
 #include "nets/net/core/SocketChannelContext.h"
 #include "nets/net/core/SocketChannelHandler.h"
 
-namespace nets::net
+namespace nets
 {
-    class SocketChannelHandlerPipeline : public nets::base::Copyable
+    class SocketChannelHandlerPipeline : public Copyable
     {
     public:
         using SocketChannelContextRawPtr = SocketChannelContext*;
@@ -51,6 +51,6 @@ namespace nets::net
         SocketChannelContextPtr channelContext_ {};
         SocketChannelHandlerList channelHandlers_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SOCKET_CHANNEL_HANDLER_PIPELINE_H
+#endif // NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H

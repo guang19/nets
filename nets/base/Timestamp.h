@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_TIMESTAMP_H
-#define NETS_BASE_TIMESTAMP_H
+#ifndef NETS_TIMESTAMP_H
+#define NETS_TIMESTAMP_H
 
 #include <cstdint>
 #include <ctime>
 
 #include "nets/base/Copyable.h"
 
-namespace nets::base
+namespace nets
 {
     namespace
     {
@@ -121,6 +121,6 @@ namespace nets::base
     private:
         TimeType microsecondsSinceEpoch_ {0};
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_TIMESTAMP_H
+#endif // NETS_TIMESTAMP_H

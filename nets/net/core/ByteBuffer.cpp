@@ -13,7 +13,7 @@
 #include "nets/net/channel/DatagramChannel.h"
 #include "nets/net/channel/SocketChannel.h"
 
-namespace nets::net
+namespace nets
 {
     namespace
     {
@@ -285,8 +285,7 @@ namespace nets::net
                 }
                 if (newCapacity > gMaxCapacity)
                 {
-                    THROW_FMT(nets::base::OutOfMemoryException, "ByteBuffer newCapacity %lu exceeds the MaxCapacity",
-                              newCapacity);
+                    THROW_FMT(OutOfMemoryException, "ByteBuffer newCapacity %lu exceeds the MaxCapacity", newCapacity);
                 }
             }
             else
@@ -340,7 +339,7 @@ namespace nets::net
     {
         if (readableBytes() < bytes)
         {
-            THROW_FMT(nets::base::IndexOutOfBoundsException, "ByteBuffer readableBytes less than bytes %u", bytes);
+            THROW_FMT(IndexOutOfBoundsException, "ByteBuffer readableBytes less than bytes %u", bytes);
         }
     }
 
@@ -356,4 +355,4 @@ namespace nets::net
             clear();
         }
     }
-} // namespace nets::net
+} // namespace nets

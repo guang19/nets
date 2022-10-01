@@ -6,7 +6,7 @@
 
 #include "nets/net/channel/DatagramChannel.h"
 
-namespace nets::net
+namespace nets
 {
     DatagramChannelContext::DatagramChannelContext(DatagramChannelRawPtr channel) : channel_(channel) {}
 
@@ -59,4 +59,4 @@ namespace nets::net
     {
         return channel_->leaveIpv6MulticastGroup(multicastAddr, inf);
     }
-} // namespace nets::net
+} // namespace nets

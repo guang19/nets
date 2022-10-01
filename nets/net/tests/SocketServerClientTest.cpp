@@ -7,7 +7,7 @@
 #include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/Socket.h"
 
-using namespace nets::net;
+using namespace nets;
 
 TEST(SocketServerClienTest, SocketServer)
 {

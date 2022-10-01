@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_DATAGRAM_CHANNEL_HANDLER_H
-#define NETS_NET_DATAGRAM_CHANNEL_HANDLER_H
+#ifndef NETS_DATAGRAM_CHANNEL_HANDLER_H
+#define NETS_DATAGRAM_CHANNEL_HANDLER_H
 
 #include "nets/net/core/DatagramPacket.h"
 
-namespace nets::net
+namespace nets
 {
     class DatagramChannelContext;
     class DatagramChannelHandler
@@ -20,6 +20,6 @@ namespace nets::net
         virtual void channelActive(DatagramChannelContext& channelContext);
         virtual void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message);
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_DATAGRAM_CHANNEL_HANDLER_H
+#endif // NETS_DATAGRAM_CHANNEL_HANDLER_H

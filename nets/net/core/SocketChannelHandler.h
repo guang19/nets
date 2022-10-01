@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SOCKET_CHANNEL_HANDLER_H
-#define NETS_NET_SOCKET_CHANNEL_HANDLER_H
+#ifndef NETS_SOCKET_CHANNEL_HANDLER_H
+#define NETS_SOCKET_CHANNEL_HANDLER_H
 
 #include "nets/net/core/InetSockAddress.h"
 
-namespace nets::net
+namespace nets
 {
     class ByteBuffer;
     class SocketChannelContext;
@@ -23,6 +23,6 @@ namespace nets::net
         virtual void channelDisconnect(SocketChannelContext& channelContext);
         virtual void channelRead(SocketChannelContext& channelContext, ByteBuffer& message);
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SOCKET_CHANNEL_HANDLER_H
+#endif // NETS_SOCKET_CHANNEL_HANDLER_H

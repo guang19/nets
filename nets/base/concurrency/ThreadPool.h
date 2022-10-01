@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_THREAD_POOL_H
-#define NETS_BASE_THREAD_POOL_H
+#ifndef NETS_THREAD_POOL_H
+#define NETS_THREAD_POOL_H
 
 #include <atomic>
 #include <cassert>
@@ -17,7 +17,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/base/ThreadHelper.h"
 
-namespace nets::base
+namespace nets
 {
     class ThreadPool : Noncopyable
     {
@@ -168,7 +168,7 @@ namespace nets::base
     };
 
     template <typename Fn, typename... Args>
-    bool ThreadPool:: execute(Fn&& fn, Args&&... args)
+    bool ThreadPool::execute(Fn&& fn, Args&&... args)
     {
         TaskType task = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
         IntType ctl = ctl_.load();
@@ -270,6 +270,6 @@ namespace nets::base
         }
         return future;
     }
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_THREAD_POOL_H
+#endif // NETS_THREAD_POOL_H

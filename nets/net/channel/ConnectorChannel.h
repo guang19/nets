@@ -2,14 +2,14 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_CONNECTOR_CHANNEL_H
-#define NETS_NET_CONNECTOR_CHANNEL_H
+#ifndef NETS_CONNECTOR_CHANNEL_H
+#define NETS_CONNECTOR_CHANNEL_H
 
 #include <functional>
 
 #include "nets/net/channel/SocketChannel.h"
 
-namespace nets::net
+namespace nets
 {
     class ConnectorChannel : public Channel
     {
@@ -83,6 +83,6 @@ namespace nets::net
         ChannelHandlerList channelHandlers_ {};
         ChannelInitializationCallback channelInitializationCallback_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_CONNECTOR_CHANNEL_H
+#endif // NETS_CONNECTOR_CHANNEL_H

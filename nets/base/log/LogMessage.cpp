@@ -6,7 +6,7 @@
 
 #include <cstring>
 
-namespace nets::base
+namespace nets
 {
     LogMessage::LogMessage(LogLevel logLevel, const char* file, ::uint32_t line)
         : logTime_(Timestamp::now()), logLevel_(logLevel), line_(line), stream_()
@@ -17,4 +17,4 @@ namespace nets::base
             filename_ = filename_ + 1;
         }
     }
-} // namespace nets::base
+} // namespace nets

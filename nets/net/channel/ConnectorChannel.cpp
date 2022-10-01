@@ -11,7 +11,7 @@
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
-namespace nets::net
+namespace nets
 {
     ConnectorChannel::ConnectorChannel(EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(socket::gInvalidFd), localAddress_(), peerAddress_(),
@@ -108,7 +108,7 @@ namespace nets::net
         }
         if (!channelHandlers_.empty())
         {
-            for (const auto& channelHandler : channelHandlers_)
+            for (const auto& channelHandler: channelHandlers_)
             {
                 assert(channelHandler.use_count() == 1);
                 socketChannel->pipeline().addLast(channelHandler);
@@ -222,4 +222,4 @@ namespace nets::net
                                  self->connect(self->peerAddress_);
                              });
     }
-} // namespace nets::net
+} // namespace nets

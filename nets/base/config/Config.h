@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_CONFIG_H
-#define NETS_BASE_CONFIG_H
+#ifndef NETS_CONFIG_H
+#define NETS_CONFIG_H
 
 #include <map>
 #include <string>
 
 #include "nets/base/Copyable.h"
 
-namespace nets::base
+namespace nets
 {
     // k-v configuration
     class Config : public Copyable
@@ -46,6 +46,6 @@ namespace nets::base
     private:
         ConfigMap config_ {};
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_CONFIG_H
+#endif // NETS_CONFIG_H

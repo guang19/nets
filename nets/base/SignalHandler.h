@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_SIGNAL_HANDLER_H
-#define NETS_BASE_SIGNAL_HANDLER_H
+#ifndef NETS_SIGNAL_HANDLER_H
+#define NETS_SIGNAL_HANDLER_H
 
 #include <csignal>
 #include <functional>
 
 #include "nets/base/Noncopyable.h"
 
-namespace nets::base
+namespace nets
 {
     class SignalHandler : Noncopyable
     {
@@ -38,6 +38,6 @@ namespace nets::base
     private:
         static SignalHandlerType gSignalHandler;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_SIGNAL_HANDLER_H
+#endif // NETS_SIGNAL_HANDLER_H

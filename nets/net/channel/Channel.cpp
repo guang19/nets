@@ -6,7 +6,7 @@
 
 #include "nets/net/core/EventLoop.h"
 
-namespace nets::net
+namespace nets
 {
     Channel::Channel(EventLoopRawPtr eventLoop)
         : events_(gNoneEvent), readyEvents_(gNoneEvent), isRegistered_(false), eventLoop_(eventLoop)
@@ -226,4 +226,4 @@ namespace nets::net
     {
         LOGS_DEBUG << "Channel::handleErrorEvent";
     }
-} // namespace nets::net
+} // namespace nets

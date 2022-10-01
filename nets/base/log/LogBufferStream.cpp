@@ -4,7 +4,7 @@
 
 #include "nets/base/log/LogBufferStream.h"
 
-namespace nets::base
+namespace nets
 {
     LogBufferStream& LogBufferStream::operator<<(char value)
     {
@@ -101,4 +101,4 @@ namespace nets::base
         buffer_.writeBytes(stream.buffer_.array(), stream.buffer_.length());
         return *this;
     }
-} // namespace nets::base
+} // namespace nets

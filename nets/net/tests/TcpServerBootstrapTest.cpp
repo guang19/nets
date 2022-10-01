@@ -7,7 +7,7 @@
 #include "nets/net/bootstrap/Bootstrap.h"
 #include "nets/net/bootstrap/ServerBootstrap.h"
 
-using namespace nets::net;
+using namespace nets;
 
 class TestServerChannelHandler : public SocketChannelHandler
 {

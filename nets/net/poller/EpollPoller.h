@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_EPOLL_POLLER_H
-#define NETS_NET_EPOLL_POLLER_H
+#ifndef NETS_EPOLL_POLLER_H
+#define NETS_EPOLL_POLLER_H
 
-#include <vector>
 #include <sys/epoll.h>
+#include <vector>
 
 #include "nets/net/poller/Poller.h"
 
-namespace nets::net
+namespace nets
 {
     class EpollPoller : public Poller
     {
@@ -39,6 +39,6 @@ namespace nets::net
         // dynamically growing array of events
         EventList events_ {};
     };
-}; // namespace nets::net
+}; // namespace nets
 
-#endif // NETS_NET_EPOLL_POLLER_H
+#endif // NETS_EPOLL_POLLER_H

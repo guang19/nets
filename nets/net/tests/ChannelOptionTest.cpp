@@ -11,7 +11,7 @@
 
 #include "nets/net/core/ChannelOption.h"
 
-using namespace nets::net;
+using namespace nets;
 
 using ValueType = ::std::variant<bool, int, SockLinger>;
 

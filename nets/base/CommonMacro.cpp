@@ -6,7 +6,7 @@
 
 #include <execinfo.h>
 
-namespace nets::base
+namespace nets
 {
     StringType stackTrace()
     {
@@ -32,4 +32,4 @@ namespace nets::base
             return backtraceInfo;
         }
     }
-} // namespace nets::base
+} // namespace nets

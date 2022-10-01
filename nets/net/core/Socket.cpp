@@ -15,7 +15,7 @@
 #include "nets/net/exception/SocketCreationException.h"
 #include "nets/net/exception/SocketOperationException.h"
 
-namespace nets::net::socket
+namespace nets::socket
 {
     FdType createTcpSocket(SockAddrFamily family)
     {
@@ -500,4 +500,4 @@ namespace nets::net::socket
         socket::closeFd(sockFd);
         return optVal;
     }
-} // namespace nets::net::socket
+} // namespace nets::socket

@@ -2,13 +2,13 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_CONFIG_READER_H
-#define NETS_BASE_CONFIG_READER_H
+#ifndef NETS_CONFIG_READER_H
+#define NETS_CONFIG_READER_H
 
 #include "nets/base/config/Config.h"
 #include "nets/base/Singleton.h"
 
-namespace nets::base
+namespace nets
 {
     DECLARE_SINGLETON_CLASS(ConfigReader)
     {
@@ -25,8 +25,8 @@ namespace nets::base
     public:
         Config read(const StringType& file);
     };
-} // namespace nets::base
+} // namespace nets
 
-#define CONFIG_READER (nets::base::ConfigReader::getInstance())
+#define CONFIG_READER (nets::ConfigReader::getInstance())
 
-#endif // NETS_BASE_CONFIG_READER_H
+#endif // NETS_CONFIG_READER_H

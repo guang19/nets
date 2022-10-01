@@ -9,7 +9,7 @@
 
 #include "nets/base/CommonMacro.h"
 
-namespace nets::base
+namespace nets
 {
     namespace
     {
@@ -68,4 +68,4 @@ namespace nets::base
     {
         return gThreadName;
     }
-} // namespace nets::base
+} // namespace nets

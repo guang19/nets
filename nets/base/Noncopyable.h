@@ -2,10 +2,10 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_NONCOPYABLE_H
-#define NETS_BASE_NONCOPYABLE_H
+#ifndef NETS_NONCOPYABLE_H
+#define NETS_NONCOPYABLE_H
 
-namespace nets::base
+namespace nets
 {
     class Noncopyable
     {
@@ -19,6 +19,6 @@ namespace nets::base
         Noncopyable& operator=(const Noncopyable&) = delete;
         Noncopyable& operator=(Noncopyable&&) = delete;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_NONCOPYABLE_H
+#endif // NETS_NONCOPYABLE_H

@@ -9,7 +9,7 @@
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/Timestamp.h"
 
-using namespace nets::base;
+using namespace nets;
 
 class BlockingQueueTest : public testing::Test
 {

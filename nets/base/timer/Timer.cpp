@@ -4,7 +4,7 @@
 
 #include "nets/base/timer/Timer.h"
 
-namespace nets::base
+namespace nets
 {
     ::std::atomic<Timer::IdType> Timer::gTimerIdGenerator = 0;
 
@@ -88,4 +88,4 @@ namespace nets::base
             }
         }
     }
-} // namespace nets::base
+} // namespace nets

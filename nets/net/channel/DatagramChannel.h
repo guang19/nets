@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_DATAGRAM_CHANNEL_H
-#define NETS_NET_DATAGRAM_CHANNEL_H
+#ifndef NETS_DATAGRAM_CHANNEL_H
+#define NETS_DATAGRAM_CHANNEL_H
 
 #include <vector>
 
 #include "nets/net/channel/Channel.h"
 #include "nets/net/core/DatagramChannelHandlerPipeline.h"
 
-namespace nets::net
+namespace nets
 {
     class DatagramChannel : public Channel
     {
@@ -65,6 +65,6 @@ namespace nets::net
         DatagramChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
         ChannelOptionList channelOptions_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_DATAGRAM_CHANNEL_H
+#endif // NETS_DATAGRAM_CHANNEL_H

@@ -9,7 +9,7 @@
 #include "nets/base/exception/ConfigurationSyntaxError.h"
 #include "nets/base/StringUtils.h"
 
-namespace nets::base
+namespace nets
 {
     INIT_SINGLETON(ConfigReader);
 
@@ -45,4 +45,4 @@ namespace nets::base
         }
         return Config(config);
     }
-} // namespace nets::base
+} // namespace nets

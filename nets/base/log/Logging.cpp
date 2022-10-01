@@ -7,7 +7,7 @@
 #include "nets/base/log/LogFormatter.h"
 #include "nets/base/log/LogWriter.h"
 
-namespace nets::base
+namespace nets
 {
     LogMessageStream::LogMessageStream(LogLevel logLevel, const char* file, ::uint32_t line)
         : logMessage_(logLevel, file, line)
@@ -28,4 +28,4 @@ namespace nets::base
             ::exit(1);
         }
     }
-} // namespace nets::base
+} // namespace nets

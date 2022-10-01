@@ -9,7 +9,7 @@
 
 #include "nets/base/Singleton.h"
 
-using namespace nets::base;
+using namespace nets;
 
 DECLARE_SINGLETON_CLASS(Clazz)
 {

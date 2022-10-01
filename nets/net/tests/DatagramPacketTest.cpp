@@ -6,7 +6,7 @@
 
 #include "nets/net/core/DatagramPacket.h"
 
-using namespace nets::net;
+using namespace nets;
 
 TEST(DatagramPacketTest, BasicUse)
 {

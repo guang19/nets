@@ -7,7 +7,7 @@
 #include "nets/base/config/Config.h"
 #include "nets/base/config/ConfigReader.h"
 
-using namespace nets::base;
+using namespace nets;
 
 TEST(ConfigTest, BasicUse)
 {

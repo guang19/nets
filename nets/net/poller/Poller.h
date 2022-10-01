@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_POLLER_H
-#define NETS_NET_POLLER_H
+#ifndef NETS_POLLER_H
+#define NETS_POLLER_H
 
 #include <unordered_map>
 #include <vector>
@@ -11,11 +11,11 @@
 #include "nets/base/Noncopyable.h"
 #include "nets/net/channel/Channel.h"
 
-namespace nets::net
+namespace nets
 {
     class Channel;
 
-    class Poller : nets::base::Noncopyable
+    class Poller : Noncopyable
     {
     public:
         using TimeType = ::time_t;
@@ -51,6 +51,6 @@ namespace nets::net
     public:
         static PollerPtr getPoller(EventLoopRawPtr eventLoop);
     };
-}; // namespace nets::net
+}; // namespace nets
 
-#endif // NETS_NET_POLLER_H
+#endif // NETS_POLLER_H

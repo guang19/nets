@@ -7,7 +7,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/net/core/DatagramChannelContext.h"
 
-namespace nets::net
+namespace nets
 {
     void DatagramChannelHandler::channelActive(DatagramChannelContext& channelContext)
     {
@@ -18,4 +18,4 @@ namespace nets::net
     {
         LOGS_DEBUG << "DatagramChannelHandler::channelRead";
     }
-} // namespace nets::net
+} // namespace nets

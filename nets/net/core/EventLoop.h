@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_EVENT_LOOP_H
-#define NETS_NET_EVENT_LOOP_H
+#ifndef NETS_EVENT_LOOP_H
+#define NETS_EVENT_LOOP_H
 
 #include <atomic>
 #include <cassert>
@@ -18,13 +18,13 @@
 #include "nets/base/timer/TimerManager.h"
 #include "nets/net/channel/NotifyChannel.h"
 
-namespace nets::net
+namespace nets
 {
     class Channel;
     class Poller;
     class PollerFactory;
 
-    class EventLoop : nets::base::Noncopyable
+    class EventLoop : Noncopyable
     {
     public:
         using TaskType = ::std::function<void()>;
@@ -39,11 +39,8 @@ namespace nets::net
         using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
         using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
         using PollerPtr = ::std::unique_ptr<Poller>;
-        using TimeType = typename nets::base::TimerManager::TimeType;
-        using Timer = typename nets::base::Timer;
-        using TimerId = typename nets::base::Timer::TimerId;
-        using Timestamp = typename nets::base::Timestamp;
-        using TimerManager = typename nets::base::TimerManager;
+        using TimeType = typename TimerManager::TimeType;
+        using TimerId = typename Timer::TimerId;
         using EventLoopRawPtr = EventLoop*;
 
     public:
@@ -153,13 +150,13 @@ namespace nets::net
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
@@ -185,13 +182,13 @@ namespace nets::net
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "EventLoop exception caught during thread [" << nets::base::currentTid()
+                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
@@ -220,6 +217,6 @@ namespace nets::net
         return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::gRepeatForever, delay, true,
                                       ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_EVENT_LOOP_H
+#endif // NETS_EVENT_LOOP_H

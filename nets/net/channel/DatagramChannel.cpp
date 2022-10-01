@@ -10,7 +10,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
-namespace nets::net
+namespace nets
 {
     namespace
     {
@@ -48,7 +48,7 @@ namespace nets::net
             sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
         }
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption : channelOptions_)
+        for (const auto& channelOption: channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
@@ -182,4 +182,4 @@ namespace nets::net
                 break;
         }
     }
-} // namespace nets::net
+} // namespace nets

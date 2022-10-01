@@ -6,7 +6,7 @@
 
 #include "nets/base/log/LogWriter.h"
 
-namespace nets::base
+namespace nets
 {
     INIT_SINGLETON(StdoutLogSynchronizer);
     INIT_SINGLETON(SingleLogFileSynchronizer);
@@ -102,4 +102,4 @@ namespace nets::base
                 return StdoutLogSynchronizer::getInstance();
         }
     }
-} // namespace nets::base
+} // namespace nets

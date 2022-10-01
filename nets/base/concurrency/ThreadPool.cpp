@@ -4,7 +4,7 @@
 
 #include "nets/base/concurrency/ThreadPool.h"
 
-namespace nets::base
+namespace nets
 {
     ThreadPool::ThreadWrapper::ThreadWrapper(const StringType& threadName, bool isCoreThread, TaskType task,
                                              ThreadPoolRawPtr threadPoolPtr)
@@ -67,10 +67,10 @@ namespace nets::base
         taskQueue_->notifyBlockingThread();
         UniqueLockType lock(mutex_);
         cv_.wait(lock,
-                     [this]() -> bool
-                     {
-                         return numOfActiveThreads(ctl_) == 0;
-                     });
+                 [this]() -> bool
+                 {
+                     return numOfActiveThreads(ctl_) == 0;
+                 });
         assert(threadPool_.empty());
         // if thread pool has no thread takes task from task queue, it needs to be deleted manually
         TaskType tmpTask = nullptr;
@@ -166,4 +166,4 @@ namespace nets::base
             }
         }
     }
-} // namespace nets::base
+} // namespace nets

@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_NOTIFY_CHANNEL_H
-#define NETS_NET_NOTIFY_CHANNEL_H
+#ifndef NETS_NOTIFY_CHANNEL_H
+#define NETS_NOTIFY_CHANNEL_H
 
 #include "nets/net/channel/Channel.h"
 
-namespace nets::net
+namespace nets
 {
     class NotifyChannel : public Channel
     {
@@ -25,6 +25,6 @@ namespace nets::net
     private:
         FdType eventFd_ {socket::gInvalidFd};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_NOTIFY_CHANNEL_H
+#endif // NETS_NOTIFY_CHANNEL_H

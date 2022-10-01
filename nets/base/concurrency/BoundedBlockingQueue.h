@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_BOUNDED_BLOCKING_QUEUE_H
-#define NETS_BASE_BOUNDED_BLOCKING_QUEUE_H
+#ifndef NETS_BOUNDED_BLOCKING_QUEUE_H
+#define NETS_BOUNDED_BLOCKING_QUEUE_H
 
 #include <condition_variable>
 #include <deque>
@@ -12,7 +12,7 @@
 
 #include "nets/base/Noncopyable.h"
 
-namespace nets::base
+namespace nets
 {
     template <typename T>
     class BoundedBlockingQueue : Noncopyable
@@ -342,6 +342,6 @@ namespace nets::base
         }
         return false;
     }
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_BOUNDED_BLOCKING_QUEUE_H
+#endif // NETS_BOUNDED_BLOCKING_QUEUE_H

@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_INDEX_OUT_OF_BOUNDS_EXCEPTION_H
-#define NETS_BASE_INDEX_OUT_OF_BOUNDS_EXCEPTION_H
+#ifndef NETS_INDEX_OUT_OF_BOUNDS_EXCEPTION_H
+#define NETS_INDEX_OUT_OF_BOUNDS_EXCEPTION_H
 
 #include "nets/base/exception/AbstractException.h"
 
-namespace nets::base
+namespace nets
 {
     class IndexOutOfBoundsException : public AbstractException
     {
@@ -16,6 +16,6 @@ namespace nets::base
         explicit IndexOutOfBoundsException(const StringType& cause) : AbstractException(cause) {}
         ~IndexOutOfBoundsException() override = default;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_INDEX_OUT_OF_BOUNDS_EXCEPTION_H
+#endif // NETS_INDEX_OUT_OF_BOUNDS_EXCEPTION_H

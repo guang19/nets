@@ -2,16 +2,16 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOGGING_H
-#define NETS_BASE_LOGGING_H
+#ifndef NETS_LOGGING_H
+#define NETS_LOGGING_H
 
 #include "nets/base/log/LogMessage.h"
 
 #ifndef LOG_LEVEL
-#define LOG_LEVEL nets::base::LogLevel::DEBUG
+#define LOG_LEVEL nets::LogLevel::DEBUG
 #endif
 
-namespace nets::base
+namespace nets
 {
     class LogMessageStream
     {
@@ -28,27 +28,27 @@ namespace nets::base
     private:
         LogMessage logMessage_;
     };
-} // namespace nets::base
+} // namespace nets
 
 // stream api
 #define LOGS_TRACE                                                                                                          \
-    if (nets::base::LogLevel::TRACE >= LOG_LEVEL)                                                                           \
-    nets::base::LogMessageStream(nets::base::LogLevel::TRACE, __FILE__, __LINE__).stream()
+    if (nets::LogLevel::TRACE >= LOG_LEVEL)                                                                                 \
+    nets::LogMessageStream(nets::LogLevel::TRACE, __FILE__, __LINE__).stream()
 
 #define LOGS_DEBUG                                                                                                          \
-    if (nets::base::LogLevel::DEBUG >= LOG_LEVEL)                                                                           \
-    nets::base::LogMessageStream(nets::base::LogLevel::DEBUG, __FILE__, __LINE__).stream()
+    if (nets::LogLevel::DEBUG >= LOG_LEVEL)                                                                                 \
+    nets::LogMessageStream(nets::LogLevel::DEBUG, __FILE__, __LINE__).stream()
 
 #define LOGS_INFO                                                                                                           \
-    if (nets::base::LogLevel::INFO >= LOG_LEVEL)                                                                            \
-    nets::base::LogMessageStream(nets::base::LogLevel::INFO, __FILE__, __LINE__).stream()
+    if (nets::LogLevel::INFO >= LOG_LEVEL)                                                                                  \
+    nets::LogMessageStream(nets::LogLevel::INFO, __FILE__, __LINE__).stream()
 
 #define LOGS_WARN                                                                                                           \
-    if (nets::base::LogLevel::WARN >= LOG_LEVEL)                                                                            \
-    nets::base::LogMessageStream(nets::base::LogLevel::WARN, __FILE__, __LINE__).stream()
+    if (nets::LogLevel::WARN >= LOG_LEVEL)                                                                                  \
+    nets::LogMessageStream(nets::LogLevel::WARN, __FILE__, __LINE__).stream()
 
-#define LOGS_ERROR nets::base::LogMessageStream(nets::base::LogLevel::ERROR, __FILE__, __LINE__).stream()
+#define LOGS_ERROR nets::LogMessageStream(nets::LogLevel::ERROR, __FILE__, __LINE__).stream()
 
-#define LOGS_FATAL nets::base::LogMessageStream(nets::base::LogLevel::FATAL, __FILE__, __LINE__).stream()
+#define LOGS_FATAL nets::LogMessageStream(nets::LogLevel::FATAL, __FILE__, __LINE__).stream()
 
-#endif // NETS_BASE_LOGGING_H
+#endif // NETS_LOGGING_H

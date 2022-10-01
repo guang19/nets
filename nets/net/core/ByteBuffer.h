@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_BYTE_BUFFER_H
-#define NETS_NET_BYTE_BUFFER_H
+#ifndef NETS_BYTE_BUFFER_H
+#define NETS_BYTE_BUFFER_H
 
 #include <cstdint>
 #include <memory>
@@ -11,12 +11,12 @@
 #include "nets/base/Copyable.h"
 #include "nets/net/core/Socket.h"
 
-namespace nets::net
+namespace nets
 {
     class SocketChannel;
     class DatagramChannel;
 
-    class ByteBuffer : public nets::base::Copyable
+    class ByteBuffer : public Copyable
     {
     public:
         using SizeType = ::size_t;
@@ -144,6 +144,6 @@ namespace nets::net
         SizeType writerIndex_ {0};
         SizeType capacity_ {0};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_BYTE_BUFFER_H
+#endif // NETS_BYTE_BUFFER_H

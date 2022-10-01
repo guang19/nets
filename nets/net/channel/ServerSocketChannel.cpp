@@ -11,7 +11,7 @@
 #include "nets/net/exception/ChannelRegisterException.h"
 #include "nets/net/exception/ServerSocketChannelException.h"
 
-namespace nets::net
+namespace nets
 {
     ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(socket::gInvalidFd), idleFd_(socket::createIdleFd()), backlog_(0), channelOptions_(),
@@ -43,7 +43,7 @@ namespace nets::net
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption : channelOptions_)
+        for (const auto& channelOption: channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
@@ -87,7 +87,7 @@ namespace nets::net
     void ServerSocketChannel::initSocketChannel(SocketChannelPtr& socketChannel)
     {
         socketChannel->setChannelOptions(childOptions_);
-        for (const auto& childHandler : childHandlers_)
+        for (const auto& childHandler: childHandlers_)
         {
             assert(childHandler.use_count() == 1);
             socketChannel->pipeline().addLast(childHandler);
@@ -136,4 +136,4 @@ namespace nets::net
                 break;
         }
     }
-} // namespace nets::net
+} // namespace nets

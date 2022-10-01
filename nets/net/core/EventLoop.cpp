@@ -9,7 +9,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/net/poller/Poller.h"
 
-namespace nets::net
+namespace nets
 {
     namespace
     {
@@ -19,9 +19,8 @@ namespace nets::net
     } // namespace
 
     EventLoop::EventLoop()
-        : running_(false), threadId_(nets::base::currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)),
-          activeChannels_(), poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(),
-          runningPendingTasks_(false), mutex_()
+        : running_(false), threadId_(currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)), activeChannels_(),
+          poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), runningPendingTasks_(false), mutex_()
     {
         assert(gCurrentThreadEventLoop == nullptr);
         // one loop per thread
@@ -58,7 +57,7 @@ namespace nets::net
             TimeType timeout =
                 remainingExpiredTime == -1 ? gDefaultPollTimeout : ::std::min(remainingExpiredTime, gDefaultPollTimeout);
             poller_->poll(::std::max(gMinimumPollTimeout, timeout), activeChannels_);
-            for (auto& channel : activeChannels_)
+            for (auto& channel: activeChannels_)
             {
                 channel->handleEvent();
             }
@@ -82,7 +81,7 @@ namespace nets::net
 
     bool EventLoop::isInCurrentEventLoop() const
     {
-        // threadId_ == nets::base::currentTid()
+        // threadId_ == currentTid()
         return (this == gCurrentThreadEventLoop);
     }
 
@@ -132,10 +131,10 @@ namespace nets::net
             LockGuardType lock(mutex_);
             tmpTasks.swap(pendingTasks_);
         }
-        for (const auto& t : tmpTasks)
+        for (const auto& t: tmpTasks)
         {
             t();
         }
         runningPendingTasks_ = false;
     }
-} // namespace nets::net
+} // namespace nets

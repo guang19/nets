@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_FILE_CREATE_EXCEPTION_H
-#define NETS_BASE_FILE_CREATE_EXCEPTION_H
+#ifndef NETS_FILE_CREATE_EXCEPTION_H
+#define NETS_FILE_CREATE_EXCEPTION_H
 
 #include "nets/base/exception/AbstractException.h"
 
-namespace nets::base
+namespace nets
 {
     class FileCreateException : public AbstractException
     {
@@ -16,6 +16,6 @@ namespace nets::base
         explicit FileCreateException(const StringType& cause) : AbstractException(cause) {}
         ~FileCreateException() override = default;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_FILE_CREATE_EXCEPTION_H
+#endif // NETS_FILE_CREATE_EXCEPTION_H

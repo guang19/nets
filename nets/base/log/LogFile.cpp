@@ -11,7 +11,7 @@
 
 #include "nets/base/CommonMacro.h"
 
-namespace nets::base
+namespace nets
 {
     namespace
     {
@@ -161,4 +161,4 @@ namespace nets::base
             }
         }
     }
-} // namespace nets::base
+} // namespace nets

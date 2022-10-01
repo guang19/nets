@@ -6,7 +6,7 @@
 
 #include "nets/net/bootstrap/Bootstrap.h"
 
-using namespace nets::net;
+using namespace nets;
 
 class TestUdpRecipientHandler : public DatagramChannelHandler
 {

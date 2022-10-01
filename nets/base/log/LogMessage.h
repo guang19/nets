@@ -2,13 +2,13 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOG_MESSAGE_H
-#define NETS_BASE_LOG_MESSAGE_H
+#ifndef NETS_LOG_MESSAGE_H
+#define NETS_LOG_MESSAGE_H
 
 #include "nets/base/log/LogBufferStream.h"
 #include "nets/base/Timestamp.h"
 
-namespace nets::base
+namespace nets
 {
     enum LogLevel
     {
@@ -60,6 +60,6 @@ namespace nets::base
         ::uint32_t line_ {0};
         LogBufferStream stream_ {};
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_LOG_MESSAGE_H
+#endif // NETS_LOG_MESSAGE_H

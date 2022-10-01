@@ -2,20 +2,19 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_EVENT_LOOP_GROUP_H
-#define NETS_NET_EVENT_LOOP_GROUP_H
+#ifndef NETS_EVENT_LOOP_GROUP_H
+#define NETS_EVENT_LOOP_GROUP_H
 
 #include "nets/base/concurrency/ThreadPool.h"
 #include "nets/net/core/EventLoop.h"
 
-namespace nets::net
+namespace nets
 {
-    class EventLoopGroup : nets::base::Noncopyable
+    class EventLoopGroup : Noncopyable
     {
     public:
-        using IntType = typename nets::base::ThreadPool::IntType;
+        using IntType = typename ThreadPool::IntType;
         using StringType = ::std::string;
-        using ThreadPoolType = typename nets::base::ThreadPool;
         using EventLoopRawPtr = EventLoop*;
         using EventLoopPtr = ::std::unique_ptr<EventLoop>;
         using EventLoopList = ::std::vector<EventLoopPtr>;
@@ -65,10 +64,10 @@ namespace nets::net
         IntType numOfEventLoops_ {0};
         EventLoopList eventLoops_ {};
         FutureList futures_ {};
-        ThreadPoolType eventLoopThreadPool_;
+        ThreadPool eventLoopThreadPool_;
         MutexType mutex_ {};
         ConditionVariableType cv_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_EVENT_LOOP_GROUP_H
+#endif // NETS_EVENT_LOOP_GROUP_H

@@ -8,7 +8,7 @@
 
 #include "nets/base/log/Logging.h"
 
-using namespace nets::base;
+using namespace nets;
 
 TEST(LoggingTest, BasicUse)
 {

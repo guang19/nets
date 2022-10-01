@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SOCKET_H
-#define NETS_NET_SOCKET_H
+#ifndef NETS_SOCKET_H
+#define NETS_SOCKET_H
 
 #include "nets/net/core/InetSockAddress.h"
 
-namespace nets::net
+namespace nets
 {
     namespace
     {
@@ -115,6 +115,6 @@ namespace nets::net
         const ::int32_t DefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
         const ::int32_t DefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
     } // namespace
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SOCKET_H
+#endif // NETS_SOCKET_H

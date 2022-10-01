@@ -6,7 +6,7 @@
 
 #include "nets/net/core/ByteBuffer.h"
 
-using namespace nets::net;
+using namespace nets;
 
 TEST(ByteBufferTest, Constructor)
 {
@@ -20,7 +20,6 @@ TEST(ByteBufferTest, Constructor)
     ASSERT_FALSE(buffer.isReadable());
     ASSERT_TRUE(buffer.isWritable());
 }
-
 
 TEST(ByteBufferTest, WriteBytes)
 {

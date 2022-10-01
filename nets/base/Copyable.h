@@ -2,10 +2,10 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_COPYABLE_H
-#define NETS_BASE_COPYABLE_H
+#ifndef NETS_COPYABLE_H
+#define NETS_COPYABLE_H
 
-namespace nets::base
+namespace nets
 {
     class Copyable
     {
@@ -13,6 +13,6 @@ namespace nets::base
         Copyable() = default;
         ~Copyable() = default;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_COPYABLE_H
+#endif // NETS_COPYABLE_H

@@ -6,7 +6,7 @@
 
 #include "nets/base/Timestamp.h"
 
-using namespace nets::base;
+using namespace nets;
 
 TEST(TimestampTest, Compare)
 {

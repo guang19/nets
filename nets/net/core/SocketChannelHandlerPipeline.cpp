@@ -4,7 +4,7 @@
 
 #include "nets/net/core/SocketChannelHandlerPipeline.h"
 
-namespace nets::net
+namespace nets
 {
     SocketChannelHandlerPipeline::SocketChannelHandlerPipeline(SocketChannelContextRawPtr channelContext)
         : channelContext_(channelContext), channelHandlers_()
@@ -62,7 +62,7 @@ namespace nets::net
     void SocketChannelHandlerPipeline::fireSocketChannelConnect(const InetSockAddress& localAddress,
                                                                 const InetSockAddress& peerAddress)
     {
-        for (auto& channelHandler : channelHandlers_)
+        for (auto& channelHandler: channelHandlers_)
         {
             channelHandler->channelConnect(*channelContext_, localAddress, peerAddress);
         }
@@ -70,7 +70,7 @@ namespace nets::net
 
     void SocketChannelHandlerPipeline::fireSocketChannelDisconnect()
     {
-        for (auto& channelHandler : channelHandlers_)
+        for (auto& channelHandler: channelHandlers_)
         {
             channelHandler->channelDisconnect(*channelContext_);
         }
@@ -78,9 +78,9 @@ namespace nets::net
 
     void SocketChannelHandlerPipeline::fireSocketChannelRead(ByteBuffer& message)
     {
-        for (auto& channelHandler : channelHandlers_)
+        for (auto& channelHandler: channelHandlers_)
         {
             channelHandler->channelRead(*channelContext_, message);
         }
     }
-} // namespace nets::net
+} // namespace nets

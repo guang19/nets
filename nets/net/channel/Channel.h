@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_CHANNEL_H
-#define NETS_NET_CHANNEL_H
+#ifndef NETS_CHANNEL_H
+#define NETS_CHANNEL_H
 
 #include <memory>
 #include <unordered_map>
@@ -12,7 +12,7 @@
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/Socket.h"
 
-namespace nets::net
+namespace nets
 {
     class EventLoop;
 
@@ -26,7 +26,7 @@ namespace nets::net
         constexpr EventType gErrorEvent = 0x01 << 2;
     } // namespace
 
-    class Channel : nets::base::Noncopyable, public ::std::enable_shared_from_this<Channel>
+    class Channel : Noncopyable, public ::std::enable_shared_from_this<Channel>
     {
     public:
         using StringType = std::string;
@@ -77,6 +77,6 @@ namespace nets::net
         bool isRegistered_ {false};
         EventLoopRawPtr eventLoop_ {nullptr};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_CHANNEL_H
+#endif // NETS_CHANNEL_H

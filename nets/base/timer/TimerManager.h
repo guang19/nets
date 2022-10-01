@@ -2,14 +2,14 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_TIMER_MANAGER_H
-#define NETS_BASE_TIMER_MANAGER_H
+#ifndef NETS_TIMER_MANAGER_H
+#define NETS_TIMER_MANAGER_H
 
 #include <map>
 
 #include "nets/base/timer/Timer.h"
 
-namespace nets::base
+namespace nets
 {
 
     class TimerManager : Noncopyable
@@ -48,6 +48,6 @@ namespace nets::base
         timers_.insert(::std::make_pair(expiredTime, ::std::move(timer)));
         return timerId;
     }
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_TIMER_MANAGER_H
+#endif // NETS_TIMER_MANAGER_H

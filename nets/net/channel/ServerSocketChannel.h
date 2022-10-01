@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SERVER_SOCKET_CHANNEL_H
-#define NETS_NET_SERVER_SOCKET_CHANNEL_H
+#ifndef NETS_SERVER_SOCKET_CHANNEL_H
+#define NETS_SERVER_SOCKET_CHANNEL_H
 
 #include <functional>
 
 #include "nets/net/channel/SocketChannel.h"
 #include "nets/net/core/InetSockAddress.h"
 
-namespace nets::net
+namespace nets
 {
     class ServerSocketChannel : public Channel
     {
@@ -78,6 +78,6 @@ namespace nets::net
         ChannelHandlerList childHandlers_ {};
         ChannelInitializationCallback childInitializationCallback_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SERVER_SOCKET_CHANNEL_H
+#endif // NETS_SERVER_SOCKET_CHANNEL_H

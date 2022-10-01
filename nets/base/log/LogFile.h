@@ -2,14 +2,14 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOG_FILE_H
-#define NETS_BASE_LOG_FILE_H
+#ifndef NETS_LOG_FILE_H
+#define NETS_LOG_FILE_H
 
 #include <string>
 
 #include "nets/base/Noncopyable.h"
 
-namespace nets::base
+namespace nets
 {
     class LogFile : Noncopyable
     {
@@ -54,6 +54,6 @@ namespace nets::base
         char buffer_[gFileIoBufferSize] {0};
     };
 
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_LOG_FILE_H
+#endif // NETS_LOG_FILE_H

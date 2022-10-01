@@ -6,10 +6,10 @@
 
 #include "nets/net/poller/EpollPoller.h"
 
-namespace nets::net
+namespace nets
 {
     PollerFactory::PollerPtr PollerFactory::getPoller(EventLoopRawPtr eventLoop)
     {
         return ::std::make_unique<EpollPoller>(eventLoop);
     }
-}; // namespace nets::net
+}; // namespace nets

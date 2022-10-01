@@ -4,7 +4,7 @@
 
 #include "nets/base/config/Config.h"
 
-namespace nets::base
+namespace nets
 {
     Config::Config(const ConfigMap& config) : config_(config) {}
 
@@ -81,4 +81,4 @@ namespace nets::base
         }
         return defaultValue;
     }
-} // namespace nets::base
+} // namespace nets

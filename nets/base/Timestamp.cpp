@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include <utility>
 
-namespace nets::base
+namespace nets
 {
     Timestamp::Timestamp() : Timestamp(0) {}
 
@@ -57,4 +57,4 @@ namespace nets::base
         ::gettimeofday(&tmv, nullptr);
         return Timestamp(tmv);
     }
-} // namespace nets::base
+} // namespace nets

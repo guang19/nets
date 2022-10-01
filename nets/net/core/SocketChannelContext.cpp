@@ -6,7 +6,7 @@
 
 #include "nets/net/channel/SocketChannel.h"
 
-namespace nets::net
+namespace nets
 {
     SocketChannelContext::SocketChannelContext(SocketChannelRawPtr channel) : channel_(channel) {}
 
@@ -59,4 +59,4 @@ namespace nets::net
     {
         channel_->shutdownWrite();
     }
-} // namespace nets::net
+} // namespace nets

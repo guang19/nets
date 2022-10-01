@@ -10,7 +10,7 @@
 #include "nets/base/log/Logging.h"
 #include "nets/net/exception/InetSockAddressException.h"
 
-namespace nets::net
+namespace nets
 {
     InetSockAddress::InetSockAddress()
     {
@@ -217,4 +217,4 @@ namespace nets::net
     {
         return addr_.sa_family == AF_UNSPEC;
     }
-} // namespace nets::net
+} // namespace nets

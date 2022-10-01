@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_INET_SOCK_ADDRESS_H
-#define NETS_NET_INET_SOCK_ADDRESS_H
+#ifndef NETS_INET_SOCK_ADDRESS_H
+#define NETS_INET_SOCK_ADDRESS_H
 
 #include <netinet/in.h>
 #include <string>
 
 #include "nets/base/Copyable.h"
 
-namespace nets::net
+namespace nets
 {
     namespace
     {
@@ -22,7 +22,7 @@ namespace nets::net
         using SockAddrFamily = ::sa_family_t;
     } // namespace
 
-    class InetSockAddress : public nets::base::Copyable
+    class InetSockAddress : public Copyable
     {
     public:
         using StringType = ::std::string;
@@ -92,6 +92,6 @@ namespace nets::net
             SockAddr6 addr6_;
         };
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_INET_SOCK_ADDRESS_H
+#endif // NETS_INET_SOCK_ADDRESS_H

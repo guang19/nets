@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOG_WRITER_H
-#define NETS_BASE_LOG_WRITER_H
+#ifndef NETS_LOG_WRITER_H
+#define NETS_LOG_WRITER_H
 
 #include <atomic>
 #include <memory>
@@ -26,7 +26,7 @@
 #define LOG_FILE_ROLLING_SIZE 24
 #endif
 
-namespace nets::base
+namespace nets
 {
     enum LogWriterType
     {
@@ -95,8 +95,8 @@ namespace nets::base
         MutexType mutex_ {};
         ConditionVarType cv_ {};
     };
-} // namespace nets::base
+} // namespace nets
 
-#define LOG_WRITER (nets::base::AsyncLogWriter::getInstance())
+#define LOG_WRITER (nets::AsyncLogWriter::getInstance())
 
-#endif // NETS_BASE_LOG_WRITER_H
+#endif // NETS_LOG_WRITER_H

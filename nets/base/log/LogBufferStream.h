@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOG_BUFFER_STREAM_H
-#define NETS_BASE_LOG_BUFFER_STREAM_H
+#ifndef NETS_LOG_BUFFER_STREAM_H
+#define NETS_LOG_BUFFER_STREAM_H
 
 #include "nets/base/StackBuffer.h"
 
-namespace nets::base
+namespace nets
 {
     class LogBufferStream : Noncopyable
     {
@@ -47,6 +47,6 @@ namespace nets::base
     private:
         LogBuffer buffer_ {};
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_LOG_BUFFER_STREAM_H
+#endif // NETS_LOG_BUFFER_STREAM_H

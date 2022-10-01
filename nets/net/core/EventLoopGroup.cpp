@@ -4,7 +4,7 @@
 
 #include "nets/net/core/EventLoopGroup.h"
 
-namespace nets::net
+namespace nets
 {
     EventLoopGroup::EventLoopGroup(IntType numOfEventLoops, const StringType& name)
         : nextLoop_(0), numOfEventLoops_(numOfEventLoops), eventLoops_(), futures_(),
@@ -43,7 +43,7 @@ namespace nets::net
 
     void EventLoopGroup::syncEach()
     {
-        for (const auto& future : futures_)
+        for (const auto& future: futures_)
         {
             future.wait();
         }
@@ -61,7 +61,7 @@ namespace nets::net
 
     void EventLoopGroup::shutdown()
     {
-        for (auto& eventLoop : eventLoops_)
+        for (auto& eventLoop: eventLoops_)
         {
             if (eventLoop->isRunning())
             {
@@ -72,7 +72,7 @@ namespace nets::net
 
     bool EventLoopGroup::isShutdown() const
     {
-        for (const auto& eventLoop : eventLoops_)
+        for (const auto& eventLoop: eventLoops_)
         {
             if (eventLoop->isRunning())
             {
@@ -81,4 +81,4 @@ namespace nets::net
         }
         return true;
     }
-} // namespace nets::net
+} // namespace nets

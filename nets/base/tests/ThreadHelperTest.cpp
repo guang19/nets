@@ -6,7 +6,7 @@
 
 #include "nets/base/ThreadHelper.h"
 
-using namespace nets::base;
+using namespace nets;
 
 TEST(ThreadHelperTest, ThreadName)
 {

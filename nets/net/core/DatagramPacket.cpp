@@ -4,7 +4,7 @@
 
 #include "nets/net/core/DatagramPacket.h"
 
-namespace nets::net
+namespace nets
 {
     DatagramPacket::DatagramPacket(const ByteBuffer& data, const InetSockAddress& recipient)
         : data_(data), recipient_(recipient)
@@ -42,4 +42,4 @@ namespace nets::net
         }
         return *this;
     }
-} // namespace nets::net
+} // namespace nets

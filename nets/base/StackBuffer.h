@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_STACK_BUFFER_H
-#define NETS_BASE_STACK_BUFFER_H
+#ifndef NETS_STACK_BUFFER_H
+#define NETS_STACK_BUFFER_H
 
 #include <algorithm>
 #include <cmath>
@@ -13,7 +13,7 @@
 #include "nets/base/CommonMacro.h"
 #include "nets/base/Noncopyable.h"
 
-namespace nets::base
+namespace nets
 {
     namespace
     {
@@ -181,6 +181,6 @@ namespace nets::base
         SizeType writerIndex_ {0};
         SizeType capacity_ {SIZE};
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_STACK_BUFFER_H
+#endif // NETS_STACK_BUFFER_H

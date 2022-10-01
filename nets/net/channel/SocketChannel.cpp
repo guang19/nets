@@ -12,7 +12,7 @@
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
-namespace nets::net
+namespace nets
 {
     namespace
     {
@@ -511,4 +511,4 @@ namespace nets::net
                 break;
         }
     }
-} // namespace nets::net
+} // namespace nets

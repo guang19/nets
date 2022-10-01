@@ -2,14 +2,14 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_BOOTSTRAP_H
-#define NETS_NET_BOOTSTRAP_H
+#ifndef NETS_BOOTSTRAP_H
+#define NETS_BOOTSTRAP_H
 
 #include "nets/net/bootstrap/AbstractBootstrap.h"
 #include "nets/net/channel/ConnectorChannel.h"
 #include "nets/net/channel/DatagramChannel.h"
 
-namespace nets::net
+namespace nets
 {
     class Bootstrap : public AbstractBootstrap<Bootstrap>
     {
@@ -74,6 +74,6 @@ namespace nets::net
         // default retry interval
         static constexpr TimeType gDefaultRetryInterval = 2000;
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_BOOTSTRAP_H
+#endif // NETS_BOOTSTRAP_H

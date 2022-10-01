@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_COMMON_MACRO_H
-#define NETS_BASE_COMMON_MACRO_H
+#ifndef NETS_COMMON_MACRO_H
+#define NETS_COMMON_MACRO_H
 
 #include <cstdarg>
 #include <cstdio>
@@ -12,7 +12,7 @@
 #include "nets/base/exception/FileCreateException.h"
 #include "nets/base/exception/FileOpenException.h"
 
-namespace nets::base
+namespace nets
 {
     using StringType = ::std::string;
 
@@ -28,7 +28,7 @@ namespace nets::base
         va_end(vl);
         throw E(msgBuf);
     }
-} // namespace nets::base
+} // namespace nets
 
 #define UNUSED(X) ((void) (X))
 
@@ -42,32 +42,31 @@ namespace nets::base
         UNUSED(jugg);                                                                                                       \
     } while (0)
 
-#define STACK_TRACE (nets::base::stackTrace())
+#define STACK_TRACE (stackTrace())
 
-#define THROW_FMT(EXCEPTION, FMT, ...) (nets::base::throwFmt<EXCEPTION>(FMT, ##__VA_ARGS__))
+#define THROW_FMT(EXCEPTION, FMT, ...) (nets::throwFmt<EXCEPTION>(FMT, ##__VA_ARGS__))
 
 #define THROW_FILE_OPEN_EXCEPTION(ERRNUM)                                                                                   \
     switch (ERRNUM)                                                                                                         \
     {                                                                                                                       \
         case ENOENT:                                                                                                        \
-            THROW_FMT(nets::base::FileOpenException, "no such file");                                                       \
+            THROW_FMT(FileOpenException, "no such file");                                                                   \
             break;                                                                                                          \
         case EACCES:                                                                                                        \
         case EPERM:                                                                                                         \
-            THROW_FMT(nets::base::FileOpenException, "no permission to access file");                                       \
+            THROW_FMT(FileOpenException, "no permission to access file");                                                   \
             break;                                                                                                          \
         case EINVAL:                                                                                                        \
-            THROW_FMT(nets::base::FileOpenException, "invalid value in flags");                                             \
+            THROW_FMT(FileOpenException, "invalid value in flags");                                                         \
             break;                                                                                                          \
         case EMFILE:                                                                                                        \
-            THROW_FMT(nets::base::FileOpenException,                                                                        \
-                      "the per-process limit on the number of open file descriptors has been reached");                     \
+            THROW_FMT(FileOpenException, "the per-process limit on the number of open file descriptors has been reached");  \
             break;                                                                                                          \
         case ENAMETOOLONG:                                                                                                  \
-            THROW_FMT(nets::base::FileOpenException, "pathname was too long");                                              \
+            THROW_FMT(FileOpenException, "pathname was too long");                                                          \
             break;                                                                                                          \
         default:                                                                                                            \
-            THROW_FMT(nets::base::FileOpenException, "failed to open file for unknown reason,errno=%d", ERRNUM);            \
+            THROW_FMT(FileOpenException, "failed to open file for unknown reason,errno=%d", ERRNUM);                        \
             break;                                                                                                          \
     }
 
@@ -75,25 +74,25 @@ namespace nets::base
     switch (ERRNUM)                                                                                                         \
     {                                                                                                                       \
         case ENOENT:                                                                                                        \
-            THROW_FMT(nets::base::FileCreateException, "no such file");                                                     \
+            THROW_FMT(FileCreateException, "no such file");                                                                 \
             break;                                                                                                          \
         case EACCES:                                                                                                        \
         case EPERM:                                                                                                         \
-            THROW_FMT(nets::base::FileCreateException, "no permission to create file");                                     \
+            THROW_FMT(FileCreateException, "no permission to create file");                                                 \
             break;                                                                                                          \
         case EINVAL:                                                                                                        \
-            THROW_FMT(nets::base::FileCreateException, "invalid value in flags");                                           \
+            THROW_FMT(FileCreateException, "invalid value in flags");                                                       \
             break;                                                                                                          \
         case EMFILE:                                                                                                        \
-            THROW_FMT(nets::base::FileCreateException,                                                                      \
+            THROW_FMT(FileCreateException,                                                                                  \
                       "the per-process limit on the number of open file descriptors has been reached");                     \
             break;                                                                                                          \
         case ENAMETOOLONG:                                                                                                  \
-            THROW_FMT(nets::base::FileCreateException, "path name was too long");                                           \
+            THROW_FMT(FileCreateException, "path name was too long");                                                       \
             break;                                                                                                          \
         default:                                                                                                            \
-            THROW_FMT(nets::base::FileCreateException, "failed to create file for unknown reason,errno=%d", ERRNUM);        \
+            THROW_FMT(FileCreateException, "failed to create file for unknown reason,errno=%d", ERRNUM);                    \
             break;                                                                                                          \
     }
 
-#endif // NETS_BASE_COMMON_MACRO_H
+#endif // NETS_COMMON_MACRO_H

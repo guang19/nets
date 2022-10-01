@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SOCKET_CHANNEL_CONTEXT_H
-#define NETS_NET_SOCKET_CHANNEL_CONTEXT_H
+#ifndef NETS_SOCKET_CHANNEL_CONTEXT_H
+#define NETS_SOCKET_CHANNEL_CONTEXT_H
 
 #include <functional>
 #include <string>
@@ -11,11 +11,11 @@
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/InetSockAddress.h"
 
-namespace nets::net
+namespace nets
 {
     class ByteBuffer;
     class SocketChannel;
-    class SocketChannelContext : nets::base::Noncopyable
+    class SocketChannelContext : Noncopyable
     {
     public:
         using SocketChannelRawPtr = SocketChannel*;
@@ -52,6 +52,6 @@ namespace nets::net
     private:
         SocketChannelRawPtr channel_ {nullptr};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SOCKET_CHANNEL_CONTEXT_H
+#endif // NETS_SOCKET_CHANNEL_CONTEXT_H

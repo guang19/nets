@@ -6,7 +6,7 @@
 
 #include "nets/base/log/LogBufferStream.h"
 
-using namespace nets::base;
+using namespace nets;
 
 TEST(LogBufferStreamTest, Append)
 {

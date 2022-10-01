@@ -2,13 +2,13 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOG_FORMATTER_H
-#define NETS_BASE_LOG_FORMATTER_H
+#ifndef NETS_LOG_FORMATTER_H
+#define NETS_LOG_FORMATTER_H
 
 #include "nets/base/log/LogMessage.h"
 #include "nets/base/Singleton.h"
 
-namespace nets::base
+namespace nets
 {
     class ILogFormatter
     {
@@ -37,8 +37,8 @@ namespace nets::base
     public:
         static ::std::shared_ptr<ILogFormatter> getLogFormatter();
     };
-} // namespace nets::base
+} // namespace nets
 
-#define LOG_FORMATTER (nets::base::LogFormatterFactory::getLogFormatter())
+#define LOG_FORMATTER (nets::LogFormatterFactory::getLogFormatter())
 
-#endif // NETS_BASE_LOG_FORMATTER_H
+#endif // NETS_LOG_FORMATTER_H

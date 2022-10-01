@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-namespace nets::base
+namespace nets
 {
     INIT_SINGLETON(AsyncLogWriter);
 
@@ -106,7 +106,7 @@ namespace nets::base
                 logSynchronizer_->synchronize(warning, ::strlen(warning), currentTime);
                 tmpBuffers.erase(tmpBuffers.begin() + static_cast<::int64_t>((size >> 1)), tmpBuffers.end());
             }
-            for (const auto& buffer : tmpBuffers)
+            for (const auto& buffer: tmpBuffers)
             {
                 logSynchronizer_->synchronize(buffer->array(), buffer->length(), currentTime);
             }
@@ -121,4 +121,4 @@ namespace nets::base
         }
         logSynchronizer_->flush();
     }
-} // namespace nets::base
+} // namespace nets

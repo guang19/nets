@@ -6,7 +6,7 @@
 
 #include "nets/net/bootstrap/Bootstrap.h"
 
-using namespace nets::net;
+using namespace nets;
 
 const StringType gMulticastIp = "224.1.1.1";
 const StringType gMulticastInterface = "ens33";

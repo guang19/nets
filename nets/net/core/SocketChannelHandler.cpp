@@ -8,7 +8,7 @@
 #include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/SocketChannelContext.h"
 
-namespace nets::net
+namespace nets
 {
     void SocketChannelHandler::channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                               const InetSockAddress& peerAddress)
@@ -25,4 +25,4 @@ namespace nets::net
     {
         LOGS_DEBUG << "SocketChannelHandler::channelRead";
     }
-} // namespace nets::net
+} // namespace nets

@@ -2,17 +2,17 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
-#define NETS_NET_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
+#ifndef NETS_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
+#define NETS_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
 
 #include <list>
 
 #include "nets/net/core/DatagramChannelContext.h"
 #include "nets/net/core/DatagramChannelHandler.h"
 
-namespace nets::net
+namespace nets
 {
-    class DatagramChannelHandlerPipeline : public nets::base::Copyable
+    class DatagramChannelHandlerPipeline : public Copyable
     {
     public:
         using DatagramChannelContextRawPtr = DatagramChannelContext*;
@@ -49,6 +49,6 @@ namespace nets::net
         DatagramChannelContextPtr channelContext_ {};
         DatagramChannelHandlerList channelHandlers_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
+#endif // NETS_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H

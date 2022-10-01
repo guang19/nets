@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_SINGLETON_H
-#define NETS_BASE_SINGLETON_H
+#ifndef NETS_SINGLETON_H
+#define NETS_SINGLETON_H
 
 #include <memory>
 #include <mutex>
@@ -51,7 +51,7 @@
  *
  */
 
-#define DECLARE_SINGLETON_CLASS(CLASS_NAME) class CLASS_NAME : nets::base::Noncopyable
+#define DECLARE_SINGLETON_CLASS(CLASS_NAME) class CLASS_NAME : nets::Noncopyable
 
 #define DEFINE_SINGLETON(CLASS_NAME)                                                                                        \
                                                                                                                             \
@@ -107,4 +107,4 @@ private:                                                                        
     {                                                                                                                       \
     }
 
-#endif // NETS_BASE_SINGLETON_H
+#endif // NETS_SINGLETON_H

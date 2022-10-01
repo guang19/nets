@@ -2,12 +2,12 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_SEGMENTATION_FAULT_EXCEPTION_H
-#define NETS_BASE_SEGMENTATION_FAULT_EXCEPTION_H
+#ifndef NETS_SEGMENTATION_FAULT_EXCEPTION_H
+#define NETS_SEGMENTATION_FAULT_EXCEPTION_H
 
 #include "nets/base/exception/AbstractException.h"
 
-namespace nets::base
+namespace nets
 {
     class SegmentationFaultException : public AbstractException
     {
@@ -16,6 +16,6 @@ namespace nets::base
         explicit SegmentationFaultException(const StringType& cause) : AbstractException(cause) {}
         ~SegmentationFaultException() override = default;
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_SEGMENTATION_FAULT_EXCEPTION_H
+#endif // NETS_SEGMENTATION_FAULT_EXCEPTION_H

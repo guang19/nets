@@ -2,14 +2,14 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_DATAGRAM_PACKET_H
-#define NETS_NET_DATAGRAM_PACKET_H
+#ifndef NETS_DATAGRAM_PACKET_H
+#define NETS_DATAGRAM_PACKET_H
 
 #include "nets/net/core/ByteBuffer.h"
 
-namespace nets::net
+namespace nets
 {
-    class DatagramPacket : public nets::base::Copyable
+    class DatagramPacket : public Copyable
     {
     public:
         DatagramPacket(const ByteBuffer& data, const InetSockAddress& recipient);
@@ -61,6 +61,6 @@ namespace nets::net
         ByteBuffer data_ {};
         InetSockAddress recipient_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_DATAGRAM_PACKET_H
+#endif // NETS_DATAGRAM_PACKET_H

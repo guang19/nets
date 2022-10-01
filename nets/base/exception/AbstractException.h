@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_ABSTRACT_EXCEPTION_H
-#define NETS_BASE_ABSTRACT_EXCEPTION_H
+#ifndef NETS_ABSTRACT_EXCEPTION_H
+#define NETS_ABSTRACT_EXCEPTION_H
 
 #include <exception>
 #include <string>
 
 #include "nets/base/Noncopyable.h"
 
-namespace nets::base
+namespace nets
 {
     class AbstractException : public ::std::exception, Noncopyable
     {
@@ -37,6 +37,6 @@ namespace nets::base
         StringType cause_ {};
         StringType backtraceInfo_ {};
     };
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_ABSTRACT_EXCEPTION_H
+#endif // NETS_ABSTRACT_EXCEPTION_H

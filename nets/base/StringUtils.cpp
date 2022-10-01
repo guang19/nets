@@ -6,7 +6,7 @@
 
 #include <cwctype>
 
-namespace nets::base::utils
+namespace nets::utils
 {
     void trim(StringType& str)
     {
@@ -30,4 +30,4 @@ namespace nets::base::utils
             }
         }
     }
-} // namespace nets::base::utils
+} // namespace nets::utils

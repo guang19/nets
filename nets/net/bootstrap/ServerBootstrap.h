@@ -2,13 +2,13 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SERVER_BOOTSTRAP_H
-#define NETS_NET_SERVER_BOOTSTRAP_H
+#ifndef NETS_SERVER_BOOTSTRAP_H
+#define NETS_SERVER_BOOTSTRAP_H
 
 #include "nets/net/bootstrap/AbstractBootstrap.h"
 #include "nets/net/channel/ServerSocketChannel.h"
 
-namespace nets::net
+namespace nets
 {
     class ServerBootstrap : public AbstractBootstrap<ServerBootstrap>
     {
@@ -54,6 +54,6 @@ namespace nets::net
         static constexpr char gChildEventLoopGroupName[] = "ChildLoopGroup";
         static const IntType gDefaultNumbOfChildEventLoops;
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SERVER_BOOTSTRAP_H
+#endif // NETS_SERVER_BOOTSTRAP_H

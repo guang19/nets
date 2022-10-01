@@ -2,13 +2,13 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_THREAD_HELPER_H
-#define NETS_BASE_THREAD_HELPER_H
+#ifndef NETS_THREAD_HELPER_H
+#define NETS_THREAD_HELPER_H
 
 #include <cstdint>
 #include <pthread.h>
 
-namespace nets::base
+namespace nets
 {
     namespace
     {
@@ -22,6 +22,6 @@ namespace nets::base
 
     void setCurrentThreadName(const char* threadName);
     const char* currentThreadName();
-} // namespace nets::base
+} // namespace nets
 
-#endif // NETS_BASE_THREAD_HELPER_H
+#endif // NETS_THREAD_HELPER_H

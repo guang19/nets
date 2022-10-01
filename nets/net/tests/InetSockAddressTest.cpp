@@ -8,7 +8,7 @@
 
 #include "nets/net/core/InetSockAddress.h"
 
-using namespace nets::net;
+using namespace nets;
 
 TEST(InetSockAddressTest, BasicUse)
 {

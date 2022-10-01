@@ -8,7 +8,7 @@
 
 #include "nets/base/timer/Timer.h"
 
-using namespace nets::base;
+using namespace nets;
 
 using TimerId = typename Timer::TimerId;
 

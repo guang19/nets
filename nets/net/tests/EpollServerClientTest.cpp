@@ -15,8 +15,7 @@
 #include "nets/net/core/InetSockAddress.h"
 #include "nets/net/core/Socket.h"
 
-using namespace nets::base;
-using namespace nets::net;
+using namespace nets;
 
 void testWriteV(::int32_t sockFd)
 {
@@ -49,7 +48,8 @@ TEST(EpollServerClienTest, EpollServer)
     socket::listen(listenFd, 1024);
 
     FdType epollFd = ::epoll_create1(EPOLL_CLOEXEC);
-    struct epoll_event accpetEpollEvent {};
+    using EpollEvent = struct epoll_event;
+    EpollEvent accpetEpollEvent;
     accpetEpollEvent.data.fd = listenFd;
     accpetEpollEvent.events = EPOLLIN;
     epoll_ctl(epollFd, EPOLL_CTL_ADD, listenFd, &accpetEpollEvent);
@@ -76,7 +76,7 @@ TEST(EpollServerClienTest, EpollServer)
                     FdType connFd = socket::accept(listenFd, clientAddr);
                     ::printf("client fd=%d,client addr:ip=%s,port=%d\n", connFd, clientAddr.ip().c_str(), clientAddr.port());
                     ::printf("client addr=%s\n", clientAddr.toString().c_str());
-                    struct epoll_event epollEvent {};
+                    EpollEvent epollEvent;
                     epollEvent.data.fd = connFd;
                     epollEvent.events = EPOLLIN;
                     epoll_ctl(epollFd, EPOLL_CTL_ADD, connFd, &epollEvent);
@@ -89,7 +89,7 @@ TEST(EpollServerClienTest, EpollServer)
                     if (n > 0)
                     {
                         ::printf("recv client msg:%s\n", buf);
-                        struct epoll_event epollEvent {};
+                        EpollEvent epollEvent;
                         epollEvent.data.fd = sockFd;
                         epollEvent.events = EPOLLOUT;
                         epoll_ctl(epollFd, EPOLL_CTL_MOD, sockFd, &epollEvent);
@@ -99,7 +99,7 @@ TEST(EpollServerClienTest, EpollServer)
                         ::sleep(2);
                         ::printf("close\n");
                         socket::closeFd(sockFd);
-                        struct epoll_event epollEvent {};
+                        EpollEvent epollEvent;
                         epollEvent.data.fd = sockFd;
                         epollEvent.events = 0;
                         epoll_ctl(epollFd, EPOLL_CTL_DEL, sockFd, &epollEvent);
@@ -114,7 +114,7 @@ TEST(EpollServerClienTest, EpollServer)
             {
                 FdType sockFd = epollEvents[i].data.fd;
                 testWriteV(sockFd);
-                struct epoll_event epollEvent {};
+                EpollEvent epollEvent;
                 epollEvent.data.fd = sockFd;
                 epollEvent.events = EPOLLIN;
                 epoll_ctl(epollFd, EPOLL_CTL_MOD, sockFd, &epollEvent);

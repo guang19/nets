@@ -6,7 +6,7 @@
 
 #include "nets/base/timer/TimerManager.h"
 
-using namespace nets::base;
+using namespace nets;
 
 using TimerId = typename Timer::TimerId;
 

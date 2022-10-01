@@ -2,8 +2,8 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_SOCKET_CHANNEL_H
-#define NETS_NET_SOCKET_CHANNEL_H
+#ifndef NETS_SOCKET_CHANNEL_H
+#define NETS_SOCKET_CHANNEL_H
 
 #include <queue>
 
@@ -11,7 +11,7 @@
 #include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/SocketChannelHandlerPipeline.h"
 
-namespace nets::net
+namespace nets
 {
     class SocketChannel : public Channel
     {
@@ -99,6 +99,6 @@ namespace nets::net
         SocketChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
         WriteCompleteCallbackQueue writeCompleteCallbacks_ {};
     };
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_SOCKET_CHANNEL_H
+#endif // NETS_SOCKET_CHANNEL_H

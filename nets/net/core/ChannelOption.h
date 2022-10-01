@@ -2,15 +2,15 @@
 // Created by guang19
 //
 
-#ifndef NETS_NET_CHANNEL_OPTION_H
-#define NETS_NET_CHANNEL_OPTION_H
+#ifndef NETS_CHANNEL_OPTION_H
+#define NETS_CHANNEL_OPTION_H
 
 #include <variant>
 
 #include "nets/base/Noncopyable.h"
 #include "nets/net/core/Socket.h"
 
-namespace nets::net
+namespace nets
 {
     enum SockOption
     {
@@ -38,6 +38,6 @@ namespace nets::net
     {
         using ValueType = ::std::variant<bool, uint8_t, OptValType, SockLinger, ::std::string>;
     }
-} // namespace nets::net
+} // namespace nets
 
-#endif // NETS_NET_CHANNEL_OPTION_H
+#endif // NETS_CHANNEL_OPTION_H

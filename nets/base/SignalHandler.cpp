@@ -6,7 +6,7 @@
 
 #include "nets/base/CommonMacro.h"
 
-namespace nets::base
+namespace nets
 {
     SignalHandler::SignalHandlerType SignalHandler::gSignalHandler = nullptr;
 
@@ -24,4 +24,4 @@ namespace nets::base
         sigaction(SIGTERM, &act, nullptr);
         sigaction(SIGSEGV, &act, nullptr);
     }
-} // namespace nets::base
+} // namespace nets

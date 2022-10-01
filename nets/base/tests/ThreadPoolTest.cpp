@@ -7,7 +7,7 @@
 #include "nets/base/concurrency/ThreadPool.h"
 #include "nets/base/ThreadHelper.h"
 
-using namespace nets::base;
+using namespace nets;
 
 class ThreadPoolTest : public testing::Test
 {

@@ -2,13 +2,13 @@
 // Created by guang19
 //
 
-#ifndef NETS_BASE_LOG_SYNCHRONIZER_H
-#define NETS_BASE_LOG_SYNCHRONIZER_H
+#ifndef NETS_LOG_SYNCHRONIZER_H
+#define NETS_LOG_SYNCHRONIZER_H
 
-#include "nets/base/Singleton.h"
 #include "nets/base/log/LogFile.h"
+#include "nets/base/Singleton.h"
 
-namespace nets::base
+namespace nets
 {
     class LogSynchronizer
     {
@@ -97,6 +97,6 @@ namespace nets::base
     public:
         static ::std::shared_ptr<LogSynchronizer> getLogSynchronizer();
     };
-}
+} // namespace nets
 
-#endif // NETS_BASE_LOG_SYNCHRONIZER_H
+#endif // NETS_LOG_SYNCHRONIZER_H
