@@ -158,9 +158,20 @@ namespace nets
         writeBytes(&value, gInt8Size);
     }
 
+    void ByteBuffer::writeUint8(::uint8_t value)
+    {
+        writeBytes(&value, gInt8Size);
+    }
+
     void ByteBuffer::writeInt16(::int16_t value)
     {
         ::int16_t tmp = htobe16(value);
+        writeBytes(&tmp, gInt16Size);
+    }
+
+    void ByteBuffer::writeUint16(::uint16_t value)
+    {
+        ::uint16_t tmp = htobe16(value);
         writeBytes(&tmp, gInt16Size);
     }
 
@@ -170,9 +181,21 @@ namespace nets
         writeBytes(&tmp, gInt32Size);
     }
 
+    void ByteBuffer::writeUint32(::uint32_t value)
+    {
+        ::uint32_t tmp = htobe32(value);
+        writeBytes(&tmp, gInt32Size);
+    }
+
     void ByteBuffer::writeInt64(::int64_t value)
     {
         ::int64_t tmp = htobe64(value);
+        writeBytes(&tmp, gInt64Size);
+    }
+
+    void ByteBuffer::writeUint64(::uint64_t value)
+    {
+        ::uint64_t tmp = htobe64(value);
         writeBytes(&tmp, gInt64Size);
     }
 

@@ -111,9 +111,13 @@ namespace nets
         SSizeType writeBytes(const SocketChannel& channel, SizeType length);
         SSizeType writeBytes(const DatagramChannel& channel, SizeType length, InetSockAddress& srcAddr);
         void writeInt8(::int8_t value);
+        void writeUint8(::uint8_t value);
         void writeInt16(::int16_t value);
+        void writeUint16(::uint16_t value);
         void writeInt32(::int32_t value);
+        void writeUint32(::uint32_t value);
         void writeInt64(::int64_t value);
+        void writeUint64(::uint64_t value);
         void writeFloat(float value);
         void writeDouble(double value);
 
