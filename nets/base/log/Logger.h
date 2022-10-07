@@ -7,13 +7,13 @@
 
 #include <string>
 
+#include "nets/base/Copyable.h"
 #include "nets/base/Noncopyable.h"
 
 namespace nets
 {
-    class LogLevel
+    namespace LogLevel
     {
-    public:
         enum Level
         {
             TRACE = 0,
@@ -28,6 +28,13 @@ namespace nets
         const char* const gLogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
     };
 
+    class LogMessage : public Copyable
+
+    class LogAppender : Noncopyable
+    {
+
+    };
+
     class Logger : Noncopyable
     {
     public:
@@ -39,6 +46,7 @@ namespace nets
 
     private:
         ::std::string name_;
+        LogLevel::Level level_;
     };
 } // namespace nets
 
