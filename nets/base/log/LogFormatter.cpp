@@ -51,10 +51,10 @@ namespace nets
 
     void DefaultLogFormatter::formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream)
     {
-        formatLogTime(logMessage.getLogTime(), logBufferStream);
+        formatLogTime(logMessage.getTime(), logBufferStream);
         logBufferStream << " [" << currentTid() << "] ";
-        logBufferStream << gLogLevelName[logMessage.getLogLevel()] << ' ';
-        logBufferStream << logMessage.getFilename() << ':' << logMessage.getLine() << " - ";
+        logBufferStream << gLogLevelName[logMessage.getLevel()] << ' ';
+        logBufferStream << logMessage.getFile() << ':' << logMessage.getLine() << " - ";
         logBufferStream << logMessage.getStream();
     }
 

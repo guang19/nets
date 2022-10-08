@@ -20,7 +20,7 @@ namespace nets
         using SizeType = ::size_t;
         constexpr char gDigits[] = {"0123456789"};
         constexpr char gHexDigits[] = {"0123456789abcdef"};
-        constexpr ::int32_t gMaxIntegerLength = ::std::numeric_limits<::uint64_t>::digits10 + 2;
+        constexpr ::int32_t gMaximumNumberLimit = ::std::numeric_limits<::uint64_t>::digits10 + 1;
     } // namespace
 
     template <SizeType SIZE>
@@ -122,7 +122,7 @@ namespace nets
         template <typename IntType>
         void writeInteger(IntType value)
         {
-            if (writableBytes() > gMaxIntegerLength)
+            if (writableBytes() > gMaximumNumberLimit)
             {
                 char* buffer = buffer_ + writerIndex_;
                 char* tmp = buffer;
@@ -155,7 +155,7 @@ namespace nets
 
         void writePointer(const void* ptr)
         {
-            if (writableBytes() > gMaxIntegerLength)
+            if (writableBytes() > gMaximumNumberLimit)
             {
                 auto value = reinterpret_cast<::uintptr_t>(ptr);
                 char* buffer = buffer_ + writerIndex_;

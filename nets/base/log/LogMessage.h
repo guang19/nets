@@ -24,26 +24,26 @@ namespace nets
     class LogMessage : Noncopyable
     {
     public:
-        explicit LogMessage(LogLevel logLevel, const char* file, ::uint32_t line);
+        explicit LogMessage(LogLevel level, const char* file, ::int32_t line);
         ~LogMessage() = default;
 
     public:
-        inline const Timestamp& getLogTime() const
+        inline const Timestamp& getTime() const
         {
-            return logTime_;
+            return time_;
         }
 
-        inline LogLevel getLogLevel() const
+        inline LogLevel getLevel() const
         {
-            return logLevel_;
+            return level_;
         }
 
-        inline const char* getFilename() const
+        inline const char* getFile() const
         {
-            return filename_;
+            return file_;
         }
 
-        inline ::uint32_t getLine() const
+        inline ::int32_t getLine() const
         {
             return line_;
         }
@@ -54,11 +54,28 @@ namespace nets
         }
 
     private:
-        Timestamp logTime_;
-        LogLevel logLevel_;
-        const char* filename_;
-        ::uint32_t line_;
+        Timestamp time_;
+        LogLevel level_;
+        const char* file_;
+        ::int32_t line_;
         LogBufferStream stream_;
+    };
+
+
+    class LogMessageStream : Noncopyable
+    {
+    public:
+        explicit LogMessageStream(LogLevel logLevel, const char* file, ::uint32_t line);
+        ~LogMessageStream();
+
+    public:
+        inline LogBufferStream& stream()
+        {
+            return logMessage_.getStream();
+        }
+
+    private:
+        LogMessage logMessage_;
     };
 } // namespace nets
 

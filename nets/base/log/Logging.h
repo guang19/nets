@@ -11,25 +11,6 @@
 #define LOG_LEVEL nets::LogLevel::DEBUG
 #endif
 
-namespace nets
-{
-    class LogMessageStream
-    {
-    public:
-        explicit LogMessageStream(LogLevel logLevel, const char* file, ::uint32_t line);
-        ~LogMessageStream();
-
-    public:
-        inline LogBufferStream& stream()
-        {
-            return logMessage_.getStream();
-        }
-
-    private:
-        LogMessage logMessage_;
-    };
-} // namespace nets
-
 // stream api
 #define LOGS_TRACE                                                                                                          \
     if (nets::LogLevel::TRACE >= LOG_LEVEL)                                                                                 \
