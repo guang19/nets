@@ -10,6 +10,7 @@
 namespace nets::utils
 {
     using StringType = std::string;
+
     void trim(StringType& str);
 } // namespace nets::utils
 

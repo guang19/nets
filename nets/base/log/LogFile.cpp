@@ -39,6 +39,7 @@ namespace nets
             THROW_FILE_OPEN_EXCEPTION(errno)
         }
         getFileInfo(&bytes_, &lastRollTime_);
+        MEMZERO(buffer_, sizeof(buffer_));
         ::setbuffer(fp_, buffer_, gFileIoBufferSize);
     }
 

@@ -58,8 +58,8 @@ namespace nets
         }
 
     private:
-        ByteBuffer data_ {};
-        InetSockAddress recipient_ {};
+        ByteBuffer data_;
+        InetSockAddress recipient_;
     };
 } // namespace nets
 

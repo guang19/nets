@@ -64,12 +64,12 @@ namespace nets
         void initDatagramChannel(DatagramChannelPtr& datagramChannel);
 
     private:
-        bool retry_ {false};
-        TimeType retryInterval_ {0};
-        SocketChannelHandlerList socketChannelHandlers_ {};
-        DatagramChannelHandlerList datagramChannelHandlers_ {};
-        SocketChannelInitializationCallback socketChannelInitializationCallback_ {};
-        DatagramChannelInitializationCallback datagramChannelInitializationCallback_ {};
+        bool retry_;
+        TimeType retryInterval_;
+        SocketChannelHandlerList socketChannelHandlers_;
+        DatagramChannelHandlerList datagramChannelHandlers_;
+        SocketChannelInitializationCallback socketChannelInitializationCallback_;
+        DatagramChannelInitializationCallback datagramChannelInitializationCallback_;
 
         // default retry interval
         static constexpr TimeType gDefaultRetryInterval = 2000;

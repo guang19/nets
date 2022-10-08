@@ -6,6 +6,8 @@
 
 namespace nets
 {
+    LogBufferStream::LogBufferStream() : buffer_() {}
+
     LogBufferStream& LogBufferStream::operator<<(char value)
     {
         buffer_.writeBytes(&value, 1);

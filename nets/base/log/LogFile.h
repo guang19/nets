@@ -44,11 +44,11 @@ namespace nets
         void getFileInfo(SizeType* fileSize, ::time_t* createTime);
 
     private:
-        FILE* fp_ {nullptr};
-        StringType dir_ {};
-        StringType file_ {};
-        SizeType bytes_ {0};
-        TimeType lastRollTime_ {0};
+        FILE* fp_;
+        StringType dir_;
+        StringType file_;
+        SizeType bytes_;
+        TimeType lastRollTime_;
 
         static constexpr ::size_t gFileIoBufferSize = 1024 * 256;
         char buffer_[gFileIoBufferSize] {0};

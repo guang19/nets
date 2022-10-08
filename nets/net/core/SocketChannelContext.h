@@ -50,7 +50,7 @@ namespace nets
         void shutdownWrite();
 
     private:
-        SocketChannelRawPtr channel_ {nullptr};
+        SocketChannelRawPtr channel_;
     };
 } // namespace nets
 

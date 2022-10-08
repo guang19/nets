@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    EventLoop::TimerId timerId_ {};
+    TimerId timerId_ {};
 };
 
 TEST(ScheduleTaskTest, TcpServer)

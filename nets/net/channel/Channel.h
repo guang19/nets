@@ -72,10 +72,10 @@ namespace nets
 
     protected:
         // channel unique identifier per EventLoop thread
-        EventType events_ {gNoneEvent};
-        EventType readyEvents_ {gNoneEvent};
-        bool isRegistered_ {false};
-        EventLoopRawPtr eventLoop_ {nullptr};
+        EventType events_;
+        EventType readyEvents_;
+        bool isRegistered_;
+        EventLoopRawPtr eventLoop_;
     };
 } // namespace nets
 

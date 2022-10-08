@@ -83,11 +83,11 @@ namespace nets
         void shutdown(::int32_t how);
 
     private:
-        FdType sockFd_ {socket::gInvalidFd};
-        InetSockAddress localAddress_ {};
-        InetSockAddress peerAddress_ {};
+        FdType sockFd_;
+        InetSockAddress localAddress_;
+        InetSockAddress peerAddress_;
         using BufferList = ::std::vector<ByteBuffer>;
-        BufferList writeBuffer_ {};
+        BufferList writeBuffer_;
 
         enum ChannelState
         {
@@ -95,9 +95,9 @@ namespace nets
             ACTIVE,
             HALF_CLOSE,
         };
-        ChannelState state_ {ChannelState::INACTIVE};
-        SocketChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
-        WriteCompleteCallbackQueue writeCompleteCallbacks_ {};
+        ChannelState state_;
+        SocketChannelHandlerPipeline channelHandlerPipeline_;
+        WriteCompleteCallbackQueue writeCompleteCallbacks_;
     };
 } // namespace nets
 

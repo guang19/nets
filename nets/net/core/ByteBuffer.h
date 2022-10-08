@@ -141,12 +141,12 @@ namespace nets
         void adjustReaderIndex(SizeType bytes);
 
     private:
-        CharArrayPtr buffer_ {nullptr};
+        CharArrayPtr buffer_;
         // reader pointer
-        SizeType readerIndex_ {0};
+        SizeType readerIndex_;
         // writer pointer
-        SizeType writerIndex_ {0};
-        SizeType capacity_ {0};
+        SizeType writerIndex_;
+        SizeType capacity_;
     };
 } // namespace nets
 

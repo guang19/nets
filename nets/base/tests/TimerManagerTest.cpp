@@ -8,8 +8,6 @@
 
 using namespace nets;
 
-using TimerId = typename Timer::TimerId;
-
 class TimerManagerTest : public testing::Test
 {
 public:

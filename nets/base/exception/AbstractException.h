@@ -34,8 +34,8 @@ namespace nets
         }
 
     protected:
-        StringType cause_ {};
-        StringType backtraceInfo_ {};
+        StringType cause_;
+        StringType backtraceInfo_;
     };
 } // namespace nets
 

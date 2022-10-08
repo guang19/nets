@@ -76,7 +76,7 @@ namespace nets
         }
 
     protected:
-        ChannelOptionList channelOptions_ {};
+        ChannelOptionList channelOptions_;
         EventLoopGroup mainLoopGroup_;
 
     private:

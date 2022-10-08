@@ -59,11 +59,9 @@ namespace nets
         void handleReadError(::int32_t errNum);
 
     private:
-        FdType sockFd_ {socket::gInvalidFd};
-        using DatagramPacketList = ::std::vector<DatagramPacket>;
-
-        DatagramChannelHandlerPipeline channelHandlerPipeline_ {nullptr};
-        ChannelOptionList channelOptions_ {};
+        FdType sockFd_;
+        DatagramChannelHandlerPipeline channelHandlerPipeline_;
+        ChannelOptionList channelOptions_;
     };
 } // namespace nets
 

@@ -22,7 +22,7 @@ namespace nets
     class ThreadPool : Noncopyable
     {
     private:
-        class ThreadWrapper;
+        struct ThreadWrapper;
         using ThreadWrapperRawPtr = ThreadWrapper*;
         using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
         using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
@@ -41,7 +41,7 @@ namespace nets
         using ThreadPoolRawPtr = ThreadPool*;
 
     private:
-        class ThreadWrapper : Noncopyable
+        struct ThreadWrapper : Noncopyable
         {
         public:
             explicit ThreadWrapper(const StringType& threadName, bool isCoreThread, TaskType task,
@@ -50,10 +50,10 @@ namespace nets
 
             void start(ThreadPoolRawPtr threadPoolPtr);
 
-            StringType threadName_ {};
-            bool isCoreThread_ {false};
-            TaskType task_ {nullptr};
-            ::std::thread thread_ {};
+            ::std::thread thread_;
+            StringType threadName_;
+            TaskType task_;
+            bool isCoreThread_;
         };
 
     public:
@@ -151,20 +151,20 @@ namespace nets
 
     private:
         // the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-        IntType corePoolSize_ {0};
+        IntType corePoolSize_;
         // the maximum numbers of threads that the thread pool can hold
-        IntType maximumPoolSize_ {0};
+        IntType maximumPoolSize_;
         // time that idle threads can survive, unit: ms
-        TimeType idleKeepAliveTime_ {0};
+        TimeType idleKeepAliveTime_;
         // task queue
-        BlockingQueuePtr taskQueue_ {nullptr};
-        ThreadPoolType threadPool_ {};
-        StringType name_ {};
+        BlockingQueuePtr taskQueue_;
+        ThreadPoolType threadPool_;
+        StringType name_;
         // high 2bits represent thread pool status: 00 - shutdown; 01-running.
         // low 30bits represent thread pool active thread size.
-        ::std::atomic<IntType> ctl_ {0};
-        MutexType mutex_ {};
-        ConditionVariableType cv_ {};
+        ::std::atomic<IntType> ctl_;
+        MutexType mutex_;
+        ConditionVariableType cv_;
     };
 
     template <typename Fn, typename... Args>

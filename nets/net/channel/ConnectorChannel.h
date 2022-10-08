@@ -66,9 +66,9 @@ namespace nets
         void reconnect();
 
     private:
-        FdType sockFd_ {socket::gInvalidFd};
-        InetSockAddress localAddress_ {};
-        InetSockAddress peerAddress_ {};
+        FdType sockFd_;
+        InetSockAddress localAddress_;
+        InetSockAddress peerAddress_;
 
         enum ConnectionState
         {
@@ -77,11 +77,11 @@ namespace nets
             DISCONNECTED
         };
         ConnectionState state_;
-        bool retry_ {false};
-        TimeType retryInterval_ {0};
-        ChannelOptionList channelOptions_ {};
-        ChannelHandlerList channelHandlers_ {};
-        ChannelInitializationCallback channelInitializationCallback_ {};
+        bool retry_;
+        TimeType retryInterval_;
+        ChannelOptionList channelOptions_;
+        ChannelHandlerList channelHandlers_;
+        ChannelInitializationCallback channelInitializationCallback_;
     };
 } // namespace nets
 

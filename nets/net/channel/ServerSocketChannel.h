@@ -69,14 +69,14 @@ namespace nets
         void handleAcceptError(::int32_t errNum);
 
     private:
-        FdType sockFd_ {socket::gInvalidFd};
-        FdType idleFd_ {socket::gInvalidFd};
-        ::int32_t backlog_ {0};
-        ChannelOptionList channelOptions_ {};
-        NextEventLoopFn nextEventLoopFn_ {};
-        ChannelOptionList childOptions_ {};
-        ChannelHandlerList childHandlers_ {};
-        ChannelInitializationCallback childInitializationCallback_ {};
+        FdType sockFd_;
+        FdType idleFd_;
+        ::int32_t backlog_;
+        ChannelOptionList channelOptions_;
+        NextEventLoopFn nextEventLoopFn_;
+        ChannelOptionList childOptions_;
+        ChannelHandlerList childHandlers_;
+        ChannelInitializationCallback childInitializationCallback_;
     };
 } // namespace nets
 

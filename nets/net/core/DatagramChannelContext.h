@@ -41,7 +41,7 @@ namespace nets
         bool leaveIpv6MulticastGroup(const StringType& multicastAddr, const StringType& inf);
 
     private:
-        DatagramChannelRawPtr channel_ {nullptr};
+        DatagramChannelRawPtr channel_;
     };
 } // namespace nets
 

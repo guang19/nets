@@ -29,6 +29,9 @@ namespace nets
     };
 
     class LogMessage : public Copyable
+    {
+
+    };
 
     class LogAppender : Noncopyable
     {

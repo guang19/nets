@@ -31,9 +31,9 @@ namespace nets
         {
             running_ = false;
             cv_.notify_one();
-            if (writerTask.joinable())
+            if (writerTask_.joinable())
             {
-                writerTask.join();
+                writerTask_.join();
             }
         }
     }
@@ -45,7 +45,7 @@ namespace nets
             return;
         }
         running_ = true;
-        writerTask = ::std::thread(&AsyncLogWriter::swap, this);
+        writerTask_ = ::std::thread(&AsyncLogWriter::swap, this);
     }
 
     void AsyncLogWriter::write(const char* data, SizeType length)

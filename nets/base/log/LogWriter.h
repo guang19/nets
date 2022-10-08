@@ -86,14 +86,14 @@ namespace nets
         void swap();
 
     private:
-        ::std::atomic_bool running_ {false};
-        BufferPtr cacheBuffer_ {nullptr};
-        BufferPtr backupCacheBuffer_ {nullptr};
-        BufferVectorType buffers_ {};
-        LogSynchronizerPtr logSynchronizer_ {nullptr};
-        ::std::thread writerTask {};
-        MutexType mutex_ {};
-        ConditionVarType cv_ {};
+        ::std::atomic_bool running_;
+        BufferPtr cacheBuffer_;
+        BufferPtr backupCacheBuffer_;
+        BufferVectorType buffers_;
+        LogSynchronizerPtr logSynchronizer_;
+        ::std::thread writerTask_ {};
+        MutexType mutex_;
+        ConditionVarType cv_;
     };
 } // namespace nets
 

@@ -39,7 +39,7 @@ namespace nets
         }
 
     protected:
-        EventLoopRawPtr eventLoop_ {nullptr};
+        EventLoopRawPtr eventLoop_;
     };
 
     class PollerFactory

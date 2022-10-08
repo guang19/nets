@@ -17,7 +17,7 @@ namespace nets
         using LogBuffer = StackBuffer<gLogBufferSize>;
 
     public:
-        LogBufferStream() = default;
+        LogBufferStream();
         ~LogBufferStream() = default;
 
     public:
@@ -45,7 +45,7 @@ namespace nets
         LogBufferStream& operator<<(const LogBufferStream& stream);
 
     private:
-        LogBuffer buffer_ {};
+        LogBuffer buffer_;
     };
 } // namespace nets
 

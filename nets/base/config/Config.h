@@ -44,7 +44,7 @@ namespace nets
         bool getBool(const StringType& key, bool defaultValue = false);
 
     private:
-        ConfigMap config_ {};
+        ConfigMap config_;
     };
 } // namespace nets
 

@@ -13,36 +13,34 @@
 
 namespace nets
 {
+    struct TimerId : public Copyable
+    {
+    public:
+        using IdType = ::int64_t;
+
+    public:
+        TimerId();
+        explicit TimerId(IdType key, const Timestamp& value);
+        ~TimerId() = default;
+
+        TimerId(const TimerId& other);
+        TimerId(TimerId&& other) noexcept;
+        TimerId& operator=(const TimerId& other);
+        TimerId& operator=(TimerId&& other) noexcept;
+
+        bool operator==(const TimerId& other) const;
+
+        IdType key_;
+        Timestamp value_;
+    };
+
     class Timer : Noncopyable
     {
     public:
         using TimeType = ::time_t;
-        using IdType = ::int64_t;
+        using IdType = TimerId::IdType;
         using TimerCallback = ::std::function<void()>;
         static constexpr ::int32_t gRepeatForever = -1;
-
-    public:
-        class TimerId : public Copyable
-        {
-        public:
-            TimerId();
-            explicit TimerId(IdType key, const Timestamp& value);
-            ~TimerId() = default;
-
-            TimerId(const TimerId& other);
-            TimerId(TimerId&& other) noexcept;
-            TimerId& operator=(const TimerId& other);
-            TimerId& operator=(TimerId&& other) noexcept;
-
-            inline bool operator==(const TimerId& other) const
-            {
-                return key_ == other.key_ && value_ == other.value_;
-            }
-
-        public:
-            IdType key_ {-1};
-            Timestamp value_ {0};
-        };
 
     public:
         explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay = false);
@@ -91,12 +89,12 @@ namespace nets
         void onTimer(const Timestamp& now);
 
     private:
-        TimerId id_ {};
-        ::int32_t repeatTimes_ {0};
+        TimerId id_;
+        ::int32_t repeatTimes_;
         // unit: milliseconds
-        TimeType interval_ {0};
-        bool fixedDelay_ {false};
-        TimerCallback timerCallback_ {};
+        TimeType interval_;
+        bool fixedDelay_;
+        TimerCallback timerCallback_;
 
         // not thread-safe, because there is usually only one TimerManager to manage Timer
         static ::std::atomic<IdType> gTimerIdGenerator;

@@ -50,7 +50,7 @@ namespace nets
         void flush() override = 0;
 
     protected:
-        FilePtr logFile_ {nullptr};
+        FilePtr logFile_;
     };
 
     DECLARE_SINGLETON_CLASS(SingleLogFileSynchronizer), public LogFileSynchronizer

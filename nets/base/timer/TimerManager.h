@@ -15,7 +15,6 @@ namespace nets
     class TimerManager : Noncopyable
     {
     public:
-        using TimerId = typename Timer::TimerId;
         using TimeType = typename Timer::TimeType;
         using TimerContainer = ::std::multimap<Timestamp, Timer>;
 
@@ -39,8 +38,8 @@ namespace nets
     };
 
     template <typename Fn, typename... Args>
-    TimerManager::TimerId TimerManager::addTimer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval,
-                                                 bool fixedDelay, Fn&& fn, Args&&... args)
+    TimerId TimerManager::addTimer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay,
+                                   Fn&& fn, Args&&... args)
     {
         Timer timer(expiredTime, repeatTimes, interval, fixedDelay);
         TimerId timerId = timer.id();

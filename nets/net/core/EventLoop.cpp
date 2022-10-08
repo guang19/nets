@@ -20,7 +20,8 @@ namespace nets
 
     EventLoop::EventLoop()
         : running_(false), threadId_(currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)), activeChannels_(),
-          poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), runningPendingTasks_(false), mutex_()
+          poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), runningPendingTasks_(false), mutex_(),
+          cv_()
     {
         assert(gCurrentThreadEventLoop == nullptr);
         // one loop per thread

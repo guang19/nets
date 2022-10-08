@@ -40,7 +40,6 @@ namespace nets
         using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
         using PollerPtr = ::std::unique_ptr<Poller>;
         using TimeType = typename TimerManager::TimeType;
-        using TimerId = typename Timer::TimerId;
         using EventLoopRawPtr = EventLoop*;
 
     public:
@@ -92,17 +91,17 @@ namespace nets
         void runPendingTasks();
 
     private:
-        ::std::atomic_bool running_ {false};
-        const ::pid_t threadId_ {-1};
-        NotifyChannelPtr notifier_ {nullptr};
-        ChannelMap channels_ {};
-        ChannelList activeChannels_ {nullptr};
-        PollerPtr poller_ {nullptr};
-        TimerManager timerManager_ {};
-        TaskList pendingTasks_ {};
-        bool runningPendingTasks_ {false};
-        MutexType mutex_ {};
-        ConditionVariableType cv_ {};
+        ::std::atomic_bool running_;
+        const ::pid_t threadId_;
+        NotifyChannelPtr notifier_;
+        ChannelMap channels_;
+        ChannelList activeChannels_;
+        PollerPtr poller_;
+        TimerManager timerManager_;
+        TaskList pendingTasks_;
+        bool runningPendingTasks_;
+        MutexType mutex_;
+        ConditionVariableType cv_;
     };
 
     template <typename Fn, typename... Args>
@@ -198,21 +197,21 @@ namespace nets
     }
 
     template <typename Fn, typename... Args>
-    EventLoop::TimerId EventLoop::schedule(TimeType delay, Fn&& fn, Args&&... args)
+    TimerId EventLoop::schedule(TimeType delay, Fn&& fn, Args&&... args)
     {
         return timerManager_.addTimer(Timestamp::now().plusMilliseconds(delay), 1, 0, false, ::std::forward<Fn>(fn),
                                       ::std::forward<Args>(args)...);
     }
 
     template <typename Fn, typename... Args>
-    EventLoop::TimerId EventLoop::scheduleAtFixedRate(TimeType initDelay, TimeType interval, Fn&& fn, Args&&... args)
+    TimerId EventLoop::scheduleAtFixedRate(TimeType initDelay, TimeType interval, Fn&& fn, Args&&... args)
     {
         return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::gRepeatForever, interval, false,
                                       ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
 
     template <typename Fn, typename... Args>
-    EventLoop::TimerId EventLoop::scheduleAtFixedDelay(TimeType initDelay, TimeType delay, Fn&& fn, Args&&... args)
+    TimerId EventLoop::scheduleAtFixedDelay(TimeType initDelay, TimeType delay, Fn&& fn, Args&&... args)
     {
         return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::gRepeatForever, delay, true,
                                       ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);

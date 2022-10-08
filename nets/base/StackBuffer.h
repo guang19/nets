@@ -178,8 +178,8 @@ namespace nets
     private:
         char buffer_[SIZE] {0};
         // writer pointer
-        SizeType writerIndex_ {0};
-        SizeType capacity_ {SIZE};
+        SizeType writerIndex_;
+        SizeType capacity_;
     };
 } // namespace nets
 

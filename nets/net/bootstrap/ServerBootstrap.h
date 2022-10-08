@@ -46,9 +46,9 @@ namespace nets
         void initServerSocketChannel(ServerSocketChannelPtr& serverSocketChannel);
 
     private:
-        ChannelOptionList childOptions_ {};
-        ChannelHandlerList childHandlers_ {};
-        ChannelInitializationCallback childInitializationCallback_ {};
+        ChannelOptionList childOptions_;
+        ChannelHandlerList childHandlers_;
+        ChannelInitializationCallback childInitializationCallback_;
         EventLoopGroup childLoopGroup_;
 
         static constexpr char gChildEventLoopGroupName[] = "ChildLoopGroup";

@@ -8,8 +8,8 @@ namespace nets
 {
     ThreadPool::ThreadWrapper::ThreadWrapper(const StringType& threadName, bool isCoreThread, TaskType task,
                                              ThreadPoolRawPtr threadPoolPtr)
-        : threadName_(threadName), isCoreThread_(isCoreThread), task_(std::move(task)),
-          thread_(&ThreadWrapper::start, this, threadPoolPtr)
+        : thread_(&ThreadWrapper::start, this, threadPoolPtr), threadName_(threadName), task_(std::move(task)),
+          isCoreThread_(isCoreThread)
     {
         if (thread_.joinable())
         {

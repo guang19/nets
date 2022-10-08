@@ -8,18 +8,18 @@ namespace nets
 {
     ::std::atomic<Timer::IdType> Timer::gTimerIdGenerator = 0;
 
-    Timer::TimerId::TimerId() : key_(-1), value_(0) {}
+    TimerId::TimerId() : key_(-1), value_(0) {}
 
-    Timer::TimerId::TimerId(IdType key, const Timestamp& value) : key_(key), value_(value) {}
+    TimerId::TimerId(IdType key, const Timestamp& value) : key_(key), value_(value) {}
 
-    Timer::TimerId::TimerId(const TimerId& other) : key_(other.key_), value_(other.value_) {}
+    TimerId::TimerId(const TimerId& other) : key_(other.key_), value_(other.value_) {}
 
-    Timer::TimerId::TimerId(TimerId&& other) noexcept : key_(other.key_), value_(::std::move(other.value_))
+    TimerId::TimerId(TimerId&& other) noexcept : key_(other.key_), value_(::std::move(other.value_))
     {
         other.key_ = -1;
     }
 
-    Timer::TimerId& Timer::TimerId::operator=(const TimerId& other)
+    TimerId& TimerId::operator=(const TimerId& other)
     {
         if (this != &other)
         {
@@ -29,7 +29,7 @@ namespace nets
         return *this;
     }
 
-    Timer::TimerId& Timer::TimerId::operator=(TimerId&& other) noexcept
+    TimerId& TimerId::operator=(TimerId&& other) noexcept
     {
         if (this != &other)
         {
@@ -38,6 +38,11 @@ namespace nets
             other.key_ = -1;
         }
         return *this;
+    }
+
+    bool TimerId::operator==(const TimerId& other) const
+    {
+        return key_ == other.key_ && value_ == other.value_;
     }
 
     Timer::Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay)

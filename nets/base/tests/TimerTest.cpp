@@ -10,8 +10,6 @@
 
 using namespace nets;
 
-using TimerId = typename Timer::TimerId;
-
 TEST(TimerTest, CopyMove)
 {
     Timestamp now(Timestamp::now());

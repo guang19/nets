@@ -119,7 +119,7 @@ namespace nets
         }
 
     private:
-        TimeType microsecondsSinceEpoch_ {0};
+        TimeType microsecondsSinceEpoch_;
     };
 } // namespace nets
 

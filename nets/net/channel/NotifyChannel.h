@@ -23,7 +23,7 @@ namespace nets
         void handleReadEvent() override;
 
     private:
-        FdType eventFd_ {socket::gInvalidFd};
+        FdType eventFd_;
     };
 } // namespace nets
 

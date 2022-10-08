@@ -15,7 +15,8 @@ namespace nets
 {
     ConnectorChannel::ConnectorChannel(EventLoopRawPtr eventLoop)
         : Channel(eventLoop), sockFd_(socket::gInvalidFd), localAddress_(), peerAddress_(),
-          state_(ConnectionState::DISCONNECTED), retry_(false), retryInterval_(0)
+          state_(ConnectionState::DISCONNECTED), retry_(false), retryInterval_(0), channelOptions_(), channelHandlers_(),
+          channelInitializationCallback_()
     {
     }
 

@@ -46,8 +46,8 @@ namespace nets
         void fireDatagramChannelRead(DatagramPacket& message);
 
     private:
-        DatagramChannelContextPtr channelContext_ {};
-        DatagramChannelHandlerList channelHandlers_ {};
+        DatagramChannelContextPtr channelContext_;
+        DatagramChannelHandlerList channelHandlers_;
     };
 } // namespace nets
 

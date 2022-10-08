@@ -48,8 +48,8 @@ namespace nets
         void fireSocketChannelRead(ByteBuffer& message);
 
     private:
-        SocketChannelContextPtr channelContext_ {};
-        SocketChannelHandlerList channelHandlers_ {};
+        SocketChannelContextPtr channelContext_;
+        SocketChannelHandlerList channelHandlers_;
     };
 } // namespace nets
 

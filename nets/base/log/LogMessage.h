@@ -54,11 +54,11 @@ namespace nets
         }
 
     private:
-        Timestamp logTime_ {};
-        LogLevel logLevel_ {};
-        const char* filename_ {nullptr};
-        ::uint32_t line_ {0};
-        LogBufferStream stream_ {};
+        Timestamp logTime_;
+        LogLevel logLevel_;
+        const char* filename_;
+        ::uint32_t line_;
+        LogBufferStream stream_;
     };
 } // namespace nets
 

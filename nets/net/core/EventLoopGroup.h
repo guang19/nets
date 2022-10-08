@@ -60,13 +60,13 @@ namespace nets
         bool isShutdown() const;
 
     private:
-        SizeType nextLoop_ {0};
-        IntType numOfEventLoops_ {0};
-        EventLoopList eventLoops_ {};
-        FutureList futures_ {};
+        SizeType nextLoop_;
+        IntType numOfEventLoops_;
+        EventLoopList eventLoops_;
+        FutureList futures_;
         ThreadPool eventLoopThreadPool_;
-        MutexType mutex_ {};
-        ConditionVariableType cv_ {};
+        MutexType mutex_;
+        ConditionVariableType cv_;
     };
 } // namespace nets
 

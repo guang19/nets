@@ -35,9 +35,9 @@ namespace nets
         const char* epollOptToString(::int32_t opt);
 
     private:
-        FdType epollFd_ {-1};
+        FdType epollFd_;
         // dynamically growing array of events
-        EventList events_ {};
+        EventList events_;
     };
 }; // namespace nets
 
