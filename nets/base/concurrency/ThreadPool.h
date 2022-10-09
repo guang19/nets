@@ -50,10 +50,10 @@ namespace nets
 
             void start(ThreadPoolRawPtr threadPoolPtr);
 
-            ::std::thread thread_;
+            bool isCoreThread_;
             StringType threadName_;
             TaskType task_;
-            bool isCoreThread_;
+            ::std::thread thread_;
         };
 
     public:

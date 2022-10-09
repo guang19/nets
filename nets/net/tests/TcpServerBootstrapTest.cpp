@@ -48,7 +48,8 @@ TEST(TcpServerBootstrapTest, TcpServer)
     ServerBootstrap(8)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)
-        //                .childHandler(new TestServerChannelHandler())
+        .option(SockOption::BACKLOG, 1028)
+//                        .childHandler(new TestServerChannelHandler())
         .childHandler(
             [](SocketChannel& channel)
             {

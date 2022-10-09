@@ -43,7 +43,7 @@ namespace nets
 
     void EventLoopGroup::syncEach()
     {
-        for (const auto& future: futures_)
+        for (const auto& future : futures_)
         {
             future.wait();
         }
@@ -61,7 +61,7 @@ namespace nets
 
     void EventLoopGroup::shutdown()
     {
-        for (auto& eventLoop: eventLoops_)
+        for (auto& eventLoop : eventLoops_)
         {
             if (eventLoop->isRunning())
             {
@@ -72,7 +72,7 @@ namespace nets
 
     bool EventLoopGroup::isShutdown() const
     {
-        for (const auto& eventLoop: eventLoops_)
+        for (const auto& eventLoop : eventLoops_)
         {
             if (eventLoop->isRunning())
             {

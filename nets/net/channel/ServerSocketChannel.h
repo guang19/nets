@@ -38,15 +38,8 @@ namespace nets
             nextEventLoopFn_ = nextEventLoopFn;
         }
 
-        inline void setChannelOptions(const ChannelOptionList& channelOptions)
-        {
-            channelOptions_.insert(channelOptions.begin(), channelOptions.end());
-        }
-
-        inline void setChildOptions(const ChannelOptionList& childOptions)
-        {
-            childOptions_.insert(childOptions.begin(), childOptions.end());
-        }
+        void setChannelOptions(const ChannelOptionList& channelOptions);
+        void setChildOptions(const ChannelOptionList& childOptions);
 
         inline void setChildHandlers(const ChannelHandlerList& childHandlers)
         {

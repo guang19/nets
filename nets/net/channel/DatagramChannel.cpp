@@ -14,7 +14,7 @@ namespace nets
 {
     namespace
     {
-        const ByteBuffer::SizeType gRecvPacketSize = DefaultUdpSockRecvBufferSize >> 2;
+        static const ByteBuffer::SizeType gRecvPacketSize = gDefaultUdpSockRecvBufferSize >> 2;
     } // namespace
 
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
@@ -35,6 +35,14 @@ namespace nets
         return sockFd_;
     }
 
+    void DatagramChannel::setChannelOptions(const ChannelOptionList& channelOptions)
+    {
+        for (const auto& it : channelOptions)
+        {
+            channelOptions_.insert_or_assign(it.first, it.second);
+        }
+    }
+
     void DatagramChannel::bind(const InetSockAddress& localAddress)
     {
         bool needBind = true;
@@ -48,7 +56,7 @@ namespace nets
             sockFd_ = socket::createUdpSocket(localAddress.ipFamily());
         }
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
+        for (const auto& channelOption : channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }

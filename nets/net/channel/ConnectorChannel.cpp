@@ -109,7 +109,7 @@ namespace nets
         }
         if (!channelHandlers_.empty())
         {
-            for (const auto& channelHandler: channelHandlers_)
+            for (const auto& channelHandler : channelHandlers_)
             {
                 assert(channelHandler.use_count() == 1);
                 socketChannel->pipeline().addLast(channelHandler);

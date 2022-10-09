@@ -157,7 +157,7 @@ namespace nets
 
         if (!datagramChannelHandlers_.empty())
         {
-            for (const auto& childHandler: datagramChannelHandlers_)
+            for (const auto& childHandler : datagramChannelHandlers_)
             {
                 assert(childHandler.use_count() == 1);
                 datagramChannel->pipeline().addLast(childHandler);

@@ -98,22 +98,21 @@ namespace nets
         // TCP SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
         // UDP SO_RCVBUF default value is 212992 bytes on linux which kernel version is 5.10.x
         void setSockRecvBuf(FdType sockFd, OptValType recvBufLen);
-        OptValType getTcpSockSendBuf();
-        OptValType getTcpSockRecvBuf();
-        OptValType getUdpSockSendBuf();
-        OptValType getUdpSockRecvBuf();
+        extern OptValType getTcpSockSendBuf();
+        extern OptValType getTcpSockRecvBuf();
+        extern OptValType getUdpSockSendBuf();
+        extern OptValType getUdpSockRecvBuf();
     } // namespace socket
 
     namespace
     {
-        const ::int32_t DefaultMaximumOfBackLog = SOMAXCONN;
-        const ::int32_t DefaultSockLinger = 0;
+        constexpr ::int32_t gDefaultMaximumOfBackLog = SOMAXCONN;
 
-        const ::int32_t DefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
-        const ::int32_t DefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
+        static const ::int32_t gDefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
+        static const ::int32_t gDefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
 
-        const ::int32_t DefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
-        const ::int32_t DefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
+        static const ::int32_t gDefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
+        static const ::int32_t gDefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
     } // namespace
 } // namespace nets
 

@@ -62,7 +62,7 @@ namespace nets
     void SocketChannelHandlerPipeline::fireSocketChannelConnect(const InetSockAddress& localAddress,
                                                                 const InetSockAddress& peerAddress)
     {
-        for (auto& channelHandler: channelHandlers_)
+        for (auto& channelHandler : channelHandlers_)
         {
             channelHandler->channelConnect(*channelContext_, localAddress, peerAddress);
         }
@@ -70,7 +70,7 @@ namespace nets
 
     void SocketChannelHandlerPipeline::fireSocketChannelDisconnect()
     {
-        for (auto& channelHandler: channelHandlers_)
+        for (auto& channelHandler : channelHandlers_)
         {
             channelHandler->channelDisconnect(*channelContext_);
         }
@@ -78,7 +78,7 @@ namespace nets
 
     void SocketChannelHandlerPipeline::fireSocketChannelRead(ByteBuffer& message)
     {
-        for (auto& channelHandler: channelHandlers_)
+        for (auto& channelHandler : channelHandlers_)
         {
             channelHandler->channelRead(*channelContext_, message);
         }

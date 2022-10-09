@@ -24,6 +24,7 @@ namespace nets
         // default options
         channelOptions_[SockOption::REUSE_ADDR] = true;
         channelOptions_[SockOption::REUSE_PORT] = true;
+        channelOptions_[SockOption::BACKLOG] = gDefaultMaximumOfBackLog;
         childOptions_[SockOption::REUSE_ADDR] = true;
         childOptions_[SockOption::REUSE_PORT] = true;
     }
@@ -43,18 +44,38 @@ namespace nets
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
-        for (const auto& channelOption: channelOptions_)
+        for (const auto& channelOption : channelOptions_)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
         channelOptions_.clear();
         assert(channelOptions_.empty());
         socket::bind(sockFd_, localAddress);
+        if (backlog_ > gDefaultMaximumOfBackLog || backlog_ <= 0)
+        {
+            backlog_ = gDefaultMaximumOfBackLog;
+        }
         socket::listen(sockFd_, backlog_);
         addEvent(gReadEvent);
         if (!registerTo())
         {
             THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
+        }
+    }
+
+    void ServerSocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
+    {
+        for (const auto& it : channelOptions)
+        {
+            channelOptions_.insert_or_assign(it.first, it.second);
+        }
+    }
+
+    void ServerSocketChannel::setChildOptions(const ChannelOptionList& childOptions)
+    {
+        for (const auto& it : childOptions)
+        {
+            childOptions_.insert_or_assign(it.first, it.second);
         }
     }
 
@@ -87,7 +108,7 @@ namespace nets
     void ServerSocketChannel::initSocketChannel(SocketChannelPtr& socketChannel)
     {
         socketChannel->setChannelOptions(childOptions_);
-        for (const auto& childHandler: childHandlers_)
+        for (const auto& childHandler : childHandlers_)
         {
             assert(childHandler.use_count() == 1);
             socketChannel->pipeline().addLast(childHandler);

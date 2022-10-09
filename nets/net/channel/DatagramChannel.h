@@ -27,10 +27,7 @@ namespace nets
             return channelHandlerPipeline_;
         }
 
-        inline void setChannelOptions(const ChannelOptionList& channelOptions)
-        {
-            channelOptions_.insert(channelOptions.begin(), channelOptions.end());
-        }
+        void setChannelOptions(const ChannelOptionList& channelOptions);
 
         void bind(const InetSockAddress& localAddress);
 

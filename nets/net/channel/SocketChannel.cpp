@@ -16,7 +16,7 @@ namespace nets
 {
     namespace
     {
-        const SocketChannel::SizeType gRecvBufferSize = DefaultTcpSockRecvBufferSize >> 2;
+        static const SocketChannel::SizeType gRecvBufferSize = gDefaultTcpSockRecvBufferSize >> 2;
         constexpr ::int32_t gMaxCountOfWriteVOnce = IOV_MAX >> 2;
     } // namespace
 
@@ -42,7 +42,7 @@ namespace nets
 
     void SocketChannel::setChannelOptions(const ChannelOptionList& channelOptions)
     {
-        for (const auto& channelOption: channelOptions)
+        for (const auto& channelOption : channelOptions)
         {
             setChannelOption(channelOption.first, channelOption.second);
         }
