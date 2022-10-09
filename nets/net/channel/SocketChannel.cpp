@@ -8,7 +8,7 @@
 #include <thread>
 #include <utility>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
@@ -66,7 +66,7 @@ namespace nets
             {
                 deregister();
             }
-            LOGS_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
+            NETS_SYSTEM_LOG_ERROR << "SocketChannel channelActive failed,cause " << exception.what();
         }
     }
 
@@ -131,7 +131,7 @@ namespace nets
     {
         if (state_ == ChannelState::INACTIVE)
         {
-            LOGS_WARN << "SocketChannel handleReadEvent,but wrong state " << state_;
+            NETS_SYSTEM_LOG_WARN << "SocketChannel handleReadEvent,but wrong state " << state_;
             return;
         }
         ByteBuffer byteBuffer(gRecvBufferSize);
@@ -167,7 +167,7 @@ namespace nets
     {
         if (state_ == ChannelState::INACTIVE)
         {
-            LOGS_WARN << "SocketChannel handleWriteEvent,but wrong state " << state_;
+            NETS_SYSTEM_LOG_WARN << "SocketChannel handleWriteEvent,but wrong state " << state_;
             return;
         }
         assert(!writeBuffer_.empty());
@@ -225,7 +225,7 @@ namespace nets
         {
             return;
         }
-        LOGS_WARN << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
+        NETS_SYSTEM_LOG_WARN << "SocketChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
         channelInActive();
     }
 
@@ -274,7 +274,7 @@ namespace nets
     {
         if (state_ == ChannelState::INACTIVE)
         {
-            LOGS_ERROR << "SocketChannel write,but wrong state " << state_;
+            NETS_SYSTEM_LOG_ERROR << "SocketChannel write,but wrong state " << state_;
             return;
         }
         if (length == 0)
@@ -445,7 +445,7 @@ namespace nets
             case ENOTCONN:
             case ENOTSOCK:
             default:
-                LOGS_ERROR << "SocketChannel handleReadError unexpected error,errno=" << errNum;
+                NETS_SYSTEM_LOG_ERROR << "SocketChannel handleReadError unexpected error,errno=" << errNum;
                 channelInActive();
                 break;
         }
@@ -472,7 +472,7 @@ namespace nets
             case EPERM:
             case EPIPE:
             default:
-                LOGS_ERROR << "SocketChannel handleWriteError unexpected error,errno=" << errNum;
+                NETS_SYSTEM_LOG_ERROR << "SocketChannel handleWriteError unexpected error,errno=" << errNum;
                 channelInActive();
                 break;
         }
@@ -507,7 +507,7 @@ namespace nets
                 socket::shutdown(sockFd_, how);
                 break;
             default:
-                LOGS_ERROR << "SocketChannel unknown shutdown operation";
+                NETS_SYSTEM_LOG_ERROR << "SocketChannel unknown shutdown operation";
                 break;
         }
     }

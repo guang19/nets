@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
 namespace nets
@@ -140,13 +140,13 @@ namespace nets
         }
         else
         {
-            LOGS_WARN << "DatagramChannel handleReadEvent read 0 bytes";
+            NETS_SYSTEM_LOG_WARN << "DatagramChannel handleReadEvent read 0 bytes";
         }
     }
 
     void DatagramChannel::handleErrorEvent()
     {
-        LOGS_ERROR << "DatagramChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
+        NETS_SYSTEM_LOG_ERROR << "DatagramChannel handleErrorEvent,errNum=" << socket::getSockError(sockFd_);
     }
 
     SSizeType DatagramChannel::doWrite(const void* data, SizeType length, const InetSockAddress& recipient)
@@ -158,7 +158,7 @@ namespace nets
         SSizeType bytes = socket::sendTo(sockFd_, data, length, recipient);
         if (bytes <= 0)
         {
-            LOGS_ERROR << "DatagramChannel occurred unexpected exception while sendto,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "DatagramChannel occurred unexpected exception while sendto,errno=" << errno;
         }
         return bytes;
     }
@@ -186,7 +186,7 @@ namespace nets
             case EOPNOTSUPP:
             case ETIMEDOUT:
             default:
-                LOGS_ERROR << "DatagramChannel handleReadError unexpected error,errno=" << errNum;
+                NETS_SYSTEM_LOG_ERROR << "DatagramChannel handleReadError unexpected error,errno=" << errNum;
                 break;
         }
     }

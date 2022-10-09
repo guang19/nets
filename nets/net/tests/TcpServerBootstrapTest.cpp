@@ -15,19 +15,19 @@ public:
     void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                         const InetSockAddress& peerAddress) override
     {
-        LOGS_DEBUG << "isActive=" << channelContext.isActive();
-        LOGS_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
+        NETS_SYSTEM_LOG_DEBUG << "isActive=" << channelContext.isActive();
+        NETS_SYSTEM_LOG_DEBUG << "Server channelConnect ====local address:" << localAddress.toString()
                    << " client address:" << peerAddress.toString();
     }
 
     void channelDisconnect(SocketChannelContext& channelContext) override
     {
-        LOGS_DEBUG << "Server channelDisconnect:" << channelContext.peerAddress().toString();
+        NETS_SYSTEM_LOG_DEBUG << "Server channelDisconnect:" << channelContext.peerAddress().toString();
     }
 
     void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
     {
-        LOGS_DEBUG << "Server recv client message is:" << message.toString();
+        NETS_SYSTEM_LOG_DEBUG << "Server recv client message is:" << message.toString();
         //        channelContext.write(message);
         channelContext.write(message,
                              [this](SocketChannelContext& ctx)
@@ -38,7 +38,7 @@ public:
 
     void writeComplete(SocketChannelContext& channelContext)
     {
-        LOGS_DEBUG << "Server writeComplete";
+        NETS_SYSTEM_LOG_DEBUG << "Server writeComplete";
         channelContext.write("server writeComplete");
     }
 };
@@ -65,8 +65,8 @@ public:
     void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                         const InetSockAddress& peerAddress) override
     {
-        LOGS_DEBUG << "isActive=" << channelContext.isActive();
-        LOGS_DEBUG << "Client channelConnect ====local address:" << localAddress.toString()
+        NETS_SYSTEM_LOG_DEBUG << "isActive=" << channelContext.isActive();
+        NETS_SYSTEM_LOG_DEBUG << "Client channelConnect ====local address:" << localAddress.toString()
                    << " server address:" << peerAddress.toString();
         //        ByteBuffer byteBuffer {};
         //        byteBuffer.writeInt8(1);
@@ -119,19 +119,19 @@ public:
 
     void channelDisconnect(SocketChannelContext& channelContext) override
     {
-        LOGS_DEBUG << "Client channelDisconnect:" << channelContext.peerAddress().toString();
+        NETS_SYSTEM_LOG_DEBUG << "Client channelDisconnect:" << channelContext.peerAddress().toString();
     }
 
     void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
     {
-        LOGS_DEBUG << "Client recv server message is:" << message.toString();
+        NETS_SYSTEM_LOG_DEBUG << "Client recv server message is:" << message.toString();
         //        channelContext.write(message);
     }
 
     void writeComplete(SocketChannelContext& channelContext)
     {
-        LOGS_DEBUG << "Client writeComplete";
-        LOGS_DEBUG << "isActive=" << channelContext.isActive();
+        NETS_SYSTEM_LOG_DEBUG << "Client writeComplete";
+        NETS_SYSTEM_LOG_DEBUG << "isActive=" << channelContext.isActive();
     }
 };
 

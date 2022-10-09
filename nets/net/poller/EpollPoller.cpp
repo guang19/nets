@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <unistd.h>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 
 namespace nets
 {
@@ -39,7 +39,7 @@ namespace nets
         ::int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<::int32_t>(size), timeoutMs);
         if (numOfReadyEvents > 0)
         {
-            LOGS_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvents << " events";
+            NETS_SYSTEM_LOG_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvents << " events";
             prepareChannelReadyEvents(numOfReadyEvents, activeChannels);
             if (static_cast<SizeType>(numOfReadyEvents) >= size)
             {
@@ -53,7 +53,7 @@ namespace nets
         }
         else if (numOfReadyEvents < 0)
         {
-            LOGS_ERROR << "EpollPoller epoll error,errNum=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "EpollPoller epoll error,errNum=" << errno;
         }
     }
 
@@ -65,7 +65,7 @@ namespace nets
             activeChannels.push_back(channel);
             EventType revents = events_[i].events;
             channel->setReadyEvents(gNoneEvent);
-            LOGS_DEBUG << "revents=" << revents << " [revents & EPOLLIN=" << (revents & EPOLLIN)
+            NETS_SYSTEM_LOG_DEBUG << "revents=" << revents << " [revents & EPOLLIN=" << (revents & EPOLLIN)
                        << "] [revents & EPOLLERR=" << (revents & EPOLLERR)
                        << "] [revents & EPOLLHUP=" << (revents & EPOLLHUP)
                        << "] [revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
@@ -149,7 +149,7 @@ namespace nets
         {
             return true;
         }
-        LOGS_ERROR << "EpollPoller epollCtl [" << epollOptToString(opt) << "] failed";
+        NETS_SYSTEM_LOG_ERROR << "EpollPoller epollCtl [" << epollOptToString(opt) << "] failed";
         return false;
     }
 

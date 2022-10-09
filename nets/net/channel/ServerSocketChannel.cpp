@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 #include "nets/net/exception/ServerSocketChannelException.h"
@@ -86,7 +86,7 @@ namespace nets
         FdType connFd = socket::gInvalidFd;
         if ((connFd = socket::accept(sockFd_, peerAddr)) >= 0)
         {
-            LOGS_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
+            NETS_SYSTEM_LOG_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
             InetSockAddress localAddr {};
             socket::getLocalAddress(connFd, localAddr);
             auto socketChannel = ::std::make_shared<SocketChannel>(connFd, localAddr, peerAddr, nextEventLoopFn_());
@@ -126,18 +126,18 @@ namespace nets
             // EAGAIN/EWOULDBLOCK is not an error
             // EWOULDBLOCK
             case EAGAIN:
-                LOGS_WARN << "ServerSocketChannel accpet EAGAIN";
+                NETS_SYSTEM_LOG_WARN << "ServerSocketChannel accpet EAGAIN";
                 break;
             // allow retry
             case EINTR:
             case EPROTO:
             case ECONNABORTED:
-                LOGS_ERROR << "ServerSocketChannel occurred expected exception while accepting,errno=" << errNum;
+                NETS_SYSTEM_LOG_ERROR << "ServerSocketChannel occurred expected exception while accepting,errno=" << errNum;
                 break;
             // the per-process limit on the number of open file descriptors has been reached
             case EMFILE:
             {
-                LOGS_ERROR << "ServerSocketChannel accpet EMFILE";
+                NETS_SYSTEM_LOG_ERROR << "ServerSocketChannel accpet EMFILE";
                 socket::dealwithEMFILE(idleFd_, sockFd_);
                 break;
             }

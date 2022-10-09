@@ -214,16 +214,16 @@ namespace nets
 
     void Channel::handleReadEvent()
     {
-        LOGS_DEBUG << "Channel::handleReadEvent";
+        NETS_SYSTEM_LOG_DEBUG << "Channel::handleReadEvent";
     }
 
     void Channel::handleWriteEvent()
     {
-        LOGS_DEBUG << "Channel::handleWriteEvent";
+        NETS_SYSTEM_LOG_DEBUG << "Channel::handleWriteEvent";
     }
 
     void Channel::handleErrorEvent()
     {
-        LOGS_DEBUG << "Channel::handleErrorEvent";
+        NETS_SYSTEM_LOG_DEBUG << "Channel::handleErrorEvent";
     }
 } // namespace nets

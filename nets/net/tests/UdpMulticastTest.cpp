@@ -74,20 +74,20 @@ public:
     {
         if (channelContext.joinIpv4MulticastGroupByIfAddr(gMulticastIp, gMulticastLocalAddr))
         {
-            LOGS_DEBUG << "TestUdpRecipientHandler::channelActive joinIpv4MulticastGroupByIfAddr success";
+            NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive joinIpv4MulticastGroupByIfAddr success";
         }
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
-        LOGS_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
+        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
         count_++;
         if (count_ == 5)
         {
             if (channelContext.leaveIpv4MulticastGroupByIfAddr(gMulticastIp, gMulticastLocalAddr))
             {
-                LOGS_DEBUG << "TestUdpRecipientHandler::channelActive leaveIpv4MulticastGroupByIfAddr success";
+                NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive leaveIpv4MulticastGroupByIfAddr success";
             }
         }
     }
@@ -127,7 +127,7 @@ class TestUdpMulticastSenderHandler : public DatagramChannelHandler
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
-        LOGS_DEBUG << "TestUdpRecipientHandler::channelActive";
+        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive";
         channelContext.channel().eventLoop()->scheduleAtFixedDelay(2000, 2000,
                                                                    [&]()
                                                                    {

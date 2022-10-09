@@ -12,7 +12,7 @@
 #include <memory>
 #include <vector>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/base/ThreadHelper.h"
 #include "nets/base/timer/TimerManager.h"
@@ -149,13 +149,13 @@ namespace nets
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
+                NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
+                NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
@@ -181,13 +181,13 @@ namespace nets
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
+                NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "EventLoop exception caught during thread [" << currentTid()
+                NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
                            << "] execution in event loop thread [" << threadId_ << "]";
             }
         };

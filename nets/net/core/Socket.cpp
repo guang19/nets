@@ -11,7 +11,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/exception/SocketCreationException.h"
 #include "nets/net/exception/SocketOperationException.h"
 
@@ -55,7 +55,7 @@ namespace nets::socket
         {
             if (::close(fd) == -1)
             {
-                LOGS_ERROR << "socket closeFd " << fd << " failed,errno=" << errno;
+                NETS_SYSTEM_LOG_ERROR << "socket closeFd " << fd << " failed,errno=" << errno;
             }
         }
     }
@@ -64,7 +64,7 @@ namespace nets::socket
     {
         if (::shutdown(sockFd, how) == -1)
         {
-            LOGS_ERROR << "socket shutdown " << shutdownHowToString(how) << " failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket shutdown " << shutdownHowToString(how) << " failed,errno=" << errno;
         }
     }
 
@@ -88,7 +88,7 @@ namespace nets::socket
         FdType idleFd = ::open("/dev/null", O_RDONLY | O_CLOEXEC);
         if (idleFd < 0)
         {
-            LOGS_ERROR << "socket createIdleFd failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket createIdleFd failed,errno=" << errno;
             return socket::gInvalidFd;
         }
         return idleFd;
@@ -170,7 +170,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(SockAddr6));
         if (::getsockname(fd, sockAddr.sockAddr(), &length) == -1)
         {
-            LOGS_ERROR << "socket getLocalAddress failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket getLocalAddress failed,errno=" << errno;
         }
     }
 
@@ -179,7 +179,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(SockAddr6));
         if (::getpeername(fd, sockAddr.sockAddr(), &length) == -1)
         {
-            LOGS_ERROR << "socket getPeerAddress failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket getPeerAddress failed,errno=" << errno;
         }
     }
 
@@ -190,7 +190,7 @@ namespace nets::socket
         if (::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &length) == -1)
         {
             int32_t errNum = errno;
-            LOGS_ERROR << "socket getSockError failed,errno=" << errNum;
+            NETS_SYSTEM_LOG_ERROR << "socket getSockError failed,errno=" << errNum;
             return errNum;
         }
         else
@@ -204,7 +204,7 @@ namespace nets::socket
         OptValType reuse = enable ? 1 : 0;
         if (::setsockopt(sockFd, SOL_SOCKET, SO_REUSEADDR, &reuse, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockAddrReuse failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockAddrReuse failed,errno=" << errno;
         }
     }
 
@@ -213,7 +213,7 @@ namespace nets::socket
         OptValType reuse = enable ? 1 : 0;
         if (::setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &reuse, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockPortReuse failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockPortReuse failed,errno=" << errno;
         }
     }
 
@@ -222,7 +222,7 @@ namespace nets::socket
         OptValType keepalive = enable ? 1 : 0;
         if (::setsockopt(sockFd, SOL_SOCKET, SO_KEEPALIVE, &keepalive, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepAlive failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockKeepAlive failed,errno=" << errno;
         }
     }
 
@@ -230,7 +230,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPIDLE, &idleTime, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepIdle failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockKeepIdle failed,errno=" << errno;
         }
     }
 
@@ -238,7 +238,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPCNT, &cnt, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepCnt failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockKeepCnt failed,errno=" << errno;
         }
     }
 
@@ -246,7 +246,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_TCP, TCP_KEEPINTVL, &interval, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockKeepIntvl failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockKeepIntvl failed,errno=" << errno;
         }
     }
 
@@ -255,7 +255,7 @@ namespace nets::socket
         OptValType noDelay = enable ? 1 : 0;
         if (::setsockopt(sockFd, IPPROTO_TCP, TCP_NODELAY, &noDelay, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setTcpNoDelay failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setTcpNoDelay failed,errno=" << errno;
         }
     }
 
@@ -272,7 +272,7 @@ namespace nets::socket
         }
         if (::fcntl(sockFd, F_SETFL, flags) == -1)
         {
-            LOGS_ERROR << "socket setSockNonBlock failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockNonBlock failed,errno=" << errno;
         }
     }
 
@@ -280,7 +280,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, SOL_SOCKET, SO_LINGER, &linger, static_cast<SockLenType>(sizeof(SockLinger))) == -1)
         {
-            LOGS_ERROR << "socket setSockLinger failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockLinger failed,errno=" << errno;
         }
     }
 
@@ -289,7 +289,7 @@ namespace nets::socket
         OptValType broadcast = enable ? 1 : 0;
         if (::setsockopt(sockFd, SOL_SOCKET, SO_BROADCAST, &broadcast, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockBroadcast failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockBroadcast failed,errno=" << errno;
         }
     }
 
@@ -299,7 +299,7 @@ namespace nets::socket
         ::inet_pton(AF_INET, ifAddr.data(), &inf.s_addr);
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &inf, static_cast<SockLenType>(sizeof(InAddr))) == -1)
         {
-            LOGS_ERROR << "socket setIpMulticastIf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setIpMulticastIf failed,errno=" << errno;
         }
     }
 
@@ -309,7 +309,7 @@ namespace nets::socket
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifIndex, static_cast<SockLenType>(sizeof(uint32_t))) ==
             -1)
         {
-            LOGS_ERROR << "socket setIpv6MulticastIf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setIpv6MulticastIf failed,errno=" << errno;
         }
     }
 
@@ -317,7 +317,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &ttl, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
         {
-            LOGS_ERROR << "socket setIpMulticastTTL failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setIpMulticastTTL failed,errno=" << errno;
         }
     }
 
@@ -325,7 +325,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
         {
-            LOGS_ERROR << "socket setIpv6MulticastHops failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setIpv6MulticastHops failed,errno=" << errno;
         }
     }
 
@@ -333,7 +333,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setIpMulticastLoop failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setIpMulticastLoop failed,errno=" << errno;
         }
     }
 
@@ -341,7 +341,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
         {
-            LOGS_ERROR << "socket setIpv6MulticastLoop failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setIpv6MulticastLoop failed,errno=" << errno;
         }
     }
 
@@ -354,7 +354,7 @@ namespace nets::socket
         group.imr_ifindex = 0;
         if (::setsockopt(sockFd, IPPROTO_IP, IP_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
-            LOGS_ERROR << "socket addIpMemberShipByIfAddr failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket addIpMemberShipByIfAddr failed,errno=" << errno;
             return false;
         }
         return true;
@@ -369,7 +369,7 @@ namespace nets::socket
         group.imr_ifindex = static_cast<int32_t>(::if_nametoindex(inf.data()));
         if (::setsockopt(sockFd, IPPROTO_IP, IPV6_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
-            LOGS_ERROR << "socket addIpMemberShipByIfIndex failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket addIpMemberShipByIfIndex failed,errno=" << errno;
             return false;
         }
         return true;
@@ -383,7 +383,7 @@ namespace nets::socket
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_JOIN_GROUP /*IPV6_ADD_MEMBERSHIP*/, &group,
                          static_cast<SockLenType>(sizeof(Ipv6Mreq))) == -1)
         {
-            LOGS_ERROR << "socket addIpv6MemberShip failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket addIpv6MemberShip failed,errno=" << errno;
             return false;
         }
         return true;
@@ -398,7 +398,7 @@ namespace nets::socket
         group.imr_ifindex = 0;
         if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
-            LOGS_ERROR << "socket dropIpMemberShipByIfAddr failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket dropIpMemberShipByIfAddr failed,errno=" << errno;
             return false;
         }
         return true;
@@ -413,7 +413,7 @@ namespace nets::socket
         group.imr_ifindex = static_cast<int32_t>(::if_nametoindex(inf.data()));
         if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
-            LOGS_ERROR << "socket dropIpMemberShipByIfIndex failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket dropIpMemberShipByIfIndex failed,errno=" << errno;
             return false;
         }
         return true;
@@ -427,7 +427,7 @@ namespace nets::socket
         if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_LEAVE_GROUP /*IPV6_DROP_MEMBERSHIP*/, &group,
                          static_cast<SockLenType>(sizeof(Ipv6Mreq))) == -1)
         {
-            LOGS_ERROR << "socket dropIpv6MemberShip failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket dropIpv6MemberShip failed,errno=" << errno;
             return false;
         }
         return true;
@@ -437,7 +437,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &sendBufLen, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockSendBuf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockSendBuf failed,errno=" << errno;
         }
     }
 
@@ -445,7 +445,7 @@ namespace nets::socket
     {
         if (::setsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &recvBufLen, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
-            LOGS_ERROR << "socket setSockRecvBuf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket setSockRecvBuf failed,errno=" << errno;
         }
     }
 
@@ -456,7 +456,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(OptValType));
         if (::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getTcpSockSendBuf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket getTcpSockSendBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;
@@ -469,7 +469,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(OptValType));
         if (::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getTcpSockRecvBuf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket getTcpSockRecvBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;
@@ -482,7 +482,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(OptValType));
         if (::getsockopt(sockFd, SOL_SOCKET, SO_SNDBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getUdpSockSendBuf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket getUdpSockSendBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;
@@ -495,7 +495,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(OptValType));
         if (::getsockopt(sockFd, SOL_SOCKET, SO_RCVBUF, &optVal, &length) == -1)
         {
-            LOGS_ERROR << "socket getUdpSockRecvBuf failed,errno=" << errno;
+            NETS_SYSTEM_LOG_ERROR << "socket getUdpSockRecvBuf failed,errno=" << errno;
         }
         socket::closeFd(sockFd);
         return optVal;

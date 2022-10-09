@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/exception/InetSockAddressException.h"
 
 namespace nets

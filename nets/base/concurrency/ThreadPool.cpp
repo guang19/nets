@@ -38,7 +38,7 @@ namespace nets
                       corePoolSize_, maximumPoolSize_);
         }
         threadPool_.reserve(maximumPoolSize_);
-        LOGS_INFO << "ThreadPool thread pool [" << name_ << "] init success";
+        NETS_SYSTEM_LOG_INFO << "ThreadPool thread pool [" << name_ << "] init success";
     }
 
     ThreadPool::~ThreadPool()
@@ -50,7 +50,7 @@ namespace nets
     {
         if (isShutdown(ctl_))
         {
-            LOGS_DEBUG << "ThreadPool thread pool [" << name_ << "] has been shutdown";
+            NETS_SYSTEM_LOG_DEBUG << "ThreadPool thread pool [" << name_ << "] has been shutdown";
             return;
         }
         // cas
@@ -79,7 +79,7 @@ namespace nets
             taskQueue_->tryPop(tmpTask);
         }
         assert(taskQueue_->isEmpty());
-        LOGS_INFO << "ThreadPool thread pool [" << name_ << "] shutdown success";
+        NETS_SYSTEM_LOG_INFO << "ThreadPool thread pool [" << name_ << "] shutdown success";
     }
 
     void ThreadPool::runThread(ThreadWrapperRawPtr threadWrapper)

@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/poller/Poller.h"
 
 namespace nets
@@ -35,14 +35,14 @@ namespace nets
         }
         notifier_->addEvent(gReadEvent);
         registerChannel(notifier_);
-        LOGS_INFO << "EventLoop one event loop is created in thread " << threadId_;
+        NETS_SYSTEM_LOG_INFO << "EventLoop one event loop is created in thread " << threadId_;
     }
 
     EventLoop::~EventLoop()
     {
         deregisterChannel(notifier_);
         gCurrentThreadEventLoop = nullptr;
-        LOGS_INFO << "EventLoop one event loop is destroyed in thread " << threadId_;
+        NETS_SYSTEM_LOG_INFO << "EventLoop one event loop is destroyed in thread " << threadId_;
     }
 
     void EventLoop::run()

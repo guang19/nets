@@ -7,7 +7,7 @@
 #include <cassert>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/ChannelRegisterException.h"
 
@@ -38,13 +38,13 @@ namespace nets
     {
         if (state_ != ConnectionState::CONNECTING)
         {
-            LOGS_WARN << "ConnectorChannel handleWriteEvent connectionState=" << state_;
+            NETS_SYSTEM_LOG_WARN << "ConnectorChannel handleWriteEvent connectionState=" << state_;
             return;
         }
         ::int32_t errNum = socket::getSockError(sockFd_);
         if (errNum != 0)
         {
-            LOGS_ERROR << "ConnectorChannel handleWriteEvent unable to connect to " << peerAddress_.toString()
+            NETS_SYSTEM_LOG_ERROR << "ConnectorChannel handleWriteEvent unable to connect to " << peerAddress_.toString()
                        << ",errNum=" << errNum;
             handleErrorEvent();
         }
@@ -179,7 +179,7 @@ namespace nets
             case ENOTSOCK:
             case EPROTOTYPE:
             default:
-                LOGS_ERROR << "ConnectorChannel occurred unexpected exception while connecting,errno=" << errNum;
+                NETS_SYSTEM_LOG_ERROR << "ConnectorChannel occurred unexpected exception while connecting,errno=" << errNum;
                 break;
         }
     }
@@ -201,7 +201,7 @@ namespace nets
             {
                 deregister();
             }
-            LOGS_ERROR << "ConnectorChannel waitConnect failed,cause " << exception.what();
+            NETS_SYSTEM_LOG_ERROR << "ConnectorChannel waitConnect failed,cause " << exception.what();
             if (retry_)
             {
                 reconnect();
@@ -211,7 +211,7 @@ namespace nets
 
     void ConnectorChannel::reconnect()
     {
-        LOGS_WARN << "ConnectorChannel reconnect";
+        NETS_SYSTEM_LOG_WARN << "ConnectorChannel reconnect";
         assert(state_ != ConnectionState::CONNECTED);
         state_ = ConnectionState::DISCONNECTED;
         socket::closeFd(sockFd_);

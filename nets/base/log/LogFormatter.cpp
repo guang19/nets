@@ -6,6 +6,7 @@
 
 #include "nets/base/CommonMacro.h"
 #include "nets/base/exception/DateTimeFormatException.h"
+#include "nets/base/log/Logger.h"
 #include "nets/base/ThreadHelper.h"
 
 namespace nets
@@ -19,7 +20,7 @@ namespace nets
         /**
          * log time cache
          */
-        __thread ILogFormatter::Tm gCacheTms {};
+        __thread LogFormatter::Tm gCacheTms {};
         __thread Timestamp::TimeType gCacheSeconds {0};
     } // namespace
 
@@ -49,7 +50,7 @@ namespace nets
         logBufferStream << timeBuf;
     }
 
-    void DefaultLogFormatter::formatLogMessage(LogMessage& logMessage, LogBufferStream& logBufferStream)
+    void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBufferStream& logBufferStream)
     {
         formatLogTime(logMessage.getTime(), logBufferStream);
         logBufferStream << " [" << currentTid() << "] ";
@@ -58,7 +59,7 @@ namespace nets
         logBufferStream << logMessage.getStream();
     }
 
-    ::std::shared_ptr<ILogFormatter> LogFormatterFactory::getLogFormatter()
+    ::std::shared_ptr<LogFormatter> LogFormatterFactory::getLogFormatter()
     {
         return DefaultLogFormatter::getInstance();
     }

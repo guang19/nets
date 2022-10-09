@@ -67,7 +67,7 @@ namespace nets
                 }
                 case SIGSEGV:
                 {
-                    LOGS_ERROR << "handleSignal SIGSEGV backtrace info:\n" << STACK_TRACE;
+                    NETS_SYSTEM_LOG_ERROR << "handleSignal SIGSEGV backtrace info:\n" << STACK_TRACE;
                     THROW_FMT(SegmentationFaultException, "segmentation fault,errno=%d,si_uid=%d,si_pid=%d", info->si_errno,
                               info->si_uid, info->si_pid);
                     break;

@@ -14,7 +14,7 @@
 #include <vector>
 
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 #include "nets/base/ThreadHelper.h"
 
 namespace nets
@@ -175,7 +175,7 @@ namespace nets
         assert(isRunning(ctl));
         if (isShutdown(ctl))
         {
-            LOGS_WARN << "ThreadPool thread pool [" << name_ << "] has been shutdown";
+            NETS_SYSTEM_LOG_WARN << "ThreadPool thread pool [" << name_ << "] has been shutdown";
             return false;
         }
         // if num of active threads less than num of corePoolSize
@@ -219,13 +219,13 @@ namespace nets
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
+                NETS_SYSTEM_LOG_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
                            << "] execution in thread pool [" << name_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
+                NETS_SYSTEM_LOG_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
                            << "] execution in thread pool [" << name_ << ']';
             }
         };
@@ -253,13 +253,13 @@ namespace nets
             catch (const ::std::exception& exception)
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
-                LOGS_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
+                NETS_SYSTEM_LOG_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
                            << "] execution in thread pool [" << name_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
-                LOGS_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
+                NETS_SYSTEM_LOG_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
                            << "] execution in thread pool [" << name_ << ']';
             }
         };

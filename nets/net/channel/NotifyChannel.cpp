@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <sys/eventfd.h>
 
-#include "nets/base/log/Logging.h"
+#include "nets/base/log/Logger.h"
 
 namespace nets
 {
@@ -36,7 +36,7 @@ namespace nets
         SSizeType n = socket::write(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
-            LOGS_ERROR << "NotifyChannel notify failed";
+            NETS_SYSTEM_LOG_ERROR << "NotifyChannel notify failed";
         }
     }
 
@@ -46,7 +46,7 @@ namespace nets
         SSizeType n = socket::read(eventFd_, &i, sizeof(i));
         if (n != sizeof(i))
         {
-            LOGS_ERROR << "NotifyChannel read failed";
+            NETS_SYSTEM_LOG_ERROR << "NotifyChannel read failed";
         }
     }
 } // namespace nets
