@@ -2,20 +2,22 @@
 // Created by guang19
 //
 
-#ifndef NETS_LOG_BUFFER_STREAM_H
-#define NETS_LOG_BUFFER_STREAM_H
+#ifndef NETS_LOG_BUFFER_H
+#define NETS_LOG_BUFFER_H
 
 #include "nets/base/StackBuffer.h"
 
 namespace nets
 {
-    class LogBufferStream : Noncopyable
+    namespace
     {
-    private:
         // log length limit: 2K
         static constexpr SizeType kLogBufferSize = (1024 << 1);
         using LogBuffer = StackBuffer<kLogBufferSize>;
+    }
 
+    class LogBufferStream : Noncopyable
+    {
     public:
         LogBufferStream();
         ~LogBufferStream() = default;
@@ -49,4 +51,4 @@ namespace nets
     };
 } // namespace nets
 
-#endif // NETS_LOG_BUFFER_STREAM_H
+#endif // NETS_LOG_BUFFER_H

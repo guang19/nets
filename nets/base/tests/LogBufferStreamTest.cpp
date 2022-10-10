@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "nets/base/log/LogBufferStream.h"
+#include "nets/base/log/LogBuffer.h"
 #include <iostream>
 
 using namespace nets;

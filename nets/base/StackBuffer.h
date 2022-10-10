@@ -27,8 +27,6 @@ namespace nets
     class StackBuffer : Noncopyable
     {
     public:
-        using IntType = ::int32_t;
-        using LongType = ::int64_t;
         using StringType = ::std::string;
 
     public:
@@ -63,6 +61,16 @@ namespace nets
         void writeString(const StringType& str)
         {
             writeBytes(str.data(), str.length());
+        }
+
+        void writeBytes(const char* data)
+        {
+            writeBytes(data, ::strlen(data));
+        }
+
+        void writeBytes(const StackBuffer<SIZE>& buffer)
+        {
+            writeBytes(&buffer.buffer_[0], buffer.writerIndex_);
         }
 
         void writeBytes(const char* data, SizeType length)

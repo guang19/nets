@@ -2,7 +2,7 @@
 // Created by guang19
 //
 
-#include "nets/base/log/LogBufferStream.h"
+#include "nets/base/log/LogBuffer.h"
 
 namespace nets
 {

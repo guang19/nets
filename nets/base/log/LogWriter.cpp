@@ -4,8 +4,6 @@
 
 #include "nets/base/log/LogWriter.h"
 
-#include <cassert>
-
 namespace nets
 {
     INIT_SINGLETON(AsyncLogWriter);

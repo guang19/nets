@@ -6,5 +6,10 @@
 
 namespace nets
 {
+    INIT_SINGLETON(StdoutLogAppender);
 
-}
+    void StdoutLogAppender::append(const LogBuffer& logBuffer)
+    {
+        ::fwrite(logBuffer.array(), sizeof(char), logBuffer.length(), stdout);
+    }
+} // namespace nets

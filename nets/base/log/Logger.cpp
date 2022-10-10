@@ -4,8 +4,6 @@
 
 #include "nets/base/log/Logger.h"
 
-#include "nets/base/log/LogWriter.h"
-
 namespace nets
 {
     namespace
@@ -33,7 +31,6 @@ namespace nets
 
     LogMessageStream::~LogMessageStream()
     {
-        logMessage_.getStream() << '\n';
         logger_->log(logMessage_.getLevel(), logMessage_);
     }
 
@@ -60,17 +57,18 @@ namespace nets
     void Logger::log(LogLevel level, const LogMessage& logMessage)
     {
         // format
+        LogBuffer logBuffer {};
+        logFormatter_->formatLogMessage(logMessage, logBuffer);
         // append
-        LogBufferStream logBufferStream {};
-        LOG_FORMATTER->formatLogMessage(logMessage, logBufferStream);
-        LOG_WRITER->write(logBufferStream.buffer().array(), logBufferStream.buffer().length());
-        if (logMessage.getLevel() == LogLevel::FATAL)
-        {
-            // if exit directly, log buffer in memory probably will lost
-            ::std::this_thread::sleep_for(::std::chrono::milliseconds(kMillisecondsPerSecond));
-            ::fprintf(stderr, "log fatal,exit\n");
-            ::exit(1);
-        }
+        logAppender_->append(logBuffer);
+        //        LOG_WRITER->write(logBufferStream.buffer().array(), logBufferStream.buffer().length());
+        //        if (logMessage.getLevel() == LogLevel::FATAL)
+        //        {
+        // if exit directly, log buffer in memory probably will lost
+        //            ::std::this_thread::sleep_for(::std::chrono::milliseconds(kMillisecondsPerSecond));
+        //            ::fprintf(stderr, "log fatal,exit\n");
+        //            ::exit(1);
+        //        }
     }
 
     void Logger::trace(const LogMessage& logMessage)
@@ -118,6 +116,8 @@ namespace nets
         else
         {
             auto logger = ::std::make_shared<Logger>(loggerName);
+            logger->setLogFormatter(DefaultLogFormatter::getInstance());
+            logger->setLogAppender(StdoutLogAppender::getInstance());
             loggers_[loggerName] = logger;
             return logger;
         }
@@ -125,8 +125,6 @@ namespace nets
 
     LoggerPtr LoggerManager::getRootLogger()
     {
-        auto logger = getLogger(kRootLoggerName);
-        logger->setLevel(LogLevel::DEBUG);
-        return logger;
+        return getLogger(kRootLoggerName);
     }
 } // namespace nets

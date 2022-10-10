@@ -10,10 +10,6 @@
 #include "nets/base/log/LogAppender.h"
 #include "nets/base/log/LogFormatter.h"
 
-#ifndef LOG_LEVEL
-#define LOG_LEVEL nets::LogLevel::DEBUG
-#endif
-
 #define NETS_LOG(LOGGER, LEVEL)                                                                                             \
     if (LEVEL >= LOGGER->getLevel())                                                                                        \
     nets::LogMessageStream(LOGGER, LEVEL, __FILE__, __LINE__).stream()

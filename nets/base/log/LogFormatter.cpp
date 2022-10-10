@@ -4,6 +4,8 @@
 
 #include "nets/base/log/LogFormatter.h"
 
+#include <cassert>
+
 #include "nets/base/CommonMacro.h"
 #include "nets/base/exception/DateTimeFormatException.h"
 #include "nets/base/log/Logger.h"
@@ -17,14 +19,23 @@ namespace nets
     {
         const char* const kLogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
+        constexpr ::int32_t kMaxLengthOfLogTimePortion = 52;
+        constexpr char kLf = '\n';
+        constexpr char kSpace = ' ';
+        constexpr char kColon = ':';
+        constexpr char kOpenSquareBracket[2] = {kSpace, '['};
+        constexpr char kCloseSquareBracket[2] = {']', kSpace};
+        constexpr char kDash[3] = {kSpace, '-', kSpace};
+
         /**
          * log time cache
          */
-        __thread LogFormatter::Tm tCacheTms {};
+        using Tm = struct tm;
+        __thread Tm tCacheTms {};
         __thread Timestamp::TimeType tCacheSeconds {0};
     } // namespace
 
-    void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBufferStream& logBufferStream)
+    void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer)
     {
         Tm tms {};
         Timestamp::TimeType seconds = logTime.secondsSinceEpoch();
@@ -41,26 +52,28 @@ namespace nets
         {
             tms = tCacheTms;
         }
-        char timeBuf[27] = {0};
+        char timeBuf[kMaxLengthOfLogTimePortion] = {0};
         // check return value to circumvent [-Werror=format-truncation]
         ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%06ld", tms.tm_year + 1900, tms.tm_mon + 1,
-                   tms.tm_mday, tms.tm_hour, tms.tm_min, tms.tm_sec, logTime.microsPartOfTimestamp()) < 0
+                   tms.tm_mday, tms.tm_hour, tms.tm_min, tms.tm_sec, logTime.microsPartOfTimestamp()) <= 0
             ? THROW_FMT(DateTimeFormatException, "DefaultLogFormatter format log time")
             : UNUSED(0);
-        logBufferStream << timeBuf;
+        logBuffer.writeBytes(timeBuf);
     }
 
-    void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBufferStream& logBufferStream)
+    void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer)
     {
-        formatLogTime(logMessage.getTime(), logBufferStream);
-        logBufferStream << " [" << currentTid() << "] ";
-        logBufferStream << kLogLevelName[logMessage.getLevel()] << ' ';
-        logBufferStream << logMessage.getFile() << ':' << logMessage.getLine() << " - ";
-        logBufferStream << logMessage.getStream();
-    }
-
-    ::std::shared_ptr<LogFormatter> LogFormatterFactory::getLogFormatter()
-    {
-        return DefaultLogFormatter::getInstance();
+        formatLogTime(logMessage.getTime(), logBuffer);
+        logBuffer.writeBytes(kOpenSquareBracket, sizeof(kOpenSquareBracket));
+        logBuffer.writeInt32(currentTid());
+        logBuffer.writeBytes(kCloseSquareBracket, sizeof(kOpenSquareBracket));
+        logBuffer.writeBytes(kLogLevelName[logMessage.getLevel()]);
+        logBuffer.writeByte(kSpace);
+        logBuffer.writeBytes(logMessage.getFile());
+        logBuffer.writeByte(kColon);
+        logBuffer.writeInt32(logMessage.getLine());
+        logBuffer.writeBytes(kDash, sizeof(kDash));
+        logBuffer.writeBytes(logMessage.getStream().buffer());
+        logBuffer.writeByte(kLf);
     }
 } // namespace nets
