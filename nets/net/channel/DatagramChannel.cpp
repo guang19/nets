@@ -14,11 +14,11 @@ namespace nets
 {
     namespace
     {
-        static const ByteBuffer::SizeType gRecvPacketSize = gDefaultUdpSockRecvBufferSize >> 2;
+        static const ByteBuffer::SizeType kRecvPacketSize = kDefaultUdpSockRecvBufferSize >> 2;
     } // namespace
 
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::gInvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
+        : Channel(eventLoop), sockFd_(socket::kInvalidFd), channelHandlerPipeline_(new DatagramChannelContext(this)),
           channelOptions_()
     {
         channelOptions_[SockOption::REUSE_ADDR] = true;
@@ -66,7 +66,7 @@ namespace nets
         {
             socket::bind(sockFd_, localAddress);
         }
-        addEvent(gReadEvent);
+        addEvent(kReadEvent);
         if (!registerTo())
         {
             THROW_FMT(ChannelRegisterException, "DatagramChannel register failed");
@@ -126,7 +126,7 @@ namespace nets
 
     void DatagramChannel::handleReadEvent()
     {
-        ByteBuffer byteBuffer(gRecvPacketSize);
+        ByteBuffer byteBuffer(kRecvPacketSize);
         InetSockAddress srcAddr {};
         SSizeType bytes = byteBuffer.writeBytes(*this, byteBuffer.writableBytes(), srcAddr);
         if (bytes > 0)

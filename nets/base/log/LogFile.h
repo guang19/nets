@@ -50,8 +50,8 @@ namespace nets
         SizeType bytes_;
         TimeType lastRollTime_;
 
-        static constexpr ::size_t gFileIoBufferSize = 1024 * 256;
-        char buffer_[gFileIoBufferSize] {0};
+        static constexpr ::size_t kFileIoBufferSize = 1024 * 256;
+        char buffer_[kFileIoBufferSize] {0};
     };
 
 } // namespace nets

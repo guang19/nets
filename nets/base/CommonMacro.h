@@ -14,7 +14,10 @@
 
 namespace nets
 {
-    using StringType = ::std::string;
+    namespace
+    {
+        using StringType = ::std::string;
+    }
 
     StringType stackTrace();
 

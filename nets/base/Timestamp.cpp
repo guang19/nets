@@ -16,7 +16,7 @@ namespace nets
     Timestamp::Timestamp(const TimeVal& tmv) : Timestamp(tmv.tv_sec, tmv.tv_usec) {}
 
     Timestamp::Timestamp(TimeType secondsSinceEpoch, TimeType microseconds)
-        : microsecondsSinceEpoch_((secondsSinceEpoch * gMicrosecondsPerSecond) + microseconds)
+        : microsecondsSinceEpoch_((secondsSinceEpoch * kMicrosecondsPerSecond) + microseconds)
     {
     }
 

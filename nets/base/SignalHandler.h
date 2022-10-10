@@ -29,14 +29,14 @@ namespace nets
 
         static void handleSignal(SignoType signo, SigInfo* info, void* context)
         {
-            if (gSignalHandler != nullptr)
+            if (signalHandler_ != nullptr)
             {
-                gSignalHandler(signo, info, context);
+                signalHandler_(signo, info, context);
             }
         }
 
     private:
-        static SignalHandlerType gSignalHandler;
+        static SignalHandlerType signalHandler_;
     };
 } // namespace nets
 

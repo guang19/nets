@@ -13,8 +13,8 @@ namespace nets
     {
     private:
         // log length limit: 2K
-        static constexpr SizeType gLogBufferSize = (1024 << 1);
-        using LogBuffer = StackBuffer<gLogBufferSize>;
+        static constexpr SizeType kLogBufferSize = (1024 << 1);
+        using LogBuffer = StackBuffer<kLogBufferSize>;
 
     public:
         LogBufferStream();

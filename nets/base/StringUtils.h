@@ -9,7 +9,10 @@
 
 namespace nets::utils
 {
-    using StringType = std::string;
+    namespace
+    {
+        using StringType = std::string;
+    }
 
     void trim(StringType& str);
 } // namespace nets::utils

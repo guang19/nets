@@ -20,10 +20,10 @@ namespace nets
     {
         using EventType = ::uint32_t;
         // event type
-        constexpr EventType gNoneEvent = 0;
-        constexpr EventType gReadEvent = 0x01;
-        constexpr EventType gWriteEvent = 0x01 << 1;
-        constexpr EventType gErrorEvent = 0x01 << 2;
+        constexpr EventType kNoneEvent = 0;
+        constexpr EventType kReadEvent = 0x01;
+        constexpr EventType kWriteEvent = 0x01 << 1;
+        constexpr EventType kErrorEvent = 0x01 << 2;
     } // namespace
 
     class Channel : Noncopyable, public ::std::enable_shared_from_this<Channel>

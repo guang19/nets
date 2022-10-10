@@ -12,9 +12,9 @@ namespace nets
 
     namespace
     {
-        constexpr ::int32_t gMaximumOfLogBuffer = 40;
+        constexpr ::int32_t kMaximumOfLogBuffer = 40;
         // Log buffer flush interval,unit：milliseconds
-        constexpr ::time_t gLogBufferFlushInterval = 1000;
+        constexpr ::time_t kLogBufferFlushInterval = 1000;
     } // namespace
 
     AsyncLogWriter::AsyncLogWriter()
@@ -82,7 +82,7 @@ namespace nets
             {
                 UniqueLockType lock(mutex_);
                 // first determine whether the buffer vector is empty, and then determine whether cache buffer has data
-                cv_.wait_for(lock, ::std::chrono::milliseconds(gLogBufferFlushInterval),
+                cv_.wait_for(lock, ::std::chrono::milliseconds(kLogBufferFlushInterval),
                              [this]() -> bool
                              {
                                  return !buffers_.empty() || cacheBuffer_->length() > 0;
@@ -97,12 +97,12 @@ namespace nets
             }
             TimeType currentTime = 0;
             ::time(&currentTime);
-            if (tmpBuffers.size() > gMaximumOfLogBuffer)
+            if (tmpBuffers.size() > kMaximumOfLogBuffer)
             {
                 SizeType size = tmpBuffers.size();
                 char warning[255] = {0};
                 ::snprintf(warning, sizeof(warning), "Dropped %ldM logs\n",
-                           (size >> 1) * (gLogBufferPieceSize / 1024 / 1024));
+                           (size >> 1) * (kLogBufferPieceSize / 1024 / 1024));
                 logSynchronizer_->synchronize(warning, ::strlen(warning), currentTime);
                 tmpBuffers.erase(tmpBuffers.begin() + static_cast<::int64_t>((size >> 1)), tmpBuffers.end());
             }

@@ -25,7 +25,7 @@ namespace nets
 
     namespace socket
     {
-        constexpr FdType gInvalidFd = -1;
+        constexpr FdType kInvalidFd = -1;
 
         FdType createTcpSocket(SockAddrFamily family = AF_INET);
         FdType createUdpSocket(SockAddrFamily family = AF_INET);
@@ -106,13 +106,13 @@ namespace nets
 
     namespace
     {
-        constexpr ::int32_t gDefaultMaximumOfBackLog = SOMAXCONN;
+        constexpr ::int32_t kDefaultMaximumOfBackLog = SOMAXCONN;
 
-        static const ::int32_t gDefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
-        static const ::int32_t gDefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
+        static const ::int32_t kDefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
+        static const ::int32_t kDefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
 
-        static const ::int32_t gDefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
-        static const ::int32_t gDefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
+        static const ::int32_t kDefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
+        static const ::int32_t kDefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
     } // namespace
 } // namespace nets
 

@@ -18,9 +18,9 @@ namespace nets
     namespace
     {
         using SizeType = ::size_t;
-        constexpr char gDigits[] = {"0123456789"};
-        constexpr char gHexDigits[] = {"0123456789abcdef"};
-        constexpr ::int32_t gMaximumNumberLimit = ::std::numeric_limits<::uint64_t>::digits10 + 1;
+        constexpr char kDigits[] = {"0123456789"};
+        constexpr char kHexDigits[] = {"0123456789abcdef"};
+        constexpr ::int32_t kMaximumNumberLimit = ::std::numeric_limits<::uint64_t>::digits10 + 1;
     } // namespace
 
     template <SizeType SIZE>
@@ -122,14 +122,14 @@ namespace nets
         template <typename IntType>
         void writeInteger(IntType value)
         {
-            if (writableBytes() > gMaximumNumberLimit)
+            if (writableBytes() > kMaximumNumberLimit)
             {
                 char* buffer = buffer_ + writerIndex_;
                 char* tmp = buffer;
                 do
                 {
                     auto lastIndex = static_cast<::int32_t>(value % 10);
-                    *tmp = gDigits[lastIndex];
+                    *tmp = kDigits[lastIndex];
                     ++tmp;
                     value /= 10;
                 } while (value > 0);
@@ -155,7 +155,7 @@ namespace nets
 
         void writePointer(const void* ptr)
         {
-            if (writableBytes() > gMaximumNumberLimit)
+            if (writableBytes() > kMaximumNumberLimit)
             {
                 auto value = reinterpret_cast<::uintptr_t>(ptr);
                 char* buffer = buffer_ + writerIndex_;
@@ -166,7 +166,7 @@ namespace nets
                 do
                 {
                     auto lastIndex = static_cast<::int32_t>(value % 16);
-                    *tmp = gHexDigits[lastIndex];
+                    *tmp = kHexDigits[lastIndex];
                     ++tmp;
                     value /= 16;
                 } while (value > 0);

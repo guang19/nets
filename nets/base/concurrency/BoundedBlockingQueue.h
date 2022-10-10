@@ -33,7 +33,7 @@ namespace nets
         using PredicateType = ::std::function<bool()>;
 
     public:
-        explicit BoundedBlockingQueue(SizeType maxQueueSize = gDefaultMaxQueueSize)
+        explicit BoundedBlockingQueue(SizeType maxQueueSize = kDefaultMaxQueueSize)
             : maxQueueSize_(maxQueueSize), queue_(), mutex_(), notFullCV_(), notEmptyCV_()
         {
         }
@@ -93,7 +93,7 @@ namespace nets
         ConditionVariableType notFullCV_;
         ConditionVariableType notEmptyCV_;
 
-        static constexpr SizeType gDefaultMaxQueueSize = INT32_MAX;
+        static constexpr SizeType kDefaultMaxQueueSize = INT32_MAX;
     };
 
     template <typename T>

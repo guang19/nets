@@ -10,11 +10,11 @@ namespace nets
 {
     namespace
     {
-        constexpr char gRootLoggerName[] = "RootLogger";
-        constexpr LogLevel gDefaultLogLevel = LogLevel::DEBUG;
+        constexpr char kRootLoggerName[] = "RootLogger";
+        constexpr LogLevel kDefaultLogLevel = LogLevel::DEBUG;
     } // namespace
 
-    LoggerPtr gRootLogger = LOGGER_MGR->getRootLogger();
+    LoggerPtr kRootLogger = LOGGER_MGR->getRootLogger();
 
     LogMessage::LogMessage(LogLevel level, const char* file, ::int32_t line)
         : time_(Timestamp::now()), level_(level), file_(nullptr), line_(line), stream_()
@@ -37,7 +37,7 @@ namespace nets
         logger_->log(logMessage_.getLevel(), logMessage_);
     }
 
-    Logger::Logger(const StringType& name) : Logger(name, gDefaultLogLevel, nullptr, nullptr) {}
+    Logger::Logger(const StringType& name) : Logger(name, kDefaultLogLevel, nullptr, nullptr) {}
 
     Logger::Logger(const StringType& name, LogLevel level, const LogFormatterPtr& logFormatter,
                    const LogAppenderPtr& logAppender)
@@ -67,7 +67,7 @@ namespace nets
         if (logMessage.getLevel() == LogLevel::FATAL)
         {
             // if exit directly, log buffer in memory probably will lost
-            ::std::this_thread::sleep_for(::std::chrono::milliseconds(gMillisecondsPerSecond));
+            ::std::this_thread::sleep_for(::std::chrono::milliseconds(kMillisecondsPerSecond));
             ::fprintf(stderr, "log fatal,exit\n");
             ::exit(1);
         }
@@ -125,7 +125,7 @@ namespace nets
 
     LoggerPtr LoggerManager::getRootLogger()
     {
-        auto logger = getLogger(gRootLoggerName);
+        auto logger = getLogger(kRootLoggerName);
         logger->setLevel(LogLevel::DEBUG);
         return logger;
     }

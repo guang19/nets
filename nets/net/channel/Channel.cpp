@@ -9,7 +9,7 @@
 namespace nets
 {
     Channel::Channel(EventLoopRawPtr eventLoop)
-        : events_(gNoneEvent), readyEvents_(gNoneEvent), isRegistered_(false), eventLoop_(eventLoop)
+        : events_(kNoneEvent), readyEvents_(kNoneEvent), isRegistered_(false), eventLoop_(eventLoop)
     {
     }
 
@@ -50,17 +50,17 @@ namespace nets
 
     bool Channel::isNoneEvent() const
     {
-        return events_ == gNoneEvent;
+        return events_ == kNoneEvent;
     }
 
     bool Channel::hasReadEvent() const
     {
-        return events_ & gReadEvent;
+        return events_ & kReadEvent;
     }
 
     bool Channel::hasWriteEvent() const
     {
-        return events_ & gWriteEvent;
+        return events_ & kWriteEvent;
     }
 
     void Channel::setReadyEvents(EventType events)
@@ -198,15 +198,15 @@ namespace nets
 
     void Channel::handleEvent()
     {
-        if (readyEvents_ & gErrorEvent)
+        if (readyEvents_ & kErrorEvent)
         {
             handleErrorEvent();
         }
-        if (readyEvents_ & gReadEvent)
+        if (readyEvents_ & kReadEvent)
         {
             handleReadEvent();
         }
-        if (readyEvents_ & gWriteEvent)
+        if (readyEvents_ & kWriteEvent)
         {
             handleWriteEvent();
         }

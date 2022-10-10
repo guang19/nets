@@ -58,8 +58,8 @@ namespace nets
 
     public:
         explicit ThreadPool(IntType corePoolSize, IntType maxPoolSize, IntType maxQueueSize,
-                            const StringType& name = gDefaultThreadPoolName,
-                            TimeType keepAliveTime = gDefaultIdleKeepAliveTime);
+                            const StringType& name = kDefaultThreadPoolName,
+                            TimeType keepAliveTime = kDefaultIdleKeepAliveTime);
         ~ThreadPool();
 
         void shutdown();
@@ -122,32 +122,32 @@ namespace nets
 
         inline bool isRunning(IntType ctl) const
         {
-            return (ctl & ~gCountMask) == gRunning;
+            return (ctl & ~kCountMask) == kRunning;
         }
 
         inline bool isShutdown(IntType ctl) const
         {
-            return (ctl & ~gCountMask) == gShutdown;
+            return (ctl & ~kCountMask) == kShutdown;
         }
 
         inline IntType numOfActiveThreads(IntType ctl) const
         {
-            return ctl & gCountMask;
+            return ctl & kCountMask;
         }
 
     private:
-        static constexpr IntType gInt32Bits = 32;
-        static constexpr IntType gCountBits = gInt32Bits - 2;
+        static constexpr IntType kInt32Bits = 32;
+        static constexpr IntType kCountBits = kInt32Bits - 2;
         // maximum active thread size
         // 00,111111111111111111111111111111
-        static constexpr IntType gCountMask = (1 << gCountBits) - 1;
+        static constexpr IntType kCountMask = (1 << kCountBits) - 1;
         // 01,000000000000000000000000000000
-        static constexpr IntType gRunning = 1 << gCountBits;
+        static constexpr IntType kRunning = 1 << kCountBits;
         // 00,000000000000000000000000000000
-        static constexpr IntType gShutdown = 0 << gCountBits;
+        static constexpr IntType kShutdown = 0 << kCountBits;
 
-        static constexpr TimeType gDefaultIdleKeepAliveTime = 30000;
-        static constexpr char gDefaultThreadPoolName[] = "NetsThreadPool";
+        static constexpr TimeType kDefaultIdleKeepAliveTime = 30000;
+        static constexpr char kDefaultThreadPoolName[] = "NetsThreadPool";
 
     private:
         // the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
@@ -220,13 +220,13 @@ namespace nets
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 NETS_SYSTEM_LOG_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
-                           << "] execution in thread pool [" << name_ << "],reason is " << exception.what();
+                                      << "] execution in thread pool [" << name_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 NETS_SYSTEM_LOG_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
-                           << "] execution in thread pool [" << name_ << ']';
+                                      << "] execution in thread pool [" << name_ << ']';
             }
         };
         assert(2 == promise.use_count());
@@ -254,13 +254,13 @@ namespace nets
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 NETS_SYSTEM_LOG_ERROR << "ThreadPool exception caught during thread [" << currentThreadName()
-                           << "] execution in thread pool [" << name_ << "],reason is " << exception.what();
+                                      << "] execution in thread pool [" << name_ << "],reason is " << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 NETS_SYSTEM_LOG_ERROR << "ThreadPool unknown exception caught during thread [" << currentThreadName()
-                           << "] execution in thread pool [" << name_ << ']';
+                                      << "] execution in thread pool [" << name_ << ']';
             }
         };
         assert(2 == promise.use_count());

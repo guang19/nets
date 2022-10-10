@@ -40,7 +40,7 @@ namespace nets
         using TimeType = ::time_t;
         using IdType = TimerId::IdType;
         using TimerCallback = ::std::function<void()>;
-        static constexpr ::int32_t gRepeatForever = -1;
+        static constexpr ::int32_t kRepeatForever = -1;
 
     public:
         explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay = false);
@@ -67,7 +67,7 @@ namespace nets
 
         inline bool isRepeatable() const
         {
-            return repeatTimes_ == gRepeatForever || repeatTimes_ > 0;
+            return repeatTimes_ == kRepeatForever || repeatTimes_ > 0;
         }
 
         inline void setRepeatTimes(::int32_t repeatTimes)
@@ -97,7 +97,7 @@ namespace nets
         TimerCallback timerCallback_;
 
         // not thread-safe, because there is usually only one TimerManager to manage Timer
-        static ::std::atomic<IdType> gTimerIdGenerator;
+        static ::std::atomic<IdType> timerIdGenerator_;
     };
 } // namespace nets
 

@@ -14,12 +14,12 @@ namespace nets
 {
     namespace
     {
-        constexpr ::size_t gEpollEventInitialSize = 12;
-        constexpr EpollPoller::EventList::size_type gMaxEpollEventSize = INT32_MAX;
+        constexpr ::size_t kEpollEventInitialSize = 12;
+        constexpr EpollPoller::EventList::size_type kMaxEpollEventSize = INT32_MAX;
     } // namespace
 
     EpollPoller::EpollPoller(EventLoopRawPtr eventLoop)
-        : Poller(eventLoop), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(gEpollEventInitialSize)
+        : Poller(eventLoop), epollFd_(::epoll_create1(EPOLL_CLOEXEC)), events_(kEpollEventInitialSize)
     {
         assert(epollFd_ >= 0);
         if (epollFd_ < 0)
@@ -44,9 +44,9 @@ namespace nets
             if (static_cast<SizeType>(numOfReadyEvents) >= size)
             {
                 size = size + (size >> 1);
-                if (size >= gMaxEpollEventSize)
+                if (size >= kMaxEpollEventSize)
                 {
-                    size = gMaxEpollEventSize - 1;
+                    size = kMaxEpollEventSize - 1;
                 }
                 events_.resize(size);
             }
@@ -64,7 +64,7 @@ namespace nets
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
             activeChannels.push_back(channel);
             EventType revents = events_[i].events;
-            channel->setReadyEvents(gNoneEvent);
+            channel->setReadyEvents(kNoneEvent);
             NETS_SYSTEM_LOG_DEBUG << "revents=" << revents << " [revents & EPOLLIN=" << (revents & EPOLLIN)
                        << "] [revents & EPOLLERR=" << (revents & EPOLLERR)
                        << "] [revents & EPOLLHUP=" << (revents & EPOLLHUP)
@@ -74,15 +74,15 @@ namespace nets
             // local may shutdown connection or read/write error
             if (revents & EPOLLIN && revents & (EPOLLERR | EPOLLHUP))
             {
-                channel->addReadyEvent(gErrorEvent);
+                channel->addReadyEvent(kErrorEvent);
             }
             if (revents & (EPOLLIN | EPOLLPRI | EPOLLRDHUP))
             {
-                channel->addReadyEvent(gReadEvent);
+                channel->addReadyEvent(kReadEvent);
             }
             if (revents & EPOLLOUT)
             {
-                channel->addReadyEvent(gWriteEvent);
+                channel->addReadyEvent(kWriteEvent);
             }
         }
     }
@@ -137,11 +137,11 @@ namespace nets
         event.data.ptr = channel;
         event.events = 0;
         EventType events = channel->events();
-        if (events & gReadEvent)
+        if (events & kReadEvent)
         {
             event.events |= EPOLLIN;
         }
-        if (events & gWriteEvent)
+        if (events & kWriteEvent)
         {
             event.events |= EPOLLOUT;
         }

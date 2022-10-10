@@ -6,7 +6,7 @@
 
 namespace nets
 {
-    ::std::atomic<Timer::IdType> Timer::gTimerIdGenerator = 0;
+    ::std::atomic<Timer::IdType> Timer::timerIdGenerator_ = 0;
 
     TimerId::TimerId() : key_(-1), value_(0) {}
 
@@ -46,7 +46,7 @@ namespace nets
     }
 
     Timer::Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay)
-        : id_(gTimerIdGenerator++, expiredTime), repeatTimes_(repeatTimes), interval_(interval), fixedDelay_(fixedDelay)
+        : id_(timerIdGenerator_++, expiredTime), repeatTimes_(repeatTimes), interval_(interval), fixedDelay_(fixedDelay)
     {
     }
 

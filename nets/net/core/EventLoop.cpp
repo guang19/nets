@@ -13,9 +13,9 @@ namespace nets
 {
     namespace
     {
-        constexpr EventLoop::TimeType gDefaultPollTimeout = 3000;
-        constexpr EventLoop::TimeType gMinimumPollTimeout = 1;
-        __thread EventLoop::EventLoopRawPtr gCurrentThreadEventLoop = nullptr;
+        constexpr EventLoop::TimeType kDefaultPollTimeout = 3000;
+        constexpr EventLoop::TimeType kMinimumPollTimeout = 1;
+        __thread EventLoop::EventLoopRawPtr tCurrentThreadEventLoop = nullptr;
     } // namespace
 
     EventLoop::EventLoop()
@@ -23,17 +23,17 @@ namespace nets
           poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), runningPendingTasks_(false), mutex_(),
           cv_()
     {
-        assert(gCurrentThreadEventLoop == nullptr);
+        assert(tCurrentThreadEventLoop == nullptr);
         // one loop per thread
-        if (gCurrentThreadEventLoop != nullptr)
+        if (tCurrentThreadEventLoop != nullptr)
         {
             THROW_FMT(::std::runtime_error, "EventLoop there must be only one loop per thread");
         }
         else
         {
-            gCurrentThreadEventLoop = this;
+            tCurrentThreadEventLoop = this;
         }
-        notifier_->addEvent(gReadEvent);
+        notifier_->addEvent(kReadEvent);
         registerChannel(notifier_);
         NETS_SYSTEM_LOG_INFO << "EventLoop one event loop is created in thread " << threadId_;
     }
@@ -41,7 +41,7 @@ namespace nets
     EventLoop::~EventLoop()
     {
         deregisterChannel(notifier_);
-        gCurrentThreadEventLoop = nullptr;
+        tCurrentThreadEventLoop = nullptr;
         NETS_SYSTEM_LOG_INFO << "EventLoop one event loop is destroyed in thread " << threadId_;
     }
 
@@ -56,8 +56,8 @@ namespace nets
             activeChannels_.clear();
             TimeType remainingExpiredTime = timerManager_.nearestTimerRemainingExpiredTime();
             TimeType timeout =
-                remainingExpiredTime == -1 ? gDefaultPollTimeout : ::std::min(remainingExpiredTime, gDefaultPollTimeout);
-            poller_->poll(::std::max(gMinimumPollTimeout, timeout), activeChannels_);
+                remainingExpiredTime == -1 ? kDefaultPollTimeout : ::std::min(remainingExpiredTime, kDefaultPollTimeout);
+            poller_->poll(::std::max(kMinimumPollTimeout, timeout), activeChannels_);
             for (auto& channel : activeChannels_)
             {
                 channel->handleEvent();
@@ -83,13 +83,13 @@ namespace nets
     bool EventLoop::isInCurrentEventLoop() const
     {
         // threadId_ == currentTid()
-        return (this == gCurrentThreadEventLoop);
+        return (this == tCurrentThreadEventLoop);
     }
 
     EventLoop::EventLoopRawPtr EventLoop::currentEventLoop() const
     {
         assert(isInCurrentEventLoop());
-        return gCurrentThreadEventLoop;
+        return tCurrentThreadEventLoop;
     }
 
     bool EventLoop::registerChannel(const ChannelPtr& channel)

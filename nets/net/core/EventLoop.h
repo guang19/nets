@@ -206,14 +206,14 @@ namespace nets
     template <typename Fn, typename... Args>
     TimerId EventLoop::scheduleAtFixedRate(TimeType initDelay, TimeType interval, Fn&& fn, Args&&... args)
     {
-        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::gRepeatForever, interval, false,
+        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::kRepeatForever, interval, false,
                                       ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
 
     template <typename Fn, typename... Args>
     TimerId EventLoop::scheduleAtFixedDelay(TimeType initDelay, TimeType delay, Fn&& fn, Args&&... args)
     {
-        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::gRepeatForever, delay, true,
+        return timerManager_.addTimer(Timestamp::now().plusMilliseconds(initDelay), Timer::kRepeatForever, delay, true,
                                       ::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
     }
 } // namespace nets

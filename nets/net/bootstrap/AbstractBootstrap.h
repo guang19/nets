@@ -21,7 +21,7 @@ namespace nets
         using ChannelOptionList = Channel::ChannelOptionList;
 
     public:
-        explicit AbstractBootstrap() : channelOptions_(), mainLoopGroup_(gNumbOfMainEventLoops, gMainEventLoopGroupName)
+        explicit AbstractBootstrap() : channelOptions_(), mainLoopGroup_(kNumbOfMainEventLoops, kMainEventLoopGroupName)
         {
             SignalHandler::initSignalHandler(::std::bind(&AbstractBootstrap<B>::handleSignal, this, ::std::placeholders::_1,
                                                          ::std::placeholders::_2, ::std::placeholders::_3));
@@ -80,8 +80,8 @@ namespace nets
         EventLoopGroup mainLoopGroup_;
 
     private:
-        static constexpr IntType gNumbOfMainEventLoops = 1;
-        static constexpr char gMainEventLoopGroupName[] = "MainLoopGroup";
+        static constexpr IntType kNumbOfMainEventLoops = 1;
+        static constexpr char kMainEventLoopGroupName[] = "MainLoopGroup";
     };
 } // namespace nets
 

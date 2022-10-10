@@ -13,9 +13,9 @@ namespace nets
 {
     namespace
     {
-        constexpr const char* const gMainThreadName = "Main";
-        __thread ::pid_t gCacheTid = 0;
-        __thread char gThreadName[gThreadNameMaxLength] = "unnamed";
+        constexpr const char* const kMainThreadName = "Main";
+        __thread ::pid_t tCacheTid = 0;
+        __thread char tThreadName[kThreadNameMaxLength] = "unnamed";
     } // namespace
 
     ::pid_t getTid()
@@ -25,11 +25,11 @@ namespace nets
 
     ::pid_t currentTid()
     {
-        if (gCacheTid <= 0)
+        if (tCacheTid <= 0)
         {
-            gCacheTid = getTid();
+            tCacheTid = getTid();
         }
-        return gCacheTid;
+        return tCacheTid;
     }
 
     bool isMainThread()
@@ -39,9 +39,9 @@ namespace nets
 
     void afterFork()
     {
-        gCacheTid = 0;
-        MEMZERO(gThreadName, gThreadNameMaxLength);
-        ::memcpy(gThreadName, gMainThreadName, ::strlen(gMainThreadName));
+        tCacheTid = 0;
+        MEMZERO(tThreadName, kThreadNameMaxLength);
+        ::memcpy(tThreadName, kMainThreadName, ::strlen(kMainThreadName));
     }
 
     struct ThreadInitializer
@@ -49,8 +49,8 @@ namespace nets
         ThreadInitializer()
         {
             currentTid();
-            MEMZERO(gThreadName, gThreadNameMaxLength);
-            ::memcpy(gThreadName, gMainThreadName, ::strlen(gMainThreadName));
+            MEMZERO(tThreadName, kThreadNameMaxLength);
+            ::memcpy(tThreadName, kMainThreadName, ::strlen(kMainThreadName));
             ::pthread_atfork(nullptr, nullptr, &afterFork);
         }
     };
@@ -60,12 +60,12 @@ namespace nets
 
     void setCurrentThreadName(const char* threadName)
     {
-        MEMZERO(gThreadName, gThreadNameMaxLength);
-        ::memcpy(gThreadName, threadName, ::strlen(threadName));
+        MEMZERO(tThreadName, kThreadNameMaxLength);
+        ::memcpy(tThreadName, threadName, ::strlen(threadName));
     }
 
     const char* currentThreadName()
     {
-        return gThreadName;
+        return tThreadName;
     }
 } // namespace nets

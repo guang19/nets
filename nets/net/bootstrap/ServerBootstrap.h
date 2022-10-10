@@ -51,8 +51,8 @@ namespace nets
         ChannelInitializationCallback childInitializationCallback_;
         EventLoopGroup childLoopGroup_;
 
-        static constexpr char gChildEventLoopGroupName[] = "ChildLoopGroup";
-        static const IntType gDefaultNumbOfChildEventLoops;
+        static constexpr char kChildEventLoopGroupName[] = "ChildLoopGroup";
+        static const IntType kDefaultNumbOfChildEventLoops;
     };
 } // namespace nets
 

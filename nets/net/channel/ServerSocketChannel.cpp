@@ -14,7 +14,7 @@
 namespace nets
 {
     ServerSocketChannel::ServerSocketChannel(EventLoopRawPtr eventLoop)
-        : Channel(eventLoop), sockFd_(socket::gInvalidFd), idleFd_(socket::createIdleFd()), backlog_(0), channelOptions_(),
+        : Channel(eventLoop), sockFd_(socket::kInvalidFd), idleFd_(socket::createIdleFd()), backlog_(0), channelOptions_(),
           nextEventLoopFn_(), childOptions_(), childHandlers_(), childInitializationCallback_()
     {
         if (idleFd_ < 0)
@@ -24,7 +24,7 @@ namespace nets
         // default options
         channelOptions_[SockOption::REUSE_ADDR] = true;
         channelOptions_[SockOption::REUSE_PORT] = true;
-        channelOptions_[SockOption::BACKLOG] = gDefaultMaximumOfBackLog;
+        channelOptions_[SockOption::BACKLOG] = kDefaultMaximumOfBackLog;
         childOptions_[SockOption::REUSE_ADDR] = true;
         childOptions_[SockOption::REUSE_PORT] = true;
     }
@@ -51,12 +51,12 @@ namespace nets
         channelOptions_.clear();
         assert(channelOptions_.empty());
         socket::bind(sockFd_, localAddress);
-        if (backlog_ > gDefaultMaximumOfBackLog || backlog_ <= 0)
+        if (backlog_ > kDefaultMaximumOfBackLog || backlog_ <= 0)
         {
-            backlog_ = gDefaultMaximumOfBackLog;
+            backlog_ = kDefaultMaximumOfBackLog;
         }
         socket::listen(sockFd_, backlog_);
-        addEvent(gReadEvent);
+        addEvent(kReadEvent);
         if (!registerTo())
         {
             THROW_FMT(ChannelRegisterException, "ServerSocketChannel register failed");
@@ -83,7 +83,7 @@ namespace nets
     {
         assert(eventLoop_->isInCurrentEventLoop());
         InetSockAddress peerAddr {};
-        FdType connFd = socket::gInvalidFd;
+        FdType connFd = socket::kInvalidFd;
         if ((connFd = socket::accept(sockFd_, peerAddr)) >= 0)
         {
             NETS_SYSTEM_LOG_DEBUG << "ServerSocketChannel accpet client addr:" << peerAddr.toString();
