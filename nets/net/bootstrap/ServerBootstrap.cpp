@@ -4,6 +4,8 @@
 
 #include "nets/net/bootstrap/ServerBootstrap.h"
 
+#include <unistd.h>
+
 namespace nets
 {
     const ServerBootstrap::IntType ServerBootstrap::kDefaultNumbOfChildEventLoops = ::sysconf(_SC_NPROCESSORS_ONLN) << 1;
