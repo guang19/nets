@@ -4,8 +4,6 @@
 
 #include "nets/base/log/LogFormatter.h"
 
-#include <cassert>
-
 #include "nets/base/CommonMacro.h"
 #include "nets/base/exception/DateTimeFormatException.h"
 #include "nets/base/log/Logger.h"
@@ -20,7 +18,7 @@ namespace nets
         const char* const kLogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
         constexpr ::int32_t kMaxLengthOfLogTimePortion = 52;
-        constexpr char kLf = '\n';
+        constexpr char kLF = '\n';
         constexpr char kSpace = ' ';
         constexpr char kColon = ':';
         constexpr char kOpenSquareBracket[2] = {kSpace, '['};
@@ -74,6 +72,6 @@ namespace nets
         logBuffer.writeInt32(logMessage.getLine());
         logBuffer.writeBytes(kDash, sizeof(kDash));
         logBuffer.writeBytes(logMessage.getStream().buffer());
-        logBuffer.writeByte(kLf);
+        logBuffer.writeByte(kLF);
     }
 } // namespace nets

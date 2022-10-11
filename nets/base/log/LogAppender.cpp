@@ -12,4 +12,8 @@ namespace nets
     {
         ::fwrite(logBuffer.array(), sizeof(char), logBuffer.length(), stdout);
     }
+    void StdoutLogAppender::flush()
+    {
+        ::fflush(stdout);
+    }
 } // namespace nets

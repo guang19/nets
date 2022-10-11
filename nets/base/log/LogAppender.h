@@ -18,6 +18,7 @@ namespace nets
 
     public:
         virtual void append(const LogBuffer& logBuffer) = 0;
+        virtual void flush() = 0;
     };
 
     DECLARE_SINGLETON_CLASS(StdoutLogAppender), public LogAppender
@@ -30,6 +31,7 @@ namespace nets
 
     public:
         void append(const LogBuffer& logBuffer) override;
+        void flush() override;
     };
 } // namespace nets
 

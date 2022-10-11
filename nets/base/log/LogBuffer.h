@@ -11,8 +11,8 @@ namespace nets
 {
     namespace
     {
-        // log length limit: 2K
-        static constexpr SizeType kLogBufferSize = (1024 << 1);
+        // log length limit: 4K
+        constexpr SizeType kLogBufferSize = (1024 << 2);
         using LogBuffer = StackBuffer<kLogBufferSize>;
     }
 

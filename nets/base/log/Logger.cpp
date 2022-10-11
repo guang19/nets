@@ -61,14 +61,13 @@ namespace nets
         logFormatter_->formatLogMessage(logMessage, logBuffer);
         // append
         logAppender_->append(logBuffer);
-        //        LOG_WRITER->write(logBufferStream.buffer().array(), logBufferStream.buffer().length());
-        //        if (logMessage.getLevel() == LogLevel::FATAL)
-        //        {
-        // if exit directly, log buffer in memory probably will lost
-        //            ::std::this_thread::sleep_for(::std::chrono::milliseconds(kMillisecondsPerSecond));
-        //            ::fprintf(stderr, "log fatal,exit\n");
-        //            ::exit(1);
-        //        }
+        if (logMessage.getLevel() == LogLevel::FATAL)
+        {
+            logAppender_->flush();
+            // if exit directly, log buffer in memory probably will lost
+            ::fprintf(stderr, "log fatal,exit\n");
+            ::exit(1);
+        }
     }
 
     void Logger::trace(const LogMessage& logMessage)
