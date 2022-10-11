@@ -5,7 +5,14 @@
 #ifndef NETS_LOG_APPENDER_H
 #define NETS_LOG_APPENDER_H
 
+#include <atomic>
+#include <condition_variable>
+#include <memory>
+#include <thread>
+#include <vector>
+
 #include "nets/base/log/LogBuffer.h"
+#include "nets/base/log/LogFile.h"
 #include "nets/base/Singleton.h"
 
 namespace nets
@@ -32,6 +39,54 @@ namespace nets
     public:
         void append(const LogBuffer& logBuffer) override;
         void flush() override;
+    };
+
+    enum LogFileType
+    {
+        SINGLE_FILE,
+        DAILY_FILE,
+        ROLLING_FILE
+    };
+
+    class FileLogAppender : public LogAppender
+    {
+    private:
+        using TimeType = ::time_t;
+        using FilePtr = ::std::unique_ptr<LogFile>;
+        // Log buffer cache 2M
+        static constexpr ::size_t kLogBufferPieceSize = 1024 * 1024 << 1;
+        using BufferType = StackBuffer<kLogBufferPieceSize>;
+        using BufferPtr = ::std::unique_ptr<BufferType>;
+        using BufferVectorType = ::std::vector<BufferPtr>;
+        using MutexType = ::std::mutex;
+        using LockGuardType = ::std::lock_guard<MutexType>;
+        using UniqueLockType = ::std::unique_lock<MutexType>;
+        using ConditionVarType = ::std::condition_variable;
+        using FileLogAppenderPtr = ::std::shared_ptr<FileLogAppender>;
+
+    public:
+        explicit FileLogAppender(const char* logFile, LogFileType logFileType);
+        ~FileLogAppender() override;
+
+        static FileLogAppenderPtr createFileLogAppender(const char* logFile, LogFileType logFileType);
+
+    public:
+        void append(const LogBuffer& logBuffer) override;
+        void flush() override;
+
+    private:
+        void sync();
+
+    protected:
+        ::std::atomic_bool running_;
+        FilePtr logFile_;
+        const LogFileType logFileType_;
+        BufferPtr cacheBuffer_;
+        BufferPtr backupCacheBuffer_;
+        BufferVectorType buffers_;
+        MutexType mutex_;
+        ConditionVarType cv_;
+        ::std::thread syncTask_;
     };
 } // namespace nets
 

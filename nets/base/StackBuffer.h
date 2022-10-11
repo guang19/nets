@@ -11,7 +11,7 @@
 #include <limits>
 
 #include "nets/base/CommonMacro.h"
-#include "nets/base/Noncopyable.h"
+#include "nets/base/Copyable.h"
 
 namespace nets
 {
@@ -24,18 +24,67 @@ namespace nets
     } // namespace
 
     template <SizeType SIZE>
-    class StackBuffer : Noncopyable
+    class StackBuffer : public Copyable
     {
     public:
         using StringType = ::std::string;
 
     public:
-        StackBuffer() : writerIndex_(0), capacity_(SIZE)
+        StackBuffer() : writerIndex_(0)
         {
             MEMZERO(buffer_, SIZE);
         }
 
         ~StackBuffer() = default;
+
+        StackBuffer(const StackBuffer& other)
+        {
+            MEMZERO(buffer_, SIZE);
+            ::memcpy(&buffer_[0], &other.buffer_[0], other.writerIndex_);
+            writerIndex_ = other.writerIndex_;
+        }
+
+        StackBuffer(StackBuffer&& other) noexcept
+        {
+            MEMZERO(buffer_, SIZE);
+            ::memcpy(&buffer_[0], &other.buffer_[0], other.writerIndex_);
+            writerIndex_ = other.writerIndex_;
+            MEMZERO(other.buffer_, other.writerIndex_);
+            other.writerIndex_ = 0;
+        }
+
+        StackBuffer& operator=(const StackBuffer& other)
+        {
+            if (this != &other)
+            {
+                MEMZERO(buffer_, writerIndex_);
+                ::memcpy(&buffer_[0], &other.buffer_[0], other.writerIndex_);
+                writerIndex_ = other.writerIndex_;
+            }
+        }
+
+        StackBuffer& operator=(StackBuffer&& other) noexcept
+        {
+            if (this != &other)
+            {
+                MEMZERO(buffer_, writerIndex_);
+                ::memcpy(&buffer_[0], &other.buffer_[0], other.writerIndex_);
+                writerIndex_ = other.writerIndex_;
+                MEMZERO(other.buffer_, other.writerIndex_);
+                other.writerIndex_ = 0;
+            }
+        }
+
+        void swap(StackBuffer& other) noexcept
+        {
+            // ::std::swap(buffer, other.buffer), but for SIZE
+            SizeType n = writerIndex_ < other.writerIndex_ ? other.writerIndex_ : writerIndex_;
+            for (SizeType i = 0; i < n; ++i)
+            {
+                ::std::swap(buffer_[i], other.buffer_[i]);
+            }
+            ::std::swap(writerIndex_, other.writerIndex_);
+        }
 
     public:
         inline const char* array() const
@@ -55,25 +104,25 @@ namespace nets
 
         inline SizeType writableBytes() const
         {
-            return capacity_ - writerIndex_;
+            return SIZE - writerIndex_;
         }
 
-        void writeString(const StringType& str)
+        inline void writeString(const StringType& str)
         {
             writeBytes(str.data(), str.length());
         }
 
-        void writeBytes(const char* data)
+        inline void writeBytes(const char* data)
         {
             writeBytes(data, ::strlen(data));
         }
 
-        void writeBytes(const StackBuffer<SIZE>& buffer)
+        inline void writeBytes(const StackBuffer<SIZE>& buffer)
         {
             writeBytes(&buffer.buffer_[0], buffer.writerIndex_);
         }
 
-        void writeBytes(const char* data, SizeType length)
+        inline void writeBytes(const char* data, SizeType length)
         {
             if (writableBytes() > length)
             {
@@ -82,53 +131,53 @@ namespace nets
             }
         }
 
-        void writeByte(char value)
+        inline void writeByte(char value)
         {
             writeBytes(&value, 1);
         }
 
-        void writeInt8(::int8_t value)
+        inline void writeInt8(::int8_t value)
         {
             writeInt32(static_cast<::int32_t>(value));
         }
 
-        void writeUint8(::uint8_t value)
+        inline void writeUint8(::uint8_t value)
         {
             writeUint32(static_cast<::uint32_t>(value));
         }
 
-        void writeInt16(::int16_t value)
+        inline void writeInt16(::int16_t value)
         {
             writeInt32(static_cast<::int32_t>(value));
         }
 
-        void writeUint16(::uint16_t value)
+        inline void writeUint16(::uint16_t value)
         {
             writeUint32(static_cast<::uint32_t>(value));
         }
 
-        void writeInt32(::int32_t value)
+        inline void writeInt32(::int32_t value)
         {
             writeInteger(value);
         }
 
-        void writeUint32(::uint32_t value)
+        inline void writeUint32(::uint32_t value)
         {
             writeInteger(value);
         }
 
-        void writeInt64(::int64_t value)
+        inline void writeInt64(::int64_t value)
         {
             writeInteger(value);
         }
 
-        void writeUint64(::uint64_t value)
+        inline void writeUint64(::uint64_t value)
         {
             writeInteger(value);
         }
 
         template <typename IntType>
-        void writeInteger(IntType value)
+        inline void writeInteger(IntType value)
         {
             if (writableBytes() > kMaximumNumberLimit)
             {
@@ -151,17 +200,17 @@ namespace nets
             }
         }
 
-        void writeFloat(float value)
+        inline void writeFloat(float value)
         {
             writeDouble(static_cast<double>(value));
         }
 
-        void writeDouble(double value)
+        inline void writeDouble(double value)
         {
             writeString(::std::to_string(value));
         }
 
-        void writePointer(const void* ptr)
+        inline void writePointer(const void* ptr)
         {
             if (writableBytes() > kMaximumNumberLimit)
             {
@@ -187,7 +236,6 @@ namespace nets
         char buffer_[SIZE] {0};
         // writer pointer
         SizeType writerIndex_;
-        SizeType capacity_;
     };
 } // namespace nets
 

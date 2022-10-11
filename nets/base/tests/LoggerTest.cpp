@@ -38,6 +38,18 @@ TEST(LoggerTest, SingleFile)
     NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream";
 }
 
+// change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
+TEST(LoggerTest, SingleFile2)
+{
+    LOGGER_MGR->getRootLogger()->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::SINGLE_FILE));
+    NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream";
+    NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream";
+    NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream";
+    NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream";
+    NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream";
+    NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream";
+}
+
 // before execute:
 // change LOG_WRITER_TYPE to 2（DAILY_FILE）
 // for testing,  you better change the constant "SecondsPerDay(in LogSynchronizer.cpp)" for short intervals

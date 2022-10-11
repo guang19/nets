@@ -48,12 +48,12 @@ namespace nets
 
     ByteBuffer::ByteBuffer(const ByteBuffer& other)
     {
+        buffer_ = ::std::make_unique<char[]>(other.capacity_);
+        MEMZERO(&buffer_[0], other.capacity_);
+        ::memcpy(&buffer_[0], &other.buffer_[0], other.capacity_);
         readerIndex_ = other.readerIndex_;
         writerIndex_ = other.writerIndex_;
         capacity_ = other.capacity_;
-        buffer_.reset(new char[capacity_]);
-        MEMZERO(&buffer_[0], capacity_);
-        ::memcpy(&buffer_[0], &other.buffer_[0], capacity_);
     }
 
     ByteBuffer::ByteBuffer(ByteBuffer&& other) noexcept
@@ -70,12 +70,12 @@ namespace nets
     {
         if (this != &other)
         {
+            buffer_ = ::std::make_unique<char[]>(other.capacity_);
+            MEMZERO(&buffer_[0], other.capacity_);
+            ::memcpy(&buffer_[0], &other.buffer_[0], other.capacity_);
             readerIndex_ = other.readerIndex_;
             writerIndex_ = other.writerIndex_;
             capacity_ = other.capacity_;
-            buffer_.reset(new char[capacity_]);
-            MEMZERO(&buffer_[0], capacity_);
-            ::memcpy(&buffer_[0], &other.buffer_[0], capacity_);
         }
         return *this;
     }
@@ -84,11 +84,11 @@ namespace nets
     {
         if (this != &other)
         {
+            buffer_ = std::move(other.buffer_);
+            assert(other.buffer_ == nullptr);
             readerIndex_ = other.readerIndex_;
             writerIndex_ = other.writerIndex_;
             capacity_ = other.capacity_;
-            buffer_ = std::move(other.buffer_);
-            assert(other.buffer_ == nullptr);
             other.readerIndex_ = 0;
             other.writerIndex_ = 0;
             other.capacity_ = 0;

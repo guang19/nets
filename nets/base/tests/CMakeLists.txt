@@ -22,6 +22,9 @@ TARGET_LINK_LIBRARIES(TimerTest nets_base_shared libgtest.a)
 ADD_EXECUTABLE(TimerManagerTest TimerManagerTest.cpp)
 TARGET_LINK_LIBRARIES(TimerManagerTest nets_base_shared libgtest.a)
 
+ADD_EXECUTABLE(StackBufferTest StackBufferTest.cpp)
+TARGET_LINK_LIBRARIES(StackBufferTest nets_base_shared libgtest.a)
+
 ADD_EXECUTABLE(LogBufferStreamTest LogBufferStreamTest.cpp)
 TARGET_LINK_LIBRARIES(LogBufferStreamTest nets_base_shared libgtest.a)
 
