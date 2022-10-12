@@ -29,6 +29,3 @@ TARGET_LINK_LIBRARIES(LogBufferStreamTest nets_base gtest_main)
 
 ADD_EXECUTABLE(LoggerTest LoggerTest.cpp)
 TARGET_LINK_LIBRARIES(LoggerTest nets_base gtest_main)
-
-ADD_EXECUTABLE(ConfigTest ConfigTest.cpp)
-TARGET_LINK_LIBRARIES(ConfigTest nets_base gtest_main)
