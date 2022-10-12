@@ -8,7 +8,6 @@
 #include <memory>
 #include <mutex>
 
-#include "nets/base/CommonMacro.h"
 #include "nets/base/Noncopyable.h"
 
 /***
@@ -54,7 +53,6 @@
 #define DECLARE_SINGLETON_CLASS(CLASS_NAME) class CLASS_NAME : nets::Noncopyable
 
 #define DEFINE_SINGLETON(CLASS_NAME)                                                                                        \
-                                                                                                                            \
 private:                                                                                                                    \
     template <typename C>                                                                                                   \
     static void _CALL_AFTER_INIT(...)                                                                                       \
@@ -75,7 +73,6 @@ private:                                                                        
     template <typename... Args>                                                                                             \
     static void _INIT(Args&&... args)                                                                                       \
     {                                                                                                                       \
-        CHECK_CLASS_COMPLETE_TYPE(CLASS_NAME);                                                                              \
         INSTANCE = ::std::shared_ptr<CLASS_NAME>(new CLASS_NAME(::std::forward<Args>(args)...), &CLASS_NAME::_DESTROY);     \
         _CALL_AFTER_INIT<CLASS_NAME>(INSTANCE.get());                                                                       \
     }                                                                                                                       \
