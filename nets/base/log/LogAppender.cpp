@@ -127,7 +127,7 @@ namespace nets
             {
                 SizeType bufferSize = buffers.size();
                 buffers.erase(buffers.begin() + static_cast<::int64_t>(bufferSize >> 1), buffers.end());
-                char warning[255] = {0};
+                char warning[64] = {0};
                 ::snprintf(warning, sizeof(warning), "Dropped %ld log buffers\n", bufferSize >> 1);
                 auto buf = std::make_unique<BufferType>();
                 buf->writeBytes(warning);
