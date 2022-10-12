@@ -41,7 +41,7 @@ namespace nets
             futures_.emplace_back(eventLoopThreadPool_.submit(
                 [this]()
                 {
-                    auto eventLoop = new EventLoop();
+                    auto eventLoop = new EventLoop(this);
                     {
                         LockGuardType lock(mutex_);
                         eventLoops_.push_back(::std::unique_ptr<EventLoop>(eventLoop));

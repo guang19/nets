@@ -30,6 +30,7 @@
 
 namespace nets
 {
+    class EventLoop;
     class EventLoopGroup : Noncopyable
     {
     public:

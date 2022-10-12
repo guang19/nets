@@ -41,10 +41,10 @@ namespace nets
         __thread EventLoop::EventLoopRawPtr tCurrentThreadEventLoop = nullptr;
     } // namespace
 
-    EventLoop::EventLoop()
+    EventLoop::EventLoop(EventLoopGroupRawPtr parent)
         : running_(false), threadId_(currentTid()), notifier_(::std::make_shared<NotifyChannel>(this)), activeChannels_(),
           poller_(PollerFactory::getPoller(this)), timerManager_(), pendingTasks_(), runningPendingTasks_(false), mutex_(),
-          cv_()
+          cv_(), parent_(parent)
     {
         assert(tCurrentThreadEventLoop == nullptr);
         // one loop per thread
@@ -113,6 +113,11 @@ namespace nets
     {
         assert(isInCurrentEventLoop());
         return tCurrentThreadEventLoop;
+    }
+
+    EventLoop::EventLoopGroupRawPtr EventLoop::parent() const
+    {
+        return parent_;
     }
 
     bool EventLoop::registerChannel(const ChannelPtr& channel)

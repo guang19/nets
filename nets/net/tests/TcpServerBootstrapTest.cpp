@@ -26,6 +26,7 @@
 
 #include "nets/net/bootstrap/Bootstrap.h"
 #include "nets/net/bootstrap/ServerBootstrap.h"
+#include "nets/net/core/EventLoop.h"
 
 using namespace nets;
 
@@ -39,7 +40,8 @@ public:
     {
         NETS_LOG_DEBUG(testLogger) << "isActive=" << channelContext.isActive();
         NETS_LOG_DEBUG(testLogger) << "Server channelConnect ====local address:" << localAddress.toString()
-                   << " client address:" << peerAddress.toString();
+                                   << " client address:" << peerAddress.toString();
+        channelContext.channel().eventLoop()->parent()->isShutdown();
     }
 
     void channelDisconnect(SocketChannelContext& channelContext) override
@@ -71,7 +73,7 @@ TEST(TcpServerBootstrapTest, TcpServer)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)
         .option(SockOption::BACKLOG, 1028)
-//                        .childHandler(new TestServerChannelHandler())
+        //                        .childHandler(new TestServerChannelHandler())
         .childHandler(
             [](SocketChannel& channel)
             {
@@ -89,7 +91,7 @@ public:
     {
         NETS_LOG_DEBUG(testLogger) << "isActive=" << channelContext.isActive();
         NETS_LOG_DEBUG(testLogger) << "Client channelConnect ====local address:" << localAddress.toString()
-                   << " server address:" << peerAddress.toString();
+                                   << " server address:" << peerAddress.toString();
         //        ByteBuffer byteBuffer {};
         //        byteBuffer.writeInt8(1);
         //        channelContext.write(byteBuffer);

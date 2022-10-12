@@ -46,6 +46,7 @@ namespace nets
     class Channel;
     class Poller;
     class PollerFactory;
+    class EventLoopGroup;
 
     class EventLoop : Noncopyable
     {
@@ -64,9 +65,10 @@ namespace nets
         using PollerPtr = ::std::unique_ptr<Poller>;
         using TimeType = typename TimerManager::TimeType;
         using EventLoopRawPtr = EventLoop*;
+        using EventLoopGroupRawPtr = EventLoopGroup*;
 
     public:
-        EventLoop();
+        EventLoop(EventLoopGroupRawPtr parent);
         ~EventLoop();
 
     public:
@@ -75,6 +77,7 @@ namespace nets
         bool isRunning() const;
         bool isInCurrentEventLoop() const;
         EventLoopRawPtr currentEventLoop() const;
+        EventLoopGroupRawPtr parent() const;
 
         bool registerChannel(const ChannelPtr& channel);
         bool modifyChannel(const ChannelPtr& channel);
@@ -125,6 +128,7 @@ namespace nets
         bool runningPendingTasks_;
         MutexType mutex_;
         ConditionVariableType cv_;
+        EventLoopGroupRawPtr parent_;
     };
 
     template <typename Fn, typename... Args>
