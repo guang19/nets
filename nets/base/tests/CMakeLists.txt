@@ -9,8 +9,8 @@ TARGET_LINK_LIBRARIES(TimestampTest nets_base gtest_main)
 ADD_EXECUTABLE(ThreadHelperTest ThreadHelperTest.cpp)
 TARGET_LINK_LIBRARIES(ThreadHelperTest nets_base gtest_main)
 
-ADD_EXECUTABLE(BlockingQueueTest BlockingQueueTest.cpp)
-TARGET_LINK_LIBRARIES(BlockingQueueTest nets_base gtest_main)
+ADD_EXECUTABLE(BoundedBlockingQueueTest BoundedBlockingQueueTest.cpp)
+TARGET_LINK_LIBRARIES(BoundedBlockingQueueTest nets_base gtest_main)
 
 ADD_EXECUTABLE(ThreadPoolTest ThreadPoolTest.cpp)
 TARGET_LINK_LIBRARIES(ThreadPoolTest nets_base gtest_main)

@@ -20,44 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Kernel signal handler
+// @brief common macro and function
 
-#ifndef NETS_SIGNAL_HANDLER_H
-#define NETS_SIGNAL_HANDLER_H
+#include "nets/base/Common.h"
 
-#include <csignal>
-#include <functional>
-
-#include "nets/base/Noncopyable.h"
+#include <execinfo.h>
 
 namespace nets
 {
-    class SignalHandler : Noncopyable
+    StringType stackTrace()
     {
-    public:
-        using SignoType = ::int32_t;
-        using Sigaction = struct sigaction;
-        using SigInfo = siginfo_t;
-        using SignalHandlerType = ::std::function<void(SignoType signo, SigInfo* info, void* context)>;
-
-    public:
-        explicit SignalHandler() = default;
-        ~SignalHandler() = default;
-
-    public:
-        static void initSignalHandler(const SignalHandlerType& signalHandler);
-
-        static void handleSignal(SignoType signo, SigInfo* info, void* context)
+        constexpr size_t kMaxBackTraceSize = 24;
+        StringType backtraceInfo;
+        void* addrList[kMaxBackTraceSize];
+        ::int32_t numOfAddr = ::backtrace(addrList, kMaxBackTraceSize);
+        if (numOfAddr == 0)
         {
-            if (signalHandler_ != nullptr)
-            {
-                signalHandler_(signo, info, context);
-            }
+            return backtraceInfo;
         }
-
-    private:
-        static SignalHandlerType signalHandler_;
-    };
+        char** symbolList = ::backtrace_symbols(addrList, numOfAddr);
+        if (symbolList != nullptr)
+        {
+            for (::int32_t i = 1; i < numOfAddr; ++i)
+            {
+                backtraceInfo.append(symbolList[i]);
+                backtraceInfo.push_back('\n');
+            }
+            free(symbolList);
+        }
+        return backtraceInfo;
+    }
 } // namespace nets
-
-#endif // NETS_SIGNAL_HANDLER_H
