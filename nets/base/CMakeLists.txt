@@ -29,7 +29,5 @@ TARGET_LINK_LIBRARIES(nets_base pthread)
 INSTALL(TARGETS nets_base DESTINATION ${PROJECT_BINARY_DIR}/lib)
 
 IF (BUILD_NETS_TESTS)
-    ADD_LIBRARY(nets_base_shared SHARED ${BaseSrcs})
-    TARGET_LINK_LIBRARIES(nets_base_shared pthread)
     ADD_SUBDIRECTORY(tests)
 ENDIF ()

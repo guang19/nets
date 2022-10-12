@@ -1,12 +1,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.16...3.23)
 
-PROJECT(nets LANGUAGES C CXX)
-
 # C CXX Compiler
 SET(CMAKE_C_COMPILER "/usr/bin/gcc")
 SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 #SET(CMAKE_C_COMPILER "/usr/bin/clang")
 #SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+
+PROJECT(nets LANGUAGES C CXX)
 
 ################################################################################################
 # log level,default DEBUG. option：
@@ -39,8 +39,8 @@ ELSE ()
     OPTION(BUILD_NETS_TESTS "Build nets tests" ON)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
     ENABLE_TESTING()
-    SET(GOOGLE_TEST_INC_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/include)
-    SET(GOOGLE_TEST_LIB_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/lib)
+    ADD_SUBDIRECTORY(nets/third_party/googletest)
+    SET(GOOGLE_TEST_INC_DIR ${PROJECT_SOURCE_DIR}/nets/third_party/googletest/googletest/include)
 ENDIF ()
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -g \
