@@ -8,22 +8,24 @@
 
 using namespace nets;
 
+LoggerPtr testLogger = LOGGER_MGR->getLogger("UdpUnicastTest");
+
 class TestUdpRecipientHandler : public DatagramChannelHandler
 {
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive";
+        NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelActive";
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
+        NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
     }
 };
 
-TEST(UdpUnicastRecipientTest, UdpUnicastRecipient)
+TEST(UdpUnicastTest, UdpUnicastRecipient)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)
@@ -41,19 +43,19 @@ class TestUdpSenderHandler : public DatagramChannelHandler
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpSenderHandler::channelActive";
+        NETS_LOG_DEBUG(testLogger) << "TestUdpSenderHandler::channelActive";
         channelContext.write("Hello UdpRecipient", InetSockAddress("127.0.0.1", 8080));
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpSenderHandler::channelRead recv from " << message.recipient().toString()
+        NETS_LOG_DEBUG(testLogger) << "TestUdpSenderHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
         channelContext.write(message);
     }
 };
 
-TEST(UdpUnicastSenderTest, UdpUnicastSender)
+TEST(UdpUnicastTest, UdpUnicastSender)
 {
     Bootstrap()
         .option(SockOption::BROADCAST, true)

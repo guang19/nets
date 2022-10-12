@@ -8,12 +8,14 @@
 
 using namespace nets;
 
+LoggerPtr testLogger = LOGGER_MGR->getLogger("UdpBroadcastTest");
+
 class TestUdpRecipientHandler : public DatagramChannelHandler
 {
 public:
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
+        NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
     }
 };
@@ -49,7 +51,7 @@ class TestUdpBroadcastSenderHandler : public DatagramChannelHandler
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive";
+        NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelActive";
         // broadcast address, such as 192.168.223.255
         channelContext.write("Hello UdpRecipient", InetSockAddress("xx.xx.xx.255", 8080));
     }

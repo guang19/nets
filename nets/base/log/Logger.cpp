@@ -4,6 +4,8 @@
 
 #include "nets/base/log/Logger.h"
 
+#include <unistd.h>
+
 namespace nets
 {
     namespace
@@ -38,7 +40,7 @@ namespace nets
 
     Logger::Logger(const StringType& name, LogLevel level, const LogFormatterPtr& logFormatter,
                    const LogAppenderPtr& logAppender)
-        : name_(name), logFormatter_(logFormatter), logAppender_(logAppender)
+        : name_(name), level_(level), logFormatter_(logFormatter), logAppender_(logAppender)
     {
     }
 
@@ -54,6 +56,12 @@ namespace nets
         logAppender_ = logAppender;
     }
 
+    void Logger::setLogFileRollingSize(SizeType rollingSize)
+    {
+        LockGuardType lock(mutex_);
+        logAppender_->setLogFileRollingSize(rollingSize);
+    }
+
     void Logger::log(LogLevel level, const LogMessage& logMessage)
     {
         // format
@@ -64,7 +72,8 @@ namespace nets
         if (logMessage.getLevel() == LogLevel::FATAL)
         {
             logAppender_->flush();
-            // if exit directly, log buffer in memory probably will lost
+            // exit with a delay of one second to allow time for the log in memory to persist
+            ::sleep(1);
             ::fprintf(stderr, "log fatal,exit\n");
             ::exit(1);
         }

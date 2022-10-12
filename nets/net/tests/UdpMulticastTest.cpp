@@ -8,6 +8,8 @@
 
 using namespace nets;
 
+LoggerPtr testLogger = LOGGER_MGR->getLogger("UdpMulticastTest");
+
 const StringType gMulticastIp = "224.1.1.1";
 const StringType gMulticastInterface = "ens33";
 const StringType gMulticastLocalAddr = "192.168.24.128"; // my ens33 addr
@@ -74,20 +76,20 @@ public:
     {
         if (channelContext.joinIpv4MulticastGroupByIfAddr(gMulticastIp, gMulticastLocalAddr))
         {
-            NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive joinIpv4MulticastGroupByIfAddr success";
+            NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelActive joinIpv4MulticastGroupByIfAddr success";
         }
     }
 
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
+        NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
                    << "\nmessage is:" << message.byteBuffer().toString();
         count_++;
         if (count_ == 5)
         {
             if (channelContext.leaveIpv4MulticastGroupByIfAddr(gMulticastIp, gMulticastLocalAddr))
             {
-                NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive leaveIpv4MulticastGroupByIfAddr success";
+                NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelActive leaveIpv4MulticastGroupByIfAddr success";
             }
         }
     }
@@ -127,7 +129,7 @@ class TestUdpMulticastSenderHandler : public DatagramChannelHandler
 public:
     void channelActive(DatagramChannelContext& channelContext) override
     {
-        NETS_SYSTEM_LOG_DEBUG << "TestUdpRecipientHandler::channelActive";
+        NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelActive";
         channelContext.channel().eventLoop()->scheduleAtFixedDelay(2000, 2000,
                                                                    [&]()
                                                                    {

@@ -8,20 +8,15 @@ namespace nets
 {
     namespace
     {
+        constexpr ::int32_t kMaximumOfLogBuffer = 24;
+
         // Log buffer flush interval,unit：milliseconds
         constexpr ::time_t kLogBufferFlushInterval = 1000;
 
-        // if you want to test DAILY_FILE LogWriter, you need to adjust this
-        // constant for short intervals, not for the whole day
+        // if you want to test DAILY_FILE, you need to adjust kSecondsPerDay for short intervals, not for the whole day
         constexpr ::time_t kSecondsPerDay = 60 * 60 * 24;
         // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
         // constexpr ::time_t kSecondsPerDay = 30;
-
-        // if you want to test ROLLING_FILE LogWriter, you need to adjust this
-        // constant  as small as possible
-        constexpr ::size_t kLogFileRollingSize = LOG_FILE_ROLLING_SIZE * 1024 * 1024;
-        // Set LogFileRollingSize to 200 Bytes, then you will see soon if the log file is roll back
-        // constexpr ::size_t kLogFileRollingSize = 200;
     } // namespace
 
     INIT_SINGLETON(StdoutLogAppender);
@@ -29,16 +24,22 @@ namespace nets
     void StdoutLogAppender::append(const LogBuffer& logBuffer)
     {
         ::fwrite(logBuffer.array(), sizeof(char), logBuffer.length(), stdout);
+        // if in Debug mode, flush log buffer
+#ifndef NDEBUG
+        flush();
+#endif
     }
+
     void StdoutLogAppender::flush()
     {
         ::fflush(stdout);
     }
 
     FileLogAppender::FileLogAppender(const char* logFile, LogFileType logFileType)
-        : running_(true), logFile_(::std::make_unique<LogFile>(logFile)), logFileType_(logFileType),
-          cacheBuffer_(::std::make_unique<BufferType>()), backupCacheBuffer_(::std::make_unique<BufferType>()), buffers_(),
-          mutex_(), cv_(), syncTask_(&FileLogAppender::sync, this)
+        : running_(true), logFile_(::std::make_unique<LogFile>(logFile)), logFileRollingSize_(kDefaultLogFileRollingSize),
+          logFileType_(logFileType), cacheBuffer_(::std::make_unique<BufferType>()),
+          backupCacheBuffer_(::std::make_unique<BufferType>()), buffers_(), mutex_(), cv_(),
+          syncTask_(&FileLogAppender::sync, this)
     {
     }
 
@@ -122,54 +123,83 @@ namespace nets
                     continue;
                 }
             }
-            switch (logFileType_)
+            if (buffers.size() > kMaximumOfLogBuffer)
             {
-
-                case SINGLE_FILE:
-                {
-                    for (const auto& buffer: buffers)
-                    {
-                        logFile_->write(buffer->array(), buffer->length());
-                    }
-                    break;
-                }
-                case DAILY_FILE:
-                {
-                    TimeType now = 0;
-                    ::time(&now);
-                    for (const auto& buffer: buffers)
-                    {
-                        if (now - logFile_->lastRollTime() >= kSecondsPerDay)
-                        {
-                            logFile_->renameByNowTime(now);
-                        }
-                        logFile_->write(buffer->array(), buffer->length());
-                    }
-                    break;
-                }
-                case ROLLING_FILE:
-                {
-                    TimeType now = 0;
-                    ::time(&now);
-                    for (const auto& buffer: buffers)
-                    {
-                        if (logFile_->size() + buffer->length() > kLogFileRollingSize)
-                        {
-                            logFile_->renameByNowTime(now);
-                        }
-                        logFile_->write(buffer->array(), buffer->length());
-                    }
-                    break;
-                }
+                SizeType bufferSize = buffers.size();
+                buffers.erase(buffers.begin() + static_cast<::int64_t>(bufferSize >> 1), buffers.end());
+                char warning[255] = {0};
+                ::snprintf(warning, sizeof(warning), "Dropped %ld log buffers\n", bufferSize >> 1);
+                auto buf = std::make_unique<BufferType>();
+                buf->writeBytes(warning);
+                buffers.push_back(::std::move(buf));
             }
-            // if not running, the writer task that is not added to the queue will be discarded
+            syncFile(buffers);
             buffers.clear();
             cacheBuffer = std::make_unique<BufferType>();
             if (backupCacheBuffer == nullptr)
             {
                 backupCacheBuffer = std::make_unique<BufferType>();
             }
+            logFile_->flush();
         }
         logFile_->flush();
+    }
+
+    void FileLogAppender::syncFile(const BufferVectorType& buffers)
+    {
+        switch (logFileType_)
+        {
+            case SINGLE_FILE:
+            {
+                syncSingleFile(buffers);
+                break;
+            }
+            case DAILY_FILE:
+            {
+                syncDailyFile(buffers);
+                break;
+            }
+            case ROLLING_FILE:
+            {
+                syncRollingFile(buffers);
+                break;
+            }
+        }
+    }
+
+    void FileLogAppender::syncSingleFile(const BufferVectorType& buffers)
+    {
+        for (const auto& buffer : buffers)
+        {
+            logFile_->write(buffer->array(), buffer->length());
+        }
+    }
+
+    void FileLogAppender::syncDailyFile(const BufferVectorType& buffers)
+    {
+        TimeType now = 0;
+        ::time(&now);
+        for (const auto& buffer : buffers)
+        {
+            if (kSecondsPerDay < now - logFile_->lastRollTime())
+            {
+                logFile_->renameByNowTime(now);
+            }
+            logFile_->write(buffer->array(), buffer->length());
+        }
+    }
+
+    void FileLogAppender::syncRollingFile(const BufferVectorType& buffers)
+    {
+        TimeType now = 0;
+        ::time(&now);
+        for (const auto& buffer : buffers)
+        {
+            if ((logFile_->size() + buffer->length()) / 1024 >= logFileRollingSize_)
+            {
+                logFile_->renameByNowTime(now);
+            }
+            logFile_->write(buffer->array(), buffer->length());
+        }
     }
 } // namespace nets

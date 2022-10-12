@@ -12,6 +12,7 @@ using namespace nets;
 
 TEST(LoggerTest, BasicUse)
 {
+    ASSERT_EQ(kRootLogger->getLevel(), LogLevel::DEBUG);
     NETS_SYSTEM_LOG_TRACE << "这是一条trace信息";
     NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息";
     NETS_SYSTEM_LOG_INFO << "这是一条info信息";
@@ -24,54 +25,52 @@ TEST(LoggerTest, BasicUse)
         });
     t1.join();
     NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息";
-    ::std::this_thread::sleep_for(::std::chrono::milliseconds(500));
 }
 
-// change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
 TEST(LoggerTest, SingleFile)
 {
-    NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream";
-    NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream";
-    NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream";
-    NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream";
-    NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream";
-    NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream";
-}
-
-// change option LOG_WRITER_TYPE to 1（SINGLE_FILE）
-TEST(LoggerTest, SingleFile2)
-{
-    LOGGER_MGR->getRootLogger()->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::SINGLE_FILE));
-    NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream";
-    NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream";
-    NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream";
-    NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream";
-    NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream";
-    NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream";
+    LOGGER_MGR->getRootLogger()->setLogAppender(
+        FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::SINGLE_FILE));
+    NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream，验证SingleFile";
+    NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream，验证SingleFile";
+    NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream，验证SingleFile";
+    NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream，验证SingleFile";
+    NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream，验证SingleFile";
+    NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream，验证SingleFile";
 }
 
 // before execute:
-// change LOG_WRITER_TYPE to 2（DAILY_FILE）
-// for testing,  you better change the constant "SecondsPerDay(in LogSynchronizer.cpp)" for short intervals
+// for testing,  you better change the constant "kSecondsPerDay(in LogAppender.h)" for short intervals
 TEST(LoggerTest, DailyFile)
 {
-    NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream";
-    NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream";
-    NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream";
-    NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream";
-    NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream";
-    NETS_SYSTEM_LOG_FATAL << "这是一条fatal信息 stream";
+    kRootLogger->setLogAppender(
+        FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::DAILY_FILE));
+    NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream，验证DailyFile";
+    NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream，验证DailyFile";
+    NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream，验证DailyFile";
+    NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream，验证DailyFile";
+    NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream，验证DailyFile";
+    NETS_SYSTEM_LOG_FATAL << "这是一条fatal信息 stream，验证DailyFile";
 }
 
-// before execute:
-// change LOG_WRITER_TYPE to 3（DLOG_FILE_ROLLING_SIZE）
-// for testing,  you better change constant "LogFileRollingSize(in LogSynchronizer.cpp)" as small as possible
 TEST(LoggerTest, RollingFile)
 {
-    NETS_SYSTEM_LOG_DEBUG << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
-        "一条足够长的信息一条足够长的信息一条足够长的信息";
+    kRootLogger->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::ROLLING_FILE));
+    kRootLogger->setLogFileRollingSize(1);
+    NETS_SYSTEM_LOG_DEBUG
+        << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息，验证RollingFile";
+    ::sleep(1);
 }
-
 
 int main(int argc, char** argv)
 {

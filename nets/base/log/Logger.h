@@ -151,6 +151,8 @@ namespace nets
         void setLogFormatter(const LogFormatterPtr& logFormatter);
         void setLogAppender(const LogAppenderPtr& logAppender);
 
+        void setLogFileRollingSize(SizeType rollingSize);
+
     public:
         void log(LogLevel level, const LogMessage& logMessage);
         void trace(const LogMessage& logMessage);

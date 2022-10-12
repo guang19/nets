@@ -8,27 +8,6 @@ SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
 PROJECT(nets LANGUAGES C CXX)
 
-################################################################################################
-# log level,default DEBUG. option：
-# - 0：TRACE
-# - 1：DEBUG
-# - 2：INFO
-# - 3：WARN
-# - 4：ERROR
-# - 5：FATAL
-ADD_DEFINITIONS(-DLOG_LEVEL=1)
-# log writer type,default 0(stdout).option：
-# 0：STDOUT:stdout.
-# 1：SINGLE_FILE:out to single file,no rollback,regardless of size and time.
-# 2：DAILY_FILE:generate file daily.
-# 3：ROLLING_FILE:rollback by file size.
-ADD_DEFINITIONS(-DLOG_WRITER_TYPE=0)
-# log file, default "/tmp/nets/nets.log", must be absolute path.
-ADD_DEFINITIONS(-DLOG_FILE="/tmp/nets/nets.log")
-# log file rollback size, unit:MB, default 24.
-ADD_DEFINITIONS(-DLOG_FILE_ROLLING_SIZE=24)
-################################################################################################
-
 IF (NOT CMAKE_BUILD_TYPE)
     SET(CMAKE_BUILD_TYPE "Release")
 ENDIF ()

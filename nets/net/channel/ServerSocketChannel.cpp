@@ -40,7 +40,7 @@ namespace nets
         return sockFd_;
     }
 
-    void ServerSocketChannel::bind(const InetSockAddress& localAddress)
+    void ServerSocketChannel:: bind(const InetSockAddress& localAddress)
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);

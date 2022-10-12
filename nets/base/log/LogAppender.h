@@ -26,6 +26,8 @@ namespace nets
     public:
         virtual void append(const LogBuffer& logBuffer) = 0;
         virtual void flush() = 0;
+
+        virtual void setLogFileRollingSize(SizeType rollingSize) {}
     };
 
     DECLARE_SINGLETON_CLASS(StdoutLogAppender), public LogAppender
@@ -51,6 +53,7 @@ namespace nets
     class FileLogAppender : public LogAppender
     {
     private:
+        using SizeType = ::size_t;
         using TimeType = ::time_t;
         using FilePtr = ::std::unique_ptr<LogFile>;
         // Log buffer cache 2M
@@ -74,12 +77,24 @@ namespace nets
         void append(const LogBuffer& logBuffer) override;
         void flush() override;
 
+        // if you want to test ROLLING_FILE, you need to adjust logFileRollingSize as small as possible
+        void setLogFileRollingSize(SizeType rollingSize) override
+        {
+            logFileRollingSize_ = rollingSize;
+        }
+
     private:
         void sync();
+        void syncFile(const BufferVectorType& buffers);
+        void syncSingleFile(const BufferVectorType& buffers);
+        void syncDailyFile(const BufferVectorType& buffers);
+        void syncRollingFile(const BufferVectorType& buffers);
 
-    protected:
+    private:
         ::std::atomic_bool running_;
         FilePtr logFile_;
+        // unit:kb
+        SizeType logFileRollingSize_;
         const LogFileType logFileType_;
         BufferPtr cacheBuffer_;
         BufferPtr backupCacheBuffer_;
@@ -87,6 +102,8 @@ namespace nets
         MutexType mutex_;
         ConditionVarType cv_;
         ::std::thread syncTask_;
+
+        static constexpr SizeType kDefaultLogFileRollingSize = 1024;
     };
 } // namespace nets
 
