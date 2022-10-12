@@ -43,8 +43,7 @@ TEST(LoggerTest, SingleFile)
 // for testing,  you better change the constant "kSecondsPerDay(in LogAppender.h)" for short intervals
 TEST(LoggerTest, DailyFile)
 {
-    kRootLogger->setLogAppender(
-        FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::DAILY_FILE));
+    kRootLogger->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::DAILY_FILE));
     NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream，验证DailyFile";
     NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream，验证DailyFile";
     NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream，验证DailyFile";
@@ -68,7 +67,8 @@ TEST(LoggerTest, RollingFile)
            "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
            "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
            "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"
-           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息，验证RollingFile";
+           "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息，验证RollingFil"
+           "e";
     ::sleep(1);
 }
 

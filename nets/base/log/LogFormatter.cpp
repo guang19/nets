@@ -21,9 +21,9 @@ namespace nets
         constexpr char kLF = '\n';
         constexpr char kSpace = ' ';
         constexpr char kColon = ':';
-        constexpr char kOpenSquareBracket[2] = {kSpace, '['};
-        constexpr char kCloseSquareBracket[2] = {']', kSpace};
-        constexpr char kDash[3] = {kSpace, '-', kSpace};
+        constexpr char kOpenSquareBracket[] = {kSpace, '['};
+        constexpr char kCloseSquareBracket[] = {']', kSpace};
+        constexpr char kDash[] = {kSpace, '-', kSpace};
 
         /**
          * log time cache
@@ -32,6 +32,22 @@ namespace nets
         __thread Tm tCacheTms {};
         __thread Timestamp::TimeType tCacheSeconds {0};
     } // namespace
+
+    void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer)
+    {
+        formatLogTime(logMessage.getTime(), logBuffer);
+        logBuffer.writeBytes(kOpenSquareBracket, sizeof(kOpenSquareBracket));
+        logBuffer.writeInt32(currentTid());
+        logBuffer.writeBytes(kCloseSquareBracket, sizeof(kOpenSquareBracket));
+        logBuffer.writeBytes(kLogLevelName[logMessage.getLevel()]);
+        logBuffer.writeByte(kSpace);
+        logBuffer.writeBytes(logMessage.getFile());
+        logBuffer.writeByte(kColon);
+        logBuffer.writeInt32(logMessage.getLine());
+        logBuffer.writeBytes(kDash, sizeof(kDash));
+        logBuffer.writeBytes(logMessage.getStream().buffer());
+        logBuffer.writeByte(kLF);
+    }
 
     void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer)
     {
@@ -57,21 +73,5 @@ namespace nets
             ? THROW_FMT(DateTimeFormatException, "DefaultLogFormatter format log time")
             : UNUSED(0);
         logBuffer.writeBytes(timeBuf);
-    }
-
-    void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer)
-    {
-        formatLogTime(logMessage.getTime(), logBuffer);
-        logBuffer.writeBytes(kOpenSquareBracket, sizeof(kOpenSquareBracket));
-        logBuffer.writeInt32(currentTid());
-        logBuffer.writeBytes(kCloseSquareBracket, sizeof(kOpenSquareBracket));
-        logBuffer.writeBytes(kLogLevelName[logMessage.getLevel()]);
-        logBuffer.writeByte(kSpace);
-        logBuffer.writeBytes(logMessage.getFile());
-        logBuffer.writeByte(kColon);
-        logBuffer.writeInt32(logMessage.getLine());
-        logBuffer.writeBytes(kDash, sizeof(kDash));
-        logBuffer.writeBytes(logMessage.getStream().buffer());
-        logBuffer.writeByte(kLF);
     }
 } // namespace nets

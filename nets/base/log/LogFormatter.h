@@ -19,7 +19,6 @@ namespace nets
         virtual ~LogFormatter() = default;
 
     public:
-        virtual void formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer) = 0;
         virtual void formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer) = 0;
     };
 
@@ -32,8 +31,10 @@ namespace nets
         ~DefaultLogFormatter() override = default;
 
     public:
-        void formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer) override;
         void formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer) override;
+
+    private:
+        void formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer);
     };
 } // namespace nets
 
