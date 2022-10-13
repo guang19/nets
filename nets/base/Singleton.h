@@ -32,12 +32,12 @@
 
 /***
  *
- *	Considering the problem of cross-DLL calls in templates,
- *	i did not use templates to write singletons.
- *  If a class needs to use a singleton, use the following three macros directly.
+ * Considering the problem of cross-DLL calls in templates,
+ * i did not use templates to write singletons.
+ * If a class needs to use a singleton, use the following three macros directly.
  *
- *	If you need to do some work after the singleton is initialized, you need to define a function
- *	named <afterInit>, the function named afterInit is automatically called after the singleton is initialized.
+ * If you need to do some work after the singleton is initialized, you need to define a function
+ * named <afterInit>, the function named afterInit is automatically called after the singleton is initialized.
  *
  * return type and parameter are void
  * /////////////////////////
@@ -64,7 +64,7 @@
  * 	       }
  * };
  *
- * INIT_SINGLETON(MyClass);
+ * INIT_SINGLETON(MyClass); // INIT_SINGLETON in .cpp file
  *
  * auto myClass = MyClass::getInstance(...);
  *
