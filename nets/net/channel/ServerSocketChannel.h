@@ -26,6 +26,7 @@
 #define NETS_SERVER_SOCKET_CHANNEL_H
 
 #include <functional>
+#include <list>
 
 #include "nets/net/channel/SocketChannel.h"
 #include "nets/net/core/InetSockAddress.h"
@@ -37,7 +38,7 @@ namespace nets
     public:
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
-        using ChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
+        using ChannelHandlerList = ::std::list<SocketChannelHandlerPipeline::SocketChannelHandlerPtr>;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:
@@ -59,6 +60,7 @@ namespace nets
         }
 
         void setChannelOptions(const ChannelOptionList& channelOptions);
+
         void setChildOptions(const ChannelOptionList& childOptions);
 
         inline void setChildHandlers(const ChannelHandlerList& childHandlers)

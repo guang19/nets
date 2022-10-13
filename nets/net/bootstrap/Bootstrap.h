@@ -38,11 +38,11 @@ namespace nets
         using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using DatagramChannelPtr = ::std::shared_ptr<DatagramChannel>;
         using SocketChannelHandlerPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerPtr;
-        using SocketChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
+        using SocketChannelHandlerList = typename ConnectorChannel::ChannelHandlerList;
         using SocketChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
         using DatagramChannelHandlerPtr = typename DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr;
-        using DatagramChannelHandlerList = typename DatagramChannelHandlerPipeline::DatagramChannelHandlerList;
+        using DatagramChannelHandlerList = ::std::list<DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr>;
         using DatagramChannelInitializationCallback = ::std::function<void(DatagramChannel& channel)>;
 
     public:
@@ -50,10 +50,10 @@ namespace nets
         ~Bootstrap() override = default;
 
     public:
-        Bootstrap& channelHandler(SocketChannelHandlerPtr channelHandler);
+        Bootstrap& channelHandler(const SocketChannelHandlerPtr& channelHandler);
         Bootstrap& channelHandler(const SocketChannelInitializationCallback& channelInitializationCallback);
 
-        Bootstrap& channelHandler(DatagramChannelHandlerPtr channelHandler);
+        Bootstrap& channelHandler(const DatagramChannelHandlerPtr& channelHandler);
         Bootstrap& channelHandler(const DatagramChannelInitializationCallback& channelInitializationCallback);
 
         // udp does not bind addr

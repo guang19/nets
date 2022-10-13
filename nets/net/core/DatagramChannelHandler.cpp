@@ -29,13 +29,52 @@
 
 namespace nets
 {
+    DatagramChannelHandler::DatagramChannelHandler() : name_(), next_(nullptr) {}
+
+    DatagramChannelHandler::DatagramChannelHandler(const StringType& name) : name_(name), next_(nullptr) {}
+
+    void DatagramChannelHandler::addLast(const DatagramChannelHandlerPtr& channelHandler)
+    {
+        if (next_ != nullptr)
+        {
+            auto& temp = next_;
+            while (temp->next_ != nullptr)
+            {
+                temp = temp->next_;
+            }
+            temp->next_ = channelHandler;
+        }
+        else
+        {
+            next_ = channelHandler;
+        }
+    }
+
     void DatagramChannelHandler::channelActive(DatagramChannelContext& channelContext)
     {
         NETS_SYSTEM_LOG_DEBUG << "DatagramChannelHandler::channelActive";
+        fireChannelActive(channelContext);
     }
 
     void DatagramChannelHandler::channelRead(DatagramChannelContext& channelContext, DatagramPacket& message)
     {
         NETS_SYSTEM_LOG_DEBUG << "DatagramChannelHandler::channelRead";
+        fireChannelRead(channelContext, message);
+    }
+
+    void DatagramChannelHandler::fireChannelActive(DatagramChannelContext& channelContext)
+    {
+        if (next_ != nullptr)
+        {
+            next_->channelActive(channelContext);
+        }
+    }
+
+    void DatagramChannelHandler::fireChannelRead(DatagramChannelContext& channelContext, DatagramPacket& message)
+    {
+        if (next_ != nullptr)
+        {
+            next_->channelRead(channelContext, message);
+        }
     }
 } // namespace nets

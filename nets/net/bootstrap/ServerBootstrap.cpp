@@ -43,14 +43,22 @@ namespace nets
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::childHandler(ChannelHandlerPtr childHandler)
+    ServerBootstrap& ServerBootstrap::childHandler(const ChannelHandlerPtr& childHandler)
     {
+        if (childHandler == nullptr)
+        {
+            THROW_FMT(::std::invalid_argument, "ServerBootstrap sets childHandler with nullptr");
+        }
         childHandlers_.push_back(childHandler);
         return *this;
     }
 
     ServerBootstrap& ServerBootstrap::childHandler(const ChannelInitializationCallback& childInitializationCallback)
     {
+        if (childInitializationCallback == nullptr)
+        {
+            THROW_FMT(::std::invalid_argument, "Bootstrap sets childHandler with nullptr");
+        }
         childInitializationCallback_ = childInitializationCallback;
         return *this;
     }

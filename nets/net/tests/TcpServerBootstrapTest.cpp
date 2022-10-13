@@ -41,12 +41,14 @@ public:
         NETS_LOG_DEBUG(testLogger) << "isActive=" << channelContext.isActive();
         NETS_LOG_DEBUG(testLogger) << "Server channelConnect ====local address:" << localAddress.toString()
                                    << " client address:" << peerAddress.toString();
-        channelContext.channel().eventLoop()->parent()->isShutdown();
+        assert(!channelContext.channel().eventLoop()->parent()->isShutdown());
+        fireChannelConnect(channelContext, localAddress, peerAddress);
     }
 
     void channelDisconnect(SocketChannelContext& channelContext) override
     {
         NETS_LOG_DEBUG(testLogger) << "Server channelDisconnect:" << channelContext.peerAddress().toString();
+        fireChannelDisconnect(channelContext);
     }
 
     void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
@@ -58,6 +60,7 @@ public:
                              {
                                  writeComplete(ctx);
                              });
+        fireChannelRead(channelContext, message);
     }
 
     void writeComplete(SocketChannelContext& channelContext)
@@ -73,10 +76,11 @@ TEST(TcpServerBootstrapTest, TcpServer)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)
         .option(SockOption::BACKLOG, 1028)
-        //                        .childHandler(::std::shared_ptr<SocketChannelHandler>(new TestServerChannelHandler()))
+        //        .childHandler(::std::shared_ptr<SocketChannelHandler>(nullptr))
         .childHandler(
             [](SocketChannel& channel)
             {
+                channel.pipeline().addLast(::std::shared_ptr<SocketChannelHandler>(new TestServerChannelHandler()));
                 channel.pipeline().addLast(::std::shared_ptr<SocketChannelHandler>(new TestServerChannelHandler()));
             })
         .bind(8080)
@@ -102,54 +106,20 @@ public:
                                  writeComplete(ctx);
                              });
         //        channelContext.shutdown();
-
-        //        channelContext.write(
-        //            "你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你"
-        //            "好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好"
-        //            "，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，"
-        //            "服务端，这是客户端发来的消息"
-        //            "你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你好，服务端，这是客户端发来的消息你"
-        //            "好，服务端，这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消"
-        //            "息这是客户端发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端发来的消息这是客户端"
-        //            "发来的消息这是客户端发来的消息"
-        //            "结尾");
-        //        ByteBuffer buffer;
-        //        buffer.writeInt8(1);
-        //        channelContext.write(buffer);
+        fireChannelConnect(channelContext, localAddress, peerAddress);
     }
 
     void channelDisconnect(SocketChannelContext& channelContext) override
     {
         NETS_LOG_DEBUG(testLogger) << "Client channelDisconnect:" << channelContext.peerAddress().toString();
+        fireChannelDisconnect(channelContext);
     }
 
     void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override
     {
         NETS_LOG_DEBUG(testLogger) << "Client recv server message is:" << message.toString();
         //        channelContext.write(message);
+        fireChannelRead(channelContext, message);
     }
 
     void writeComplete(SocketChannelContext& channelContext)
@@ -165,18 +135,13 @@ TEST(TcpServerBootstrapTest, TcpClient)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)
         .retry(true, 3000)
-        //        .channelHandler(::std::shared_ptr<SocketChannelHandler>(new TestClientChannelHandler()))
+        //        .channelHandler(::std::shared_ptr<SocketChannelHandler>(nullptr))
         .channelHandler(
             [](SocketChannel& channel)
             {
                 channel.pipeline().addLast(::std::shared_ptr<SocketChannelHandler>(new TestClientChannelHandler()));
+                channel.pipeline().addLast(::std::shared_ptr<SocketChannelHandler>(new TestClientChannelHandler()));
             })
         .connect("127.0.0.1", 8080)
         .sync();
-}
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

@@ -65,7 +65,7 @@ namespace nets
         if (errNum != 0)
         {
             NETS_SYSTEM_LOG_ERROR << "ConnectorChannel handleWriteEvent unable to connect to " << peerAddress_.toString()
-                       << ",errNum=" << errNum;
+                                  << ",errNum=" << errNum;
             handleErrorEvent();
         }
         else

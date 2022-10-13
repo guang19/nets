@@ -30,23 +30,68 @@
 
 namespace nets
 {
-    SocketChannelHandler::SocketChannelHandler() : name_(), prev_(nullptr), next_(nullptr) {}
+    SocketChannelHandler::SocketChannelHandler() : name_(), next_(nullptr) {}
 
-    SocketChannelHandler::SocketChannelHandler(const StringType& name) : name_(name), prev_(nullptr), next_(nullptr) {}
+    SocketChannelHandler::SocketChannelHandler(const StringType& name) : name_(name), next_(nullptr) {}
+
+    void SocketChannelHandler::addLast(const SocketChannelHandlerPtr& channelHandler)
+    {
+        if (next_ != nullptr)
+        {
+            auto& temp = next_;
+            while (temp->next_ != nullptr)
+            {
+                temp = temp->next_;
+            }
+            temp->next_ = channelHandler;
+        }
+        else
+        {
+            next_ = channelHandler;
+        }
+    }
 
     void SocketChannelHandler::channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                               const InetSockAddress& peerAddress)
     {
         NETS_SYSTEM_LOG_DEBUG << "SocketChannelHandler::channelConnect";
+        fireChannelConnect(channelContext, localAddress, peerAddress);
     }
 
     void SocketChannelHandler::channelDisconnect(SocketChannelContext& channelContext)
     {
         NETS_SYSTEM_LOG_DEBUG << "SocketChannelHandler::channelDisconnect";
+        fireChannelDisconnect(channelContext);
     }
 
     void SocketChannelHandler::channelRead(SocketChannelContext& channelContext, ByteBuffer& message)
     {
         NETS_SYSTEM_LOG_DEBUG << "SocketChannelHandler::channelRead";
+        fireChannelRead(channelContext, message);
+    }
+
+    void SocketChannelHandler::fireChannelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
+                                                  const InetSockAddress& peerAddress)
+    {
+        if (next_ != nullptr)
+        {
+            next_->channelConnect(channelContext, localAddress, peerAddress);
+        }
+    }
+
+    void SocketChannelHandler::fireChannelDisconnect(SocketChannelContext& channelContext)
+    {
+        if (next_ != nullptr)
+        {
+            next_->channelDisconnect(channelContext);
+        }
+    }
+
+    void SocketChannelHandler::fireChannelRead(SocketChannelContext& channelContext, ByteBuffer& message)
+    {
+        if (next_ != nullptr)
+        {
+            next_->channelRead(channelContext, message);
+        }
     }
 } // namespace nets

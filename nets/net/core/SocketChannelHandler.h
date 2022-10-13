@@ -46,19 +46,40 @@ namespace nets
         virtual ~SocketChannelHandler() = default;
 
     public:
-        inline const StringType& name()
+        inline void setNext(const SocketChannelHandlerPtr& next)
+        {
+            next_ = next;
+        }
+
+        inline const SocketChannelHandlerPtr& next() const
+        {
+            return next_;
+        }
+
+        inline SocketChannelHandlerPtr& next()
+        {
+            return next_;
+        }
+
+        inline const StringType& name() const
         {
             return name_;
         }
+
+        void addLast(const SocketChannelHandlerPtr& channelHandler);
 
         virtual void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                     const InetSockAddress& peerAddress);
         virtual void channelDisconnect(SocketChannelContext& channelContext);
         virtual void channelRead(SocketChannelContext& channelContext, ByteBuffer& message);
 
+        void fireChannelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
+                                const InetSockAddress& peerAddress);
+        void fireChannelDisconnect(SocketChannelContext& channelContext);
+        void fireChannelRead(SocketChannelContext& channelContext, ByteBuffer& message);
+
     private:
         StringType name_;
-        SocketChannelHandlerPtr prev_;
         SocketChannelHandlerPtr next_;
     };
 } // namespace nets

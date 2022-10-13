@@ -112,9 +112,3 @@ TEST(TcpServerBootstrapTest, TcpClient)
         .connect("127.0.0.1", 8080)
         .sync();
 }
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}

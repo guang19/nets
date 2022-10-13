@@ -25,8 +25,6 @@
 #ifndef NETS_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
 #define NETS_DATAGRAM_CHANNEL_HANDLER_PIPELINE_H
 
-#include <list>
-
 #include "nets/net/core/DatagramChannelContext.h"
 #include "nets/net/core/DatagramChannelHandler.h"
 
@@ -37,8 +35,7 @@ namespace nets
     public:
         using DatagramChannelContextRawPtr = DatagramChannelContext*;
         using DatagramChannelContextPtr = ::std::unique_ptr<DatagramChannelContext>;
-        using DatagramChannelHandlerPtr = ::std::shared_ptr<DatagramChannelHandler>;
-        using DatagramChannelHandlerList = ::std::list<DatagramChannelHandlerPtr>;
+        using DatagramChannelHandlerPtr = typename DatagramChannelHandler::DatagramChannelHandlerPtr;
 
     public:
         explicit DatagramChannelHandlerPipeline(DatagramChannelContextRawPtr channelContext);
@@ -50,8 +47,13 @@ namespace nets
             return *channelContext_;
         }
 
-        void addFirst(DatagramChannelHandlerPtr channelHandler);
-        void addLast(DatagramChannelHandlerPtr channelHandler);
+        void addFirst(const DatagramChannelHandlerPtr& channelHandler);
+        void addLast(const DatagramChannelHandlerPtr& channelHandler);
+
+        DatagramChannelHandlerPtr removeFirst();
+        DatagramChannelHandlerPtr removeLast();
+        DatagramChannelHandlerPtr remove(const StringType& name);
+        bool remove(const DatagramChannelHandlerPtr& channelHandler);
 
     public:
         void fireDatagramChannelActive();
@@ -59,7 +61,7 @@ namespace nets
 
     private:
         DatagramChannelContextPtr channelContext_;
-        DatagramChannelHandlerList channelHandlers_;
+        DatagramChannelHandlerPtr headChannelHandler_;
     };
 } // namespace nets
 

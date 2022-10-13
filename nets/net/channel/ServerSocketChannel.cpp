@@ -60,7 +60,7 @@ namespace nets
         return sockFd_;
     }
 
-    void ServerSocketChannel:: bind(const InetSockAddress& localAddress)
+    void ServerSocketChannel::bind(const InetSockAddress& localAddress)
     {
         sockFd_ = socket::createTcpSocket(localAddress.ipFamily());
         socket::setSockNonBlock(sockFd_, true);
@@ -130,7 +130,6 @@ namespace nets
         socketChannel->setChannelOptions(childOptions_);
         for (const auto& childHandler : childHandlers_)
         {
-            assert(childHandler.use_count() == 1);
             socketChannel->pipeline().addLast(childHandler);
         }
         if (childInitializationCallback_ != nullptr)

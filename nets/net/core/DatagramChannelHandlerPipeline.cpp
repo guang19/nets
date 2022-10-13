@@ -27,39 +27,197 @@
 namespace nets
 {
     DatagramChannelHandlerPipeline::DatagramChannelHandlerPipeline(DatagramChannelContextRawPtr channelContext)
-        : channelContext_(channelContext), channelHandlers_()
+        : channelContext_(channelContext), headChannelHandler_(nullptr)
     {
     }
 
-    void DatagramChannelHandlerPipeline::addFirst(DatagramChannelHandlerPtr channelHandler)
+    void DatagramChannelHandlerPipeline::addFirst(const DatagramChannelHandlerPtr& channelHandler)
     {
         if (channelHandler != nullptr)
         {
-            channelHandlers_.push_front(channelHandler);
+            if (headChannelHandler_ != nullptr)
+            {
+                channelHandler->setNext(headChannelHandler_);
+            }
+            headChannelHandler_ = channelHandler;
         }
     }
 
-    void DatagramChannelHandlerPipeline::addLast(DatagramChannelHandlerPtr channelHandler)
+    void DatagramChannelHandlerPipeline::addLast(const DatagramChannelHandlerPtr& channelHandler)
     {
         if (channelHandler != nullptr)
         {
-            channelHandlers_.push_back(channelHandler);
+            if (headChannelHandler_ != nullptr)
+            {
+                headChannelHandler_->addLast(channelHandler);
+            }
+            else
+            {
+                headChannelHandler_ = channelHandler;
+            }
+        }
+    }
+
+    DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr DatagramChannelHandlerPipeline::removeFirst()
+    {
+        if (headChannelHandler_ == nullptr)
+        {
+            return nullptr;
+        }
+        auto ret = headChannelHandler_;
+        if (headChannelHandler_->next() != nullptr)
+        {
+            const auto next = headChannelHandler_->next();
+            headChannelHandler_->setNext(nullptr);
+            headChannelHandler_ = next;
+        }
+        return ret;
+    }
+
+    DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr DatagramChannelHandlerPipeline::removeLast()
+    {
+        if (headChannelHandler_ == nullptr)
+        {
+            return nullptr;
+        }
+        if (headChannelHandler_->next() == nullptr)
+        {
+            auto ret = headChannelHandler_;
+            headChannelHandler_ = nullptr;
+            return ret;
+        }
+        DatagramChannelHandlerPtr ret {};
+        auto& prev = headChannelHandler_;
+        auto& temp = headChannelHandler_->next();
+        for (;;)
+        {
+            if (temp->next() != nullptr)
+            {
+                prev = temp;
+                temp = temp->next();
+            }
+            else
+            {
+                ret = temp;
+                prev->setNext(nullptr);
+                break;
+            }
+        }
+        return ret;
+    }
+
+    DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr DatagramChannelHandlerPipeline::remove(const StringType& name)
+    {
+        if (headChannelHandler_ == nullptr)
+        {
+            return nullptr;
+        }
+        if (headChannelHandler_->next() == nullptr)
+        {
+            if (headChannelHandler_->name() != name)
+            {
+                return nullptr;
+            }
+            else
+            {
+                auto ret = headChannelHandler_;
+                headChannelHandler_ = nullptr;
+                return ret;
+            }
+        }
+        DatagramChannelHandlerPtr ret {};
+        auto& prev = headChannelHandler_;
+        auto& temp = headChannelHandler_->next();
+        for (;;)
+        {
+            if (temp->name() != name)
+            {
+                if (temp->next() != nullptr)
+                {
+                    prev = temp;
+                    temp = temp->next();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                ret = temp;
+                if (temp->next() != nullptr)
+                {
+                    prev->setNext(temp->next());
+                }
+                else
+                {
+                    prev->setNext(nullptr);
+                }
+                break;
+            }
+        }
+        return ret;
+    }
+
+    bool DatagramChannelHandlerPipeline::remove(const DatagramChannelHandlerPtr& channelHandler)
+    {
+        if (headChannelHandler_ == nullptr)
+        {
+            return false;
+        }
+        if (headChannelHandler_->next() == nullptr)
+        {
+            if (headChannelHandler_ == channelHandler)
+            {
+                headChannelHandler_ = nullptr;
+                return true;
+            }
+            return false;
+        }
+        auto& prev = headChannelHandler_;
+        auto& temp = headChannelHandler_->next();
+        for (;;)
+        {
+            if (temp != channelHandler)
+            {
+                if (temp->next() != nullptr)
+                {
+                    prev = temp;
+                    temp = temp->next();
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (temp->next() != nullptr)
+                {
+                    prev->setNext(temp->next());
+                }
+                else
+                {
+                    prev->setNext(nullptr);
+                }
+                return true;
+            }
         }
     }
 
     void DatagramChannelHandlerPipeline::fireDatagramChannelActive()
     {
-        for (auto& channelHandler : channelHandlers_)
+        if (headChannelHandler_ != nullptr)
         {
-            channelHandler->channelActive(*channelContext_);
+            headChannelHandler_->channelActive(*channelContext_);
         }
     }
 
     void DatagramChannelHandlerPipeline::fireDatagramChannelRead(DatagramPacket& message)
     {
-        for (auto& channelHandler : channelHandlers_)
+        if (headChannelHandler_ != nullptr)
         {
-            channelHandler->channelRead(*channelContext_, message);
+            headChannelHandler_->channelRead(*channelContext_, message);
         }
     }
 } // namespace nets

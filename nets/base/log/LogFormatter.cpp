@@ -90,7 +90,7 @@ namespace nets
         // check return value to circumvent [-Werror=format-truncation]
         ::snprintf(timeBuf, sizeof(timeBuf), "%04d-%02d-%02d %02d:%02d:%02d.%06ld", tms.tm_year + 1900, tms.tm_mon + 1,
                    tms.tm_mday, tms.tm_hour, tms.tm_min, tms.tm_sec, logTime.microsPartOfTimestamp()) <= 0
-            ? THROW_FMT(DateTimeFormatException, "DefaultLogFormatter format log time")
+            ? THROW_FMT(DateTimeFormatException, "DefaultLogFormatter format log time error")
             : UNUSED(0);
         logBuffer.writeBytes(timeBuf);
     }

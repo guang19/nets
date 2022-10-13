@@ -32,26 +32,42 @@ namespace nets
     {
     }
 
-    Bootstrap& Bootstrap::channelHandler(SocketChannelHandlerPtr channelHandler)
+    Bootstrap& Bootstrap::channelHandler(const SocketChannelHandlerPtr& channelHandler)
     {
+        if (channelHandler == nullptr)
+        {
+            THROW_FMT(::std::invalid_argument, "Bootstrap sets channelHandler with nullptr");
+        }
         socketChannelHandlers_.push_back(channelHandler);
         return *this;
     }
 
     Bootstrap& Bootstrap::channelHandler(const SocketChannelInitializationCallback& channelInitializationCallback)
     {
+        if (channelInitializationCallback == nullptr)
+        {
+            THROW_FMT(::std::invalid_argument, "Bootstrap sets channelHandler with nullptr");
+        }
         socketChannelInitializationCallback_ = channelInitializationCallback;
         return *this;
     }
 
-    Bootstrap& Bootstrap::channelHandler(DatagramChannelHandlerPtr channelHandler)
+    Bootstrap& Bootstrap::channelHandler(const DatagramChannelHandlerPtr& channelHandler)
     {
+        if (channelHandler == nullptr)
+        {
+            THROW_FMT(::std::invalid_argument, "Bootstrap sets channelHandler with nullptr");
+        }
         datagramChannelHandlers_.push_back(channelHandler);
         return *this;
     }
 
     Bootstrap& Bootstrap::channelHandler(const DatagramChannelInitializationCallback& channelInitializationCallback)
     {
+        if (channelInitializationCallback == nullptr)
+        {
+            THROW_FMT(::std::invalid_argument, "Bootstrap sets channelHandler with nullptr");
+        }
         datagramChannelInitializationCallback_ = channelInitializationCallback;
         return *this;
     }

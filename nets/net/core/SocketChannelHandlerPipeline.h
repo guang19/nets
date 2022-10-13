@@ -25,8 +25,6 @@
 #ifndef NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
 #define NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
 
-#include <list>
-
 #include "nets/net/core/SocketChannelContext.h"
 #include "nets/net/core/SocketChannelHandler.h"
 
@@ -35,10 +33,10 @@ namespace nets
     class SocketChannelHandlerPipeline : Noncopyable
     {
     public:
+        using StringType = SocketChannelHandler::StringType;
         using SocketChannelContextRawPtr = SocketChannelContext*;
         using SocketChannelContextPtr = ::std::unique_ptr<SocketChannelContext>;
         using SocketChannelHandlerPtr = typename SocketChannelHandler::SocketChannelHandlerPtr;
-        using SocketChannelHandlerList = ::std::list<SocketChannelHandlerPtr>;
 
     public:
         explicit SocketChannelHandlerPipeline(SocketChannelContextRawPtr channelContext);
@@ -51,7 +49,12 @@ namespace nets
         }
 
         void addFirst(const SocketChannelHandlerPtr& channelHandler);
-        void addLast(SocketChannelHandlerPtr channelHandler);
+        void addLast(const SocketChannelHandlerPtr& channelHandler);
+
+        SocketChannelHandlerPtr removeFirst();
+        SocketChannelHandlerPtr removeLast();
+        SocketChannelHandlerPtr remove(const StringType& name);
+        bool remove(const SocketChannelHandlerPtr& channelHandler);
 
     public:
         void fireSocketChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
@@ -60,7 +63,7 @@ namespace nets
 
     private:
         SocketChannelContextPtr channelContext_;
-        SocketChannelHandlerList channelHandlers_;
+        SocketChannelHandlerPtr headChannelHandler_;
     };
 } // namespace nets
 

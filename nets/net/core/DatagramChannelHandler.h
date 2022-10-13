@@ -33,12 +33,45 @@ namespace nets
     class DatagramChannelHandler
     {
     public:
-        DatagramChannelHandler() = default;
+        using DatagramChannelHandlerPtr = ::std::shared_ptr<DatagramChannelHandler>;
+
+    public:
+        DatagramChannelHandler();
+        explicit DatagramChannelHandler(const StringType& name);
         virtual ~DatagramChannelHandler() = default;
 
     public:
+        inline void setNext(const DatagramChannelHandlerPtr& next)
+        {
+            next_ = next;
+        }
+
+        inline const DatagramChannelHandlerPtr& next() const
+        {
+            return next_;
+        }
+
+        inline DatagramChannelHandlerPtr& next()
+        {
+            return next_;
+        }
+
+        inline const StringType& name() const
+        {
+            return name_;
+        }
+
+        void addLast(const DatagramChannelHandlerPtr& channelHandler);
+
         virtual void channelActive(DatagramChannelContext& channelContext);
         virtual void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message);
+
+        void fireChannelActive(DatagramChannelContext& channelContext);
+        void fireChannelRead(DatagramChannelContext& channelContext, DatagramPacket& message);
+
+    private:
+        StringType name_;
+        DatagramChannelHandlerPtr next_;
     };
 } // namespace nets
 

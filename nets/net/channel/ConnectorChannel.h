@@ -26,6 +26,7 @@
 #define NETS_CONNECTOR_CHANNEL_H
 
 #include <functional>
+#include <list>
 
 #include "nets/net/channel/SocketChannel.h"
 
@@ -36,7 +37,7 @@ namespace nets
     public:
         using TimeType = ::time_t;
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
-        using ChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
+        using ChannelHandlerList = ::std::list<SocketChannelHandlerPipeline::SocketChannelHandlerPtr>;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:
