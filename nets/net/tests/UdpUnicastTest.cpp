@@ -22,7 +22,6 @@
 
 // @brief Test for udp udp unicast
 
-
 #include <gtest/gtest.h>
 
 #include "nets/net/bootstrap/Bootstrap.h"
@@ -42,7 +41,7 @@ public:
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
         NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
-                   << "\nmessage is:" << message.byteBuffer().toString();
+                                   << "\nmessage is:" << message.byteBuffer().toString();
     }
 };
 
@@ -53,7 +52,7 @@ TEST(UdpUnicastTest, UdpUnicastRecipient)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpRecipientHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpRecipientHandler));
             })
         .bind(8080)
         .sync();
@@ -71,7 +70,7 @@ public:
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
         NETS_LOG_DEBUG(testLogger) << "TestUdpSenderHandler::channelRead recv from " << message.recipient().toString()
-                   << "\nmessage is:" << message.byteBuffer().toString();
+                                   << "\nmessage is:" << message.byteBuffer().toString();
         channelContext.write(message);
     }
 };
@@ -83,7 +82,7 @@ TEST(UdpUnicastTest, UdpUnicastSender)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpSenderHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpSenderHandler));
             })
         .bind()
         .sync();

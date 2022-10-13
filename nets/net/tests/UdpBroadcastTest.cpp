@@ -36,7 +36,7 @@ public:
     void channelRead(DatagramChannelContext& channelContext, DatagramPacket& message) override
     {
         NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
-                   << "\nmessage is:" << message.byteBuffer().toString();
+                                   << "\nmessage is:" << message.byteBuffer().toString();
     }
 };
 

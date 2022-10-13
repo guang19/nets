@@ -74,7 +74,7 @@ namespace nets
             return;
         }
         // cas
-        while (true)
+        for (;;)
         {
             IntType ctl = ctl_.load();
             // set state to shutdown
@@ -155,7 +155,7 @@ namespace nets
     bool ThreadPool::addThreadTask(const TaskType& task, bool isCore)
     {
         // cas
-        while (true)
+        for (;;)
         {
             IntType ctl = ctl_.load();
             if (isShutdown(ctl))

@@ -254,7 +254,7 @@ namespace nets
         // read all at once
         SizeType expectedReadLen = byteBuffer.writableBytes();
         SSizeType readBytes = 0;
-        while (true)
+        for (;;)
         {
             readBytes = byteBuffer.writeBytes(*this, expectedReadLen);
             if (readBytes > 0)
