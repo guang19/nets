@@ -30,6 +30,10 @@
 
 namespace nets
 {
+    SocketChannelHandler::SocketChannelHandler() : name_(), prev_(nullptr), next_(nullptr) {}
+
+    SocketChannelHandler::SocketChannelHandler(const StringType& name) : name_(name), prev_(nullptr), next_(nullptr) {}
+
     void SocketChannelHandler::channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                               const InetSockAddress& peerAddress)
     {

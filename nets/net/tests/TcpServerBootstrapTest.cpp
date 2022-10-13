@@ -73,11 +73,11 @@ TEST(TcpServerBootstrapTest, TcpServer)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)
         .option(SockOption::BACKLOG, 1028)
-        //                        .childHandler(new TestServerChannelHandler())
+        //                        .childHandler(::std::shared_ptr<SocketChannelHandler>(new TestServerChannelHandler()))
         .childHandler(
             [](SocketChannel& channel)
             {
-                channel.pipeline().addLast(new TestServerChannelHandler());
+                channel.pipeline().addLast(::std::shared_ptr<SocketChannelHandler>(new TestServerChannelHandler()));
             })
         .bind(8080)
         .sync();
@@ -165,11 +165,11 @@ TEST(TcpServerBootstrapTest, TcpClient)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)
         .retry(true, 3000)
-        //        .channelHandler(new TestClientChannelHandler())
+        //        .channelHandler(::std::shared_ptr<SocketChannelHandler>(new TestClientChannelHandler()))
         .channelHandler(
             [](SocketChannel& channel)
             {
-                channel.pipeline().addLast(new TestClientChannelHandler);
+                channel.pipeline().addLast(::std::shared_ptr<SocketChannelHandler>(new TestClientChannelHandler()));
             })
         .connect("127.0.0.1", 8080)
         .sync();

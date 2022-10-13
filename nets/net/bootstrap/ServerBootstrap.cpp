@@ -43,13 +43,7 @@ namespace nets
         return *this;
     }
 
-    ServerBootstrap& ServerBootstrap::childHandler(ChannelHandlerRawPtr childHandler)
-    {
-        childHandlers_.push_back(ChannelHandlerPtr(childHandler));
-        return *this;
-    }
-
-    ServerBootstrap& ServerBootstrap::childHandler(const ChannelHandlerPtr& childHandler)
+    ServerBootstrap& ServerBootstrap::childHandler(ChannelHandlerPtr childHandler)
     {
         childHandlers_.push_back(childHandler);
         return *this;

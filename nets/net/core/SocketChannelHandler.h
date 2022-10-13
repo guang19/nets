@@ -25,23 +25,41 @@
 #ifndef NETS_SOCKET_CHANNEL_HANDLER_H
 #define NETS_SOCKET_CHANNEL_HANDLER_H
 
+#include <memory>
+
+#include "nets/base/Noncopyable.h"
 #include "nets/net/core/InetSockAddress.h"
 
 namespace nets
 {
     class ByteBuffer;
     class SocketChannelContext;
-    class SocketChannelHandler
+    class SocketChannelHandler : Noncopyable
     {
     public:
-        SocketChannelHandler() = default;
+        using StringType = ::std::string;
+        using SocketChannelHandlerPtr = ::std::shared_ptr<SocketChannelHandler>;
+
+    public:
+        SocketChannelHandler();
+        explicit SocketChannelHandler(const StringType& name);
         virtual ~SocketChannelHandler() = default;
 
     public:
+        inline const StringType& name()
+        {
+            return name_;
+        }
+
         virtual void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                     const InetSockAddress& peerAddress);
         virtual void channelDisconnect(SocketChannelContext& channelContext);
         virtual void channelRead(SocketChannelContext& channelContext, ByteBuffer& message);
+
+    private:
+        StringType name_;
+        SocketChannelHandlerPtr prev_;
+        SocketChannelHandlerPtr next_;
     };
 } // namespace nets
 

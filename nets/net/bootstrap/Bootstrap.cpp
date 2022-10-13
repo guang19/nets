@@ -32,13 +32,7 @@ namespace nets
     {
     }
 
-    Bootstrap& Bootstrap::channelHandler(SocketChannelHandlerRawPtr channelHandler)
-    {
-        socketChannelHandlers_.push_back(SocketChannelHandlerPtr(channelHandler));
-        return *this;
-    }
-
-    Bootstrap& Bootstrap::channelHandler(const SocketChannelHandlerPtr& channelHandler)
+    Bootstrap& Bootstrap::channelHandler(SocketChannelHandlerPtr channelHandler)
     {
         socketChannelHandlers_.push_back(channelHandler);
         return *this;
@@ -50,13 +44,7 @@ namespace nets
         return *this;
     }
 
-    Bootstrap& Bootstrap::channelHandler(DatagramChannelHandlerRawPtr channelHandler)
-    {
-        datagramChannelHandlers_.push_back(DatagramChannelHandlerPtr(channelHandler));
-        return *this;
-    }
-
-    Bootstrap& Bootstrap::channelHandler(const DatagramChannelHandlerPtr& channelHandler)
+    Bootstrap& Bootstrap::channelHandler(DatagramChannelHandlerPtr channelHandler)
     {
         datagramChannelHandlers_.push_back(channelHandler);
         return *this;

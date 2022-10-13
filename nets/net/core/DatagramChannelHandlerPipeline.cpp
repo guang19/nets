@@ -31,53 +31,20 @@ namespace nets
     {
     }
 
-    DatagramChannelHandlerPipeline::DatagramChannelHandlerPipeline(const DatagramChannelHandlerPipeline& other)
+    void DatagramChannelHandlerPipeline::addFirst(DatagramChannelHandlerPtr channelHandler)
     {
-        this->channelHandlers_ = other.channelHandlers_;
-    }
-
-    DatagramChannelHandlerPipeline::DatagramChannelHandlerPipeline(DatagramChannelHandlerPipeline&& other) noexcept
-        : channelHandlers_(::std::move(other.channelHandlers_))
-    {
-    }
-
-    DatagramChannelHandlerPipeline& DatagramChannelHandlerPipeline::operator=(const DatagramChannelHandlerPipeline& other)
-    {
-        if (this != &other)
+        if (channelHandler != nullptr)
         {
-            this->channelHandlers_ = other.channelHandlers_;
+            channelHandlers_.push_front(channelHandler);
         }
-        return *this;
     }
 
-    DatagramChannelHandlerPipeline&
-    DatagramChannelHandlerPipeline::operator=(DatagramChannelHandlerPipeline&& other) noexcept
+    void DatagramChannelHandlerPipeline::addLast(DatagramChannelHandlerPtr channelHandler)
     {
-        if (this != &other)
+        if (channelHandler != nullptr)
         {
-            this->channelHandlers_ = ::std::move(other.channelHandlers_);
+            channelHandlers_.push_back(channelHandler);
         }
-        return *this;
-    }
-
-    void DatagramChannelHandlerPipeline::addFirst(DatagramChannelHandlerRawPtr channelHandler)
-    {
-        channelHandlers_.push_front(DatagramChannelHandlerPtr(channelHandler));
-    }
-
-    void DatagramChannelHandlerPipeline::addFirst(const DatagramChannelHandlerPtr& channelHandler)
-    {
-        channelHandlers_.push_front(channelHandler);
-    }
-
-    void DatagramChannelHandlerPipeline::addLast(DatagramChannelHandlerRawPtr channelHandler)
-    {
-        channelHandlers_.push_back(DatagramChannelHandlerPtr(channelHandler));
-    }
-
-    void DatagramChannelHandlerPipeline::addLast(const DatagramChannelHandlerPtr& channelHandler)
-    {
-        channelHandlers_.push_back(channelHandler);
     }
 
     void DatagramChannelHandlerPipeline::fireDatagramChannelActive()

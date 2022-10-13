@@ -125,7 +125,7 @@ TEST(UdpMulticastTest, UdpMulticastRepient1)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpRecipientHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpRecipientHandler()));
             })
         .bind(gMulticastPort)
         .sync();
@@ -138,7 +138,7 @@ TEST(UdpMulticastTest, UdpMulticastRepient2)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpRecipientHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpRecipientHandler()));
             })
         .bind(gMulticastPort)
         .sync();
@@ -168,7 +168,7 @@ TEST(UdpMulticastTest, UdpMulticastSender)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpMulticastSenderHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpMulticastSenderHandler()));
             })
         .bind()
         .sync();

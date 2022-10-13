@@ -26,30 +26,23 @@
 #define NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
 
 #include <list>
-#include <memory>
 
 #include "nets/net/core/SocketChannelContext.h"
 #include "nets/net/core/SocketChannelHandler.h"
 
 namespace nets
 {
-    class SocketChannelHandlerPipeline : public Copyable
+    class SocketChannelHandlerPipeline : Noncopyable
     {
     public:
         using SocketChannelContextRawPtr = SocketChannelContext*;
         using SocketChannelContextPtr = ::std::unique_ptr<SocketChannelContext>;
-        using SocketChannelHandlerRawPtr = SocketChannelHandler*;
-        using SocketChannelHandlerPtr = ::std::shared_ptr<SocketChannelHandler>;
+        using SocketChannelHandlerPtr = typename SocketChannelHandler::SocketChannelHandlerPtr;
         using SocketChannelHandlerList = ::std::list<SocketChannelHandlerPtr>;
 
     public:
         explicit SocketChannelHandlerPipeline(SocketChannelContextRawPtr channelContext);
         ~SocketChannelHandlerPipeline() = default;
-
-        SocketChannelHandlerPipeline(const SocketChannelHandlerPipeline& other);
-        SocketChannelHandlerPipeline(SocketChannelHandlerPipeline&& other) noexcept;
-        SocketChannelHandlerPipeline& operator=(const SocketChannelHandlerPipeline& other);
-        SocketChannelHandlerPipeline& operator=(SocketChannelHandlerPipeline&& other) noexcept;
 
     public:
         inline SocketChannelContext& context()
@@ -57,10 +50,8 @@ namespace nets
             return *channelContext_;
         }
 
-        void addFirst(SocketChannelHandlerRawPtr channelHandler);
         void addFirst(const SocketChannelHandlerPtr& channelHandler);
-        void addLast(SocketChannelHandlerRawPtr channelHandler);
-        void addLast(const SocketChannelHandlerPtr& channelHandler);
+        void addLast(SocketChannelHandlerPtr channelHandler);
 
     public:
         void fireSocketChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);

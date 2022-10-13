@@ -34,7 +34,6 @@ namespace nets
     {
     public:
         using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
-        using ChannelHandlerRawPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerRawPtr;
         using ChannelHandlerPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerPtr;
         using ChannelHandlerList = typename SocketChannelHandlerPipeline::SocketChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
@@ -46,8 +45,7 @@ namespace nets
     public:
         ServerBootstrap& childOption(SockOption sockOption, const ChannelOption::ValueType& value);
         // set the ChannelHandler shared by all channels
-        ServerBootstrap& childHandler(ChannelHandlerRawPtr childHandler);
-        ServerBootstrap& childHandler(const ChannelHandlerPtr& childHandler);
+        ServerBootstrap& childHandler(ChannelHandlerPtr childHandler);
         // set the ChannelHandler for each channel
         ServerBootstrap& childHandler(const ChannelInitializationCallback& childInitializationCallback);
 

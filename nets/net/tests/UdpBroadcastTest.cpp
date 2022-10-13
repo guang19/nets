@@ -47,7 +47,7 @@ TEST(UdpBroadcastTest, UdpBroadcastRepient1)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpRecipientHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpRecipientHandler()));
             })
         .bind(8080)
         .sync();
@@ -60,7 +60,7 @@ TEST(UdpBroadcastTest, UdpBroadcastRepient2)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpRecipientHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpRecipientHandler()));
             })
         .bind(8080)
         .sync();
@@ -84,7 +84,7 @@ TEST(UdpBroadcastTest, UdpBroadcastSender)
         .channelHandler(
             [](DatagramChannel& channel)
             {
-                channel.pipeline().addLast(new TestUdpBroadcastSenderHandler);
+                channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpBroadcastSenderHandler()));
             })
         .bind()
         .sync();
