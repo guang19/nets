@@ -218,7 +218,7 @@ namespace nets
             }
             SockLenType ipLen = ::strlen(buffer);
             PortType port = be16toh(addr6_.sin6_port);
-            ::snprintf(buffer + ipLen, length - ipLen, "]:%u", port);
+            ::snprintf(buffer + ipLen, length - ipLen, "]:", port);
         }
         else if (AF_INET == addr_.sa_family)
         {

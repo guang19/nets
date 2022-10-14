@@ -382,7 +382,7 @@ namespace nets
     {
         if (readableBytes() < bytes)
         {
-            THROW_FMT(IndexOutOfBoundsException, "ByteBuffer readableBytes less than bytes %u", bytes);
+            THROW_FMT(IndexOutOfBoundsException, "ByteBuffer readableBytes less than bytes %lu", bytes);
         }
     }
 

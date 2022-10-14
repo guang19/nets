@@ -45,7 +45,7 @@ namespace nets
         SizeType filePathLength = file_.length();
         if (filePathLength > kMaxFilePathLength || filePathLength == 0)
         {
-            THROW_FMT(::std::invalid_argument, "log file name length %lu more than %u", filePathLength, kMaxFilePathLength);
+            THROW_FMT(::std::invalid_argument, "the log file cannot be empty and the length of the log file name cannot exceed %d", kMaxFilePathLength);
         }
         SizeType lastIndex = file_.find_last_of('/');
         if (lastIndex != StringType::npos)

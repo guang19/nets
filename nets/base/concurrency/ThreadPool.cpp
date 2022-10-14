@@ -54,7 +54,7 @@ namespace nets
         {
             THROW_FMT(::std::invalid_argument,
                       "ThreadPool corePoolSize must be greater than 0 and maximumPoolSize must be greater than "
-                      "corePoolSize.corePoolSize=%u,maximumPoolSize=%u",
+                      "corePoolSize.corePoolSize=%d,maximumPoolSize=%d",
                       corePoolSize_, maximumPoolSize_);
         }
         threadPool_.reserve(maximumPoolSize_);
