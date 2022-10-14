@@ -65,11 +65,15 @@ namespace nets
             return nullptr;
         }
         auto ret = headChannelHandler_;
-        if (headChannelHandler_->next() != nullptr)
+        auto next = headChannelHandler_->next();
+        if (next != nullptr)
         {
-            const auto next = headChannelHandler_->next();
             headChannelHandler_->setNext(nullptr);
             headChannelHandler_ = next;
+        }
+        else
+        {
+            headChannelHandler_ = nullptr;
         }
         return ret;
     }
@@ -87,8 +91,8 @@ namespace nets
             return ret;
         }
         DatagramChannelHandlerPtr ret {};
-        auto& prev = headChannelHandler_;
-        auto& temp = headChannelHandler_->next();
+        auto prev = headChannelHandler_;
+        auto temp = headChannelHandler_->next();
         for (;;)
         {
             if (temp->next() != nullptr)
@@ -126,8 +130,8 @@ namespace nets
             }
         }
         DatagramChannelHandlerPtr ret {};
-        auto& prev = headChannelHandler_;
-        auto& temp = headChannelHandler_->next();
+        auto prev = headChannelHandler_;
+        auto temp = headChannelHandler_->next();
         for (;;)
         {
             if (temp->name() != name)
@@ -174,8 +178,8 @@ namespace nets
             }
             return false;
         }
-        auto& prev = headChannelHandler_;
-        auto& temp = headChannelHandler_->next();
+        auto prev = headChannelHandler_;
+        auto temp = headChannelHandler_->next();
         for (;;)
         {
             if (temp != channelHandler)

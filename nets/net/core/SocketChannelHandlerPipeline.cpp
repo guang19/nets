@@ -66,11 +66,15 @@ namespace nets
             return nullptr;
         }
         auto ret = headChannelHandler_;
-        if (headChannelHandler_->next() != nullptr)
+        auto next = headChannelHandler_->next();
+        if (next != nullptr)
         {
-            const auto next = headChannelHandler_->next();
             headChannelHandler_->setNext(nullptr);
             headChannelHandler_ = next;
+        }
+        else
+        {
+            headChannelHandler_ = nullptr;
         }
         return ret;
     }
@@ -87,23 +91,9 @@ namespace nets
             headChannelHandler_ = nullptr;
             return ret;
         }
-        SocketChannelHandlerPtr ret {};
-        auto& prev = headChannelHandler_;
-        auto& temp = headChannelHandler_->next();
-        for (;;)
-        {
-            if (temp->next() != nullptr)
-            {
-                prev = temp;
-                temp = temp->next();
-            }
-            else
-            {
-                ret = temp;
-                prev->setNext(nullptr);
-                break;
-            }
-        }
+        auto prev = headChannelHandler_->findLastPrev();
+        auto ret = prev->next();
+        prev->setNext(nullptr);
         return ret;
     }
 
@@ -127,8 +117,8 @@ namespace nets
             }
         }
         SocketChannelHandlerPtr ret {};
-        auto& prev = headChannelHandler_;
-        auto& temp = headChannelHandler_->next();
+        auto prev = headChannelHandler_;
+        auto temp = headChannelHandler_->next();
         for (;;)
         {
             if (temp->name() != name)
@@ -149,6 +139,7 @@ namespace nets
                 if (temp->next() != nullptr)
                 {
                     prev->setNext(temp->next());
+                    temp->setNext(nullptr);
                 }
                 else
                 {
@@ -175,8 +166,8 @@ namespace nets
             }
             return false;
         }
-        auto& prev = headChannelHandler_;
-        auto& temp = headChannelHandler_->next();
+        auto prev = headChannelHandler_;
+        auto temp = headChannelHandler_->next();
         for (;;)
         {
             if (temp != channelHandler)
@@ -196,6 +187,7 @@ namespace nets
                 if (temp->next() != nullptr)
                 {
                     prev->setNext(temp->next());
+                    temp->setNext(nullptr);
                 }
                 else
                 {

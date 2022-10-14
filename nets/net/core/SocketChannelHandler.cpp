@@ -38,7 +38,7 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            auto& temp = next_;
+            auto temp = next_;
             while (temp->next_ != nullptr)
             {
                 temp = temp->next_;
@@ -49,6 +49,18 @@ namespace nets
         {
             next_ = channelHandler;
         }
+    }
+
+    SocketChannelHandler::SocketChannelHandlerPtr SocketChannelHandler::findLastPrev()
+    {
+        auto prev = shared_from_this();
+        auto temp = next_;
+        while (temp->next_ != nullptr)
+        {
+            prev = temp;
+            temp = temp->next_;
+        }
+        return prev;
     }
 
     void SocketChannelHandler::channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,

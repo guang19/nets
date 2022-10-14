@@ -37,7 +37,7 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            auto& temp = next_;
+            auto temp = next_;
             while (temp->next_ != nullptr)
             {
                 temp = temp->next_;

@@ -34,7 +34,7 @@ namespace nets
 {
     class ByteBuffer;
     class SocketChannelContext;
-    class SocketChannelHandler : Noncopyable
+    class SocketChannelHandler : Noncopyable, public ::std::enable_shared_from_this<SocketChannelHandler>
     {
     public:
         using StringType = ::std::string;
@@ -67,6 +67,7 @@ namespace nets
         }
 
         void addLast(const SocketChannelHandlerPtr& channelHandler);
+        SocketChannelHandlerPtr findLastPrev();
 
         virtual void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                     const InetSockAddress& peerAddress);

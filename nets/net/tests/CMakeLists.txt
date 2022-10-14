@@ -15,6 +15,9 @@ TARGET_LINK_LIBRARIES(SocketTest nets_net gtest_main)
 ADD_EXECUTABLE(ChannelOptionTest ChannelOptionTest.cpp)
 TARGET_LINK_LIBRARIES(ChannelOptionTest nets_net gtest_main)
 
+ADD_EXECUTABLE(ChannelHandlerPipelineTest ChannelHandlerPipelineTest.cpp)
+TARGET_LINK_LIBRARIES(ChannelHandlerPipelineTest nets_net gtest_main)
+
 ADD_EXECUTABLE(SocketServerClientTest SocketServerClientTest.cpp)
 TARGET_LINK_LIBRARIES(SocketServerClientTest nets_net gtest_main)
 
