@@ -20,32 +20,41 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Manage DatagramChannelHandler owned by DatagramChannel
+// @brief ChannelHandlerPipeline has the ability to chain call ChannelHandler
 
-#include "nets/net/core/DatagramChannelHandlerPipeline.h"
+#ifndef NETS_CHANNEL_HANDLER_PIPELINE_H
+#define NETS_CHANNEL_HANDLER_PIPELINE_H
 
-#include "nets/net/core/DatagramChannelHandler.h"
+#include "nets/net/core/ChannelHandler.h"
 
 namespace nets
 {
-    DatagramChannelHandlerPipeline::DatagramChannelHandlerPipeline(DatagramChannelContextRawPtr channelContext)
-        : ChannelHandlerPipeline(), channelContext_(channelContext)
+    class ChannelHandlerPipeline : Noncopyable
     {
-    }
+    public:
+        using StringType = ChannelHandler::StringType;
+        using ChannelHandlerPtr = ChannelHandler::ChannelHandlerPtr;
 
-    void DatagramChannelHandlerPipeline::fireDatagramChannelActive()
-    {
-        if (headChannelHandler_ != nullptr)
-        {
-            ::std::dynamic_pointer_cast<DatagramChannelHandler>(headChannelHandler_)->channelActive(*channelContext_);
-        }
-    }
+    public:
+        ChannelHandlerPipeline();
+        virtual ~ChannelHandlerPipeline() = default;
 
-    void DatagramChannelHandlerPipeline::fireDatagramChannelRead(DatagramPacket& message)
-    {
-        if (headChannelHandler_ != nullptr)
-        {
-            ::std::dynamic_pointer_cast<DatagramChannelHandler>(headChannelHandler_)->channelRead(*channelContext_, message);
-        }
-    }
+    public:
+        void addFirst(const ChannelHandlerPtr& channelHandler);
+        void addLast(const ChannelHandlerPtr& channelHandler);
+
+        ChannelHandlerPtr removeFirst();
+        ChannelHandlerPtr removeLast();
+        ChannelHandlerPtr remove(const StringType& name);
+        bool remove(const ChannelHandlerPtr& channelHandler);
+
+    private:
+        void unlinkHead();
+        void unlinkChannelHandler(const ChannelHandlerPtr& prev, const ChannelHandlerPtr& channelHandler);
+
+    protected:
+        ChannelHandlerPtr headChannelHandler_;
+    };
 } // namespace nets
+
+#endif // NETS_CHANNEL_HANDLER_PIPELINE_H

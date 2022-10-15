@@ -25,43 +25,13 @@
 #include "nets/net/core/SocketChannelHandler.h"
 
 #include "nets/base/log/Logger.h"
-#include "nets/net/core/ByteBuffer.h"
 #include "nets/net/core/SocketChannelContext.h"
 
 namespace nets
 {
-    SocketChannelHandler::SocketChannelHandler() : name_(), next_(nullptr) {}
+    SocketChannelHandler::SocketChannelHandler() : ChannelHandler() {}
 
-    SocketChannelHandler::SocketChannelHandler(const StringType& name) : name_(name), next_(nullptr) {}
-
-    void SocketChannelHandler::addLast(const SocketChannelHandlerPtr& channelHandler)
-    {
-        if (next_ != nullptr)
-        {
-            auto temp = next_;
-            while (temp->next_ != nullptr)
-            {
-                temp = temp->next_;
-            }
-            temp->next_ = channelHandler;
-        }
-        else
-        {
-            next_ = channelHandler;
-        }
-    }
-
-    SocketChannelHandler::SocketChannelHandlerPtr SocketChannelHandler::findLastPrev()
-    {
-        auto prev = shared_from_this();
-        auto temp = next_;
-        while (temp->next_ != nullptr)
-        {
-            prev = temp;
-            temp = temp->next_;
-        }
-        return prev;
-    }
+    SocketChannelHandler::SocketChannelHandler(const StringType& name) : ChannelHandler(name) {}
 
     void SocketChannelHandler::channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                               const InetSockAddress& peerAddress)
@@ -87,7 +57,8 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            next_->channelConnect(channelContext, localAddress, peerAddress);
+            ::std::dynamic_pointer_cast<SocketChannelHandler>(next_)->channelConnect(channelContext, localAddress,
+                                                                                     peerAddress);
         }
     }
 
@@ -95,7 +66,7 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            next_->channelDisconnect(channelContext);
+            ::std::dynamic_pointer_cast<SocketChannelHandler>(next_)->channelDisconnect(channelContext);
         }
     }
 
@@ -103,7 +74,7 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            next_->channelRead(channelContext, message);
+            ::std::dynamic_pointer_cast<SocketChannelHandler>(next_)->channelRead(channelContext, message);
         }
     }
 } // namespace nets

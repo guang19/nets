@@ -25,50 +25,24 @@
 #ifndef NETS_SOCKET_CHANNEL_HANDLER_H
 #define NETS_SOCKET_CHANNEL_HANDLER_H
 
-#include <memory>
-
-#include "nets/base/Noncopyable.h"
+#include "nets/net/core/ChannelHandler.h"
 #include "nets/net/core/InetSockAddress.h"
 
 namespace nets
 {
     class ByteBuffer;
     class SocketChannelContext;
-    class SocketChannelHandler : Noncopyable, public ::std::enable_shared_from_this<SocketChannelHandler>
+    class SocketChannelHandler : public ChannelHandler
     {
     public:
-        using StringType = ::std::string;
         using SocketChannelHandlerPtr = ::std::shared_ptr<SocketChannelHandler>;
 
     public:
         SocketChannelHandler();
         explicit SocketChannelHandler(const StringType& name);
-        virtual ~SocketChannelHandler() = default;
+        virtual ~SocketChannelHandler() override = default;
 
     public:
-        inline void setNext(const SocketChannelHandlerPtr& next)
-        {
-            next_ = next;
-        }
-
-        inline const SocketChannelHandlerPtr& next() const
-        {
-            return next_;
-        }
-
-        inline SocketChannelHandlerPtr& next()
-        {
-            return next_;
-        }
-
-        inline const StringType& name() const
-        {
-            return name_;
-        }
-
-        void addLast(const SocketChannelHandlerPtr& channelHandler);
-        SocketChannelHandlerPtr findLastPrev();
-
         virtual void channelConnect(SocketChannelContext& channelContext, const InetSockAddress& localAddress,
                                     const InetSockAddress& peerAddress);
         virtual void channelDisconnect(SocketChannelContext& channelContext);
@@ -78,10 +52,6 @@ namespace nets
                                 const InetSockAddress& peerAddress);
         void fireChannelDisconnect(SocketChannelContext& channelContext);
         void fireChannelRead(SocketChannelContext& channelContext, ByteBuffer& message);
-
-    private:
-        StringType name_;
-        SocketChannelHandlerPtr next_;
     };
 } // namespace nets
 

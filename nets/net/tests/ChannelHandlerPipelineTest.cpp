@@ -25,6 +25,8 @@
 #include <gtest/gtest.h>
 
 #include "nets/net/core/DatagramChannelHandlerPipeline.h"
+#include "nets/net/core/SocketChannelHandler.h"
+#include "nets/net/core/DatagramChannelHandler.h"
 #include "nets/net/core/SocketChannelHandlerPipeline.h"
 
 using namespace nets;
@@ -50,19 +52,21 @@ TEST(SocketChannelHandlerPipelineTest, AddRemove)
     auto handler4 = ::std::make_shared<TestSocketChannelHandler>("handler4");
     auto handler5 = ::std::make_shared<TestSocketChannelHandler>("handler5");
     auto handler6 = ::std::make_shared<TestSocketChannelHandler>("handler6");
-    ASSERT_FALSE(pipeline.remove(::std::make_shared<TestSocketChannelHandler>("heandler7")));
+    auto handler7 = ::std::make_shared<TestSocketChannelHandler>("handler7");
     pipeline.addFirst(handler2);
     pipeline.addFirst(handler1);
     pipeline.addLast(handler3);
     pipeline.addLast(handler4);
     pipeline.addFirst(handler5);
     pipeline.addLast(handler6);
+    pipeline.addLast(handler7);
     ASSERT_TRUE(pipeline.remove("handler4") == handler4);
     ASSERT_TRUE(pipeline.removeFirst() == handler5);
     ASSERT_TRUE(pipeline.remove("handler3") == handler3);
-    ASSERT_TRUE(pipeline.removeLast() == handler6);
+    ASSERT_TRUE(pipeline.removeLast() == handler7);
     ASSERT_TRUE(pipeline.removeFirst() == handler1);
     ASSERT_TRUE(pipeline.removeFirst() == handler2);
+    ASSERT_TRUE(pipeline.remove(handler6));
     ASSERT_TRUE(pipeline.removeLast() == nullptr);
 }
 
@@ -70,7 +74,7 @@ TEST(SocketChannelHandlerPipelineTest, StackOverflow)
 {
     SocketChannelHandlerPipeline pipeline(nullptr);
     SocketChannelHandlerPipeline::StringType namePrefix = "handler";
-    for (::int32_t i = 0; i < 50000; ++i)
+    for (::int32_t i = 0; i < 10000; ++i)
     {
         pipeline.addLast(::std::make_shared<TestSocketChannelHandler>(namePrefix.append(::std::to_string(i))));
     }
@@ -92,19 +96,21 @@ TEST(DatagramChannelHandlerPipelineTest, AddRemove)
     auto handler4 = ::std::make_shared<TestDatagramChannelHandler>("handler4");
     auto handler5 = ::std::make_shared<TestDatagramChannelHandler>("handler5");
     auto handler6 = ::std::make_shared<TestDatagramChannelHandler>("handler6");
-    ASSERT_FALSE(pipeline.remove(::std::make_shared<TestDatagramChannelHandler>("heandler7")));
+    auto handler7 = ::std::make_shared<TestDatagramChannelHandler>("handler7");
     pipeline.addFirst(handler2);
     pipeline.addFirst(handler1);
     pipeline.addLast(handler3);
     pipeline.addLast(handler4);
     pipeline.addFirst(handler5);
     pipeline.addLast(handler6);
+    pipeline.addLast(handler7);
     ASSERT_TRUE(pipeline.remove("handler4") == handler4);
     ASSERT_TRUE(pipeline.removeFirst() == handler5);
     ASSERT_TRUE(pipeline.remove("handler3") == handler3);
-    ASSERT_TRUE(pipeline.removeLast() == handler6);
+    ASSERT_TRUE(pipeline.removeLast() == handler7);
     ASSERT_TRUE(pipeline.removeFirst() == handler1);
     ASSERT_TRUE(pipeline.removeFirst() == handler2);
+    ASSERT_TRUE(pipeline.remove(handler6));
     ASSERT_TRUE(pipeline.removeLast() == nullptr);
 }
 

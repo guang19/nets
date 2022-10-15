@@ -28,6 +28,7 @@
 #include "nets/net/bootstrap/AbstractBootstrap.h"
 #include "nets/net/channel/ConnectorChannel.h"
 #include "nets/net/channel/DatagramChannel.h"
+#include "nets/net/core/DatagramChannelHandler.h"
 
 namespace nets
 {
@@ -37,12 +38,11 @@ namespace nets
         using TimeType = typename ConnectorChannel::TimeType;
         using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using DatagramChannelPtr = ::std::shared_ptr<DatagramChannel>;
-        using SocketChannelHandlerPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerPtr;
+        using SocketChannelHandlerPtr = typename ConnectorChannel::ChannelHandlerPtr;
         using SocketChannelHandlerList = typename ConnectorChannel::ChannelHandlerList;
         using SocketChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
-
-        using DatagramChannelHandlerPtr = typename DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr;
-        using DatagramChannelHandlerList = ::std::list<DatagramChannelHandlerPipeline::DatagramChannelHandlerPtr>;
+        using DatagramChannelHandlerPtr = typename DatagramChannelHandler::DatagramChannelHandlerPtr;
+        using DatagramChannelHandlerList = ::std::list<DatagramChannelHandlerPtr>;
         using DatagramChannelInitializationCallback = ::std::function<void(DatagramChannel& channel)>;
 
     public:

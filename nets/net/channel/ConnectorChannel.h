@@ -29,6 +29,7 @@
 #include <list>
 
 #include "nets/net/channel/SocketChannel.h"
+#include "nets/net/core/SocketChannelHandler.h"
 
 namespace nets
 {
@@ -37,7 +38,8 @@ namespace nets
     public:
         using TimeType = ::time_t;
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
-        using ChannelHandlerList = ::std::list<SocketChannelHandlerPipeline::SocketChannelHandlerPtr>;
+        using ChannelHandlerPtr = typename SocketChannelHandler::SocketChannelHandlerPtr;
+        using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:

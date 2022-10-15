@@ -20,39 +20,54 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Manage SocketChannelHandler owned by SocketChannel
+// @brief ChannelHandler is a singly linked list structure
 
-#ifndef NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
-#define NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
+#ifndef NETS_CHANNEL_HANDLER_H
+#define NETS_CHANNEL_HANDLER_H
 
-#include "nets/net/core/ChannelHandlerPipeline.h"
-#include "nets/net/core/SocketChannelContext.h"
+#include <memory>
+#include <string>
+
+#include "nets/base/Noncopyable.h"
 
 namespace nets
 {
-    class SocketChannelHandlerPipeline : public ChannelHandlerPipeline
+    class ChannelHandler : Noncopyable, public ::std::enable_shared_from_this<ChannelHandler>
     {
     public:
-        using SocketChannelContextRawPtr = SocketChannelContext*;
-        using SocketChannelContextPtr = ::std::unique_ptr<SocketChannelContext>;
+        using StringType = ::std::string;
+        using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
 
     public:
-        explicit SocketChannelHandlerPipeline(SocketChannelContextRawPtr channelContext);
-        ~SocketChannelHandlerPipeline() override = default;
+        ChannelHandler();
+        explicit ChannelHandler(const StringType& name);
+        virtual ~ChannelHandler() = default;
 
     public:
-        inline SocketChannelContext& context()
+        inline void setNext(const ChannelHandlerPtr& next)
         {
-            return *channelContext_;
+            next_ = next;
         }
 
-        void fireSocketChannelConnect(const InetSockAddress& localAddress, const InetSockAddress& peerAddress);
-        void fireSocketChannelDisconnect();
-        void fireSocketChannelRead(ByteBuffer& message);
+        inline const ChannelHandlerPtr& next() const
+        {
+            return next_;
+        }
 
-    private:
-        SocketChannelContextPtr channelContext_;
+        inline const StringType& name() const
+        {
+            return name_;
+        }
+
+        ChannelHandlerPtr findLast();
+        ChannelHandlerPtr findLastPrev();
+        ChannelHandlerPtr findChannelHandlerPrev(const StringType& name);
+        ChannelHandlerPtr findChannelHandlerPrev(const ChannelHandlerPtr& channelHandler);
+
+    protected:
+        StringType name_;
+        ChannelHandlerPtr next_;
     };
 } // namespace nets
 
-#endif // NETS_SOCKET_CHANNEL_HANDLER_PIPELINE_H
+#endif // NETS_CHANNEL_HANDLER_H

@@ -29,26 +29,9 @@
 
 namespace nets
 {
-    DatagramChannelHandler::DatagramChannelHandler() : name_(), next_(nullptr) {}
+    DatagramChannelHandler::DatagramChannelHandler() : ChannelHandler() {}
 
-    DatagramChannelHandler::DatagramChannelHandler(const StringType& name) : name_(name), next_(nullptr) {}
-
-    void DatagramChannelHandler::addLast(const DatagramChannelHandlerPtr& channelHandler)
-    {
-        if (next_ != nullptr)
-        {
-            auto temp = next_;
-            while (temp->next_ != nullptr)
-            {
-                temp = temp->next_;
-            }
-            temp->next_ = channelHandler;
-        }
-        else
-        {
-            next_ = channelHandler;
-        }
-    }
+    DatagramChannelHandler::DatagramChannelHandler(const StringType& name) : ChannelHandler(name) {}
 
     void DatagramChannelHandler::channelActive(DatagramChannelContext& channelContext)
     {
@@ -66,7 +49,7 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            next_->channelActive(channelContext);
+            ::std::dynamic_pointer_cast<DatagramChannelHandler>(next_)->channelActive(channelContext);
         }
     }
 
@@ -74,7 +57,7 @@ namespace nets
     {
         if (next_ != nullptr)
         {
-            next_->channelRead(channelContext, message);
+            ::std::dynamic_pointer_cast<DatagramChannelHandler>(next_)->channelRead(channelContext, message);
         }
     }
 } // namespace nets

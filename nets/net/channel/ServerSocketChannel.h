@@ -30,6 +30,7 @@
 
 #include "nets/net/channel/SocketChannel.h"
 #include "nets/net/core/InetSockAddress.h"
+#include "nets/net/core/SocketChannelHandler.h"
 
 namespace nets
 {
@@ -38,7 +39,7 @@ namespace nets
     public:
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using NextEventLoopFn = ::std::function<EventLoopRawPtr()>;
-        using ChannelHandlerList = ::std::list<SocketChannelHandlerPipeline::SocketChannelHandlerPtr>;
+        using ChannelHandlerList = ::std::list<SocketChannelHandler::SocketChannelHandlerPtr>;
         using ChannelInitializationCallback = ::std::function<void(SocketChannel& channel)>;
 
     public:

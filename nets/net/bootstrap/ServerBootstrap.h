@@ -34,7 +34,7 @@ namespace nets
     {
     public:
         using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
-        using ChannelHandlerPtr = typename SocketChannelHandlerPipeline::SocketChannelHandlerPtr;
+        using ChannelHandlerPtr = typename SocketChannelHandler::SocketChannelHandlerPtr;
         using ChannelHandlerList = typename ServerSocketChannel::ChannelHandlerList;
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
