@@ -114,13 +114,9 @@ namespace nets
         // {
         // 		// The task throws an exception when it executes
         // }
-        // catch(...)
-        // {
-        //  	// The task throws an unknown exception when it executes
-        // }
         // to catch possible exceptions. The exceptions are as follows:
         // 1. An exception may occur when the submitted task is executed, and the promise sets the abnormal result;
-        // 2. After the task is submitted, the thread pool shutsdown before the task is executed;
+        // 2. After the task is submitted, the thread pool shutdown before the task is executed;
         // 3. The thread pool is full and The task queue cannot receive new tasks, then the task will be discarded;
         template <typename Fn, typename... Args,
                   typename HasRet = typename ::std::enable_if<
