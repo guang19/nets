@@ -24,17 +24,14 @@
 #define NETS_ABSTRACT_EXCEPTION_H
 
 #include <exception>
-#include <string>
 
 #include "nets/base/Noncopyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
     class AbstractException : public ::std::exception, Noncopyable
     {
-    public:
-        using StringType = ::std::string;
-
     protected:
         AbstractException();
         explicit AbstractException(const StringType& cause);

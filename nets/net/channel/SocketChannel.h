@@ -36,7 +36,6 @@ namespace nets
     class SocketChannel : public Channel
     {
     public:
-        using SizeType = ByteBuffer::SizeType;
         using IoVecList = ::std::vector<IoVec>;
         using WriteCompleteCallback = SocketChannelContext::WriteCompleteCallback;
         using WriteCompleteCallbackQueue = ::std::queue<WriteCompleteCallback>;
@@ -95,12 +94,12 @@ namespace nets
         void doWriteDirectly(const void* data, SizeType length, WriteCompleteCallback writeCompleteCallback);
         void appendBuffer(const void* data, SizeType length);
         bool writeBufferLastCanAppend(SizeType length);
-        SSizeType writev(const IoVecList& iovecs, ::int32_t count) const;
+        SSizeType writev(const IoVecList& iovecs, Int32Type count) const;
         void removeSentBuffer(SSizeType writtenBytes);
-        void handleReadError(::int32_t errNum);
-        void handleWriteError(::int32_t errNum);
+        void handleReadError(Int32Type errNum);
+        void handleWriteError(Int32Type errNum);
         void channelInActive();
-        void shutdown(::int32_t how);
+        void shutdown(Int32Type how);
 
     private:
         FdType sockFd_;

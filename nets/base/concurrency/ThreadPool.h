@@ -36,6 +36,7 @@
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/Logger.h"
 #include "nets/base/ThreadHelper.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
@@ -48,9 +49,6 @@ namespace nets
         using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
     public:
-        using IntType = ::int32_t;
-        using TimeType = ::time_t;
-        using StringType = ::std::string;
         using TaskType = ::std::function<void()>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
@@ -77,7 +75,7 @@ namespace nets
         };
 
     public:
-        explicit ThreadPool(IntType corePoolSize, IntType maxPoolSize, IntType maxQueueSize,
+        explicit ThreadPool(Int32Type corePoolSize, Int32Type maxPoolSize, Int32Type maxQueueSize,
                             const StringType& name = kDefaultThreadPoolName,
                             TimeType keepAliveTime = kDefaultIdleKeepAliveTime);
         ~ThreadPool();
@@ -89,7 +87,7 @@ namespace nets
             return isRunning(ctl_);
         }
 
-        inline IntType numOfActiveThreads() const
+        inline Int32Type numOfActiveThreads() const
         {
             return numOfActiveThreads(ctl_);
         }
@@ -140,40 +138,40 @@ namespace nets
         void releaseThread(ThreadWrapperRawPtr threadWrapperRawPtr);
         bool addThreadTask(const TaskType& task, bool isCore);
 
-        inline bool isRunning(IntType ctl) const
+        inline bool isRunning(Int32Type ctl) const
         {
             return (ctl & ~kCountMask) == kRunning;
         }
 
-        inline bool isShutdown(IntType ctl) const
+        inline bool isShutdown(Int32Type ctl) const
         {
             return (ctl & ~kCountMask) == kShutdown;
         }
 
-        inline IntType numOfActiveThreads(IntType ctl) const
+        inline Int32Type numOfActiveThreads(Int32Type ctl) const
         {
             return ctl & kCountMask;
         }
 
     private:
-        static constexpr IntType kInt32Bits = 32;
-        static constexpr IntType kCountBits = kInt32Bits - 2;
+        static constexpr Int32Type kInt32Bits = 32;
+        static constexpr Int32Type kCountBits = kInt32Bits - 2;
         // maximum active thread size
         // 00,111111111111111111111111111111
-        static constexpr IntType kCountMask = (1 << kCountBits) - 1;
+        static constexpr Int32Type kCountMask = (1 << kCountBits) - 1;
         // 01,000000000000000000000000000000
-        static constexpr IntType kRunning = 1 << kCountBits;
+        static constexpr Int32Type kRunning = 1 << kCountBits;
         // 00,000000000000000000000000000000
-        static constexpr IntType kShutdown = 0 << kCountBits;
+        static constexpr Int32Type kShutdown = 0 << kCountBits;
 
         static constexpr TimeType kDefaultIdleKeepAliveTime = 30000;
         static constexpr char kDefaultThreadPoolName[] = "NetsThreadPool";
 
     private:
         // the numbers of core threads, once created, will be destroyed as the life cycle of the thread pool ends
-        IntType corePoolSize_;
+        Int32Type corePoolSize_;
         // the maximum numbers of threads that the thread pool can hold
-        IntType maximumPoolSize_;
+        Int32Type maximumPoolSize_;
         // time that idle threads can survive, unit: ms
         TimeType idleKeepAliveTime_;
         // task queue
@@ -182,7 +180,7 @@ namespace nets
         StringType name_;
         // high 2bits represent thread pool status: 00 - shutdown; 01-running.
         // low 30bits represent thread pool active thread size.
-        ::std::atomic<IntType> ctl_;
+        ::std::atomic<Int32Type> ctl_;
         MutexType mutex_;
         ConditionVariableType cv_;
     };
@@ -191,7 +189,7 @@ namespace nets
     bool ThreadPool::execute(Fn&& fn, Args&&... args)
     {
         TaskType task = ::std::bind(::std::forward<Fn>(fn), ::std::forward<Args>(args)...);
-        IntType ctl = ctl_.load();
+        Int32Type ctl = ctl_.load();
         assert(isRunning(ctl));
         if (isShutdown(ctl))
         {

@@ -28,15 +28,15 @@ namespace nets
 {
     namespace
     {
-        constexpr ::int32_t kMaximumOfLogBuffer = 24;
+        constexpr Int32Type kMaximumOfLogBuffer = 24;
 
         // Log buffer flush interval,unit：milliseconds
-        constexpr ::time_t kLogBufferFlushInterval = 1000;
+        constexpr TimeType kLogBufferFlushInterval = 1000;
 
         // if you want to test DAILY_FILE, you need to adjust kSecondsPerDay for short intervals, not for the whole day
-        constexpr ::time_t kSecondsPerDay = 60 * 60 * 24;
+        constexpr TimeType kSecondsPerDay = 60 * 60 * 24;
         // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-        // constexpr ::time_t kSecondsPerDay = 30;
+        // constexpr TimeType kSecondsPerDay = 30;
     } // namespace
 
     INIT_SINGLETON(StdoutLogAppender);
@@ -146,7 +146,7 @@ namespace nets
             if (buffers.size() > kMaximumOfLogBuffer)
             {
                 SizeType bufferSize = buffers.size();
-                buffers.erase(buffers.begin() + static_cast<::int64_t>(bufferSize >> 1), buffers.end());
+                buffers.erase(buffers.begin() + static_cast<Int64Type>(bufferSize >> 1), buffers.end());
                 char warning[64] = {0};
                 ::snprintf(warning, sizeof(warning), "Dropped %ld log buffers\n", bufferSize >> 1);
                 auto buf = std::make_unique<BufferType>();

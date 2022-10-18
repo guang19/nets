@@ -36,8 +36,8 @@ namespace nets
 {
     namespace
     {
-        constexpr EventLoop::TimeType kDefaultPollTimeout = 3000;
-        constexpr EventLoop::TimeType kMinimumPollTimeout = 1;
+        constexpr TimeType kDefaultPollTimeout = 3000;
+        constexpr TimeType kMinimumPollTimeout = 1;
         __thread EventLoop::EventLoopRawPtr tCurrentThreadEventLoop = nullptr;
     } // namespace
 

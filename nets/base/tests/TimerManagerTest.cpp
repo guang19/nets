@@ -64,7 +64,7 @@ TEST_F(TimerManagerTest, ExecuteRepeatable)
 {
     timerManager->addTimer(Timestamp::now().plusSeconds(1), Timer::kRepeatForever, 2000, false, testFunc);
     ::sleep(1);
-    for (::int32_t i = 0; i < 6; ++i)
+    for (Int32Type i = 0; i < 6; ++i)
     {
         timerManager->update();
         ::sleep(2);
@@ -84,7 +84,7 @@ TEST_F(TimerManagerTest, ExecuteFixedDelay)
 {
     timerManager->addTimer(Timestamp::now().plusMilliseconds(2000), 6, 3000, true, fixedDelayFunc);
     ::sleep(2);
-    for (::int32_t i = 0; i < 6; ++i)
+    for (Int32Type i = 0; i < 6; ++i)
     {
         timerManager->update();
         ::sleep(3);
@@ -119,7 +119,7 @@ TEST_F(TimerManagerTest, Remove)
     TimerId timerId2 =
         timerManager->addTimer(Timestamp::now().plusMilliseconds(1000), Timer::kRepeatForever, 2000, false, func2);
     ::sleep(1);
-    for (::int32_t i = 0; i < 6; ++i)
+    for (Int32Type i = 0; i < 6; ++i)
     {
         timerManager->update();
         if (i == 3)

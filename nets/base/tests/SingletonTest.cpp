@@ -27,6 +27,7 @@
 #include <string>
 #include <thread>
 
+#include "nets/base/Types.h"
 #include "nets/base/Singleton.h"
 
 using namespace nets;
@@ -38,15 +39,15 @@ DECLARE_SINGLETON_CLASS(Clazz)
 public:
     Clazz() {}
 
-    explicit Clazz(const ::std::string& name) : name_(name) {}
+    explicit Clazz(const StringType& name) : name_(name) {}
 
-    ::std::string name() const
+    StringType name() const
     {
         return name_;
     }
 
 private:
-    ::std::string name_ {};
+    StringType name_ {};
 };
 INIT_SINGLETON(Clazz);
 

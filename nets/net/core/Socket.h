@@ -31,16 +31,14 @@ namespace nets
 {
     namespace
     {
-        using FdType = ::int32_t;
-        using OptValType = ::int32_t;
+        using FdType = Int32Type;
+        using OptValType = Int32Type;
         using SockLinger = struct linger;
         using IoVec = struct iovec;
         using InAddr = struct in_addr;
         using IpMreqn = struct ip_mreqn;
         using Ipv6Mreq = struct ipv6_mreq;
-        using SizeType = ::size_t;
         using SSizeType = ::ssize_t;
-        using StringType = std::string;
     } // namespace
 
     namespace socket
@@ -51,22 +49,22 @@ namespace nets
         FdType createUdpSocket(SockAddrFamily family = AF_INET);
         void setSockCloExec(FdType sockFd);
         void closeFd(FdType fd);
-        void shutdown(FdType sockFd, ::int32_t how);
-        const char* shutdownHowToString(::int32_t how);
+        void shutdown(FdType sockFd, Int32Type how);
+        const char* shutdownHowToString(Int32Type how);
 
         // EMFILE: The per-process limit of open file descriptors has been reached
         FdType createIdleFd();
         void dealwithEMFILE(FdType& idleFd, FdType sockFd);
 
         void bind(FdType sockFd, const InetSockAddress& localAddr);
-        void listen(FdType sockFd, ::int32_t backlog);
+        void listen(FdType sockFd, Int32Type backlog);
         FdType accept(FdType sockFd, InetSockAddress& localAddr);
-        ::int32_t connect(FdType sockFd, const InetSockAddress& peerAddr);
+        Int32Type connect(FdType sockFd, const InetSockAddress& peerAddr);
 
         SSizeType read(FdType fd, void* buf, SizeType n);
-        SSizeType readv(FdType fd, const IoVec* iov, ::int32_t iovcnt);
+        SSizeType readv(FdType fd, const IoVec* iov, Int32Type iovcnt);
         SSizeType write(FdType fd, const void* buf, SizeType n);
-        SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt);
+        SSizeType writev(FdType fd, const IoVec* iov, Int32Type iovcnt);
 
         SSizeType sendTo(FdType fd, const void* buf, SizeType n, const InetSockAddress& destAddr);
         SSizeType recvFrom(FdType fd, void* buf, SizeType n, InetSockAddress& srcAddr);
@@ -93,8 +91,8 @@ namespace nets
         void setIpv6MulticastIf(FdType sockFd, const StringType& ifName);
 
         // set multicast TTL
-        void setIpMulticastTTL(FdType sockFd, uint8_t ttl);
-        void setIpv6MulticastHops(FdType sockFd, uint8_t hops);
+        void setIpMulticastTTL(FdType sockFd, Uint8Type ttl);
+        void setIpv6MulticastHops(FdType sockFd, Uint8Type hops);
 
         // set multicast send loop enable
         void setIpMulticastLoop(FdType sockFd, bool enable);
@@ -126,13 +124,13 @@ namespace nets
 
     namespace
     {
-        constexpr ::int32_t kDefaultMaximumOfBackLog = SOMAXCONN;
+        constexpr Int32Type kDefaultMaximumOfBackLog = SOMAXCONN;
 
-        static const ::int32_t kDefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
-        static const ::int32_t kDefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
+        static const Int32Type kDefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
+        static const Int32Type kDefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
 
-        static const ::int32_t kDefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
-        static const ::int32_t kDefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
+        static const Int32Type kDefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
+        static const Int32Type kDefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
     } // namespace
 } // namespace nets
 

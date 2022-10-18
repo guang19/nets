@@ -73,8 +73,8 @@ TEST(SocketChannelHandlerPipelineTest, AddRemove)
 TEST(SocketChannelHandlerPipelineTest, StackOverflow)
 {
     SocketChannelHandlerPipeline pipeline(nullptr);
-    SocketChannelHandlerPipeline::StringType namePrefix = "handler";
-    for (::int32_t i = 0; i < 10000; ++i)
+    StringType namePrefix = "handler";
+    for (Int32Type i = 0; i < 10000; ++i)
     {
         pipeline.addLast(::std::make_shared<TestSocketChannelHandler>(namePrefix.append(::std::to_string(i))));
     }

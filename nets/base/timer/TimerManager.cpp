@@ -83,7 +83,7 @@ namespace nets
         }
     }
 
-    TimerManager::TimeType TimerManager::nearestTimerRemainingExpiredTime()
+    TimeType TimerManager::nearestTimerRemainingExpiredTime()
     {
         auto begin = timers_.begin();
         if (begin == timers_.end())

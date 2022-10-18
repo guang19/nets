@@ -50,7 +50,7 @@ namespace nets
         FdType fd() const override;
 
     public:
-        inline void setBacklog(::int32_t backlog) override
+        inline void setBacklog(Int32Type backlog) override
         {
             backlog_ = backlog;
         }
@@ -82,12 +82,12 @@ namespace nets
 
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);
-        void handleAcceptError(::int32_t errNum);
+        void handleAcceptError(Int32Type errNum);
 
     private:
         FdType sockFd_;
         FdType idleFd_;
-        ::int32_t backlog_;
+        Int32Type backlog_;
         ChannelOptionList channelOptions_;
         NextEventLoopFn nextEventLoopFn_;
         ChannelOptionList childOptions_;

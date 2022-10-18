@@ -37,17 +37,17 @@ namespace nets
 {
     namespace
     {
-        constexpr ByteBuffer::SizeType kDefaultInitialCapacity = 1024;
-        constexpr ByteBuffer::SizeType kMaxCapacity = INT32_MAX - 1;
+        constexpr SizeType kDefaultInitialCapacity = 1024;
+        constexpr SizeType kMaxCapacity = INT32_MAX - 1;
 
-        constexpr ByteBuffer::SizeType kBooleanSize = sizeof(bool);
-        constexpr ByteBuffer::SizeType kCharSize = sizeof(char);
-        constexpr ByteBuffer::SizeType kInt8Size = sizeof(::int8_t);
-        constexpr ByteBuffer::SizeType kInt16Size = sizeof(::int16_t);
-        constexpr ByteBuffer::SizeType kInt32Size = sizeof(::int32_t);
-        constexpr ByteBuffer::SizeType kInt64Size = sizeof(::int64_t);
-        constexpr ByteBuffer::SizeType kFloatSize = sizeof(float);
-        constexpr ByteBuffer::SizeType kDoubleSize = sizeof(double);
+        constexpr SizeType kBooleanSize = sizeof(bool);
+        constexpr SizeType kCharSize = sizeof(char);
+        constexpr SizeType kInt8Size = sizeof(Int8Type);
+        constexpr SizeType kInt16Size = sizeof(Int16Type);
+        constexpr SizeType kInt32Size = sizeof(Int32Type);
+        constexpr SizeType kInt64Size = sizeof(Int64Type);
+        constexpr SizeType kFloatSize = sizeof(float);
+        constexpr SizeType kDoubleSize = sizeof(double);
     } // namespace
 
     ByteBuffer::ByteBuffer() : ByteBuffer(kDefaultInitialCapacity) {}
@@ -173,49 +173,49 @@ namespace nets
         return bytes;
     }
 
-    void ByteBuffer::writeInt8(::int8_t value)
+    void ByteBuffer::writeInt8(Int8Type value)
     {
         writeBytes(&value, kInt8Size);
     }
 
-    void ByteBuffer::writeUint8(::uint8_t value)
+    void ByteBuffer::writeUint8(Uint8Type value)
     {
         writeBytes(&value, kInt8Size);
     }
 
-    void ByteBuffer::writeInt16(::int16_t value)
+    void ByteBuffer::writeInt16(Int16Type value)
     {
-        ::int16_t tmp = htobe16(value);
+        Int16Type tmp = htobe16(value);
         writeBytes(&tmp, kInt16Size);
     }
 
-    void ByteBuffer::writeUint16(::uint16_t value)
+    void ByteBuffer::writeUint16(Uint16Type value)
     {
-        ::uint16_t tmp = htobe16(value);
+        Uint16Type tmp = htobe16(value);
         writeBytes(&tmp, kInt16Size);
     }
 
-    void ByteBuffer::writeInt32(::int32_t value)
+    void ByteBuffer::writeInt32(Int32Type value)
     {
-        ::int32_t tmp = htobe32(value);
+        Int32Type tmp = htobe32(value);
         writeBytes(&tmp, kInt32Size);
     }
 
-    void ByteBuffer::writeUint32(::uint32_t value)
+    void ByteBuffer::writeUint32(Uint32Type value)
     {
-        ::uint32_t tmp = htobe32(value);
+        Uint32Type tmp = htobe32(value);
         writeBytes(&tmp, kInt32Size);
     }
 
-    void ByteBuffer::writeInt64(::int64_t value)
+    void ByteBuffer::writeInt64(Int64Type value)
     {
-        ::int64_t tmp = htobe64(value);
+        Int64Type tmp = htobe64(value);
         writeBytes(&tmp, kInt64Size);
     }
 
-    void ByteBuffer::writeUint64(::uint64_t value)
+    void ByteBuffer::writeUint64(Uint64Type value)
     {
-        ::uint64_t tmp = htobe64(value);
+        Uint64Type tmp = htobe64(value);
         writeBytes(&tmp, kInt64Size);
     }
 
@@ -247,7 +247,7 @@ namespace nets
         return c;
     }
 
-    ByteBuffer::StringType ByteBuffer::readBytes(SizeType length)
+    StringType ByteBuffer::readBytes(SizeType length)
     {
         checkReadableBytes(length);
         StringType s(&buffer_[readerIndex_], length);
@@ -255,37 +255,37 @@ namespace nets
         return s;
     }
 
-    ::int8_t ByteBuffer::readInt8()
+    Int8Type ByteBuffer::readInt8()
     {
         checkReadableBytes(kInt8Size);
-        ::int8_t val = 0;
+        Int8Type val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], kInt8Size);
         adjustReaderIndex(kInt8Size);
         return val;
     }
 
-    ::int16_t ByteBuffer::readInt16()
+    Int16Type ByteBuffer::readInt16()
     {
         checkReadableBytes(kInt16Size);
-        ::int16_t val = 0;
+        Int16Type val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], kInt16Size);
         adjustReaderIndex(kInt16Size);
         return be16toh(val);
     }
 
-    ::int32_t ByteBuffer::readInt32()
+    Int32Type ByteBuffer::readInt32()
     {
         checkReadableBytes(kInt32Size);
-        ::int32_t val = 0;
+        Int32Type val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], kInt32Size);
         adjustReaderIndex(kInt32Size);
         return be32toh(val);
     }
 
-    ::int64_t ByteBuffer::readInt64()
+    Int64Type ByteBuffer::readInt64()
     {
         checkReadableBytes(kInt64Size);
-        ::int64_t val = 0L;
+        Int64Type val = 0L;
         ::memcpy(&val, &buffer_[readerIndex_], kInt64Size);
         adjustReaderIndex(kInt64Size);
         return be64toh(val);
@@ -309,7 +309,7 @@ namespace nets
         return *(double*) &val;
     }
 
-    ByteBuffer::StringType ByteBuffer::toString() const
+    StringType ByteBuffer::toString() const
     {
         return {&buffer_[readerIndex_], readableBytes()};
     }
@@ -339,7 +339,7 @@ namespace nets
         }
     }
 
-    ByteBuffer::SizeType ByteBuffer::calculateNewCapacity(SizeType targetCapacity) const
+    SizeType ByteBuffer::calculateNewCapacity(SizeType targetCapacity) const
     {
         // ensure newCapacity is a power of 2
         if (targetCapacity == 0)

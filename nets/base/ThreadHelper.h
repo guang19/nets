@@ -28,13 +28,15 @@
 #include <cstdint>
 #include <pthread.h>
 
+#include "nets/base/Types.h"
+
 namespace nets
 {
     namespace
     {
         // it‘s too short that the max length that unix/linux posix thread name is 16
-        // constexpr ::int32_t gThreadNameMaxLength = 16;
-        constexpr ::int32_t kThreadNameMaxLength = 64;
+        // constexpr Int32Type gThreadNameMaxLength = 16;
+        constexpr Int32Type kThreadNameMaxLength = 64;
     } // namespace
 
     ::pid_t currentTid();
@@ -42,6 +44,8 @@ namespace nets
 
     void setCurrentThreadName(const char* threadName);
     const char* currentThreadName();
+
+    StringType stackTrace();
 } // namespace nets
 
 #endif // NETS_THREAD_HELPER_H

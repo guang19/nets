@@ -30,12 +30,14 @@
 #include <unistd.h>
 
 #include "nets/base/Common.h"
+#include "nets/base/exception/FileCreateException.h"
+#include "nets/base/exception/FileOpenException.h"
 
 namespace nets
 {
     namespace
     {
-        constexpr ::int32_t kMaxFilePathLength = 512;
+        constexpr Int32Type kMaxFilePathLength = 512;
         constexpr char const kLogFileNamePattern[] = "%Y-%m-%d_%H-%M-%S";
         constexpr char const kLogFileSuffix[] = ".log";
     } // namespace
@@ -45,7 +47,9 @@ namespace nets
         SizeType filePathLength = file_.length();
         if (filePathLength > kMaxFilePathLength || filePathLength == 0)
         {
-            THROW_FMT(::std::invalid_argument, "the log file cannot be empty and the length of the log file name cannot exceed %d", kMaxFilePathLength);
+            THROW_FMT(::std::invalid_argument,
+                      "the log file cannot be empty and the length of the log file name cannot exceed %d",
+                      kMaxFilePathLength);
         }
         SizeType lastIndex = file_.find_last_of('/');
         if (lastIndex != StringType::npos)
@@ -82,7 +86,7 @@ namespace nets
             SizeType n = ::fwrite_unlocked(data + writtenBytes, 1, remain, fp_);
             if (n != remain)
             {
-                ::int32_t errNum = ::ferror(fp_);
+                Int32Type errNum = ::ferror(fp_);
                 if (errNum != 0)
                 {
                     ::fprintf(stderr,

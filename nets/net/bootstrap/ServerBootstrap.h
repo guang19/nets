@@ -39,7 +39,7 @@ namespace nets
         using ChannelInitializationCallback = typename ServerSocketChannel::ChannelInitializationCallback;
 
     public:
-        explicit ServerBootstrap(IntType numOfChildEventLoops);
+        explicit ServerBootstrap(Int32Type numOfChildEventLoops);
         ~ServerBootstrap() override = default;
 
     public:
@@ -70,7 +70,7 @@ namespace nets
         EventLoopGroup childLoopGroup_;
 
         static constexpr char kChildEventLoopGroupName[] = "ChildLoopGroup";
-        static const IntType kDefaultNumbOfChildEventLoops;
+        static const Int32Type kDefaultNumbOfChildEventLoops;
     };
 } // namespace nets
 

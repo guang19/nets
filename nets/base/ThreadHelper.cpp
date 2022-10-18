@@ -24,6 +24,7 @@
 
 #include "nets/base/ThreadHelper.h"
 
+#include <execinfo.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -87,5 +88,28 @@ namespace nets
     const char* currentThreadName()
     {
         return tThreadName;
+    }
+
+    StringType stackTrace()
+    {
+        constexpr Int32Type kMaxBackTraceSize = 24;
+        StringType backtraceInfo;
+        void* addrList[kMaxBackTraceSize];
+        Int32Type numOfAddr = ::backtrace(addrList, kMaxBackTraceSize);
+        if (numOfAddr == 0)
+        {
+            return backtraceInfo;
+        }
+        char** symbolList = ::backtrace_symbols(addrList, numOfAddr);
+        if (symbolList != nullptr)
+        {
+            for (Int32Type i = 1; i < numOfAddr; ++i)
+            {
+                backtraceInfo.append(symbolList[i]);
+                backtraceInfo.push_back('\n');
+            }
+            free(symbolList);
+        }
+        return backtraceInfo;
     }
 } // namespace nets

@@ -83,7 +83,7 @@ namespace nets
     class LogMessage : Noncopyable
     {
     public:
-        explicit LogMessage(LogLevel level, const char* file, ::int32_t line);
+        explicit LogMessage(LogLevel level, const char* file, Int32Type line);
         ~LogMessage() = default;
 
     public:
@@ -102,7 +102,7 @@ namespace nets
             return file_;
         }
 
-        inline ::int32_t getLine() const
+        inline Int32Type getLine() const
         {
             return line_;
         }
@@ -121,14 +121,14 @@ namespace nets
         Timestamp time_;
         LogLevel level_;
         const char* file_;
-        ::int32_t line_;
+        Int32Type line_;
         LogBufferStream stream_;
     };
 
     class LogMessageStream : Noncopyable
     {
     public:
-        explicit LogMessageStream(LoggerPtr& logger, LogLevel logLevel, const char* file, ::uint32_t line);
+        explicit LogMessageStream(LoggerPtr& logger, LogLevel logLevel, const char* file, Int32Type line);
         ~LogMessageStream();
 
     public:
@@ -145,7 +145,6 @@ namespace nets
     class Logger : Noncopyable
     {
     public:
-        using StringType = ::std::string;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
         using LogAppenderPtr = ::std::shared_ptr<LogAppender>;
@@ -199,7 +198,6 @@ namespace nets
         ~LoggerManager() = default;
 
     private:
-        using StringType = Logger::StringType;
         using LoggerContainer = ::std::map<StringType, LoggerPtr>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;

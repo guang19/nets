@@ -178,7 +178,7 @@ namespace nets
         }
     }
 
-    InetSockAddress::StringType InetSockAddress::ip() const
+    StringType InetSockAddress::ip() const
     {
         char buffer[64] = {0};
         auto length = static_cast<SockLenType>(sizeof(buffer));
@@ -204,7 +204,7 @@ namespace nets
         return be16toh(addr4_.sin_port);
     }
 
-    InetSockAddress::StringType InetSockAddress::toString() const
+    StringType InetSockAddress::toString() const
     {
         char buffer[128] = {0};
         auto length = static_cast<SockLenType>(sizeof(buffer));

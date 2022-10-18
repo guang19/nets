@@ -38,7 +38,7 @@ namespace nets
 
     namespace
     {
-        using EventType = ::uint32_t;
+        using EventType = Uint32Type;
         // event type
         constexpr EventType kNoneEvent = 0;
         constexpr EventType kReadEvent = 0x01;
@@ -49,7 +49,6 @@ namespace nets
     class Channel : Noncopyable, public ::std::enable_shared_from_this<Channel>
     {
     public:
-        using StringType = std::string;
         using EventLoopRawPtr = EventLoop*;
         using ChannelOptionList = ::std::unordered_map<SockOption, ChannelOption::ValueType>;
 
@@ -79,7 +78,7 @@ namespace nets
 
     public:
         void setChannelOption(SockOption sockOption, const ChannelOption::ValueType& value);
-        virtual void setBacklog(::int32_t backlog);
+        virtual void setBacklog(Int32Type backlog);
 
     public:
         virtual FdType fd() const = 0;

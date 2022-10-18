@@ -112,7 +112,7 @@ namespace nets
             {
                 case SockOption::BACKLOG:
                 {
-                    setBacklog(::std::get<::int32_t>(value));
+                    setBacklog(::std::get<Int32Type>(value));
                     break;
                 }
                 case SockOption::REUSE_ADDR:
@@ -172,12 +172,12 @@ namespace nets
                 }
                 case SockOption::IP4_MULTICAST_TTL:
                 {
-                    socket::setIpMulticastTTL(sockFd, ::std::get<uint8_t>(value));
+                    socket::setIpMulticastTTL(sockFd, ::std::get<Uint8Type>(value));
                     break;
                 }
                 case SockOption::IP6_MULTICAST_HOPS:
                 {
-                    socket::setIpv6MulticastHops(sockFd, ::std::get<uint8_t>(value));
+                    socket::setIpv6MulticastHops(sockFd, ::std::get<Uint8Type>(value));
                     break;
                 }
                 case SockOption::IP4_MULTICAST_LOOP:
@@ -211,7 +211,7 @@ namespace nets
         }
     }
 
-    void Channel::setBacklog(::int32_t backlog)
+    void Channel::setBacklog(Int32Type backlog)
     {
         THROW_FMT(::std::runtime_error, "Channel does not support setting backlog");
     }

@@ -34,49 +34,49 @@ namespace nets
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int8_t value)
+    LogBufferStream& LogBufferStream::operator<<(Int8Type value)
     {
         buffer_.writeInt8(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint8_t value)
+    LogBufferStream& LogBufferStream::operator<<(Uint8Type value)
     {
         buffer_.writeUint8(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int16_t value)
+    LogBufferStream& LogBufferStream::operator<<(Int16Type value)
     {
         buffer_.writeInt16(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint16_t value)
+    LogBufferStream& LogBufferStream::operator<<(Uint16Type value)
     {
         buffer_.writeUint16(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int32_t value)
+    LogBufferStream& LogBufferStream::operator<<(Int32Type value)
     {
         buffer_.writeInt32(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint32_t value)
+    LogBufferStream& LogBufferStream::operator<<(Uint32Type value)
     {
         buffer_.writeUint32(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::int64_t value)
+    LogBufferStream& LogBufferStream::operator<<(Int64Type value)
     {
         buffer_.writeInt64(value);
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(::uint64_t value)
+    LogBufferStream& LogBufferStream::operator<<(Uint64Type value)
     {
         buffer_.writeUint64(value);
         return *this;
@@ -106,13 +106,13 @@ namespace nets
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(const ::std::string& str)
+    LogBufferStream& LogBufferStream::operator<<(const StringType& str)
     {
         buffer_.writeBytes(str.c_str(), str.length());
         return *this;
     }
 
-    LogBufferStream& LogBufferStream::operator<<(const std::string_view& str)
+    LogBufferStream& LogBufferStream::operator<<(const StringViewType& str)
     {
         buffer_.writeBytes(str.data(), str.length());
         return *this;

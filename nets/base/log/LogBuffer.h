@@ -25,6 +25,7 @@
 #ifndef NETS_LOG_BUFFER_H
 #define NETS_LOG_BUFFER_H
 
+#include "nets/base/Noncopyable.h"
 #include "nets/base/StackBuffer.h"
 
 namespace nets
@@ -34,7 +35,7 @@ namespace nets
         // log length limit: 4K
         constexpr SizeType kLogBufferSize = (1024 << 2);
         using LogBuffer = StackBuffer<kLogBufferSize>;
-    }
+    } // namespace
 
     class LogBufferStream : Noncopyable
     {
@@ -50,20 +51,20 @@ namespace nets
 
     public:
         LogBufferStream& operator<<(char value);
-        LogBufferStream& operator<<(::int8_t value);
-        LogBufferStream& operator<<(::uint8_t value);
-        LogBufferStream& operator<<(::int16_t value);
-        LogBufferStream& operator<<(::uint16_t value);
-        LogBufferStream& operator<<(::int32_t value);
-        LogBufferStream& operator<<(::uint32_t value);
-        LogBufferStream& operator<<(::int64_t value);
-        LogBufferStream& operator<<(::uint64_t value);
+        LogBufferStream& operator<<(Int8Type value);
+        LogBufferStream& operator<<(Uint8Type value);
+        LogBufferStream& operator<<(Int16Type value);
+        LogBufferStream& operator<<(Uint16Type value);
+        LogBufferStream& operator<<(Int32Type value);
+        LogBufferStream& operator<<(Uint32Type value);
+        LogBufferStream& operator<<(Int64Type value);
+        LogBufferStream& operator<<(Uint64Type value);
         LogBufferStream& operator<<(const void* ptr);
         LogBufferStream& operator<<(float value);
         LogBufferStream& operator<<(double value);
         LogBufferStream& operator<<(const char* str);
-        LogBufferStream& operator<<(const ::std::string& str);
-        LogBufferStream& operator<<(const ::std::string_view& str);
+        LogBufferStream& operator<<(const StringType& str);
+        LogBufferStream& operator<<(const StringViewType& str);
         LogBufferStream& operator<<(const LogBufferStream& stream);
 
     private:

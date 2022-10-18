@@ -37,7 +37,6 @@ namespace nets
     public:
         using EpollEvent = struct epoll_event;
         using EventList = ::std::vector<EpollEvent>;
-        using SizeType = EventList::size_type;
 
     public:
         explicit EpollPoller(EventLoopRawPtr eventLoop);
@@ -50,9 +49,9 @@ namespace nets
         bool deregisterChannel(ChannelRawPtr channel) override;
 
     private:
-        void prepareChannelReadyEvents(::int32_t numOfReadyEvents, ChannelList& activeChannels);
-        bool epollCtl(::int32_t opt, ChannelRawPtr channel);
-        const char* epollOptToString(::int32_t opt);
+        void prepareChannelReadyEvents(Int32Type numOfReadyEvents, ChannelList& activeChannels);
+        bool epollCtl(Int32Type opt, ChannelRawPtr channel);
+        const char* epollOptToString(Int32Type opt);
 
     private:
         FdType epollFd_;

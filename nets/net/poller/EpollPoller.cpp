@@ -34,8 +34,8 @@ namespace nets
 {
     namespace
     {
-        constexpr ::size_t kEpollEventInitialSize = 12;
-        constexpr EpollPoller::EventList::size_type kMaxEpollEventSize = INT32_MAX;
+        constexpr SizeType kEpollEventInitialSize = 12;
+        constexpr SizeType kMaxEpollEventSize = INT32_MAX;
     } // namespace
 
     EpollPoller::EpollPoller(EventLoopRawPtr eventLoop)
@@ -56,7 +56,7 @@ namespace nets
     void EpollPoller::poll(TimeType timeoutMs, ChannelList& activeChannels)
     {
         SizeType size = events_.size();
-        ::int32_t numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<::int32_t>(size), timeoutMs);
+        Int32Type numOfReadyEvents = ::epoll_wait(epollFd_, &events_[0], static_cast<Int32Type>(size), timeoutMs);
         if (numOfReadyEvents > 0)
         {
             NETS_SYSTEM_LOG_DEBUG << "EpollPoller epoll wait:" << numOfReadyEvents << " events";
@@ -77,9 +77,9 @@ namespace nets
         }
     }
 
-    void EpollPoller::prepareChannelReadyEvents(::int32_t numOfReadyEvents, ChannelList& activeChannels)
+    void EpollPoller::prepareChannelReadyEvents(Int32Type numOfReadyEvents, ChannelList& activeChannels)
     {
-        for (::int32_t i = 0; i < numOfReadyEvents; ++i)
+        for (Int32Type i = 0; i < numOfReadyEvents; ++i)
         {
             auto channel = static_cast<ChannelRawPtr>(events_[i].data.ptr);
             activeChannels.push_back(channel);
@@ -149,7 +149,7 @@ namespace nets
         return epollCtl(EPOLL_CTL_DEL, channel);
     }
 
-    bool EpollPoller::epollCtl(::int32_t opt, const ChannelRawPtr channel)
+    bool EpollPoller::epollCtl(Int32Type opt, const ChannelRawPtr channel)
     {
         EpollEvent event {};
         FdType fd = channel->fd();
@@ -173,7 +173,7 @@ namespace nets
         return false;
     }
 
-    const char* EpollPoller::epollOptToString(::int32_t opt)
+    const char* EpollPoller::epollOptToString(Int32Type opt)
     {
         switch (opt)
         {

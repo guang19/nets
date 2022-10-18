@@ -28,6 +28,7 @@
 #include <netinet/in.h>
 #include <string>
 
+#include "nets/base/Types.h"
 #include "nets/base/Copyable.h"
 
 namespace nets
@@ -35,7 +36,7 @@ namespace nets
     namespace
     {
         using SockLenType = ::socklen_t;
-        using PortType = ::uint16_t;
+        using PortType = Uint16Type;
         using SockAddr = struct sockaddr;
         using SockAddr4 = struct sockaddr_in;
         using SockAddr6 = struct sockaddr_in6;
@@ -44,9 +45,6 @@ namespace nets
 
     class InetSockAddress : public Copyable
     {
-    public:
-        using StringType = ::std::string;
-
     public:
         InetSockAddress();
         explicit InetSockAddress(const SockAddr4& addr4);

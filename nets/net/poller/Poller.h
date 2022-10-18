@@ -38,7 +38,6 @@ namespace nets
     class Poller : Noncopyable
     {
     public:
-        using TimeType = ::time_t;
         using ChannelRawPtr = Channel*;
         using ChannelList = ::std::vector<ChannelRawPtr>;
         using EventLoopRawPtr = EventLoop*;

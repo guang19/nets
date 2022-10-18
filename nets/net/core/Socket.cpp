@@ -61,7 +61,7 @@ namespace nets::socket
 
     void setSockCloExec(FdType sockFd)
     {
-        ::int32_t flags = ::fcntl(sockFd, F_GETFD, 0);
+        Int32Type flags = ::fcntl(sockFd, F_GETFD, 0);
         flags |= FD_CLOEXEC;
         if (::fcntl(sockFd, F_SETFD, flags) == -1)
         {
@@ -80,7 +80,7 @@ namespace nets::socket
         }
     }
 
-    void shutdown(FdType sockFd, ::int32_t how)
+    void shutdown(FdType sockFd, Int32Type how)
     {
         if (::shutdown(sockFd, how) == -1)
         {
@@ -88,7 +88,7 @@ namespace nets::socket
         }
     }
 
-    const char* shutdownHowToString(::int32_t how)
+    const char* shutdownHowToString(Int32Type how)
     {
         switch (how)
         {
@@ -133,7 +133,7 @@ namespace nets::socket
         }
     }
 
-    void listen(FdType sockFd, ::int32_t backlog)
+    void listen(FdType sockFd, Int32Type backlog)
     {
         if (::listen(sockFd, backlog) == -1)
         {
@@ -147,7 +147,7 @@ namespace nets::socket
         return ::accept4(sockFd, localAddr.sockAddr(), &length, SOCK_NONBLOCK | SOCK_CLOEXEC);
     }
 
-    ::int32_t connect(FdType sockFd, const InetSockAddress& peerAddr)
+    Int32Type connect(FdType sockFd, const InetSockAddress& peerAddr)
     {
         auto length = static_cast<SockLenType>((peerAddr.ipFamily() == AF_INET ? sizeof(SockAddr4) : sizeof(SockAddr6)));
         return ::connect(sockFd, peerAddr.sockAddr(), length);
@@ -158,7 +158,7 @@ namespace nets::socket
         return ::read(fd, buf, n);
     }
 
-    SSizeType readv(FdType fd, const IoVec* iov, ::int32_t iovcnt)
+    SSizeType readv(FdType fd, const IoVec* iov, Int32Type iovcnt)
     {
         return ::readv(fd, iov, iovcnt);
     }
@@ -168,7 +168,7 @@ namespace nets::socket
         return ::write(fd, buf, n);
     }
 
-    SSizeType writev(FdType fd, const IoVec* iov, ::int32_t iovcnt)
+    SSizeType writev(FdType fd, const IoVec* iov, Int32Type iovcnt)
     {
         return ::writev(fd, iov, iovcnt);
     }
@@ -209,7 +209,7 @@ namespace nets::socket
         auto length = static_cast<SockLenType>(sizeof(OptValType));
         if (::getsockopt(sockFd, SOL_SOCKET, SO_ERROR, &optVal, &length) == -1)
         {
-            int32_t errNum = errno;
+            Int32Type errNum = errno;
             NETS_SYSTEM_LOG_ERROR << "socket getSockError failed,errno=" << errNum;
             return errNum;
         }
@@ -281,7 +281,7 @@ namespace nets::socket
 
     void setSockNonBlock(FdType sockFd, bool enable)
     {
-        ::int32_t flags = ::fcntl(sockFd, F_GETFL, 0);
+        Int32Type flags = ::fcntl(sockFd, F_GETFL, 0);
         if (enable)
         {
             flags |= O_NONBLOCK;
@@ -325,25 +325,26 @@ namespace nets::socket
 
     void setIpv6MulticastIf(FdType sockFd, const StringType& ifName)
     {
-        uint32_t ifIndex = ::if_nametoindex(ifName.data());
-        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifIndex, static_cast<SockLenType>(sizeof(uint32_t))) ==
+        Uint32Type ifIndex = ::if_nametoindex(ifName.data());
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_IF, &ifIndex, static_cast<SockLenType>(sizeof(Uint32Type))) ==
             -1)
         {
             NETS_SYSTEM_LOG_ERROR << "socket setIpv6MulticastIf failed,errno=" << errno;
         }
     }
 
-    void setIpMulticastTTL(FdType sockFd, uint8_t ttl)
+    void setIpMulticastTTL(FdType sockFd, Uint8Type ttl)
     {
-        if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &ttl, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
+        if (::setsockopt(sockFd, IPPROTO_IP, IP_MULTICAST_IF, &ttl, static_cast<SockLenType>(sizeof(Uint8Type))) == -1)
         {
             NETS_SYSTEM_LOG_ERROR << "socket setIpMulticastTTL failed,errno=" << errno;
         }
     }
 
-    void setIpv6MulticastHops(FdType sockFd, uint8_t hops)
+    void setIpv6MulticastHops(FdType sockFd, Uint8Type hops)
     {
-        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, static_cast<SockLenType>(sizeof(uint8_t))) == -1)
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_HOPS, &hops, static_cast<SockLenType>(sizeof(Uint8Type))) ==
+            -1)
         {
             NETS_SYSTEM_LOG_ERROR << "socket setIpv6MulticastHops failed,errno=" << errno;
         }
@@ -359,7 +360,8 @@ namespace nets::socket
 
     void setIpv6MulticastLoop(FdType sockFd, bool enable)
     {
-        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &enable, static_cast<SockLenType>(sizeof(bool))) == -1)
+        OptValType loop = enable ? 1 : 0;
+        if (::setsockopt(sockFd, IPPROTO_IPV6, IPV6_MULTICAST_LOOP, &loop, static_cast<SockLenType>(sizeof(OptValType))) == -1)
         {
             NETS_SYSTEM_LOG_ERROR << "socket setIpv6MulticastLoop failed,errno=" << errno;
         }
@@ -386,7 +388,7 @@ namespace nets::socket
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
         group.imr_address.s_addr = htonl(INADDR_ANY);
         // find internet interface index
-        group.imr_ifindex = static_cast<int32_t>(::if_nametoindex(inf.data()));
+        group.imr_ifindex = static_cast<Int32Type>(::if_nametoindex(inf.data()));
         if (::setsockopt(sockFd, IPPROTO_IP, IPV6_ADD_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
             NETS_SYSTEM_LOG_ERROR << "socket addIpMemberShipByIfIndex failed,errno=" << errno;
@@ -430,7 +432,7 @@ namespace nets::socket
         ::inet_pton(AF_INET, multicastAddr.data(), &group.imr_multiaddr.s_addr);
         group.imr_address.s_addr = htonl(INADDR_ANY);
         // find internet interface index
-        group.imr_ifindex = static_cast<int32_t>(::if_nametoindex(inf.data()));
+        group.imr_ifindex = static_cast<Int32Type>(::if_nametoindex(inf.data()));
         if (::setsockopt(sockFd, IPPROTO_IP, IP_DROP_MEMBERSHIP, &group, static_cast<SockLenType>(sizeof(IpMreqn))) == -1)
         {
             NETS_SYSTEM_LOG_ERROR << "socket dropIpMemberShipByIfIndex failed,errno=" << errno;

@@ -29,13 +29,14 @@
 #include <functional>
 
 #include "nets/base/Noncopyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
     class SignalHandler : Noncopyable
     {
     public:
-        using SignoType = ::int32_t;
+        using SignoType = Int32Type;
         using Sigaction = struct sigaction;
         using SigInfo = siginfo_t;
         using SignalHandlerType = ::std::function<void(SignoType signo, SigInfo* info, void* context)>;

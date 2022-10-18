@@ -36,15 +36,15 @@
 
 using namespace nets;
 
-void testWriteV(::int32_t sockFd)
+void testWriteV(Int32Type sockFd)
 {
     Timestamp start(Timestamp::now());
-    const ::int32_t count = 5;
+    const Int32Type count = 5;
     const char* strArr[count] = {"hello client\n", "this is first message\n", "this is second message\n",
                                  "this is third message\n", "this is fourth message\n"};
     SSizeType expectedBytes = 0;
     IoVec iovecs[count];
-    for (::int32_t i = 0; i < count; ++i)
+    for (Int32Type i = 0; i < count; ++i)
     {
         SizeType len = ::strlen(strArr[i]);
         iovecs[i].iov_base = const_cast<char*>(&strArr[i][0]);
@@ -76,11 +76,11 @@ TEST(EpollServerClienTest, EpollServer)
     {
         FdType numOfReadEvents = 0;
         numOfReadEvents = epoll_wait(epollFd, &*epollEvents.begin(), epollEvents.size(), -1);
-        for (::int32_t i = 0; i < numOfReadEvents; ++i)
+        for (Int32Type i = 0; i < numOfReadEvents; ++i)
         {
             if (epollEvents[i].events & (EPOLLHUP | EPOLLERR))
             {
-                ::int32_t optval;
+                Int32Type optval;
                 auto optlen = static_cast<SockLenType>(sizeof(optval));
                 ::getsockopt(epollEvents[i].data.fd, SOL_SOCKET, SO_ERROR, &optval, &optlen);
                 // broken pipe
@@ -148,7 +148,7 @@ TEST(EpollServerClienTest, EpollClient)
     InetSockAddress serverAddr("127.0.0.1", 8080);
     socket::connect(sockFd, serverAddr);
     char buf[1024] = "Hello Server";
-    size_t n = ::strlen(buf);
+    SizeType n = ::strlen(buf);
     socket::write(sockFd, buf, n);
     char recvBuf[1024] = {0};
     while (true)

@@ -37,7 +37,7 @@ public:
     // Sets up the test fixture.
     void SetUp() override
     {
-        blockingQueue = new BoundedBlockingQueue<::int32_t>(5);
+        blockingQueue = new BoundedBlockingQueue<Int32Type>(5);
     }
 
     // Tears down the test fixture.
@@ -51,7 +51,7 @@ public:
     }
 
 protected:
-    BoundedBlockingQueue<::int32_t>* blockingQueue {nullptr};
+    BoundedBlockingQueue<Int32Type>* blockingQueue {nullptr};
 };
 
 TEST_F(BoundedBlockingQueueTest, PutTake)
@@ -60,7 +60,7 @@ TEST_F(BoundedBlockingQueueTest, PutTake)
     blockingQueue->put(2);
     blockingQueue->put(3);
     ASSERT_EQ(blockingQueue->size(), 3u);
-    ::int32_t data = 0;
+    Int32Type data = 0;
     blockingQueue->take(data);
     ASSERT_EQ(data, 1);
     blockingQueue->take(data);
@@ -83,7 +83,7 @@ TEST_F(BoundedBlockingQueueTest, PutTakeMultiThread)
         ::std::thread t2(
             [&]
             {
-                ::int32_t n;
+                Int32Type n;
                 blockingQueue->take(n);
             });
         t2.detach();
@@ -100,7 +100,7 @@ TEST_F(BoundedBlockingQueueTest, PutTakeConditionVar)
         return !running;
     };
     ASSERT_EQ(blockingQueue->put(1, func), true);
-    ::int32_t takeVal = 0;
+    Int32Type takeVal = 0;
     ASSERT_EQ(blockingQueue->take(takeVal, func), true);
     ASSERT_EQ(takeVal, 1);
     ASSERT_EQ(blockingQueue->put(2, func), true);
@@ -118,10 +118,10 @@ TEST_F(BoundedBlockingQueueTest, PutTimeout)
     blockingQueue->put(4);
     blockingQueue->put(5);
     ASSERT_EQ(blockingQueue->size(), 5U);
-    ::int32_t takeVal = 0;
-    ::int64_t start = Timestamp::now().secondsSinceEpoch();
+    Int32Type takeVal = 0;
+    Int64Type start = Timestamp::now().secondsSinceEpoch();
     ASSERT_EQ(blockingQueue->put(takeVal, 3000L), false);
-    ::int64_t end = Timestamp::now().secondsSinceEpoch();
+    Int64Type end = Timestamp::now().secondsSinceEpoch();
     ASSERT_GT(end, start);
     ASSERT_GE((end - start), 3);
     ASSERT_EQ(takeVal, 0);
@@ -129,11 +129,11 @@ TEST_F(BoundedBlockingQueueTest, PutTimeout)
 
 TEST_F(BoundedBlockingQueueTest, TakeTimeout)
 {
-    ::int32_t takeVal = 0;
-    ::int64_t start = Timestamp::now().secondsSinceEpoch();
+    Int32Type takeVal = 0;
+    Int64Type start = Timestamp::now().secondsSinceEpoch();
     ASSERT_EQ(blockingQueue->isEmpty(), true);
     ASSERT_EQ(blockingQueue->take(takeVal, 3000L), false);
-    ::int64_t end = Timestamp::now().secondsSinceEpoch();
+    Int64Type end = Timestamp::now().secondsSinceEpoch();
     ASSERT_GT(end, start);
     ASSERT_GE((end - start), 3);
     ASSERT_EQ(takeVal, 0);
@@ -142,7 +142,7 @@ TEST_F(BoundedBlockingQueueTest, TakeTimeout)
 TEST_F(BoundedBlockingQueueTest, TryPushPop)
 {
     ASSERT_EQ(blockingQueue->tryPush(1), true);
-    ::int32_t takeVal = 0;
+    Int32Type takeVal = 0;
     ASSERT_EQ(blockingQueue->tryPop(takeVal), true);
     ASSERT_EQ(takeVal, 1);
 }

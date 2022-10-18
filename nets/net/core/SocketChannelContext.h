@@ -39,8 +39,6 @@ namespace nets
     {
     public:
         using SocketChannelRawPtr = SocketChannel*;
-        using SizeType = ::size_t;
-        using StringType = ::std::string;
         using WriteCompleteCallback = ::std::function<void(SocketChannelContext&)>;
 
     public:

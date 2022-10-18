@@ -34,7 +34,6 @@ namespace nets
     class DatagramChannelContext : Noncopyable
     {
     public:
-        using StringType = ::std::string;
         using DatagramChannelRawPtr = DatagramChannel*;
 
     public:

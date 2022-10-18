@@ -63,7 +63,6 @@ namespace nets
         using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
         using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
         using PollerPtr = ::std::unique_ptr<Poller>;
-        using TimeType = typename TimerManager::TimeType;
         using EventLoopRawPtr = EventLoop*;
         using EventLoopGroupRawPtr = EventLoopGroup*;
 

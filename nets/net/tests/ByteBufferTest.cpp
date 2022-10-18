@@ -48,7 +48,7 @@ TEST(ByteBufferTest, WriteBytes)
     buffer.writeBytes(s1, ::strlen(s1));
     ASSERT_TRUE(buffer.isReadable());
     ASSERT_EQ(buffer.readableBytes(), ::strlen(s1));
-    ::std::string s = buffer.readBytes(::strlen(s1));
+    StringType s = buffer.readBytes(::strlen(s1));
     ASSERT_STREQ(s.c_str(), s1);
     ASSERT_FALSE(buffer.isReadable());
     ASSERT_EQ(buffer.readerIndex(), 0U);
@@ -58,10 +58,10 @@ TEST(ByteBufferTest, WriteBytes)
 TEST(ByteBufferTest, WriteInt16)
 {
     ByteBuffer buffer {};
-    ::int16_t n = 1024;
+    Int16Type n = 1024;
     buffer.writeInt16(n);
     ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(::int16_t));
+    ASSERT_EQ(buffer.readableBytes(), sizeof(Int16Type));
     ASSERT_EQ(buffer.readInt16(), n);
     ASSERT_FALSE(buffer.isReadable());
     ASSERT_EQ(buffer.readerIndex(), 0U);
@@ -71,10 +71,10 @@ TEST(ByteBufferTest, WriteInt16)
 TEST(ByteBufferTest, WriteInt32)
 {
     ByteBuffer buffer {};
-    ::int32_t n = 2048;
+    Int32Type n = 2048;
     buffer.writeInt32(n);
     ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(::int32_t));
+    ASSERT_EQ(buffer.readableBytes(), sizeof(Int32Type));
     ASSERT_EQ(buffer.readInt32(), n);
     ASSERT_FALSE(buffer.isReadable());
     ASSERT_EQ(buffer.readerIndex(), 0U);
@@ -84,10 +84,10 @@ TEST(ByteBufferTest, WriteInt32)
 TEST(ByteBufferTest, WriteInt64)
 {
     ByteBuffer buffer {};
-    ::int64_t n = 65535L;
+    Int64Type n = 65535L;
     buffer.writeInt64(n);
     ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(::int64_t));
+    ASSERT_EQ(buffer.readableBytes(), sizeof(Int64Type));
     ASSERT_EQ(buffer.readInt64(), n);
     ASSERT_FALSE(buffer.isReadable());
     ASSERT_EQ(buffer.readerIndex(), 0U);

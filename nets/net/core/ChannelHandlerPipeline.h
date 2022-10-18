@@ -32,7 +32,6 @@ namespace nets
     class ChannelHandlerPipeline : Noncopyable
     {
     public:
-        using StringType = ChannelHandler::StringType;
         using ChannelHandlerPtr = ChannelHandler::ChannelHandlerPtr;
 
     public:

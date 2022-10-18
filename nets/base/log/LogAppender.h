@@ -73,11 +73,9 @@ namespace nets
     class FileLogAppender : public LogAppender
     {
     private:
-        using SizeType = ::size_t;
-        using TimeType = ::time_t;
         using FilePtr = ::std::unique_ptr<LogFile>;
         // Log buffer cache 2M
-        static constexpr ::size_t kLogBufferPieceSize = 1024 * 1024 << 1;
+        static constexpr SizeType kLogBufferPieceSize = 1024 * 1024 << 1;
         using BufferType = StackBuffer<kLogBufferPieceSize>;
         using BufferPtr = ::std::unique_ptr<BufferType>;
         using BufferVectorType = ::std::vector<BufferPtr>;

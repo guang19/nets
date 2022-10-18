@@ -32,23 +32,20 @@
 
 #include "nets/base/Common.h"
 #include "nets/base/Copyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
     namespace
     {
-        using SizeType = ::size_t;
         constexpr char kDigits[] = {"0123456789"};
         constexpr char kHexDigits[] = {"0123456789abcdef"};
-        constexpr ::int32_t kMaximumNumberLimit = ::std::numeric_limits<::uint64_t>::digits10 + 1;
+        constexpr Int32Type kMaximumNumberLimit = ::std::numeric_limits<Uint64Type>::digits10 + 1;
     } // namespace
 
     template <SizeType SIZE>
     class StackBuffer : public Copyable
     {
-    public:
-        using StringType = ::std::string;
-
     public:
         StackBuffer() : writerIndex_(0)
         {
@@ -156,42 +153,42 @@ namespace nets
             writeBytes(&value, 1);
         }
 
-        inline void writeInt8(::int8_t value)
+        inline void writeInt8(Int8Type value)
         {
-            writeInt32(static_cast<::int32_t>(value));
+            writeInt32(static_cast<Uint32Type>(value));
         }
 
-        inline void writeUint8(::uint8_t value)
+        inline void writeUint8(Uint8Type value)
         {
-            writeUint32(static_cast<::uint32_t>(value));
+            writeUint32(static_cast<Uint32Type>(value));
         }
 
-        inline void writeInt16(::int16_t value)
+        inline void writeInt16(Int16Type value)
         {
-            writeInt32(static_cast<::int32_t>(value));
+            writeInt32(static_cast<Int32Type>(value));
         }
 
-        inline void writeUint16(::uint16_t value)
+        inline void writeUint16(Uint16Type value)
         {
-            writeUint32(static_cast<::uint32_t>(value));
+            writeUint32(static_cast<Uint32Type>(value));
         }
 
-        inline void writeInt32(::int32_t value)
-        {
-            writeInteger(value);
-        }
-
-        inline void writeUint32(::uint32_t value)
+        inline void writeInt32(Int32Type value)
         {
             writeInteger(value);
         }
 
-        inline void writeInt64(::int64_t value)
+        inline void writeUint32(Uint32Type value)
         {
             writeInteger(value);
         }
 
-        inline void writeUint64(::uint64_t value)
+        inline void writeInt64(Int64Type value)
+        {
+            writeInteger(value);
+        }
+
+        inline void writeUint64(Uint64Type value)
         {
             writeInteger(value);
         }
@@ -205,7 +202,7 @@ namespace nets
                 char* tmp = buffer;
                 do
                 {
-                    auto lastIndex = static_cast<::int32_t>(value % 10);
+                    auto lastIndex = static_cast<Int32Type>(value % 10);
                     *tmp = kDigits[lastIndex];
                     ++tmp;
                     value /= 10;
@@ -234,7 +231,7 @@ namespace nets
         {
             if (writableBytes() > kMaximumNumberLimit)
             {
-                auto value = reinterpret_cast<::uintptr_t>(ptr);
+                auto value = reinterpret_cast<UintPtrType>(ptr);
                 char* buffer = buffer_ + writerIndex_;
                 char* tmp = buffer;
                 tmp[0] = '0';
@@ -242,7 +239,7 @@ namespace nets
                 tmp += 2;
                 do
                 {
-                    auto lastIndex = static_cast<::int32_t>(value % 16);
+                    auto lastIndex = static_cast<Int32Type>(value % 16);
                     *tmp = kHexDigits[lastIndex];
                     ++tmp;
                     value /= 16;

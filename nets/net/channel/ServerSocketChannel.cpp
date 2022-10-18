@@ -121,7 +121,7 @@ namespace nets
 
     void ServerSocketChannel::handleErrorEvent()
     {
-        ::int32_t errNum = socket::getSockError(sockFd_);
+        Int32Type errNum = socket::getSockError(sockFd_);
         THROW_FMT(ServerSocketChannelException, "ServerSocketChannel occurred unexpected exception,errNum=%d", errNum);
     }
 
@@ -138,7 +138,7 @@ namespace nets
         }
     }
 
-    void ServerSocketChannel::handleAcceptError(::int32_t errNum)
+    void ServerSocketChannel::handleAcceptError(Int32Type errNum)
     {
         switch (errNum)
         {

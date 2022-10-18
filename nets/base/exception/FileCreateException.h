@@ -25,7 +25,33 @@
 #ifndef NETS_FILE_CREATE_EXCEPTION_H
 #define NETS_FILE_CREATE_EXCEPTION_H
 
+#include "nets/base/Common.h"
 #include "nets/base/exception/AbstractException.h"
+
+#define THROW_FILE_CREATE_EXCEPTION(ERRNUM)                                                                                 \
+    switch (ERRNUM)                                                                                                         \
+    {                                                                                                                       \
+        case ENOENT:                                                                                                        \
+            THROW_FMT(FileCreateException, "no such file");                                                                 \
+            break;                                                                                                          \
+        case EACCES:                                                                                                        \
+        case EPERM:                                                                                                         \
+            THROW_FMT(FileCreateException, "no permission to create file");                                                 \
+            break;                                                                                                          \
+        case EINVAL:                                                                                                        \
+            THROW_FMT(FileCreateException, "invalid value in flags");                                                       \
+            break;                                                                                                          \
+        case EMFILE:                                                                                                        \
+            THROW_FMT(FileCreateException,                                                                                  \
+                      "the per-process limit on the number of open file descriptors has been reached");                     \
+            break;                                                                                                          \
+        case ENAMETOOLONG:                                                                                                  \
+            THROW_FMT(FileCreateException, "path name was too long");                                                       \
+            break;                                                                                                          \
+        default:                                                                                                            \
+            THROW_FMT(FileCreateException, "failed to create file for unknown reason,errno=%d", ERRNUM);                    \
+            break;                                                                                                          \
+    }
 
 namespace nets
 {

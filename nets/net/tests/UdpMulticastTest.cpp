@@ -33,7 +33,7 @@ LoggerPtr testLogger = LOGGER_MGR->getLogger("UdpMulticastTest");
 const StringType gMulticastIp = "224.1.1.1";
 const StringType gMulticastInterface = "ens33";
 const StringType gMulticastLocalAddr = "192.168.24.128"; // my ens33 addr
-const int32_t gMulticastPort = 12333;
+const Int32Type gMulticastPort = 12333;
 
 TEST(UdpMulticastTest, SockRecipient1)
 {

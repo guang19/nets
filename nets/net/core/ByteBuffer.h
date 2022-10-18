@@ -39,8 +39,6 @@ namespace nets
     class ByteBuffer : public Copyable
     {
     public:
-        using SizeType = ::size_t;
-        using StringType = ::std::string;
         using CharArrayPtr = ::std::unique_ptr<char[]>;
 
     public:
@@ -130,24 +128,24 @@ namespace nets
         void writeBytes(const char* data, SizeType length);
         SSizeType writeBytes(const SocketChannel& channel, SizeType length);
         SSizeType writeBytes(const DatagramChannel& channel, SizeType length, InetSockAddress& srcAddr);
-        void writeInt8(::int8_t value);
-        void writeUint8(::uint8_t value);
-        void writeInt16(::int16_t value);
-        void writeUint16(::uint16_t value);
-        void writeInt32(::int32_t value);
-        void writeUint32(::uint32_t value);
-        void writeInt64(::int64_t value);
-        void writeUint64(::uint64_t value);
+        void writeInt8(Int8Type value);
+        void writeUint8(Uint8Type value);
+        void writeInt16(Int16Type value);
+        void writeUint16(Uint16Type value);
+        void writeInt32(Int32Type value);
+        void writeUint32(Uint32Type value);
+        void writeInt64(Int64Type value);
+        void writeUint64(Uint64Type value);
         void writeFloat(float value);
         void writeDouble(double value);
 
         bool readBoolean();
         char readByte();
         StringType readBytes(SizeType length);
-        ::int8_t readInt8();
-        ::int16_t readInt16();
-        ::int32_t readInt32();
-        ::int64_t readInt64();
+        Int8Type readInt8();
+        Int16Type readInt16();
+        Int32Type readInt32();
+        Int64Type readInt64();
         float readFloat();
         double readDouble();
         StringType toString() const;

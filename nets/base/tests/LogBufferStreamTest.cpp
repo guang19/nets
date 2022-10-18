@@ -35,7 +35,7 @@ TEST(LogBufferStreamTest, Append)
     ASSERT_EQ(stream.buffer().writerIndex(), 0U);
     stream << "abc";
     ASSERT_EQ(stream.buffer().writerIndex(), 3U);
-    ::int8_t i8 = 8;
+    Int8Type i8 = 8;
     stream << i8 << &i8 << 12345678U << NAN << 123123.5123123F << 123123123.123123123456 << "我爱你 I love you";
     ::printf("%lu\n", stream.buffer().writerIndex());
     ::printf("%lu\n", stream.buffer().writableBytes());

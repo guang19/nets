@@ -28,16 +28,12 @@
 #include <string>
 
 #include "nets/base/Noncopyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
     class LogFile : Noncopyable
     {
-    public:
-        using SizeType = ::size_t;
-        using TimeType = ::time_t;
-        using StringType = ::std::string;
-
     public:
         explicit LogFile(const char* file);
         ~LogFile();
@@ -61,7 +57,7 @@ namespace nets
         }
 
     private:
-        void getFileInfo(SizeType* fileSize, ::time_t* createTime);
+        void getFileInfo(SizeType* fileSize, TimeType* createTime);
 
     private:
         FILE* fp_;
@@ -70,7 +66,7 @@ namespace nets
         SizeType bytes_;
         TimeType lastRollTime_;
 
-        static constexpr ::size_t kFileIoBufferSize = 1024 * 256;
+        static constexpr SizeType kFileIoBufferSize = 1024 * 256;
         char buffer_[kFileIoBufferSize] {0};
     };
 

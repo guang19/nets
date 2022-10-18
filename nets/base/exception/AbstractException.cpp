@@ -22,11 +22,11 @@
 
 #include "nets/base/exception/AbstractException.h"
 
-#include "nets/base/Common.h"
+#include "nets/base/ThreadHelper.h"
 
 namespace nets
 {
-    AbstractException::AbstractException() : cause_(), backtraceInfo_(STACK_TRACE) {}
+    AbstractException::AbstractException() : cause_(), backtraceInfo_(stackTrace()) {}
 
-    AbstractException::AbstractException(const StringType& cause) : cause_(cause), backtraceInfo_(STACK_TRACE) {}
+    AbstractException::AbstractException(const StringType& cause) : cause_(cause), backtraceInfo_(stackTrace()) {}
 } // namespace nets

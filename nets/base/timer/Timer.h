@@ -57,13 +57,12 @@ namespace nets
     class Timer : Noncopyable
     {
     public:
-        using TimeType = ::time_t;
         using IdType = TimerId::IdType;
         using TimerCallback = ::std::function<void()>;
-        static constexpr ::int32_t kRepeatForever = -1;
+        static constexpr Int32Type kRepeatForever = -1;
 
     public:
-        explicit Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay = false);
+        explicit Timer(const Timestamp& expiredTime, Int32Type repeatTimes, TimeType interval, bool fixedDelay = false);
         ~Timer() = default;
 
         // in order to allow map store timer, needs to support move
@@ -90,7 +89,7 @@ namespace nets
             return repeatTimes_ == kRepeatForever || repeatTimes_ > 0;
         }
 
-        inline void setRepeatTimes(::int32_t repeatTimes)
+        inline void setRepeatTimes(Int32Type repeatTimes)
         {
             repeatTimes_ = repeatTimes;
         }
@@ -110,7 +109,7 @@ namespace nets
 
     private:
         TimerId id_;
-        ::int32_t repeatTimes_;
+        Int32Type repeatTimes_;
         // unit: milliseconds
         TimeType interval_;
         bool fixedDelay_;

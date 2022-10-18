@@ -29,13 +29,13 @@
 #include <string>
 
 #include "nets/base/Noncopyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
     class ChannelHandler : Noncopyable, public ::std::enable_shared_from_this<ChannelHandler>
     {
     public:
-        using StringType = ::std::string;
         using ChannelHandlerPtr = ::std::shared_ptr<ChannelHandler>;
 
     public:

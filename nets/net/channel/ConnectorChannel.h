@@ -36,7 +36,6 @@ namespace nets
     class ConnectorChannel : public Channel
     {
     public:
-        using TimeType = ::time_t;
         using SocketChannelPtr = ::std::shared_ptr<SocketChannel>;
         using ChannelHandlerPtr = typename SocketChannelHandler::SocketChannelHandlerPtr;
         using ChannelHandlerList = ::std::list<ChannelHandlerPtr>;
@@ -84,7 +83,7 @@ namespace nets
     private:
         void initSocketChannel(SocketChannelPtr& socketChannel);
         void newSocketChannel();
-        void handleConnectError(::int32_t errNum);
+        void handleConnectError(Int32Type errNum);
         void waitConnect();
         void reconnect();
 

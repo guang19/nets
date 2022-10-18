@@ -65,7 +65,7 @@ namespace nets
         return key_ == other.key_ && value_ == other.value_;
     }
 
-    Timer::Timer(const Timestamp& expiredTime, ::int32_t repeatTimes, TimeType interval, bool fixedDelay)
+    Timer::Timer(const Timestamp& expiredTime, Int32Type repeatTimes, TimeType interval, bool fixedDelay)
         : id_(timerIdGenerator_++, expiredTime), repeatTimes_(repeatTimes), interval_(interval), fixedDelay_(fixedDelay)
     {
     }

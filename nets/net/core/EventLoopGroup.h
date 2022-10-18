@@ -34,20 +34,17 @@ namespace nets
     class EventLoopGroup : Noncopyable
     {
     public:
-        using IntType = typename ThreadPool::IntType;
-        using StringType = ::std::string;
         using EventLoopRawPtr = EventLoop*;
         using EventLoopPtr = ::std::unique_ptr<EventLoop>;
         using EventLoopList = ::std::vector<EventLoopPtr>;
         using FutureList = ::std::vector<::std::future<void>>;
-        using SizeType = typename EventLoopList::size_type;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;
         using UniqueLockType = ::std::unique_lock<MutexType>;
         using ConditionVariableType = ::std::condition_variable;
 
     public:
-        explicit EventLoopGroup(IntType numOfEventLoops, const StringType& name);
+        explicit EventLoopGroup(Int32Type numOfEventLoops, const StringType& name);
         ~EventLoopGroup() = default;
 
     public:
@@ -82,7 +79,7 @@ namespace nets
 
     private:
         SizeType nextLoop_;
-        IntType numOfEventLoops_;
+        Int32Type numOfEventLoops_;
         EventLoopList eventLoops_;
         FutureList futures_;
         ThreadPool eventLoopThreadPool_;

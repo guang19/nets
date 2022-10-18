@@ -30,6 +30,7 @@
 #include <functional>
 #include <shared_mutex>
 
+#include "nets/base/Types.h"
 #include "nets/base/Noncopyable.h"
 
 namespace nets
@@ -46,10 +47,8 @@ namespace nets
         using SharedLockType = ::std::shared_lock<MutexType>;
         using UniqueLockType = ::std::unique_lock<MutexType>;
         using ConditionVariableType = ::std::condition_variable_any;
-        using TimeType = ::time_t;
         using MillisTimeType = ::std::chrono::milliseconds;
         using ContainerType = ::std::deque<ValueType>;
-        using SizeType = typename ContainerType::size_type;
         using PredicateType = ::std::function<bool()>;
 
     public:

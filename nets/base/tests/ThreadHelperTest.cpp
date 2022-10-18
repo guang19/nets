@@ -43,6 +43,11 @@ TEST(ThreadHelperTest, Tid)
     ASSERT_EQ(currentTid(), ::getpid());
 }
 
+TEST(ThreadHelperTest, StackTrace)
+{
+    ::printf("%s\n", stackTrace().c_str());
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);

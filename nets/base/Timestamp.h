@@ -29,20 +29,20 @@
 #include <ctime>
 
 #include "nets/base/Copyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {
     namespace
     {
-        constexpr ::int32_t kMillisecondsPerSecond = 1000;
-        constexpr ::int32_t kMicrosecondsPerMillisecond = 1000;
-        constexpr ::int32_t kMicrosecondsPerSecond = 1000000;
+        constexpr Int32Type kMillisecondsPerSecond = 1000;
+        constexpr Int32Type kMicrosecondsPerMillisecond = 1000;
+        constexpr Int32Type kMicrosecondsPerSecond = 1000000;
     } // namespace
 
     class Timestamp : public Copyable
     {
     public:
-        using TimeType = ::time_t;
         using TimeVal = struct timeval;
 
     public:

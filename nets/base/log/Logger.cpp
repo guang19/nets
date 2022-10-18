@@ -36,7 +36,7 @@ namespace nets
 
     LoggerPtr kRootLogger = LOGGER_MGR->getRootLogger();
 
-    LogMessage::LogMessage(LogLevel level, const char* file, ::int32_t line)
+    LogMessage::LogMessage(LogLevel level, const char* file, Int32Type line)
         : time_(Timestamp::now()), level_(level), file_(nullptr), line_(line), stream_()
     {
         file_ = ::strrchr(file, '/');
@@ -46,7 +46,7 @@ namespace nets
         }
     }
 
-    LogMessageStream::LogMessageStream(LoggerPtr& logger, LogLevel logLevel, const char* file, ::uint32_t line)
+    LogMessageStream::LogMessageStream(LoggerPtr& logger, LogLevel logLevel, const char* file, Int32Type line)
         : logger_(logger), logMessage_(logLevel, file, line)
     {
     }

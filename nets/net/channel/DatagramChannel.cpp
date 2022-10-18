@@ -34,7 +34,7 @@ namespace nets
 {
     namespace
     {
-        static const ByteBuffer::SizeType kRecvPacketSize = kDefaultUdpSockRecvBufferSize >> 2;
+        static const SizeType kRecvPacketSize = kDefaultUdpSockRecvBufferSize >> 2;
     } // namespace
 
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
@@ -183,7 +183,7 @@ namespace nets
         return bytes;
     }
 
-    void DatagramChannel::handleReadError(::int32_t errNum)
+    void DatagramChannel::handleReadError(Int32Type errNum)
     {
         switch (errNum)
         {

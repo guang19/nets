@@ -88,7 +88,7 @@ public:
         NETS_LOG_DEBUG(testLogger) << "Client channelConnect ====local address:" << localAddress.toString()
                                    << " server address:" << peerAddress.toString();
         // 1746
-        ::std::string content1 = "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
+        StringType content1 = "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
                                  "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
                                  "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
                                  "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
@@ -108,7 +108,7 @@ public:
                                  writeComplete(ctx, bytes);
                              });
         // 6030
-        ::std::string content2 = "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中"
+        StringType content2 = "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中"
                                  "文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
                                  "一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中"
                                  "文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容一段中文内容"
@@ -177,7 +177,7 @@ public:
         fireChannelRead(channelContext, message);
     }
 
-    void writeComplete(SocketChannelContext& channelContext, ::size_t bytes)
+    void writeComplete(SocketChannelContext& channelContext, SizeType bytes)
     {
         NETS_LOG_DEBUG(testLogger) << "Client writeComplete " << bytes;
     }

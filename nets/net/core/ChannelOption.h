@@ -56,7 +56,7 @@ namespace nets
 
     namespace ChannelOption
     {
-        using ValueType = ::std::variant<bool, uint8_t, OptValType, SockLinger, ::std::string>;
+        using ValueType = ::std::variant<bool, Uint8Type, OptValType, SockLinger, StringType>;
     }
 } // namespace nets
 

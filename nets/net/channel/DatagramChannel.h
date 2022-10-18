@@ -73,7 +73,7 @@ namespace nets
 
     private:
         SSizeType doWrite(const void* data, SizeType length, const InetSockAddress& recipient);
-        void handleReadError(::int32_t errNum);
+        void handleReadError(Int32Type errNum);
 
     private:
         FdType sockFd_;

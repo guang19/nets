@@ -12,8 +12,8 @@ namespace nets
     class DatagramPacket : public Copyable
     {
     public:
-        DatagramPacket(const ByteBuffer& data, const InetSockAddress& recipient);
-        DatagramPacket(ByteBuffer&& data, InetSockAddress&& recipient);
+        explicit DatagramPacket(const ByteBuffer& data, const InetSockAddress& recipient);
+        explicit DatagramPacket(ByteBuffer&& data, InetSockAddress&& recipient);
         ~DatagramPacket() = default;
 
         DatagramPacket(const DatagramPacket& other);
@@ -42,7 +42,7 @@ namespace nets
             return data_.data();
         }
 
-        inline ByteBuffer::SizeType length() const
+        inline SizeType length() const
         {
             return data_.readableBytes();
         }

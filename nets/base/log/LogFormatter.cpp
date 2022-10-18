@@ -37,7 +37,7 @@ namespace nets
     {
         const char* const kLogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
 
-        constexpr ::int32_t kMaxLengthOfLogTimePortion = 52;
+        constexpr Int32Type kMaxLengthOfLogTimePortion = 52;
         constexpr char kLF = '\n';
         constexpr char kSpace = ' ';
         constexpr char kColon = ':';
@@ -50,7 +50,7 @@ namespace nets
          */
         using Tm = struct tm;
         __thread Tm tCacheTms {};
-        __thread Timestamp::TimeType tCacheSeconds {0};
+        __thread TimeType tCacheSeconds {0};
     } // namespace
 
     void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer)
@@ -72,7 +72,7 @@ namespace nets
     void DefaultLogFormatter::formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer)
     {
         Tm tms {};
-        Timestamp::TimeType seconds = logTime.secondsSinceEpoch();
+        TimeType seconds = logTime.secondsSinceEpoch();
         if (seconds != tCacheSeconds)
         {
             if (nullptr == localtime_r(&seconds, &tms))

@@ -26,7 +26,7 @@
 
 namespace nets
 {
-    EventLoopGroup::EventLoopGroup(IntType numOfEventLoops, const StringType& name)
+    EventLoopGroup::EventLoopGroup(Int32Type numOfEventLoops, const StringType& name)
         : nextLoop_(0), numOfEventLoops_(numOfEventLoops), eventLoops_(), futures_(),
           eventLoopThreadPool_(numOfEventLoops_, numOfEventLoops_, 0, name), mutex_(), cv_()
     {
@@ -36,7 +36,7 @@ namespace nets
 
     void EventLoopGroup::loopEach()
     {
-        for (IntType i = 0; i < numOfEventLoops_; ++i)
+        for (Int32Type i = 0; i < numOfEventLoops_; ++i)
         {
             futures_.emplace_back(eventLoopThreadPool_.submit(
                 [this]()
