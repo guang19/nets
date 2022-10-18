@@ -264,10 +264,28 @@ namespace nets
         return val;
     }
 
+    Uint8Type ByteBuffer::readUint8()
+    {
+        checkReadableBytes(kInt8Size);
+        Uint8Type val = 0;
+        ::memcpy(&val, &buffer_[readerIndex_], kInt8Size);
+        adjustReaderIndex(kInt8Size);
+        return val;
+    }
+
     Int16Type ByteBuffer::readInt16()
     {
         checkReadableBytes(kInt16Size);
         Int16Type val = 0;
+        ::memcpy(&val, &buffer_[readerIndex_], kInt16Size);
+        adjustReaderIndex(kInt16Size);
+        return be16toh(val);
+    }
+
+    Uint16Type ByteBuffer::readUint16()
+    {
+        checkReadableBytes(kInt16Size);
+        Uint16Type val = 0;
         ::memcpy(&val, &buffer_[readerIndex_], kInt16Size);
         adjustReaderIndex(kInt16Size);
         return be16toh(val);
@@ -282,10 +300,28 @@ namespace nets
         return be32toh(val);
     }
 
+    Uint32Type ByteBuffer::readUint32()
+    {
+        checkReadableBytes(kInt32Size);
+        Uint32Type val = 0;
+        ::memcpy(&val, &buffer_[readerIndex_], kInt32Size);
+        adjustReaderIndex(kInt32Size);
+        return be32toh(val);
+    }
+
     Int64Type ByteBuffer::readInt64()
     {
         checkReadableBytes(kInt64Size);
         Int64Type val = 0L;
+        ::memcpy(&val, &buffer_[readerIndex_], kInt64Size);
+        adjustReaderIndex(kInt64Size);
+        return be64toh(val);
+    }
+
+    Uint64Type ByteBuffer::readUint64()
+    {
+        checkReadableBytes(kInt64Size);
+        Uint64Type val = 0L;
         ::memcpy(&val, &buffer_[readerIndex_], kInt64Size);
         adjustReaderIndex(kInt64Size);
         return be64toh(val);

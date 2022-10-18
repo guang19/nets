@@ -143,9 +143,13 @@ namespace nets
         char readByte();
         StringType readBytes(SizeType length);
         Int8Type readInt8();
+        Uint8Type readUint8();
         Int16Type readInt16();
+        Uint16Type readUint16();
         Int32Type readInt32();
+        Uint32Type readUint32();
         Int64Type readInt64();
+        Uint64Type readUint64();
         float readFloat();
         double readDouble();
         StringType toString() const;
