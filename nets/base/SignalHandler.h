@@ -42,7 +42,7 @@ namespace nets
         using SignalHandlerType = ::std::function<void(SignoType signo, SigInfo* info, void* context)>;
 
     public:
-        explicit SignalHandler() = default;
+        SignalHandler() = default;
         ~SignalHandler() = default;
 
     public:
