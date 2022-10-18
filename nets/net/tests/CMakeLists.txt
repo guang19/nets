@@ -24,6 +24,9 @@ TARGET_LINK_LIBRARIES(SocketServerClientTest nets_net gtest_main)
 ADD_EXECUTABLE(EpollServerClientTest EpollServerClientTest.cpp)
 TARGET_LINK_LIBRARIES(EpollServerClientTest nets_net gtest_main)
 
+ADD_EXECUTABLE(TcpBigDataSendTest TcpBigDataSendTest.cpp)
+TARGET_LINK_LIBRARIES(TcpBigDataSendTest nets_net gtest_main)
+
 ADD_EXECUTABLE(TcpServerBootstrapTest TcpServerBootstrapTest.cpp)
 TARGET_LINK_LIBRARIES(TcpServerBootstrapTest nets_net gtest_main)
 

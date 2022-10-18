@@ -211,15 +211,18 @@ namespace nets
             if (totalBytes == static_cast<SizeType>(writtenBytes))
             {
                 writeBuffer_.clear();
-                WriteCompleteCallback writeCompleteCallback = writeCompleteCallbacks_.front();
-                writeCompleteCallbacks_.pop();
-                if (writeCompleteCallback != nullptr)
+                while (!writeCompleteCallbacks_.empty())
                 {
-                    eventLoop_->addTask(
-                        [this, writeCompleteCb = ::std::move(writeCompleteCallback)]()
-                        {
-                            writeCompleteCb(dynamic_cast<SocketChannelContext&>(channelHandlerPipeline_.context()));
-                        });
+                    WriteCompleteCallback writeCompleteCallback = writeCompleteCallbacks_.front();
+                    writeCompleteCallbacks_.pop();
+                    if (writeCompleteCallback != nullptr)
+                    {
+                        eventLoop_->addTask(
+                            [this, writeCompleteCb = ::std::move(writeCompleteCallback)]()
+                            {
+                                writeCompleteCb(dynamic_cast<SocketChannelContext&>(channelHandlerPipeline_.context()));
+                            });
+                    }
                 }
                 if (state_ == ChannelState::HALF_CLOSE)
                 {
@@ -301,7 +304,7 @@ namespace nets
         {
             return;
         }
-        // the writeBuffer has residual data waiting to be sent, append the data to the end of the writeBuffer
+        // the writeBuffer has data waiting to be sent, append the data to the end of the writeBuffer
         if (!writeBuffer_.empty())
         {
             appendBuffer(data, length);
@@ -430,17 +433,19 @@ namespace nets
 
     void SocketChannel::removeSentBuffer(SSizeType writtenBytes)
     {
-        for (auto it = writeBuffer_.begin(); it != writeBuffer_.end() && writtenBytes > 0; ++it)
+        for (auto it = writeBuffer_.begin(); it != writeBuffer_.end() && writtenBytes > 0;)
         {
-            if (it->readableBytes() <= static_cast<SizeType>(writtenBytes))
+            SizeType bytes = it->readableBytes();
+            if (bytes <= static_cast<SizeType>(writtenBytes))
             {
                 writeBuffer_.erase(it);
-                writtenBytes -= it->readableBytes();
+                writtenBytes -= bytes;
             }
             else
             {
                 it->setReaderIndex(it->readerIndex() + writtenBytes);
                 writtenBytes = 0;
+                ++it;
             }
         }
     }
