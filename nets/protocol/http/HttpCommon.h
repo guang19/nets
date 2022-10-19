@@ -96,7 +96,7 @@ namespace nets
         UNSUPPORTED_MEDIA_TYPE = 415,
         RANGE_NOT_SATISFIABLE = 416,
         EXPECTATION_FAILED = 417,
-        IM_A_TEAPOT = 418,
+        I_AM_A_TEAPOT = 418,
         UNPROCESSABLE_ENTITY = 422,
         TOO_EARLY = 425,
         UPGRADE_REQUIRED = 426,
