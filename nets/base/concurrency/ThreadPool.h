@@ -36,7 +36,6 @@
 #include "nets/base/concurrency/BoundedBlockingQueue.h"
 #include "nets/base/log/Logger.h"
 #include "nets/base/ThreadHelper.h"
-#include "nets/base/Types.h"
 
 namespace nets
 {

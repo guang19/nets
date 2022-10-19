@@ -30,8 +30,8 @@
 #include <functional>
 #include <shared_mutex>
 
-#include "nets/base/Types.h"
 #include "nets/base/Noncopyable.h"
+#include "nets/base/Types.h"
 
 namespace nets
 {

@@ -115,7 +115,7 @@ namespace nets
         bool fixedDelay_;
         TimerCallback timerCallback_;
 
-        // not thread-safe, because there is usually only one TimerManager to manage Timer
+        // not thread-safe,but there is usually only one TimerManager to manage Timer
         static ::std::atomic<IdType> timerIdGenerator_;
     };
 } // namespace nets
