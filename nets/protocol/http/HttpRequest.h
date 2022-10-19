@@ -25,9 +25,6 @@
 #ifndef NETS_HTTP_REQUEST_H
 #define NETS_HTTP_REQUEST_H
 
-#include <map>
-
-#include "nets/base/Types.h"
 #include "nets/base/Noncopyable.h"
 #include "nets/protocol/http/HttpCommon.h"
 
@@ -35,12 +32,25 @@ namespace nets
 {
     class HttpRequest : Noncopyable
     {
-    private:
-        using HttpHeaderContainer = ::std::map<StringType, StringType>;
-
     public:
         HttpRequest();
         ~HttpRequest() = default;
+
+    public:
+        void setMethod(HttpMethod method);
+        HttpMethod getMethod() const;
+
+        void setUrl(const StringType& url);
+        const StringType& getUrl() const;
+
+        void setProtocolVersion(HttpProtocolVersion version);
+        HttpProtocolVersion getProtocolVersion() const;
+
+        void setHttpHeader(const StringType& headerName, const StringType& value);
+        StringType getHttpHeader(const StringType& headerName) const;
+
+        void setRequestBody(const StringType& requestBody);
+        const StringType& getRequestBody() const;
 
     private:
         HttpMethod method_;

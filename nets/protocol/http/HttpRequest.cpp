@@ -27,7 +27,65 @@
 namespace nets
 {
     HttpRequest::HttpRequest()
-        : method_(HttpMethod::UNKNOWN), url_(), version_(HttpProtocolVersion::UNSUPPORTED), requestBody_()
+        : method_(HttpMethod::UNKNOWN), url_(), version_(HttpProtocolVersion::UNSUPPORTED), httpHeader_(), requestBody_()
     {
+    }
+
+    void HttpRequest::setMethod(HttpMethod method)
+    {
+        method_ = method;
+    }
+
+    HttpMethod HttpRequest::getMethod() const
+    {
+        return method_;
+    }
+
+    void HttpRequest::setUrl(const StringType& url)
+    {
+        url_ = url;
+    }
+
+    const StringType& HttpRequest::getUrl() const
+    {
+        return url_;
+    }
+
+    void HttpRequest::setProtocolVersion(HttpProtocolVersion version)
+    {
+        version_ = version;
+    }
+
+    HttpProtocolVersion HttpRequest::getProtocolVersion() const
+    {
+        return version_;
+    }
+
+    void HttpRequest::setHttpHeader(const StringType& headerName, const StringType& value)
+    {
+        httpHeader_.insert_or_assign(headerName, value);
+    }
+
+    StringType HttpRequest::getHttpHeader(const StringType& headerName) const
+    {
+        auto it = httpHeader_.find(headerName);
+        if (it != httpHeader_.end())
+        {
+            return it->second;
+        }
+        else
+        {
+            return {};
+        }
+    }
+
+    void HttpRequest::setRequestBody(const StringType& requestBody)
+    {
+        requestBody_ = requestBody;
+    }
+
+    const StringType& HttpRequest::getRequestBody() const
+    {
+        return requestBody_;
     }
 } // namespace nets
