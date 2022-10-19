@@ -25,7 +25,6 @@
 #ifndef NETS_BYTE_BUFFER_H
 #define NETS_BYTE_BUFFER_H
 
-#include <cstdint>
 #include <memory>
 
 #include "nets/base/Copyable.h"

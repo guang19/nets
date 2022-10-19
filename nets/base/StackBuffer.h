@@ -27,7 +27,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <cstdint>
 #include <limits>
 
 #include "nets/base/Common.h"

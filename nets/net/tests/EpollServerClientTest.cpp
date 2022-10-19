@@ -21,9 +21,9 @@
 // SOFTWARE.
 
 // @brief Test for epoll
+
 #include <gtest/gtest.h>
 
-#include <cstdint>
 #include <cstring>
 #include <fcntl.h>
 #include <sys/epoll.h>

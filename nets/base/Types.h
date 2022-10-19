@@ -5,6 +5,7 @@
 #ifndef NETS_TYPES_H
 #define NETS_TYPES_H
 
+#include <cstdint>
 #include <string>
 
 namespace nets
@@ -23,6 +24,6 @@ namespace nets
     using Uint64Type = ::uint64_t;
     using IntPtrType = ::intptr_t;
     using UintPtrType = ::uintptr_t;
-}
+} // namespace nets
 
 #endif // NETS_TYPES_H

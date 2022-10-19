@@ -25,7 +25,6 @@
 #ifndef NETS_THREAD_HELPER_H
 #define NETS_THREAD_HELPER_H
 
-#include <cstdint>
 #include <pthread.h>
 
 #include "nets/base/Types.h"

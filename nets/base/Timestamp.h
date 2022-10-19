@@ -25,7 +25,6 @@
 #ifndef NETS_TIMESTAMP_H
 #define NETS_TIMESTAMP_H
 
-#include <cstdint>
 #include <ctime>
 
 #include "nets/base/Copyable.h"
