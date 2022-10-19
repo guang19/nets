@@ -66,7 +66,7 @@
 
 namespace nets
 {
-    enum LogLevel
+    enum class LogLevel
     {
         TRACE = 0,
         DEBUG,

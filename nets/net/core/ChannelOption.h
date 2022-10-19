@@ -32,7 +32,7 @@
 
 namespace nets
 {
-    enum SockOption
+    enum class SockOption
     {
         BACKLOG = 0,        // int32_t
         REUSE_ADDR,         // bool

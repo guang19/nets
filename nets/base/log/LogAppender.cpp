@@ -169,17 +169,17 @@ namespace nets
     {
         switch (logFileType_)
         {
-            case SINGLE_FILE:
+            case LogFileType::SINGLE_FILE:
             {
                 syncSingleFile(buffers);
                 break;
             }
-            case DAILY_FILE:
+            case LogFileType::DAILY_FILE:
             {
                 syncDailyFile(buffers);
                 break;
             }
-            case ROLLING_FILE:
+            case LogFileType::ROLLING_FILE:
             {
                 syncRollingFile(buffers);
                 break;

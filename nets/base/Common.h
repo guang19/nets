@@ -47,6 +47,8 @@ namespace nets
 
 #define MEMZERO(P, LEN) (::memset((P), 0, (LEN)))
 
+#define ENUM_CLASS_TO_INT(X) (static_cast<::int32_t>(X))
+
 #define CHECK_CLASS_COMPLETE_TYPE(CLASS)                                                                                    \
     do                                                                                                                      \
     {                                                                                                                       \

@@ -63,7 +63,7 @@ namespace nets
         void flush() override;
     };
 
-    enum LogFileType
+    enum class LogFileType
     {
         SINGLE_FILE,
         DAILY_FILE,

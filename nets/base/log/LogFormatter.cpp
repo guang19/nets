@@ -35,7 +35,8 @@ namespace nets
 
     namespace
     {
-        const char* const kLogLevelName[LogLevel::NUM_OF_LOG_LEVELS] = {"TRACE", "DEBUG", "INFO", "WARN", "ERROR", "FATAL"};
+        const char* const kLogLevelName[ENUM_CLASS_TO_INT(LogLevel::NUM_OF_LOG_LEVELS)] = {"TRACE", "DEBUG", "INFO",
+                                                                                           "WARN",  "ERROR", "FATAL"};
 
         constexpr Int32Type kMaxLengthOfLogTimePortion = 52;
         constexpr char kLF = '\n';
@@ -59,7 +60,7 @@ namespace nets
         logBuffer.writeBytes(kOpenSquareBracket, sizeof(kOpenSquareBracket));
         logBuffer.writeInt32(currentTid());
         logBuffer.writeBytes(kCloseSquareBracket, sizeof(kOpenSquareBracket));
-        logBuffer.writeBytes(kLogLevelName[logMessage.getLevel()]);
+        logBuffer.writeBytes(kLogLevelName[ENUM_CLASS_TO_INT(logMessage.getLevel())]);
         logBuffer.writeByte(kSpace);
         logBuffer.writeBytes(logMessage.getFile());
         logBuffer.writeByte(kColon);
