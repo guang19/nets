@@ -34,7 +34,7 @@ namespace nets
 {
     class Bootstrap : public AbstractBootstrap<Bootstrap>
     {
-    public:
+    private:
         using ConnectorChannelPtr = ::std::shared_ptr<ConnectorChannel>;
         using DatagramChannelPtr = ::std::shared_ptr<DatagramChannel>;
         using SocketChannelHandlerPtr = typename ConnectorChannel::ChannelHandlerPtr;

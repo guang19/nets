@@ -35,6 +35,8 @@ namespace nets
     {
     public:
         using EventLoopRawPtr = EventLoop*;
+
+    private:
         using EventLoopPtr = ::std::unique_ptr<EventLoop>;
         using EventLoopList = ::std::vector<EventLoopPtr>;
         using FutureList = ::std::vector<::std::future<void>>;

@@ -27,18 +27,15 @@
 
 #include "nets/base/exception/SegmentationFaultException.h"
 #include "nets/base/SignalHandler.h"
+#include "nets/base/ThreadHelper.h"
 #include "nets/net/core/ChannelOption.h"
 #include "nets/net/core/EventLoopGroup.h"
-#include "nets/base/ThreadHelper.h"
 
 namespace nets
 {
     template <class B>
     class AbstractBootstrap : Noncopyable
     {
-    public:
-        using ChannelOptionList = Channel::ChannelOptionList;
-
     public:
         AbstractBootstrap() : channelOptions_(), mainLoopGroup_(kNumbOfMainEventLoops, kMainEventLoopGroupName)
         {
@@ -95,6 +92,7 @@ namespace nets
         }
 
     protected:
+        using ChannelOptionList = Channel::ChannelOptionList;
         ChannelOptionList channelOptions_;
         EventLoopGroup mainLoopGroup_;
 

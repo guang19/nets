@@ -35,7 +35,7 @@ namespace nets
 {
     class SocketChannel : public Channel
     {
-    public:
+    private:
         using IoVecList = ::std::vector<IoVec>;
         using WriteCompleteCallback = SocketChannelContext::WriteCompleteCallback;
         using WriteCompleteCallbackQueue = ::std::queue<WriteCompleteCallback>;

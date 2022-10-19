@@ -51,6 +51,9 @@ namespace nets
     class EventLoop : Noncopyable
     {
     public:
+        using EventLoopRawPtr = EventLoop*;
+
+    private:
         using TaskType = ::std::function<void()>;
         using TaskList = ::std::vector<TaskType>;
         using MutexType = ::std::mutex;
@@ -63,7 +66,6 @@ namespace nets
         using ChannelMap = ::std::unordered_map<FdType, ChannelPtr>;
         using NotifyChannelPtr = ::std::shared_ptr<NotifyChannel>;
         using PollerPtr = ::std::unique_ptr<Poller>;
-        using EventLoopRawPtr = EventLoop*;
         using EventLoopGroupRawPtr = EventLoopGroup*;
 
     public:
@@ -176,13 +178,14 @@ namespace nets
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
-                           << "] execution in event loop thread [" << threadId_ << "],reason is " << exception.what();
+                                      << "] execution in event loop thread [" << threadId_ << "],reason is "
+                                      << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
-                           << "] execution in event loop thread [" << threadId_ << "]";
+                                      << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
         assert(2 == promise.use_count());
@@ -208,13 +211,14 @@ namespace nets
             {
                 promise->set_exception(::std::make_exception_ptr(exception));
                 NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
-                           << "] execution in event loop thread [" << threadId_ << "],reason is " << exception.what();
+                                      << "] execution in event loop thread [" << threadId_ << "],reason is "
+                                      << exception.what();
             }
             catch (...)
             {
                 promise->set_exception(::std::current_exception());
                 NETS_SYSTEM_LOG_ERROR << "EventLoop exception caught during thread [" << currentTid()
-                           << "] execution in event loop thread [" << threadId_ << "]";
+                                      << "] execution in event loop thread [" << threadId_ << "]";
             }
         };
         assert(2 == promise.use_count());

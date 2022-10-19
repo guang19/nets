@@ -32,7 +32,7 @@ namespace nets
 {
     class SocketChannelHandlerPipeline : public ChannelHandlerPipeline
     {
-    public:
+    private:
         using SocketChannelContextRawPtr = SocketChannelContext*;
         using SocketChannelContextPtr = ::std::unique_ptr<SocketChannelContext>;
 

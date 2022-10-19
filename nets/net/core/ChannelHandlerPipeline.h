@@ -31,7 +31,7 @@ namespace nets
 {
     class ChannelHandlerPipeline : Noncopyable
     {
-    public:
+    private:
         using ChannelHandlerPtr = ChannelHandler::ChannelHandlerPtr;
 
     public:

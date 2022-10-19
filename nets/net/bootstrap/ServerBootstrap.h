@@ -32,7 +32,7 @@ namespace nets
 {
     class ServerBootstrap : public AbstractBootstrap<ServerBootstrap>
     {
-    public:
+    private:
         using ServerSocketChannelPtr = ::std::shared_ptr<ServerSocketChannel>;
         using ChannelHandlerPtr = typename SocketChannelHandler::SocketChannelHandlerPtr;
         using ChannelHandlerList = typename ServerSocketChannel::ChannelHandlerList;

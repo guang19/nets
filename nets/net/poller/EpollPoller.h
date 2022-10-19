@@ -34,7 +34,7 @@ namespace nets
 {
     class EpollPoller : public Poller
     {
-    public:
+    private:
         using EpollEvent = struct epoll_event;
         using EventList = ::std::vector<EpollEvent>;
 

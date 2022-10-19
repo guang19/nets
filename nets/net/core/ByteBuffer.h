@@ -38,9 +38,6 @@ namespace nets
     class ByteBuffer : public Copyable
     {
     public:
-        using CharArrayPtr = ::std::unique_ptr<char[]>;
-
-    public:
         ByteBuffer();
         explicit ByteBuffer(SizeType initialCapacity);
         explicit ByteBuffer(const char* data);
@@ -162,6 +159,7 @@ namespace nets
         void adjustReaderIndex(SizeType bytes);
 
     private:
+        using CharArrayPtr = ::std::unique_ptr<char[]>;
         CharArrayPtr buffer_;
         // reader pointer
         SizeType readerIndex_;

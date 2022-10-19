@@ -47,7 +47,7 @@ namespace nets
         using ThreadWrapperPtr = ::std::unique_ptr<ThreadWrapper>;
         using ThreadPoolType = ::std::vector<ThreadWrapperPtr>;
 
-    public:
+    private:
         using TaskType = ::std::function<void()>;
         using MutexType = ::std::mutex;
         using LockGuardType = ::std::lock_guard<MutexType>;

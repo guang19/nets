@@ -32,7 +32,7 @@ namespace nets
 {
     class DatagramChannelHandlerPipeline : public ChannelHandlerPipeline
     {
-    public:
+    private:
         using DatagramChannelContextRawPtr = DatagramChannelContext*;
         using DatagramChannelContextPtr = ::std::unique_ptr<DatagramChannelContext>;
 

@@ -38,7 +38,7 @@ namespace nets
     template <typename T>
     class BoundedBlockingQueue : Noncopyable
     {
-    public:
+    private:
         using ValueType = T;
         using LReferenceType = ValueType&;
         using RReferenceType = ValueType&&;

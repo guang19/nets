@@ -33,7 +33,7 @@ namespace nets
     class DatagramChannel;
     class DatagramChannelContext : Noncopyable
     {
-    public:
+    private:
         using DatagramChannelRawPtr = DatagramChannel*;
 
     public:
