@@ -42,9 +42,9 @@ namespace nets
         constexpr char kLF = '\n';
         constexpr char kSpace = ' ';
         constexpr char kColon = ':';
-        constexpr char kOpenSquareBracket[] = {kSpace, '['};
-        constexpr char kCloseSquareBracket[] = {']', kSpace};
-        constexpr char kDash[] = {kSpace, '-', kSpace};
+        constexpr char kOpenSquareBracket[] = " [";
+        constexpr char kCloseSquareBracket[] = "] ";
+        constexpr char kDash[] = " - ";
 
         /**
          * log time cache
@@ -57,15 +57,15 @@ namespace nets
     void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer)
     {
         formatLogTime(logMessage.getTime(), logBuffer);
-        logBuffer.writeBytes(kOpenSquareBracket, sizeof(kOpenSquareBracket));
+        logBuffer.writeBytes(kOpenSquareBracket, 2);
         logBuffer.writeInt32(currentTid());
-        logBuffer.writeBytes(kCloseSquareBracket, sizeof(kOpenSquareBracket));
+        logBuffer.writeBytes(kCloseSquareBracket, 2);
         logBuffer.writeBytes(kLogLevelName[ENUM_CLASS_TO_INT(logMessage.getLevel())]);
         logBuffer.writeByte(kSpace);
         logBuffer.writeBytes(logMessage.getFile());
         logBuffer.writeByte(kColon);
         logBuffer.writeInt32(logMessage.getLine());
-        logBuffer.writeBytes(kDash, sizeof(kDash));
+        logBuffer.writeBytes(kDash, 3);
         logBuffer.writeBytes(logMessage.getStream().buffer());
         logBuffer.writeByte(kLF);
     }
