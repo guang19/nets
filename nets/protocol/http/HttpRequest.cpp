@@ -27,7 +27,7 @@
 namespace nets
 {
     HttpRequest::HttpRequest()
-        : method_(HttpMethod::UNKNOWN), url_(), version_(HttpProtocolVersion::UNSUPPORTED), httpHeader_(), requestBody_()
+        : method_(HttpMethod::UNKNOWN), url_(), version_(HttpProtocolVersion::UNSUPPORTED), httpHeaders_(), requestBody_()
     {
     }
 
@@ -63,13 +63,13 @@ namespace nets
 
     void HttpRequest::setHttpHeader(const StringType& headerName, const StringType& value)
     {
-        httpHeader_.insert_or_assign(headerName, value);
+        httpHeaders_.insert_or_assign(headerName, value);
     }
 
     StringType HttpRequest::getHttpHeader(const StringType& headerName) const
     {
-        auto it = httpHeader_.find(headerName);
-        if (it != httpHeader_.end())
+        auto it = httpHeaders_.find(headerName);
+        if (it != httpHeaders_.end())
         {
             return it->second;
         }

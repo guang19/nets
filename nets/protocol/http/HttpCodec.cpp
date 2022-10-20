@@ -28,48 +28,37 @@ namespace nets
 {
     namespace
     {
-        enum class State
-        {
-            PARSE_REQUEST_LINE,
-            PARSE_REQUEST_HEADER,
-            PARSE_REQUEST_BODY
-        };
         constexpr char kLF = '\n';
         constexpr char kCRLF[] = "\r\n";
+        constexpr char kTwoCRLF[] = "\r\n\r\n";
+        constexpr char kColonSpace[] = ": ";
         constexpr char kSpace = ' ';
     } // namespace
 
     bool HttpCodec::decode(const StringType& data, HttpRequest& httpRequest)
     {
-        StringType temp(data);
-        State currentState = State::PARSE_REQUEST_LINE;
-        switch (currentState)
+        SizeType requestLineEnd = data.find(kCRLF);
+        if (requestLineEnd == StringType::npos)
         {
-            case State::PARSE_REQUEST_LINE:
-            {
-                SizeType requestLineCRLFIndex = temp.find_first_of(kCRLF);
-                if (requestLineCRLFIndex == StringType::npos)
-                {
-                    return false;
-                }
-                if (parseRequestLine(temp.substr(0, requestLineCRLFIndex), httpRequest))
-                {
-                    currentState = State::PARSE_REQUEST_HEADER;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            case State::PARSE_REQUEST_HEADER:
-            {
-            }
-            case State::PARSE_REQUEST_BODY:
-            {
-            }
+            return false;
+        }
+        if (!parseRequestLine(data.substr(0, requestLineEnd), httpRequest))
+        {
+            return false;
+        }
+        SizeType requestHeaderEnd = data.find(kTwoCRLF, requestLineEnd);
+        if (requestHeaderEnd == StringType::npos)
+        {
+            return false;
+        }
+        if (!parseRequestHeader(
+                data.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd - 2), httpRequest))
+        {
+            return false;
         }
         return true;
     }
+
     bool HttpCodec::parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest)
     {
         SizeType methodEnd = requestLine.find_first_of(kSpace);
@@ -88,12 +77,51 @@ namespace nets
         {
             return false;
         }
-        HttpProtocolVersion protocolVersion = stringToProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
+        HttpProtocolVersion protocolVersion =
+            stringToProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
         if (protocolVersion == HttpProtocolVersion::UNSUPPORTED)
         {
             return false;
         }
         httpRequest.setProtocolVersion(protocolVersion);
+        StringType url = requestLine.substr(methodEnd + 1, urlEnd - methodEnd - 1);
+        // TODO:parse url query parameter
+        httpRequest.setUrl(url);
+        return true;
+    }
+
+    bool HttpCodec::parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest)
+    {
+        bool isLastLine = false;
+        StringType headerLine {}, headerName {}, headerValue {};
+        SizeType colonAfterHeaderName = 0;
+        SizeType lastPos = 0, pos = requestHeader.find(kCRLF, lastPos);
+        for (;;)
+        {
+            if (pos == StringType::npos)
+            {
+                isLastLine = true;
+                // has no "\r\n" on the requestHeader last line
+                headerLine = requestHeader.substr(lastPos);
+            }
+            else
+            {
+                headerLine = requestHeader.substr(lastPos, pos - lastPos);
+            }
+            colonAfterHeaderName = headerLine.find(kColonSpace);
+            if (colonAfterHeaderName == StringType::npos)
+            {
+                return false;
+            }
+            httpRequest.setHttpHeader(headerLine.substr(0, colonAfterHeaderName),
+                                      headerLine.substr(colonAfterHeaderName + 2));
+            if (isLastLine)
+            {
+                break;
+            }
+            lastPos = pos + 2;
+            pos = requestHeader.find(kCRLF, lastPos);
+        }
         return true;
     }
 } // namespace nets

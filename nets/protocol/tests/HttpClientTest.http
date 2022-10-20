@@ -1,1 +1,11 @@
-POST http://192.168.24.131:8080/httptest
+POST http://localhost:8080/httptest
+Content-Type: application/json
+
+{
+  "name": "guang19",
+  "age": 19
+}
+
+###
+GET http://localhost:8080/httptest
+

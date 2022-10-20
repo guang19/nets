@@ -30,9 +30,9 @@ namespace nets
 {
     namespace
     {
-        const StringType kHttpMethodString[] = {
+        const char* kHttpMethodString[] = {
             "CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"};
-        const StringType kHttpProtocolVersionString[] = {"HTTP/1.0", "HTTP/1.1"};
+        const char* kHttpProtocolVersionString[] = {"HTTP/1.0", "HTTP/1.1"};
     }
 
     StringType methodToString(HttpMethod method)

@@ -62,7 +62,7 @@ namespace nets
 
     enum class HttpStatusCode
     {
-        UNKNOWN,
+        UNKNOWN = 0,
         CONTINUE = 100,
         SWITCHING_PROTOCOLS = 101,
         EARLY_HINTS = 103,

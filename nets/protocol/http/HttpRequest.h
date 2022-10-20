@@ -56,7 +56,7 @@ namespace nets
         HttpMethod method_;
         StringType url_;
         HttpProtocolVersion version_;
-        HttpHeaderContainer httpHeader_;
+        HttpHeaderContainer httpHeaders_;
         StringType requestBody_;
     };
 } // namespace nets
