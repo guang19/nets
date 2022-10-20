@@ -26,11 +26,4 @@
 
 namespace nets
 {
-    HttpRequestHandler::HttpRequestHandler() : SocketChannelHandler() {}
-    HttpRequestHandler::HttpRequestHandler(const StringType& name) : SocketChannelHandler(name) {}
-
-    void HttpRequestHandler::channelRead(SocketChannelContext& channelContext, ByteBuffer& message)
-    {
-        fireChannelRead(channelContext, message);
-    }
 } // namespace nets

@@ -25,19 +25,22 @@
 #ifndef NETS_HTTP_CODEC_H
 #define NETS_HTTP_CODEC_H
 
-#include "nets/net/core/SocketChannelHandler.h"
+#include "nets/base/Noncopyable.h"
+#include "nets/protocol/http/HttpRequest.h"
 
 namespace nets
 {
-    class HttpCodec : public SocketChannelHandler
+    class HttpCodec : Noncopyable
     {
     public:
-        HttpCodec();
-        explicit HttpCodec(const StringType& name);
-        ~HttpCodec() override = default;
+        HttpCodec() = default;
+        ~HttpCodec() = default;
 
     public:
-        void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override;
+        bool decode(const StringType& data, HttpRequest& httpRequest);
+
+    private:
+        bool parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest);
     };
 } // namespace nets
 

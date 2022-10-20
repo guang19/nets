@@ -110,6 +110,11 @@ namespace nets
             return &buffer_[readerIndex_];
         }
 
+        inline bool empty() const
+        {
+            return readerIndex_ == writerIndex_;
+        }
+
         inline void clear()
         {
             readerIndex_ = writerIndex_ = 0;

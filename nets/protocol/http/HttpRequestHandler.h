@@ -25,19 +25,10 @@
 #ifndef NETS_HTTP_REQUEST_HANDLER_H
 #define NETS_HTTP_REQUEST_HANDLER_H
 
-#include "nets/net/core/SocketChannelHandler.h"
-
 namespace nets
 {
-    class HttpRequestHandler : public SocketChannelHandler
+    class HttpRequestHandler
     {
-    public:
-        HttpRequestHandler();
-        explicit HttpRequestHandler(const StringType& name);
-        ~HttpRequestHandler() override = default;
-
-    public:
-        void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override;
     };
 }
 

@@ -25,9 +25,12 @@
 #ifndef NETS_COMMON_MACRO_H
 #define NETS_COMMON_MACRO_H
 
+#include <algorithm>
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
+
+#include "nets/base/Types.h"
 
 namespace nets
 {
@@ -40,6 +43,36 @@ namespace nets
         ::vsnprintf(msgBuf, sizeof(msgBuf), fmt, vl);
         va_end(vl);
         throw E(msgBuf);
+    }
+
+    struct AsciiCaseInsensitive
+    {
+        bool operator()(char lhs, char rhs) const
+        {
+            char k = lhs ^ rhs;
+            if (k == 0)
+            {
+                return true;
+            }
+            if (k != 32)
+            {
+                return false;
+            }
+            k = lhs | rhs;
+            return (k >= 'a' && k <= 'z');
+        }
+    };
+
+    inline bool caseInsensitiveEqual(const StringType& s1, const StringType& s2)
+    {
+        if (s1.length() != s2.length())
+        {
+            return false;
+        }
+        else
+        {
+            return ::std::equal(s1.begin(), s1.end(), s2.begin(), AsciiCaseInsensitive());
+        }
     }
 } // namespace nets
 

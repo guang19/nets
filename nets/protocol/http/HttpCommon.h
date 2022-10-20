@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Http common header file
+// @brief Http common file
 
 #ifndef NETS_HTTP_COMMON_H
 #define NETS_HTTP_COMMON_H
@@ -35,8 +35,7 @@ namespace nets
 
     enum class HttpMethod
     {
-        UNKNOWN,
-        CONNECT,
+        CONNECT = 0,
         DELETE,
         GET,
         HEAD,
@@ -44,16 +43,22 @@ namespace nets
         PATCH,
         POST,
         PUT,
-        TRACE
+        TRACE,
+        UNKNOWN
     };
+
+    StringType methodToString(HttpMethod method);
+    HttpMethod stringToMethod(const StringType& methodStr);
 
     enum class HttpProtocolVersion
     {
-        UNSUPPORTED,
-        HTTP_1_0,
+        HTTP_1_0 = 0,
         HTTP_1_1,
-        HTTP_2
+        UNSUPPORTED,
     };
+
+    StringType protocolVersionToString(HttpProtocolVersion protocolVersion);
+    HttpProtocolVersion stringToProtocolVersion(const StringType& protocolVersionStr);
 
     enum class HttpStatusCode
     {

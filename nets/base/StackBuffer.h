@@ -31,7 +31,6 @@
 
 #include "nets/base/Common.h"
 #include "nets/base/Copyable.h"
-#include "nets/base/Types.h"
 
 namespace nets
 {

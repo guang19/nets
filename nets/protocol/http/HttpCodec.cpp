@@ -24,18 +24,76 @@
 
 #include "nets/protocol/http/HttpCodec.h"
 
-#include "nets/base/log/Logger.h"
-#include "nets/net/core/ByteBuffer.h"
-
 namespace nets
 {
-    HttpCodec::HttpCodec() : SocketChannelHandler() {}
-
-    HttpCodec::HttpCodec(const StringType& name) : SocketChannelHandler(name) {}
-
-    void HttpCodec::channelRead(SocketChannelContext& channelContext, ByteBuffer& message)
+    namespace
     {
-        NETS_SYSTEM_LOG_DEBUG << message.toString();
-        fireChannelRead(channelContext, message);
+        enum class State
+        {
+            PARSE_REQUEST_LINE,
+            PARSE_REQUEST_HEADER,
+            PARSE_REQUEST_BODY
+        };
+        constexpr char kLF = '\n';
+        constexpr char kCRLF[] = "\r\n";
+        constexpr char kSpace = ' ';
+    } // namespace
+
+    bool HttpCodec::decode(const StringType& data, HttpRequest& httpRequest)
+    {
+        StringType temp(data);
+        State currentState = State::PARSE_REQUEST_LINE;
+        switch (currentState)
+        {
+            case State::PARSE_REQUEST_LINE:
+            {
+                SizeType requestLineCRLFIndex = temp.find_first_of(kCRLF);
+                if (requestLineCRLFIndex == StringType::npos)
+                {
+                    return false;
+                }
+                if (parseRequestLine(temp.substr(0, requestLineCRLFIndex), httpRequest))
+                {
+                    currentState = State::PARSE_REQUEST_HEADER;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            case State::PARSE_REQUEST_HEADER:
+            {
+            }
+            case State::PARSE_REQUEST_BODY:
+            {
+            }
+        }
+        return true;
+    }
+    bool HttpCodec::parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest)
+    {
+        SizeType methodEnd = requestLine.find_first_of(kSpace);
+        if (methodEnd == StringType::npos)
+        {
+            return false;
+        }
+        HttpMethod method = stringToMethod(requestLine.substr(0, methodEnd));
+        if (method == HttpMethod::UNKNOWN)
+        {
+            return false;
+        }
+        httpRequest.setMethod(method);
+        SizeType urlEnd = requestLine.find_last_of(kSpace);
+        if (urlEnd == StringType::npos || urlEnd == methodEnd)
+        {
+            return false;
+        }
+        HttpProtocolVersion protocolVersion = stringToProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
+        if (protocolVersion == HttpProtocolVersion::UNSUPPORTED)
+        {
+            return false;
+        }
+        httpRequest.setProtocolVersion(protocolVersion);
+        return true;
     }
 } // namespace nets
