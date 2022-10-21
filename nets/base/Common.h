@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief common macro and function
+// @brief Common macro and function
 
 #ifndef NETS_COMMON_MACRO_H
 #define NETS_COMMON_MACRO_H
@@ -31,6 +31,22 @@
 #include <cstring>
 
 #include "nets/base/Types.h"
+
+#define UNUSED(X) ((void) (X))
+
+#define MEMZERO(P, LEN) (::memset((P), 0, (LEN)))
+
+#define ENUM_CLASS_TO_INT(X) (static_cast<nets::Int32Type>(X))
+
+#define CHECK_CLASS_COMPLETE_TYPE(CLASS)                                                                                    \
+    do                                                                                                                      \
+    {                                                                                                                       \
+        typedef char CLASS_MUST_BE_COMPLETE_TYPE[sizeof(CLASS) == 0 ? -1 : 1];                                              \
+        CLASS_MUST_BE_COMPLETE_TYPE jugg;                                                                                   \
+        UNUSED(jugg);                                                                                                       \
+    } while (0)
+
+#define THROW_FMT(EXCEPTION, FMT, ...) (nets::throwFmt<EXCEPTION>(#EXCEPTION":" FMT, ##__VA_ARGS__))
 
 namespace nets
 {
@@ -44,52 +60,6 @@ namespace nets
         va_end(vl);
         throw E(msgBuf);
     }
-
-    struct AsciiCaseInsensitive
-    {
-        bool operator()(char lhs, char rhs) const
-        {
-            char k = lhs ^ rhs;
-            if (k == 0)
-            {
-                return true;
-            }
-            if (k != 32)
-            {
-                return false;
-            }
-            k = lhs | rhs;
-            return (k >= 'a' && k <= 'z');
-        }
-    };
-
-    inline bool caseInsensitiveEqual(const StringType& s1, const StringType& s2)
-    {
-        if (s1.length() != s2.length())
-        {
-            return false;
-        }
-        else
-        {
-            return ::std::equal(s1.begin(), s1.end(), s2.begin(), AsciiCaseInsensitive());
-        }
-    }
 } // namespace nets
-
-#define UNUSED(X) ((void) (X))
-
-#define MEMZERO(P, LEN) (::memset((P), 0, (LEN)))
-
-#define ENUM_CLASS_TO_INT(X) (static_cast<::int32_t>(X))
-
-#define CHECK_CLASS_COMPLETE_TYPE(CLASS)                                                                                    \
-    do                                                                                                                      \
-    {                                                                                                                       \
-        typedef char CLASS_MUST_BE_COMPLETE_TYPE[sizeof(CLASS) == 0 ? -1 : 1];                                              \
-        CLASS_MUST_BE_COMPLETE_TYPE jugg;                                                                                   \
-        UNUSED(jugg);                                                                                                       \
-    } while (0)
-
-#define THROW_FMT(EXCEPTION, FMT, ...) (nets::throwFmt<EXCEPTION>(FMT, ##__VA_ARGS__))
 
 #endif // NETS_COMMON_MACRO_H

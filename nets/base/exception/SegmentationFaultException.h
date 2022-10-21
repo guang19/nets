@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief segmentation fault exception
+// @brief Segmentation fault exception
 
 #ifndef NETS_SEGMENTATION_FAULT_EXCEPTION_H
 #define NETS_SEGMENTATION_FAULT_EXCEPTION_H

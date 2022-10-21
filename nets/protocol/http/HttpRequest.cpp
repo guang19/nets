@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http request
+// @brief Http request
 
 #include "nets/protocol/http/HttpRequest.h"
 
@@ -77,6 +77,11 @@ namespace nets
         {
             return {};
         }
+    }
+
+    bool HttpRequest::hasHttpHeader(const StringType& headerName)
+    {
+        return httpHeaders_.find(headerName) != httpHeaders_.end();
     }
 
     void HttpRequest::setRequestBody(const StringType& requestBody)

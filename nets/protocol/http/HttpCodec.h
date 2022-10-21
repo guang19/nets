@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http codec
+// @brief Http codec
 
 #ifndef NETS_HTTP_CODEC_H
 #define NETS_HTTP_CODEC_H
@@ -42,6 +42,7 @@ namespace nets
     private:
         bool parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest);
         bool parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest);
+        bool parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest);
     };
 } // namespace nets
 

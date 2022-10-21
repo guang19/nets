@@ -20,30 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Common type alias
+// @brief Test for StringUtils
 
-#ifndef NETS_TYPES_H
-#define NETS_TYPES_H
+#include <gtest/gtest.h>
 
-#include <cstdint>
-#include <string>
+#include "nets/base/StringUtils.h"
 
-namespace nets
+using namespace nets;
+
+TEST(StringUtilsTest, Trim)
 {
-    using StringType = ::std::string;
-    using StringViewType = ::std::string_view;
-    using SizeType = ::size_t;
-    using TimeType = ::time_t;
-    using Int8Type = ::int8_t;
-    using Uint8Type = ::uint8_t;
-    using Int16Type = ::int16_t;
-    using Uint16Type = ::uint16_t;
-    using Int32Type = ::int32_t;
-    using Uint32Type = ::uint32_t;
-    using Int64Type = ::int64_t;
-    using Uint64Type = ::uint64_t;
-    using IntPtrType = ::intptr_t;
-    using UintPtrType = ::uintptr_t;
-} // namespace nets
+    StringType s1 = " abcd efg";
+    StringType s2 = "abcd efg ";
+    StringType s3 = " abcd efg ";
+    utils::trim(s1);
+    utils::trim(s2);
+    utils::trim(s3);
+    ASSERT_EQ(s1, s2);
+    ASSERT_EQ(s2, s3);
+    ASSERT_EQ(s1, s3);
+}
 
-#endif // NETS_TYPES_H
+TEST(StringUtilsTest, CaseInsensitiveEqual)
+{
+    StringType s1 = " abcdefg";
+    StringType s2 = " ABCDEFG";
+    ASSERT_TRUE(utils::caseInsensitiveEqual(s1, s2));
+}
+
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

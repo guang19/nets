@@ -31,8 +31,6 @@
 
 namespace nets
 {
-    using HttpHeaderContainer = ::std::map<StringType, StringType>;
-
     enum class HttpMethod
     {
         CONNECT = 0,
@@ -47,8 +45,8 @@ namespace nets
         UNKNOWN
     };
 
-    StringType methodToString(HttpMethod method);
-    HttpMethod stringToMethod(const StringType& methodStr);
+    StringType httpMethodToString(HttpMethod method);
+    HttpMethod stringToHttpMethod(const StringType& methodStr);
 
     enum class HttpProtocolVersion
     {
@@ -57,8 +55,136 @@ namespace nets
         UNSUPPORTED,
     };
 
-    StringType protocolVersionToString(HttpProtocolVersion protocolVersion);
-    HttpProtocolVersion stringToProtocolVersion(const StringType& protocolVersionStr);
+    StringType httpProtocolVersionToString(HttpProtocolVersion protocolVersion);
+    HttpProtocolVersion stringToHttpProtocolVersion(const StringType& protocolVersionStr);
+
+    using HttpHeaderContainer = ::std::map<StringType, StringType>;
+
+    enum class HttpHeader
+    {
+        ACCEPT = 0,
+        ACCEPT_CH,
+        ACCEPT_CH_LIFETIME,
+        ACCEPT_CHARSET,
+        ACCEPT_ENCODING,
+        ACCEPT_LANGUAGE,
+        ACCEPT_PATCH,
+        ACCEPT_POST,
+        ACCEPT_RANGES,
+        ACCESS_CONTROL_ALLOW_CREDENTIALS,
+        ACCESS_CONTROL_ALLOW_HEADERS,
+        ACCESS_CONTROL_ALLOW_METHODS,
+        ACCESS_CONTROL_ALLOW_ORIGIN,
+        ACCESS_CONTROL_EXPOSE_HEADERS,
+        ACCESS_CONTROL_MAX_AGE,
+        ACCESS_CONTROL_REQUEST_HEADERS,
+        ACCESS_CONTROL_REQUEST_METHOD,
+        AGE,
+        ALLOW,
+        ALT_SVC,
+        AUTHORIZATION,
+        CACHE_CONTROL,
+        CLEAR_SITE_DATA,
+        CONNECTION,
+        CONTENT_DISPOSITION,
+        CONTENT_DPR,
+        CONTENT_ENCODING,
+        CONTENT_LANGUAGE,
+        CONTENT_LENGTH,
+        CONTENT_LOCATION,
+        CONTENT_RANGE,
+        CONTENT_SECURITY_POLICY,
+        CONTENT_SECURITY_POLICY_REPORT_ONLY,
+        CONTENT_TYPE,
+        COOKIE,
+        CROSS_ORIGIN_EMBEDDER_POLICY,
+        CROSS_ORIGIN_OPENER_POLICY,
+        CROSS_ORIGIN_RESOURCE_POLICY,
+        DATE,
+        DEVICE_MEMORY,
+        DIGEST,
+        DNT,
+        DOWNLINK,
+        DPR,
+        EARLY_DATA,
+        ECT,
+        ETAG,
+        EXPECT,
+        EXPECT_CT,
+        EXPIRES,
+        FEATURE_POLICY,
+        FORWARDED,
+        FROM,
+        HOST,
+        IF_MATCH,
+        IF_MODIFIED_SINCE,
+        IF_NONE_MATCH,
+        IF_RANGE,
+        IF_UNMODIFIED_SINCE,
+        KEEP_ALIVE,
+        LARGE_ALLOCATION,
+        LAST_MODIFIED,
+        LINK,
+        LOCATION,
+        MAX_FORWARDS,
+        NEL,
+        ORIGIN,
+        PRAGMA,
+        PROXY_AUTHENTICATE,
+        PROXY_AUTHORIZATION,
+        RANGE,
+        REFERER,
+        REFERRER_POLICY,
+        RETRY_AFTER,
+        RTT,
+        SAVE_DATA,
+        SEC_CH_UA,
+        SEC_CH_UA_ARCH,
+        SEC_CH_UA_BITNESS,
+        SEC_CH_UA_FULL_VERSION,
+        SEC_CH_UA_FULL_VERSION_LIST,
+        SEC_CH_UA_MOBILE,
+        SEC_CH_UA_MODEL,
+        SEC_CH_UA_PLATFORM,
+        SEC_CH_UA_PLATFORM_VERSION,
+        SEC_FETCH_DEST,
+        SEC_FETCH_MODE,
+        SEC_FETCH_SITE,
+        SEC_FETCH_USER,
+        SEC_GPC,
+        SEC_WEBSOCKET_ACCEPT,
+        SERVER,
+        SERVER_TIMING,
+        SERVICE_WORKER_NAVIGATION_PRELOAD,
+        SET_COOKIE,
+        SOURCEMAP,
+        STRICT_TRANSPORT_SECURITY,
+        TE,
+        TIMING_ALLOW_ORIGIN,
+        TK,
+        TRAILER,
+        TRANSFER_ENCODING,
+        UPGRADE,
+        UPGRADE_INSECURE_REQUESTS,
+        USER_AGENT,
+        VARY,
+        VIA,
+        VIEWPORT_WIDTH,
+        WANT_DIGEST,
+        WARNING,
+        WIDTH,
+        WWW_AUTHENTICATE,
+        X_CONTENT_TYPE_OPTIONS,
+        X_DNS_PREFETCH_CONTROL,
+        X_FORWARDED_FOR,
+        X_FORWARDED_HOST,
+        X_FORWARDED_PROTO,
+        X_FRAME_OPTIONS,
+        X_XSS_PROTECTION,
+        UNKNOWN,
+    };
+
+    StringType httpHeaderToString(HttpHeader httpHeader);
 
     enum class HttpStatusCode
     {

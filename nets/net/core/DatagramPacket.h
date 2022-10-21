@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief udp datagram
+// @brief Udp datagram
 
 #ifndef NETS_DATAGRAM_PACKET_H
 #define NETS_DATAGRAM_PACKET_H

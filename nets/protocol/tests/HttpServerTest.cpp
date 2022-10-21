@@ -39,18 +39,6 @@ TEST(HttpServerTest, HttpServer)
     //     Connection: Keep-Alive
     //     User-Agent: Apache-HttpClient/4.5.13 (Java/11.0.15)
     //     Accept-Encoding: gzip,def
-//    StringType data {"POST /httptest HTTP/1.1\n"
-//                     "Content-Length: 0\n"
-//                     "Host: 192.168.24.131:8080\n"
-//                     "Connection: Keep-Alive\n"
-//                     "User-Agent: Apache-HttpClient/4.5.13 (Java/11.0.15)\n"
-//                     "Accept-Encoding: gzip,deflate"};
-//    SizeType requestLineCRLFIndex = data.find_first_of("\r\n");
-//    ::printf("%ld\n", requestLineCRLFIndex);
-//    StringType requestLine = data.substr(0, requestLineCRLFIndex);
-//    SizeType urlEnd = requestLine.find_last_of(' ');
-//    HttpProtocolVersion version = stringToProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
-//    ASSERT_EQ(version, HttpProtocolVersion::HTTP_1_1);
     ServerBootstrap(8)
         .option(SockOption::SNDBUF, 1024)
         .option(SockOption::RCVBUF, 1024)

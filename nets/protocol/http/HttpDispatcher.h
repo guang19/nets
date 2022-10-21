@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http request dispatcher
+// @brief Http request dispatcher
 
 #ifndef NETS_HTTP_DISPATCHER_H
 #define NETS_HTTP_DISPATCHER_H

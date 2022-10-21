@@ -1,5 +1,8 @@
 INCLUDE_DIRECTORIES(${GOOGLE_TEST_INC_DIR})
 
+ADD_EXECUTABLE(StringUtilsTest StringUtilsTest.cpp)
+TARGET_LINK_LIBRARIES(StringUtilsTest nets_base gtest_main)
+
 ADD_EXECUTABLE(SingletonTest SingletonTest.cpp)
 TARGET_LINK_LIBRARIES(SingletonTest nets_base gtest_main)
 

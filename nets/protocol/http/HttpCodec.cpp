@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http codec
+// @brief Http codec
 
 #include "nets/protocol/http/HttpCodec.h"
 
@@ -51,8 +51,11 @@ namespace nets
         {
             return false;
         }
-        if (!parseRequestHeader(
-                data.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd - 2), httpRequest))
+        if (!parseRequestHeader(data.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd - 2), httpRequest))
+        {
+            return false;
+        }
+        if (!parseRequestBody(data, requestHeaderEnd + 4, httpRequest))
         {
             return false;
         }
@@ -66,7 +69,7 @@ namespace nets
         {
             return false;
         }
-        HttpMethod method = stringToMethod(requestLine.substr(0, methodEnd));
+        HttpMethod method = stringToHttpMethod(requestLine.substr(0, methodEnd));
         if (method == HttpMethod::UNKNOWN)
         {
             return false;
@@ -78,7 +81,7 @@ namespace nets
             return false;
         }
         HttpProtocolVersion protocolVersion =
-            stringToProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
+            stringToHttpProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
         if (protocolVersion == HttpProtocolVersion::UNSUPPORTED)
         {
             return false;
@@ -122,6 +125,36 @@ namespace nets
             lastPos = pos + 2;
             pos = requestHeader.find(kCRLF, lastPos);
         }
+        return true;
+    }
+
+    bool HttpCodec::parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest)
+    {
+        StringType contentLengthHttpHeaderName = httpHeaderToString(HttpHeader::CONTENT_LENGTH);
+        // has no request body
+        if (!httpRequest.hasHttpHeader(contentLengthHttpHeaderName))
+        {
+            return true;
+        }
+        StringType contentLengthStr = httpRequest.getHttpHeader(contentLengthHttpHeaderName);
+        SizeType contentLength = 0;
+        try
+        {
+            contentLength = ::std::stol(contentLengthStr);
+            if (contentLength == 0 && contentLengthStr.length() != ::std::to_string(contentLength).length())
+            {
+                return false;
+            }
+        }
+        catch (const ::std::invalid_argument& e)
+        {
+            return false;
+        }
+        if (contentLength != data.length() - requestBodyStart)
+        {
+            return false;
+        }
+        httpRequest.setRequestBody(data.substr(requestBodyStart, contentLength));
         return true;
     }
 } // namespace nets

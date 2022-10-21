@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http request
+// @brief Http request
 
 #ifndef NETS_HTTP_REQUEST_H
 #define NETS_HTTP_REQUEST_H
@@ -48,6 +48,7 @@ namespace nets
 
         void setHttpHeader(const StringType& headerName, const StringType& value);
         StringType getHttpHeader(const StringType& headerName) const;
+        bool hasHttpHeader(const StringType& headerName);
 
         void setRequestBody(const StringType& requestBody);
         const StringType& getRequestBody() const;

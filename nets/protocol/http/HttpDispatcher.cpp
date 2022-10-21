@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http request dispatcher
+// @brief Http request dispatcher
 
 #include "nets/protocol/http/HttpDispatcher.h"
 
