@@ -143,7 +143,7 @@ namespace nets
         try
         {
             contentLength = ::std::stol(contentLengthStr);
-            if (contentLength == 0 && contentLengthStr.length() != ::std::to_string(contentLength).length())
+            if (contentLengthStr.length() != ::std::to_string(contentLength).length())
             {
                 return false;
             }
@@ -151,6 +151,10 @@ namespace nets
         catch (const ::std::invalid_argument& e)
         {
             return false;
+        }
+        if (contentLength == 0)
+        {
+            return true;
         }
         if (contentLength != data.length() - requestBodyStart)
         {

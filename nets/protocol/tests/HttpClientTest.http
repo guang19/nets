@@ -1,10 +1,9 @@
 POST http://127.0.0.1:8080/httptest
-Content-Type: application/json
+Content-Type: multipart/form-data
 
-{
-  "name": "guang19",
-  "age": 19
-}
+
+
+
 
 ###
 GET http://127.0.0.1:8080/httptest
