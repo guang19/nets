@@ -24,6 +24,8 @@
 
 #include "nets/protocol/http/HttpCodec.h"
 
+#include <stdexcept>
+
 namespace nets
 {
     namespace
