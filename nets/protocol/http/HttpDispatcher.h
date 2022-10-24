@@ -41,6 +41,9 @@ namespace nets
         void channelRead(SocketChannelContext& channelContext, ByteBuffer& message) override;
 
     private:
+        void dispatch(HttpRequest& httpRequest, HttpResponse& httpResponse);
+
+    private:
         HttpCodec httpCodec_;
     };
 } // namespace nets

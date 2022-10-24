@@ -186,7 +186,7 @@ namespace nets
 
     StringType httpHeaderToString(HttpHeader httpHeader);
 
-    enum class HttpStatusCode
+    enum class HttpStatus
     {
         UNKNOWN = 0,
         CONTINUE = 100,
@@ -200,8 +200,8 @@ namespace nets
         NO_CONTENT = 204,
         RESET_CONTENT = 205,
         PARTIAL_CONTENT = 206,
-        MULTIPLE_CHOICES = 207,
 
+        MULTIPLE_CHOICES = 300,
         MOVED_PERMANENTLY = 301,
         FOUND = 302,
         SEE_OTHER = 303,
@@ -248,6 +248,10 @@ namespace nets
         NOT_EXTENDED = 510,
         NETWORK_AUTHENTICATION_REQUIRED = 511
     };
+
+    HttpStatus statusCodeToHttpStatus(Int32Type statusCode);
+    Int32Type httpStatusToCode(HttpStatus httpStatus);
+    StringType httpStatusToStatusText(HttpStatus httpStatus);
 } // namespace nets
 
 #endif // NETS_HTTP_COMMON_H

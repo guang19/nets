@@ -24,7 +24,10 @@
 
 #include "nets/protocol/http/HttpCodec.h"
 
+#include <cassert>
 #include <stdexcept>
+
+#include "nets/base/StackBuffer.h"
 
 namespace nets
 {
@@ -32,13 +35,15 @@ namespace nets
     {
         constexpr char kLF = '\n';
         constexpr char kCRLF[] = "\r\n";
-        constexpr char kTwoCRLF[] = "\r\n\r\n";
+        constexpr char kDoubleCRLF[] = "\r\n\r\n";
         constexpr char kColonSpace[] = ": ";
+        constexpr char kColon = ':';
         constexpr char kSpace = ' ';
     } // namespace
 
-    bool HttpCodec::decode(const StringType& data, HttpRequest& httpRequest)
+    bool HttpCodec::decode(const ByteBuffer& message, HttpRequest& httpRequest)
     {
+        StringType data(message.data());
         SizeType requestLineEnd = data.find(kCRLF);
         if (requestLineEnd == StringType::npos)
         {
@@ -48,7 +53,7 @@ namespace nets
         {
             return false;
         }
-        SizeType requestHeaderEnd = data.find(kTwoCRLF, requestLineEnd);
+        SizeType requestHeaderEnd = data.find(kDoubleCRLF, requestLineEnd);
         if (requestHeaderEnd == StringType::npos)
         {
             return false;
@@ -64,6 +69,29 @@ namespace nets
         return true;
     }
 
+    bool HttpCodec::encode(ByteBuffer& message, const HttpResponse& httpResponse)
+    {
+        message.writeString(httpProtocolVersionToString(httpResponse.getProtocolVersion()));
+        message.writeByte(kSpace);
+        StackBuffer<kMaximumNumberLimit + 1> statusCodeBuf {};
+        statusCodeBuf.writeInt32(httpStatusToCode(httpResponse.getStatus()));
+        message.writeBytes(statusCodeBuf.array(), statusCodeBuf.length());
+        message.writeByte(kSpace);
+        message.writeString(httpStatusToStatusText(httpResponse.getStatus()));
+        message.writeBytes(kCRLF, 2);
+        const auto& httpHeaders = httpResponse.getHttpHeaders();
+        for (const auto& httpHeader : httpHeaders)
+        {
+            message.writeString(httpHeader.first);
+            message.writeByte(kColon);
+            message.writeString(httpHeader.second);
+            message.writeBytes(kCRLF, 2);
+        }
+        message.writeBytes(kCRLF, 2);
+        message.writeString(httpResponse.getResponseBody());
+        return true;
+    }
+
     bool HttpCodec::parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest)
     {
         SizeType methodEnd = requestLine.find_first_of(kSpace);
@@ -71,24 +99,14 @@ namespace nets
         {
             return false;
         }
-        HttpMethod method = stringToHttpMethod(requestLine.substr(0, methodEnd));
-        if (method == HttpMethod::UNKNOWN)
-        {
-            return false;
-        }
-        httpRequest.setMethod(method);
+        httpRequest.setMethod(stringToHttpMethod(requestLine.substr(0, methodEnd)));
         SizeType urlEnd = requestLine.find_last_of(kSpace);
         if (urlEnd == StringType::npos || urlEnd == methodEnd)
         {
             return false;
         }
-        HttpProtocolVersion protocolVersion =
-            stringToHttpProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1));
-        if (protocolVersion == HttpProtocolVersion::UNSUPPORTED)
-        {
-            return false;
-        }
-        httpRequest.setProtocolVersion(protocolVersion);
+        httpRequest.setProtocolVersion(
+            stringToHttpProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1)));
         StringType url = requestLine.substr(methodEnd + 1, urlEnd - methodEnd - 1);
         // TODO:parse url query parameter
         httpRequest.setUrl(url);

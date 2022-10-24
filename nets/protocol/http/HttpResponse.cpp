@@ -27,8 +27,7 @@
 namespace nets
 {
     HttpResponse::HttpResponse()
-        : version_(HttpProtocolVersion::UNSUPPORTED), statusCode_(HttpStatusCode::UNKNOWN), statusText_(), httpHeader_(),
-          responseBody_()
+        : version_(HttpProtocolVersion::UNSUPPORTED), status_(HttpStatus::UNKNOWN), httpHeaders_(), responseBody_()
     {
     }
 
@@ -42,35 +41,25 @@ namespace nets
         return version_;
     }
 
-    void HttpResponse::setStatusCode(HttpStatusCode statusCode)
+    void HttpResponse::setStatus(HttpStatus statusCode)
     {
-        statusCode_ = statusCode;
+        status_ = statusCode;
     }
 
-    HttpStatusCode HttpResponse::getStatusCode() const
+    HttpStatus HttpResponse::getStatus() const
     {
-        return statusCode_;
-    }
-
-    void HttpResponse::setStatusText(const StringType& statusText)
-    {
-        statusText_ = statusText;
-    }
-
-    const StringType& HttpResponse::getStatusText() const
-    {
-        return statusText_;
+        return status_;
     }
 
     void HttpResponse::setHttpHeader(const StringType& headerName, const StringType& value)
     {
-        httpHeader_.insert_or_assign(headerName, value);
+        httpHeaders_.insert_or_assign(headerName, value);
     }
 
     StringType HttpResponse::getHttpHeader(const StringType& headerName) const
     {
-        auto it = httpHeader_.find(headerName);
-        if (it != httpHeader_.end())
+        auto it = httpHeaders_.find(headerName);
+        if (it != httpHeaders_.end())
         {
             return it->second;
         }
@@ -78,6 +67,11 @@ namespace nets
         {
             return {};
         }
+    }
+
+    const HttpHeaderContainer& HttpResponse::getHttpHeaders() const
+    {
+        return httpHeaders_;
     }
 
     void HttpResponse::setResponseBody(const StringType& responseBody)

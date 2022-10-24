@@ -40,23 +40,20 @@ namespace nets
         void setProtocolVersion(HttpProtocolVersion version);
         HttpProtocolVersion getProtocolVersion() const;
 
-        void setStatusCode(HttpStatusCode statusCode);
-        HttpStatusCode getStatusCode() const;
-
-        void setStatusText(const StringType& statusText);
-        const StringType& getStatusText() const;
+        void setStatus(HttpStatus status);
+        HttpStatus getStatus() const;
 
         void setHttpHeader(const StringType& headerName, const StringType& value);
         StringType getHttpHeader(const StringType& headerName) const;
+        const HttpHeaderContainer& getHttpHeaders() const;
 
         void setResponseBody(const StringType& responseBody);
         const StringType& getResponseBody() const;
 
     private:
         HttpProtocolVersion version_;
-        HttpStatusCode statusCode_;
-        StringType statusText_;
-        HttpHeaderContainer httpHeader_;
+        HttpStatus status_;
+        HttpHeaderContainer httpHeaders_;
         StringType responseBody_;
     };
 } // namespace nets

@@ -29,11 +29,6 @@
 
 namespace nets::utils
 {
-    namespace
-    {
-        const auto kNumberLimit = ::std::to_string(UINT64_MAX).length();
-    }
-
     void trim(StringType& str)
     {
         if (!str.empty())

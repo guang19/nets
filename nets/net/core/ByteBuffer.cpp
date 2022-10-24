@@ -173,6 +173,16 @@ namespace nets
         return bytes;
     }
 
+    void ByteBuffer::writeString(const StringType& message)
+    {
+        writeBytes(message.data(), message.length());
+    }
+
+    void ByteBuffer::writeByteBuffer(const ByteBuffer& byteBuffer)
+    {
+        writeBytes(&byteBuffer.buffer_[readerIndex_], byteBuffer.readableBytes());
+    }
+
     void ByteBuffer::writeInt8(Int8Type value)
     {
         writeBytes(&value, kInt8Size);

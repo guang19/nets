@@ -129,6 +129,8 @@ namespace nets
         void writeBytes(const char* data, SizeType length);
         SSizeType writeBytes(const SocketChannel& channel, SizeType length);
         SSizeType writeBytes(const DatagramChannel& channel, SizeType length, InetSockAddress& srcAddr);
+        void writeString(const StringType& message);
+        void writeByteBuffer(const ByteBuffer& byteBuffer);
         void writeInt8(Int8Type value);
         void writeUint8(Uint8Type value);
         void writeInt16(Int16Type value);

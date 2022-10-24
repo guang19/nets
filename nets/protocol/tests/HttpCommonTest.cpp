@@ -20,33 +20,28 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Http codec
+// @brief Test for http common
 
-#ifndef NETS_HTTP_CODEC_H
-#define NETS_HTTP_CODEC_H
+#include <gtest/gtest.h>
 
-#include "nets/base/Noncopyable.h"
-#include "nets/net/core/ByteBuffer.h"
-#include "nets/protocol/http/HttpRequest.h"
-#include "nets/protocol/http/HttpResponse.h"
+#include "nets/protocol/http/HttpCommon.h"
 
-namespace nets
+using namespace nets;
+
+TEST(HttpCommonTest, HttpHeader)
 {
-    class HttpCodec : Noncopyable
-    {
-    public:
-        HttpCodec() = default;
-        ~HttpCodec() = default;
+    ASSERT_STREQ("X-XSS-Protection", httpHeaderToString(HttpHeader::X_XSS_PROTECTION).c_str());
+}
 
-    public:
-        bool decode(const ByteBuffer& message, HttpRequest& httpRequest);
-        bool encode(ByteBuffer& message, const HttpResponse& httpResponse);
+TEST(HttpCommonTest, HttpStatusCode)
+{
+    ASSERT_EQ(404, httpStatusToCode(HttpStatus::NOT_FOUND));
+    ASSERT_EQ(200, httpStatusToCode(HttpStatus::OK));
+    ASSERT_EQ(500, httpStatusToCode(HttpStatus::INTERNAL_SERVER_ERROR));
+}
 
-    private:
-        bool parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest);
-        bool parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest);
-        bool parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest);
-    };
-} // namespace nets
-
-#endif // NETS_HTTP_CODEC_H
+int main(int argc, char** argv)
+{
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}

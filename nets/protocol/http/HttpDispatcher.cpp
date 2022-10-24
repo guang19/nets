@@ -26,6 +26,7 @@
 
 #include "nets/base/log/Logger.h"
 #include "nets/net/core/ByteBuffer.h"
+#include "nets/net/core/SocketChannelContext.h"
 
 namespace nets
 {
@@ -34,13 +35,29 @@ namespace nets
 
     void HttpDispatcher::channelRead(SocketChannelContext& channelContext, ByteBuffer& message)
     {
-        StringType data(message.toString());
-        NETS_SYSTEM_LOG_DEBUG << data;
+        NETS_SYSTEM_LOG_DEBUG << message.data();
         HttpRequest httpRequest {};
-        if (httpCodec_.decode(data, httpRequest))
+        if (httpCodec_.decode(message, httpRequest))
         {
-
+            HttpResponse httpResponse {};
+            httpResponse.setProtocolVersion(httpRequest.getProtocolVersion());
+            dispatch(httpRequest, httpResponse);
+            ByteBuffer buffer {};
+            httpCodec_.encode(buffer, httpResponse);
+            NETS_SYSTEM_LOG_DEBUG << buffer.data();
+            channelContext.write(buffer);
         }
-        fireChannelRead(channelContext, message);
+        else
+        {
+            channelContext.disconnect();
+        }
+    }
+
+    void HttpDispatcher::dispatch(HttpRequest& httpRequest, HttpResponse& httpResponse)
+    {
+        if (httpRequest.getProtocolVersion() == HttpProtocolVersion::UNSUPPORTED)
+        {
+            httpResponse.setStatus(HttpStatus::HTTP_VERSION_NOT_SUPPORTED);
+        }
     }
 } // namespace nets
