@@ -180,15 +180,13 @@ namespace nets
         X_FORWARDED_HOST,
         X_FORWARDED_PROTO,
         X_FRAME_OPTIONS,
-        X_XSS_PROTECTION,
-        UNKNOWN,
+        X_XSS_PROTECTION
     };
 
     StringType httpHeaderToString(HttpHeader httpHeader);
 
     enum class HttpStatus
     {
-        UNKNOWN = 0,
         CONTINUE = 100,
         SWITCHING_PROTOCOLS = 101,
         EARLY_HINTS = 103,
@@ -251,7 +249,7 @@ namespace nets
 
     HttpStatus statusCodeToHttpStatus(Int32Type statusCode);
     Int32Type httpStatusToCode(HttpStatus httpStatus);
-    StringType httpStatusToStatusText(HttpStatus httpStatus);
+    StringType httpStatusToText(HttpStatus httpStatus);
 } // namespace nets
 
 #endif // NETS_HTTP_COMMON_H

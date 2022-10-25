@@ -205,7 +205,7 @@ namespace nets
         return ENUM_CLASS_TO_INT(httpStatus);
     }
 
-    StringType httpStatusToStatusText(HttpStatus httpStatus)
+    StringType httpStatusToText(HttpStatus httpStatus)
     {
         switch (httpStatus)
         {
@@ -326,8 +326,6 @@ namespace nets
                 return "Not Extended";
             case HttpStatus::NETWORK_AUTHENTICATION_REQUIRED:
                 return "Network Authentication Required";
-            default:
-                return {};
         }
     }
 } // namespace nets

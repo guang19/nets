@@ -77,7 +77,7 @@ namespace nets
         statusCodeBuf.writeInt32(httpStatusToCode(httpResponse.getStatus()));
         message.writeBytes(statusCodeBuf.array(), statusCodeBuf.length());
         message.writeByte(kSpace);
-        message.writeString(httpStatusToStatusText(httpResponse.getStatus()));
+        message.writeString(httpStatusToText(httpResponse.getStatus()));
         message.writeBytes(kCRLF, 2);
         const auto& httpHeaders = httpResponse.getHttpHeaders();
         for (const auto& httpHeader : httpHeaders)
