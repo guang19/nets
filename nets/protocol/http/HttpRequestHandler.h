@@ -25,10 +25,19 @@
 #ifndef NETS_HTTP_REQUEST_HANDLER_H
 #define NETS_HTTP_REQUEST_HANDLER_H
 
+#include "nets/protocol/http/HttpRequest.h"
+#include "nets/protocol/http/HttpResponse.h"
+
 namespace nets
 {
-    class HttpRequestHandler
+    class HttpRequestHandler : Noncopyable
     {
+    public:
+        HttpRequestHandler() = default;
+        ~HttpRequestHandler() = default;
+
+    public:
+        virtual void handle(HttpRequest& httpRequest, HttpResponse& httpResponse) = 0;
     };
 }
 
