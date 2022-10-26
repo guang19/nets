@@ -34,7 +34,7 @@
     if (LEVEL >= LOGGER->getLevel())                                                                                        \
     nets::LogMessageStream(LOGGER, LEVEL, __FILE__, __LINE__).stream()
 
-#define NETS_SYSTEM_LOG(LEVEL) NETS_LOG(nets::kRootLogger, LEVEL)
+#define NETS_SYSTEM_LOG(LEVEL) NETS_LOG(nets::kNetsRootLogger, LEVEL)
 
 // log by root logger
 #define NETS_SYSTEM_LOG_TRACE NETS_SYSTEM_LOG(nets::LogLevel::TRACE)
@@ -211,7 +211,7 @@ namespace nets
         MutexType mutex_;
     };
 
-    extern LoggerPtr kRootLogger;
+    extern LoggerPtr kNetsRootLogger;
 } // namespace nets
 
 #endif // NETS_LOGGER_H

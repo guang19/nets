@@ -30,11 +30,11 @@ namespace nets
 {
     namespace
     {
-        constexpr char kRootLoggerName[] = "RootLogger";
+        constexpr char kNetsRootLoggerName[] = "RootLogger";
         constexpr LogLevel kDefaultLogLevel = LogLevel::DEBUG;
     } // namespace
 
-    LoggerPtr kRootLogger = LOGGER_MGR->getRootLogger();
+    LoggerPtr kNetsRootLogger = LOGGER_MGR->getRootLogger();
 
     LogMessage::LogMessage(LogLevel level, const char* file, Int32Type line)
         : time_(Timestamp::now()), level_(level), file_(nullptr), line_(line), stream_()
@@ -153,6 +153,6 @@ namespace nets
 
     LoggerPtr LoggerManager::getRootLogger()
     {
-        return getLogger(kRootLoggerName);
+        return getLogger(kNetsRootLoggerName);
     }
 } // namespace nets
