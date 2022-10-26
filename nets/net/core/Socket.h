@@ -125,12 +125,6 @@ namespace nets
     namespace
     {
         constexpr Int32Type kDefaultMaximumOfBackLog = SOMAXCONN;
-
-        static const Int32Type kDefaultTcpSockSendBufferSize = socket::getTcpSockSendBuf();
-        static const Int32Type kDefaultTcpSockRecvBufferSize = socket::getTcpSockRecvBuf();
-
-        static const Int32Type kDefaultUdpSockSendBufferSize = socket::getUdpSockSendBuf();
-        static const Int32Type kDefaultUdpSockRecvBufferSize = socket::getUdpSockRecvBuf();
     } // namespace
 } // namespace nets
 

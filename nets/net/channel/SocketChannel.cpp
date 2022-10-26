@@ -36,7 +36,7 @@ namespace nets
 {
     namespace
     {
-        static const SizeType kRecvBufferSize = kDefaultTcpSockRecvBufferSize >> 2;
+        constexpr SizeType kRecvBufferSize = 1024 << 4;
         constexpr Int32Type kMaxCountOfWriteVOnce = IOV_MAX >> 2;
     } // namespace
 

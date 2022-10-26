@@ -34,7 +34,7 @@ namespace nets
 {
     namespace
     {
-        static const SizeType kRecvPacketSize = kDefaultUdpSockRecvBufferSize >> 2;
+        constexpr SizeType kRecvPacketSize = 1024 << 4;
     } // namespace
 
     DatagramChannel::DatagramChannel(EventLoopRawPtr eventLoop)
