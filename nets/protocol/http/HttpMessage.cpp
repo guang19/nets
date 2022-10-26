@@ -20,11 +20,38 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Http request
+// @brief Http common message
 
-#include "nets/protocol/http/HttpRequest.h"
+#include "nets/protocol/http/HttpMessage.h"
 
 namespace nets
 {
-    HttpRequest::HttpRequest() : method_(HttpMethod::UNKNOWN), url_() {}
+    HttpMessage::HttpMessage() : version_(HttpProtocolVersion::UNSUPPORTED), headers_(), cookies_(), body_() {}
+
+    void HttpMessage::setHeader(const StringType& name, const StringType& value)
+    {
+        headers_.insert_or_assign(name, value);
+    }
+
+    const StringType& HttpMessage::getHeader(const StringType& name, const StringType& defaultValue) const
+    {
+        auto it = headers_.find(name);
+        return it != headers_.end() ? it->second : defaultValue;
+    }
+
+    bool HttpMessage::hasHeader(const StringType& name) const
+    {
+        return headers_.find(name) != headers_.end();
+    }
+
+    void HttpMessage::addCookie(const HttpCookie& cookie)
+    {
+        cookies_.insert_or_assign(cookie.getName(), cookie);
+    }
+
+    const HttpCookie& HttpMessage::getCookie(const StringType& name)
+    {
+        auto it = cookies_.find(name);
+        return it != cookies_.end() ? it->second : HttpCookie::kInvalidCookie;
+    }
 } // namespace nets

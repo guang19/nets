@@ -116,10 +116,11 @@ namespace nets
         // TCP SO_RCVBUF default value is 131072 bytes on linux which kernel version is 5.10.x
         // UDP SO_RCVBUF default value is 212992 bytes on linux which kernel version is 5.10.x
         void setSockRecvBuf(FdType sockFd, OptValType recvBufLen);
-        extern OptValType getTcpSockSendBuf();
-        extern OptValType getTcpSockRecvBuf();
-        extern OptValType getUdpSockSendBuf();
-        extern OptValType getUdpSockRecvBuf();
+
+        OptValType getTcpSockSendBuf();
+        OptValType getTcpSockRecvBuf();
+        OptValType getUdpSockSendBuf();
+        OptValType getUdpSockRecvBuf();
     } // namespace socket
 
     namespace

@@ -25,40 +25,40 @@
 #ifndef NETS_HTTP_REQUEST_H
 #define NETS_HTTP_REQUEST_H
 
-#include "nets/base/Noncopyable.h"
-#include "nets/protocol/http/HttpCommon.h"
+#include "nets/protocol/http/HttpMessage.h"
 
 namespace nets
 {
-    class HttpRequest : Noncopyable
+    class HttpRequest : public HttpMessage
     {
     public:
         HttpRequest();
         ~HttpRequest() = default;
 
     public:
-        void setMethod(HttpMethod method);
-        HttpMethod getMethod() const;
+        inline void setMethod(HttpMethod method)
+        {
+            method_ = method;
+        }
 
-        void setUrl(const StringType& url);
-        const StringType& getUrl() const;
+        inline HttpMethod getMethod() const
+        {
+            return method_;
+        }
 
-        void setProtocolVersion(HttpProtocolVersion version);
-        HttpProtocolVersion getProtocolVersion() const;
+        inline void setUrl(const StringType& url)
+        {
+            url_ = url;
+        }
 
-        void setHttpHeader(const StringType& headerName, const StringType& value);
-        StringType getHttpHeader(const StringType& headerName) const;
-        bool hasHttpHeader(const StringType& headerName);
-
-        void setRequestBody(const StringType& requestBody);
-        const StringType& getRequestBody() const;
+        inline const StringType& getUrl() const
+        {
+            return url_;
+        }
 
     private:
         HttpMethod method_;
         StringType url_;
-        HttpProtocolVersion version_;
-        HttpHeaderContainer httpHeaders_;
-        StringType requestBody_;
     };
 } // namespace nets
 

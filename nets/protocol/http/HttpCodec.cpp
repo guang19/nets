@@ -79,7 +79,7 @@ namespace nets
         message.writeByte(kSpace);
         message.writeString(httpStatusToText(httpResponse.getStatus()));
         message.writeBytes(kCRLF, 2);
-        const auto& httpHeaders = httpResponse.getHttpHeaders();
+        const auto& httpHeaders = httpResponse.getHeaders();
         for (const auto& httpHeader : httpHeaders)
         {
             message.writeString(httpHeader.first);
@@ -88,7 +88,7 @@ namespace nets
             message.writeBytes(kCRLF, 2);
         }
         message.writeBytes(kCRLF, 2);
-        message.writeString(httpResponse.getResponseBody());
+        message.writeString(httpResponse.getBody());
         return true;
     }
 
@@ -136,8 +136,7 @@ namespace nets
             {
                 return false;
             }
-            httpRequest.setHttpHeader(headerLine.substr(0, colonAfterHeaderName),
-                                      headerLine.substr(colonAfterHeaderName + 2));
+            httpRequest.setHeader(headerLine.substr(0, colonAfterHeaderName), headerLine.substr(colonAfterHeaderName + 2));
             if (isLastLine)
             {
                 break;
@@ -152,11 +151,11 @@ namespace nets
     {
         StringType contentLengthHttpHeaderName = httpHeaderToString(HttpHeader::CONTENT_LENGTH);
         // has no request body
-        if (!httpRequest.hasHttpHeader(contentLengthHttpHeaderName))
+        if (!httpRequest.hasHeader(contentLengthHttpHeaderName))
         {
             return true;
         }
-        StringType contentLengthStr = httpRequest.getHttpHeader(contentLengthHttpHeaderName);
+        StringType contentLengthStr = httpRequest.getHeader(contentLengthHttpHeaderName);
         SizeType contentLength = 0;
         try
         {
@@ -178,7 +177,7 @@ namespace nets
         {
             return false;
         }
-        httpRequest.setRequestBody(data.substr(requestBodyStart, contentLength));
+        httpRequest.setBody(data.substr(requestBodyStart, contentLength));
         return true;
     }
 } // namespace nets

@@ -20,41 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http response
+// @brief Http response
 
 #ifndef NETS_HTTP_RESPONSE_H
 #define NETS_HTTP_RESPONSE_H
 
-#include "nets/base/Noncopyable.h"
-#include "nets/protocol/http/HttpCommon.h"
+#include "nets/protocol/http/HttpMessage.h"
 
 namespace nets
 {
-    class HttpResponse : Noncopyable
+    class HttpResponse : public HttpMessage
     {
     public:
         HttpResponse();
         ~HttpResponse() = default;
 
     public:
-        void setProtocolVersion(HttpProtocolVersion version);
-        HttpProtocolVersion getProtocolVersion() const;
+        inline void setStatus(HttpStatus status)
+        {
+            status_ = status;
+        }
 
-        void setStatus(HttpStatus status);
-        HttpStatus getStatus() const;
-
-        void setHttpHeader(const StringType& headerName, const StringType& value);
-        StringType getHttpHeader(const StringType& headerName) const;
-        const HttpHeaderContainer& getHttpHeaders() const;
-
-        void setResponseBody(const StringType& responseBody);
-        const StringType& getResponseBody() const;
+        inline HttpStatus getStatus() const
+        {
+            return status_;
+        }
 
     private:
-        HttpProtocolVersion version_;
         HttpStatus status_;
-        HttpHeaderContainer httpHeaders_;
-        StringType responseBody_;
     };
 } // namespace nets
 

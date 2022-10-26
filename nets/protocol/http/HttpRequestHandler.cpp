@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http request handler
+// @brief Http request handler
 
 #include "nets/protocol/http/HttpRequestHandler.h"
 

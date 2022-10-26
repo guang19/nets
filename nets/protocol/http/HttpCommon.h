@@ -25,8 +25,6 @@
 #ifndef NETS_HTTP_COMMON_H
 #define NETS_HTTP_COMMON_H
 
-#include <map>
-
 #include "nets/base/Types.h"
 
 namespace nets
@@ -57,8 +55,6 @@ namespace nets
 
     StringType httpProtocolVersionToString(HttpProtocolVersion protocolVersion);
     HttpProtocolVersion stringToHttpProtocolVersion(const StringType& protocolVersionStr);
-
-    using HttpHeaderContainer = ::std::map<StringType, StringType>;
 
     enum class HttpHeader
     {
@@ -187,10 +183,11 @@ namespace nets
 
     enum class HttpStatus
     {
+        // 1xx
         CONTINUE = 100,
         SWITCHING_PROTOCOLS = 101,
         EARLY_HINTS = 103,
-
+        // 2xx
         OK = 200,
         CREATED = 201,
         ACCEPTED = 202,
@@ -198,7 +195,7 @@ namespace nets
         NO_CONTENT = 204,
         RESET_CONTENT = 205,
         PARTIAL_CONTENT = 206,
-
+        // 3xx
         MULTIPLE_CHOICES = 300,
         MOVED_PERMANENTLY = 301,
         FOUND = 302,
@@ -206,7 +203,7 @@ namespace nets
         NOT_MODIFIED = 304,
         TEMPORARY_REDIRECT = 307,
         PERMANENT_REDIRECT = 308,
-
+        // 4xx
         BAD_REQUEST = 400,
         UNAUTHORIZED = 401,
         PAYMENT_REQUIRED = 402,
@@ -233,7 +230,7 @@ namespace nets
         TOO_MANY_REQUESTS = 429,
         REQUEST_HEADER_FIELDS_TOO_LARGE = 431,
         UNAVAILABLE_FOR_LEGAL_REASONS = 451,
-
+        // 5xx
         INTERNAL_SERVER_ERROR = 500,
         NOT_IMPLEMENTED = 501,
         BAD_GATEWAY = 502,

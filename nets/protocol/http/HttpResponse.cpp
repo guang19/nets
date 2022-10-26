@@ -20,67 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief http response
+// @brief Http response
 
 #include "nets/protocol/http/HttpResponse.h"
 
 namespace nets
 {
-    HttpResponse::HttpResponse()
-        : version_(HttpProtocolVersion::UNSUPPORTED), status_(HttpStatus::UNKNOWN), httpHeaders_(), responseBody_()
-    {
-    }
-
-    void HttpResponse::setProtocolVersion(HttpProtocolVersion version)
-    {
-        version_ = version;
-    }
-
-    HttpProtocolVersion HttpResponse::getProtocolVersion() const
-    {
-        return version_;
-    }
-
-    void HttpResponse::setStatus(HttpStatus statusCode)
-    {
-        status_ = statusCode;
-    }
-
-    HttpStatus HttpResponse::getStatus() const
-    {
-        return status_;
-    }
-
-    void HttpResponse::setHttpHeader(const StringType& headerName, const StringType& value)
-    {
-        httpHeaders_.insert_or_assign(headerName, value);
-    }
-
-    StringType HttpResponse::getHttpHeader(const StringType& headerName) const
-    {
-        auto it = httpHeaders_.find(headerName);
-        if (it != httpHeaders_.end())
-        {
-            return it->second;
-        }
-        else
-        {
-            return {};
-        }
-    }
-
-    const HttpHeaderContainer& HttpResponse::getHttpHeaders() const
-    {
-        return httpHeaders_;
-    }
-
-    void HttpResponse::setResponseBody(const StringType& responseBody)
-    {
-        responseBody_ = responseBody;
-    }
-
-    const StringType& HttpResponse::getResponseBody() const
-    {
-        return responseBody_;
-    }
+    HttpResponse::HttpResponse() : status_(HttpStatus::OK) {}
 } // namespace nets
