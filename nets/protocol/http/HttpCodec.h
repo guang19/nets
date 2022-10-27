@@ -25,7 +25,6 @@
 #ifndef NETS_HTTP_CODEC_H
 #define NETS_HTTP_CODEC_H
 
-#include "nets/base/Noncopyable.h"
 #include "nets/net/core/ByteBuffer.h"
 #include "nets/protocol/http/HttpRequest.h"
 #include "nets/protocol/http/HttpResponse.h"

@@ -24,7 +24,6 @@
 
 #include "nets/protocol/http/HttpCodec.h"
 
-#include <cassert>
 #include <stdexcept>
 
 #include "nets/base/StackBuffer.h"
