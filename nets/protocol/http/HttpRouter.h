@@ -25,11 +25,18 @@
 #ifndef NETS_HTTP_ROUTER_H
 #define NETS_HTTP_ROUTER_H
 
+#include "nets/protocol/http/HttpRequestHandler.h"
+
 namespace nets
 {
-    class HttpRouter
+    class HttpRouter : Noncopyable
     {
+    public:
+        HttpRouter() = default;
+        ~HttpRouter() = default;
 
+    private:
+        using HandlerMapper = ::std::map<StringType, >
     };
 }
 

@@ -41,6 +41,17 @@ TEST(StringUtilsTest, Trim)
     ASSERT_EQ(s1, s3);
 }
 
+TEST(StringUtilsTest, Split)
+{
+    ::std::vector<StringType> tokens {};
+    StringType str = "123googlemetatwitter123youtube123 ";
+    utils::split(str, tokens, "123");
+    for (const auto& s : tokens)
+    {
+        ::printf("%s\n", s.c_str());
+    }
+}
+
 TEST(StringUtilsTest, CaseInsensitiveEqual)
 {
     StringType s1 = " abcdefg";

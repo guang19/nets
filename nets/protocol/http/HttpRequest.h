@@ -32,6 +32,9 @@ namespace nets
     class HttpRequest : public HttpMessage
     {
     public:
+        using QueryParameters = ::std::map<StringType, StringType>;
+
+    public:
         HttpRequest();
         ~HttpRequest() = default;
 
@@ -59,6 +62,7 @@ namespace nets
     private:
         HttpMethod method_;
         StringType url_;
+        QueryParameters queryParameters_;
     };
 } // namespace nets
 

@@ -20,9 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Http codec
+// @brief Http server codec
 
-#include "nets/protocol/http/HttpCodec.h"
+#include "nets/protocol/http/HttpServerCodec.h"
 
 #include <stdexcept>
 
@@ -40,58 +40,61 @@ namespace nets
         constexpr char kSpace = ' ';
     } // namespace
 
-    bool HttpCodec::decode(const ByteBuffer& message, HttpRequest& httpRequest)
+    bool HttpServerCodec::decode(const StringType& message, HttpRequest& httpRequest)
     {
-        StringType data(message.data());
-        SizeType requestLineEnd = data.find(kCRLF);
+        if (message.length() <= 0)
+        {
+            return false;
+        }
+        SizeType requestLineEnd = message.find(kCRLF);
         if (requestLineEnd == StringType::npos)
         {
             return false;
         }
-        if (!parseRequestLine(data.substr(0, requestLineEnd), httpRequest))
+        if (!parseRequestLine(message.substr(0, requestLineEnd), httpRequest))
         {
             return false;
         }
-        SizeType requestHeaderEnd = data.find(kDoubleCRLF, requestLineEnd);
+        SizeType requestHeaderEnd = message.find(kDoubleCRLF, requestLineEnd);
         if (requestHeaderEnd == StringType::npos)
         {
             return false;
         }
-        if (!parseRequestHeader(data.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd - 2), httpRequest))
+        if (!parseRequestHeader(message.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd - 2), httpRequest))
         {
             return false;
         }
-        if (!parseRequestBody(data, requestHeaderEnd + 4, httpRequest))
+        if (!parseRequestBody(message, requestHeaderEnd + 4, httpRequest))
         {
             return false;
         }
         return true;
     }
 
-    bool HttpCodec::encode(ByteBuffer& message, const HttpResponse& httpResponse)
+    bool HttpServerCodec::encode(StringType& message, const HttpResponse& httpResponse)
     {
-        message.writeString(httpProtocolVersionToString(httpResponse.getProtocolVersion()));
-        message.writeByte(kSpace);
+        message.append(httpProtocolVersionToString(httpResponse.getProtocolVersion()));
+        message += kSpace;
         StackBuffer<kMaximumNumberLimit + 1> statusCodeBuf {};
         statusCodeBuf.writeInt32(httpStatusToCode(httpResponse.getStatus()));
-        message.writeBytes(statusCodeBuf.array(), statusCodeBuf.length());
-        message.writeByte(kSpace);
-        message.writeString(httpStatusToText(httpResponse.getStatus()));
-        message.writeBytes(kCRLF, 2);
+        message.append(statusCodeBuf.array(), statusCodeBuf.length());
+        message += kSpace;
+        message.append(httpStatusToText(httpResponse.getStatus()));
+        message.append(kCRLF, 2);
         const auto& httpHeaders = httpResponse.getHeaders();
-        for (const auto& httpHeader : httpHeaders)
+        for (const auto& httpHeader: httpHeaders)
         {
-            message.writeString(httpHeader.first);
-            message.writeByte(kColon);
-            message.writeString(httpHeader.second);
-            message.writeBytes(kCRLF, 2);
+            message.append(httpHeader.first);
+            message += kColon;
+            message.append(httpHeader.second);
+            message.append(kCRLF, 2);
         }
-        message.writeBytes(kCRLF, 2);
-        message.writeString(httpResponse.getBody());
+        message.append(kCRLF, 2);
+        message.append(httpResponse.getBody());
         return true;
     }
 
-    bool HttpCodec::parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest)
+    bool HttpServerCodec::parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest)
     {
         SizeType methodEnd = requestLine.find_first_of(kSpace);
         if (methodEnd == StringType::npos)
@@ -104,15 +107,20 @@ namespace nets
         {
             return false;
         }
+        StringType url = requestLine.substr(methodEnd + 1, urlEnd - methodEnd - 1);
+        httpRequest.setUrl(url);
         httpRequest.setProtocolVersion(
             stringToHttpProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1)));
-        StringType url = requestLine.substr(methodEnd + 1, urlEnd - methodEnd - 1);
         // TODO:parse url query parameter
-        httpRequest.setUrl(url);
         return true;
     }
 
-    bool HttpCodec::parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest)
+    bool parseRequestQueryParameters(const StringType& queryParametersStr, HttpRequest& httpRequest)
+    {
+        return false;
+    }
+
+    bool HttpServerCodec::parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest)
     {
         bool isLastLine = false;
         StringType headerLine {}, headerName {}, headerValue {};
@@ -146,7 +154,7 @@ namespace nets
         return true;
     }
 
-    bool HttpCodec::parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest)
+    bool HttpServerCodec::parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest)
     {
         StringType contentLengthHttpHeaderName = httpHeaderToString(HttpHeader::CONTENT_LENGTH);
         // has no request body

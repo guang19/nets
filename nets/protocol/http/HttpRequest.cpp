@@ -26,5 +26,5 @@
 
 namespace nets
 {
-    HttpRequest::HttpRequest() : method_(HttpMethod::UNKNOWN), url_() {}
+    HttpRequest::HttpRequest() : method_(HttpMethod::UNSUPPORTED), url_(), queryParameters_() {}
 } // namespace nets

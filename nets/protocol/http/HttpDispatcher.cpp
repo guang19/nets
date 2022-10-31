@@ -30,22 +30,23 @@
 
 namespace nets
 {
-    HttpDispatcher::HttpDispatcher() : httpCodec_() {}
-    HttpDispatcher::HttpDispatcher(const StringType& name) : SocketChannelHandler(name), httpCodec_() {}
+    HttpDispatcher::HttpDispatcher() : serverCodec_() {}
+    HttpDispatcher::HttpDispatcher(const StringType& name) : SocketChannelHandler(name), serverCodec_() {}
 
     void HttpDispatcher::channelRead(SocketChannelContext& channelContext, ByteBuffer& message)
     {
-        NETS_SYSTEM_LOG_DEBUG << message.data();
+        StringType reqMsg(message.toString());
+        NETS_SYSTEM_LOG_DEBUG << reqMsg;
         HttpRequest httpRequest {};
-        if (httpCodec_.decode(message, httpRequest))
+        if (serverCodec_.decode(reqMsg, httpRequest))
         {
             HttpResponse httpResponse {};
             httpResponse.setProtocolVersion(httpRequest.getProtocolVersion());
             dispatch(httpRequest, httpResponse);
-            ByteBuffer buffer {};
-            httpCodec_.encode(buffer, httpResponse);
-            NETS_SYSTEM_LOG_DEBUG << buffer.data();
-            channelContext.write(buffer);
+            StringType repMsg{};
+            serverCodec_.encode(repMsg, httpResponse);
+            NETS_SYSTEM_LOG_DEBUG << repMsg;
+            channelContext.write(repMsg);
         }
         else
         {

@@ -25,11 +25,15 @@
 #ifndef NETS_STRING_UTILS_H
 #define NETS_STRING_UTILS_H
 
+#include <vector>
+
 #include "nets/base/Types.h"
 
 namespace nets::utils
 {
     void trim(StringType& str);
+
+    void split(const StringType& s, std::vector<StringType>& tokens, const StringType& delimiter = " ");
 
     // refer https://github.com/facebook/folly
     bool caseInsensitiveEqual(const StringType& s1, const StringType& s2);

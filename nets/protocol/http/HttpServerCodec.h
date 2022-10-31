@@ -20,10 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Http codec
+// @brief Http server codec
 
-#ifndef NETS_HTTP_CODEC_H
-#define NETS_HTTP_CODEC_H
+#ifndef NETS_HTTP_SERVER_CODEC_H
+#define NETS_HTTP_SERVER_CODEC_H
 
 #include "nets/net/core/ByteBuffer.h"
 #include "nets/protocol/http/HttpRequest.h"
@@ -31,21 +31,22 @@
 
 namespace nets
 {
-    class HttpCodec : Noncopyable
+    class HttpServerCodec : Noncopyable
     {
     public:
-        HttpCodec() = default;
-        ~HttpCodec() = default;
+        HttpServerCodec() = default;
+        ~HttpServerCodec() = default;
 
     public:
-        bool decode(const ByteBuffer& message, HttpRequest& httpRequest);
-        bool encode(ByteBuffer& message, const HttpResponse& httpResponse);
+        bool decode(const StringType& message, HttpRequest& httpRequest);
+        bool encode(StringType& message, const HttpResponse& httpResponse);
 
     private:
         bool parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest);
+        bool parseRequestQueryParameters(const StringType& queryParametersStr, HttpRequest& httpRequest);
         bool parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest);
         bool parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest);
     };
 } // namespace nets
 
-#endif // NETS_HTTP_CODEC_H
+#endif // NETS_HTTP_SERVER_CODEC_H

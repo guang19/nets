@@ -169,7 +169,7 @@ namespace nets
                 return HttpMethod(i);
             }
         }
-        return HttpMethod::UNKNOWN;
+        return HttpMethod::UNSUPPORTED;
     }
 
     StringType httpProtocolVersionToString(HttpProtocolVersion protocolVersion)

@@ -40,7 +40,7 @@ namespace nets
         POST,
         PUT,
         TRACE,
-        UNKNOWN
+        UNSUPPORTED
     };
 
     StringType httpMethodToString(HttpMethod method);

@@ -26,7 +26,7 @@
 #define NETS_HTTP_DISPATCHER_H
 
 #include "nets/net/core/SocketChannelHandler.h"
-#include "nets/protocol/http/HttpCodec.h"
+#include "nets/protocol/http/HttpServerCodec.h"
 
 namespace nets
 {
@@ -44,7 +44,7 @@ namespace nets
         void dispatch(HttpRequest& httpRequest, HttpResponse& httpResponse);
 
     private:
-        HttpCodec httpCodec_;
+        HttpServerCodec serverCodec_;
     };
 } // namespace nets
 
