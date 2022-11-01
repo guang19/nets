@@ -27,6 +27,7 @@
 #include <stdexcept>
 
 #include "nets/base/StackBuffer.h"
+#include "nets/base/StringUtils.h"
 
 namespace nets
 {
@@ -38,11 +39,14 @@ namespace nets
         constexpr char kColonSpace[] = ": ";
         constexpr char kColon = ':';
         constexpr char kSpace = ' ';
+        constexpr char kQuestion = '?';
+        constexpr char kAnd = '&';
+        constexpr char kEqual = '=';
     } // namespace
 
     bool HttpServerCodec::decode(const StringType& message, HttpRequest& httpRequest)
     {
-        if (message.length() <= 0)
+        if (message.length() == 0)
         {
             return false;
         }
@@ -60,7 +64,7 @@ namespace nets
         {
             return false;
         }
-        if (!parseRequestHeader(message.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd - 2), httpRequest))
+        if (!parseRequestHeader(message.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd), httpRequest))
         {
             return false;
         }
@@ -82,7 +86,7 @@ namespace nets
         message.append(httpStatusToText(httpResponse.getStatus()));
         message.append(kCRLF, 2);
         const auto& httpHeaders = httpResponse.getHeaders();
-        for (const auto& httpHeader: httpHeaders)
+        for (const auto& httpHeader : httpHeaders)
         {
             message.append(httpHeader.first);
             message += kColon;
@@ -96,60 +100,52 @@ namespace nets
 
     bool HttpServerCodec::parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest)
     {
-        SizeType methodEnd = requestLine.find_first_of(kSpace);
-        if (methodEnd == StringType::npos)
+        ::std::vector<StringType> parts {};
+        utils::split(requestLine, parts, ' ');
+        if (parts.size() != 3)
         {
             return false;
         }
-        httpRequest.setMethod(stringToHttpMethod(requestLine.substr(0, methodEnd)));
-        SizeType urlEnd = requestLine.find_last_of(kSpace);
-        if (urlEnd == StringType::npos || urlEnd == methodEnd)
-        {
-            return false;
-        }
-        StringType url = requestLine.substr(methodEnd + 1, urlEnd - methodEnd - 1);
-        httpRequest.setUrl(url);
-        httpRequest.setProtocolVersion(
-            stringToHttpProtocolVersion(requestLine.substr(urlEnd + 1, requestLine.length() - urlEnd - 1)));
-        // TODO:parse url query parameter
+        httpRequest.setMethod(stringToHttpMethod(parts[0]));
+        httpRequest.setUrl(parts[1]);
+        parseRequestQueryParameters(parts[1], httpRequest);
+        httpRequest.setProtocolVersion(stringToHttpProtocolVersion(parts[2]));
         return true;
     }
 
-    bool parseRequestQueryParameters(const StringType& queryParametersStr, HttpRequest& httpRequest)
+    void HttpServerCodec::parseRequestQueryParameters(const StringType& url, HttpRequest& httpRequest)
     {
-        return false;
+        SizeType question = url.find(kQuestion);
+        if (StringType::npos != question && question < url.length() - 1)
+        {
+            StringType queryStr = url.substr(question + 1);
+            ::std::vector<StringType> queryParameterStrs {};
+            utils::split(queryStr, queryParameterStrs, kAnd);
+            SizeType equal = 0;
+            for (const auto& queryParameterStr : queryParameterStrs)
+            {
+                equal = queryParameterStr.find(kEqual);
+                if (StringType::npos != equal)
+                {
+                    httpRequest.setQueryParameter(queryParameterStr.substr(0, equal), queryParameterStr.substr(equal + 1));
+                }
+            }
+        }
     }
 
     bool HttpServerCodec::parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest)
     {
-        bool isLastLine = false;
-        StringType headerLine {}, headerName {}, headerValue {};
+        ::std::vector<StringType> headerLines {};
+        utils::split(requestHeader, headerLines, kCRLF);
         SizeType colonAfterHeaderName = 0;
-        SizeType lastPos = 0, pos = requestHeader.find(kCRLF, lastPos);
-        for (;;)
+        for (const auto& headerLine : headerLines)
         {
-            if (pos == StringType::npos)
-            {
-                isLastLine = true;
-                // has no "\r\n" on the requestHeader last line
-                headerLine = requestHeader.substr(lastPos);
-            }
-            else
-            {
-                headerLine = requestHeader.substr(lastPos, pos - lastPos);
-            }
             colonAfterHeaderName = headerLine.find(kColonSpace);
-            if (colonAfterHeaderName == StringType::npos)
+            if (StringType::npos == colonAfterHeaderName)
             {
                 return false;
             }
             httpRequest.setHeader(headerLine.substr(0, colonAfterHeaderName), headerLine.substr(colonAfterHeaderName + 2));
-            if (isLastLine)
-            {
-                break;
-            }
-            lastPos = pos + 2;
-            pos = requestHeader.find(kCRLF, lastPos);
         }
         return true;
     }

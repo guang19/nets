@@ -72,6 +72,26 @@ namespace nets::utils
         }
     }
 
+    void split(const StringType& s, std::vector<StringType>& tokens, const char delimiter)
+    {
+        if (s.length() == 0)
+        {
+            return;
+        }
+        SizeType pos1 = 0;
+        SizeType pos2 = s.find(delimiter);
+        while(StringType::npos != pos2)
+        {
+            tokens.push_back(s.substr(pos1, pos2 - pos1));
+            pos1 = pos2 + 1;
+            pos2 = s.find(delimiter, pos1);
+        }
+        if(pos1 != s.length())
+        {
+            tokens.push_back(s.substr(pos1));
+        }
+    }
+
     struct AsciiCaseInsensitive
     {
         bool operator()(char lhs, char rhs) const

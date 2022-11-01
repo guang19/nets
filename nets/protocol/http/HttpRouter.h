@@ -34,9 +34,6 @@ namespace nets
     public:
         HttpRouter() = default;
         ~HttpRouter() = default;
-
-    private:
-        using HandlerMapper = ::std::map<StringType, >
     };
 }
 

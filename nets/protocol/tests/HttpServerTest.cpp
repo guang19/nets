@@ -26,6 +26,7 @@
 
 #include <memory>
 
+#include "nets/net/bootstrap/Bootstrap.h"
 #include "nets/net/bootstrap/ServerBootstrap.h"
 #include "nets/protocol/http/HttpDispatcher.h"
 

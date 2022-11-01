@@ -27,4 +27,20 @@
 namespace nets
 {
     HttpRequest::HttpRequest() : method_(HttpMethod::UNSUPPORTED), url_(), queryParameters_() {}
+
+    void HttpRequest::setQueryParameter(const StringType& name, const StringType& value)
+    {
+        queryParameters_.insert_or_assign(name, value);
+    }
+
+    const StringType& HttpRequest::getQueryParameter(const StringType& name, const StringType& defaultValue)
+    {
+        auto it = queryParameters_.find(name);
+        return it != queryParameters_.end() ? it->second : defaultValue;
+    }
+
+    bool HttpRequest::hasQueryParameter(const StringType& name) const
+    {
+        return queryParameters_.find(name) != queryParameters_.end();
+    }
 } // namespace nets

@@ -59,6 +59,10 @@ namespace nets
             return url_;
         }
 
+        void setQueryParameter(const StringType& name, const StringType& value);
+        const StringType& getQueryParameter(const StringType& name, const StringType& defaultValue = "");
+        bool hasQueryParameter(const StringType& name) const;
+
     private:
         HttpMethod method_;
         StringType url_;

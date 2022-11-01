@@ -25,7 +25,6 @@
 #ifndef NETS_HTTP_SERVER_CODEC_H
 #define NETS_HTTP_SERVER_CODEC_H
 
-#include "nets/net/core/ByteBuffer.h"
 #include "nets/protocol/http/HttpRequest.h"
 #include "nets/protocol/http/HttpResponse.h"
 
@@ -43,7 +42,7 @@ namespace nets
 
     private:
         bool parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest);
-        bool parseRequestQueryParameters(const StringType& queryParametersStr, HttpRequest& httpRequest);
+        void parseRequestQueryParameters(const StringType& url, HttpRequest& httpRequest);
         bool parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest);
         bool parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest);
     };

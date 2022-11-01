@@ -35,6 +35,8 @@ namespace nets::utils
 
     void split(const StringType& s, std::vector<StringType>& tokens, const StringType& delimiter = " ");
 
+    void split(const StringType& s, std::vector<StringType>& tokens, char delimiter = ' ');
+
     // refer https://github.com/facebook/folly
     bool caseInsensitiveEqual(const StringType& s1, const StringType& s2);
 }
