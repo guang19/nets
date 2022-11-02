@@ -52,6 +52,36 @@ namespace nets::utils
         }
     }
 
+    void trimL(StringType& str)
+    {
+        if (!str.empty())
+        {
+            for (auto it = str.begin(); it != str.end();)
+            {
+                if (!::iswspace(*it))
+                {
+                    break;
+                }
+                str.erase(it);
+            }
+        }
+    }
+
+    void trimR(StringType& str)
+    {
+        if (!str.empty())
+        {
+            for (auto it = str.end(); it != str.begin();)
+            {
+                if (!::iswspace(*(--it)))
+                {
+                    break;
+                }
+                str.erase(it);
+            }
+        }
+    }
+
     void split(const StringType& s, std::vector<StringType>& tokens, const StringType& delimiter)
     {
         if (s.length() == 0)

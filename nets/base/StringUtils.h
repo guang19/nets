@@ -33,6 +33,10 @@ namespace nets::utils
 {
     void trim(StringType& str);
 
+    void trimL(StringType& str);
+
+    void trimR(StringType& str);
+
     void split(const StringType& s, std::vector<StringType>& tokens, const StringType& delimiter = " ");
 
     void split(const StringType& s, std::vector<StringType>& tokens, char delimiter = ' ');

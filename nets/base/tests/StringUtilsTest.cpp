@@ -39,6 +39,17 @@ TEST(StringUtilsTest, Trim)
     ASSERT_EQ(s1, s2);
     ASSERT_EQ(s2, s3);
     ASSERT_EQ(s1, s3);
+
+    StringType s4 = " ";
+    utils::trim(s4);
+    ASSERT_GE("", s4);
+    s4 = "  ";
+    utils::trimL(s4);
+    ASSERT_GE("", s4);
+
+    s4 = "  ";
+    utils::trimR(s4);
+    ASSERT_GE("", s4);
 }
 
 TEST(StringUtilsTest, Split)

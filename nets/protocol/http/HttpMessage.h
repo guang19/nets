@@ -37,7 +37,6 @@ namespace nets
     {
     private:
         using HttpHeaderContainer = ::std::map<StringType, StringType>;
-        using HttpCookieContainer = ::std::map<StringType, HttpCookie>;
 
     public:
         HttpMessage();
@@ -62,9 +61,6 @@ namespace nets
             return headers_;
         }
 
-        void addCookie(const HttpCookie& cookie);
-        const HttpCookie& getCookie(const StringType& name);
-
         void setBody(const StringType& body)
         {
             body_ = body;
@@ -78,7 +74,6 @@ namespace nets
     protected:
         HttpProtocolVersion version_;
         HttpHeaderContainer headers_;
-        HttpCookieContainer cookies_;
         StringType body_;
     };
 } // namespace nets

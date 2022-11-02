@@ -26,7 +26,7 @@
 
 namespace nets
 {
-    HttpRequest::HttpRequest() : method_(HttpMethod::UNSUPPORTED), url_(), queryParameters_() {}
+    HttpRequest::HttpRequest() : method_(HttpMethod::UNSUPPORTED), url_(), queryParameters_(), cookies_() {}
 
     void HttpRequest::setQueryParameter(const StringType& name, const StringType& value)
     {
@@ -42,5 +42,16 @@ namespace nets
     bool HttpRequest::hasQueryParameter(const StringType& name) const
     {
         return queryParameters_.find(name) != queryParameters_.end();
+    }
+
+    void HttpRequest::addCookie(const StringType& name, const StringType& value)
+    {
+        cookies_.insert_or_assign(name, value);
+    }
+
+    const StringType& HttpRequest::getCookie(const StringType& name, const StringType& defaultValue)
+    {
+        auto it = cookies_.find(name);
+        return it != cookies_.end() ? it->second : defaultValue;
     }
 } // namespace nets

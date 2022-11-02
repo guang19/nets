@@ -26,7 +26,7 @@
 
 namespace nets
 {
-    HttpMessage::HttpMessage() : version_(HttpProtocolVersion::UNSUPPORTED), headers_(), cookies_(), body_() {}
+    HttpMessage::HttpMessage() : version_(HttpProtocolVersion::UNSUPPORTED), headers_(), body_() {}
 
     void HttpMessage::setHeader(const StringType& name, const StringType& value)
     {
@@ -42,16 +42,5 @@ namespace nets
     bool HttpMessage::hasHeader(const StringType& name) const
     {
         return headers_.find(name) != headers_.end();
-    }
-
-    void HttpMessage::addCookie(const HttpCookie& cookie)
-    {
-        cookies_.insert_or_assign(cookie.getName(), cookie);
-    }
-
-    const HttpCookie& HttpMessage::getCookie(const StringType& name)
-    {
-        auto it = cookies_.find(name);
-        return it != cookies_.end() ? it->second : HttpCookie::kInvalidCookie;
     }
 } // namespace nets

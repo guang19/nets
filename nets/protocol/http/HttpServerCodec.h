@@ -43,8 +43,9 @@ namespace nets
     private:
         bool parseRequestLine(const StringType& requestLine, HttpRequest& httpRequest);
         void parseRequestQueryParameters(const StringType& url, HttpRequest& httpRequest);
-        bool parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest);
-        bool parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest);
+        void parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest);
+        void parseRequestCookie(HttpRequest& httpRequest);
+        void parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest);
     };
 } // namespace nets
 

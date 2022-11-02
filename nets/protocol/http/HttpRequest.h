@@ -32,7 +32,8 @@ namespace nets
     class HttpRequest : public HttpMessage
     {
     public:
-        using QueryParameters = ::std::map<StringType, StringType>;
+        using QueryParameterList = ::std::map<StringType, StringType>;
+        using CookieList = ::std::map<StringType, StringType>;
 
     public:
         HttpRequest();
@@ -63,10 +64,14 @@ namespace nets
         const StringType& getQueryParameter(const StringType& name, const StringType& defaultValue = "");
         bool hasQueryParameter(const StringType& name) const;
 
+        void addCookie(const StringType& name, const StringType& value);
+        const StringType& getCookie(const StringType& name, const StringType& defaultValue = "");
+
     private:
         HttpMethod method_;
         StringType url_;
-        QueryParameters queryParameters_;
+        QueryParameterList queryParameters_;
+        CookieList cookies_;
     };
 } // namespace nets
 

@@ -26,6 +26,7 @@
 
 #include <stdexcept>
 
+#include "nets/base/log/Logger.h"
 #include "nets/base/StackBuffer.h"
 #include "nets/base/StringUtils.h"
 
@@ -36,7 +37,7 @@ namespace nets
         constexpr char kLF = '\n';
         constexpr char kCRLF[] = "\r\n";
         constexpr char kDoubleCRLF[] = "\r\n\r\n";
-        constexpr char kColonSpace[] = ": ";
+        constexpr char kSemicolonSpace[] = "; ";
         constexpr char kColon = ':';
         constexpr char kSpace = ' ';
         constexpr char kQuestion = '?';
@@ -64,14 +65,8 @@ namespace nets
         {
             return false;
         }
-        if (!parseRequestHeader(message.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd), httpRequest))
-        {
-            return false;
-        }
-        if (!parseRequestBody(message, requestHeaderEnd + 4, httpRequest))
-        {
-            return false;
-        }
+        parseRequestHeader(message.substr(requestLineEnd + 2, requestHeaderEnd - requestLineEnd), httpRequest);
+        parseRequestBody(message, requestHeaderEnd + 4, httpRequest);
         return true;
     }
 
@@ -116,7 +111,7 @@ namespace nets
     void HttpServerCodec::parseRequestQueryParameters(const StringType& url, HttpRequest& httpRequest)
     {
         SizeType question = url.find(kQuestion);
-        if (StringType::npos != question && question < url.length() - 1)
+        if (StringType::npos != question && question < url.length() - 3)
         {
             StringType queryStr = url.substr(question + 1);
             ::std::vector<StringType> queryParameterStrs {};
@@ -125,62 +120,83 @@ namespace nets
             for (const auto& queryParameterStr : queryParameterStrs)
             {
                 equal = queryParameterStr.find(kEqual);
-                if (StringType::npos != equal)
+                if (equal < queryParameterStr.length() - 1)
                 {
-                    httpRequest.setQueryParameter(queryParameterStr.substr(0, equal), queryParameterStr.substr(equal + 1));
+                    if (StringType::npos != equal)
+                    {
+                        httpRequest.setQueryParameter(queryParameterStr.substr(0, equal),
+                                                      queryParameterStr.substr(equal + 1));
+                    }
                 }
             }
         }
     }
 
-    bool HttpServerCodec::parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest)
+    void HttpServerCodec::parseRequestHeader(const StringType& requestHeader, HttpRequest& httpRequest)
     {
         ::std::vector<StringType> headerLines {};
         utils::split(requestHeader, headerLines, kCRLF);
-        SizeType colonAfterHeaderName = 0;
+        SizeType colon = 0;
         for (const auto& headerLine : headerLines)
         {
-            colonAfterHeaderName = headerLine.find(kColonSpace);
-            if (StringType::npos == colonAfterHeaderName)
+            colon = headerLine.find(kColon);
+            if (StringType::npos != colon && colon < headerLine.length() - 1)
             {
-                return false;
+                StringType value = headerLine.substr(colon + 1);
+                utils::trimL(value);
+                httpRequest.setHeader(headerLine.substr(0, colon), value);
             }
-            httpRequest.setHeader(headerLine.substr(0, colonAfterHeaderName), headerLine.substr(colonAfterHeaderName + 2));
         }
-        return true;
+        parseRequestCookie(httpRequest);
     }
 
-    bool HttpServerCodec::parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest)
+    void HttpServerCodec::parseRequestCookie(HttpRequest& httpRequest)
+    {
+        StringType cookieHttpHeaderName = httpHeaderToString(HttpHeader::COOKIE);
+        if (httpRequest.hasHeader(cookieHttpHeaderName))
+        {
+            StringType cookieStr = httpRequest.getHeader(cookieHttpHeaderName);
+            ::std::vector<StringType> cookieLines {};
+            utils::split(cookieStr, cookieLines, kSemicolonSpace);
+            SizeType equal = 0;
+            for (const auto& cookieLine : cookieLines)
+            {
+                equal = cookieLine.find(kEqual);
+                if (equal < cookieLine.length() - 1)
+                {
+                    if (StringType::npos != equal)
+                    {
+                        httpRequest.addCookie(cookieLine.substr(0, equal), cookieLine.substr(equal + 1));
+                    }
+                }
+            }
+        }
+    }
+
+    void HttpServerCodec::parseRequestBody(const StringType& data, SizeType requestBodyStart, HttpRequest& httpRequest)
     {
         StringType contentLengthHttpHeaderName = httpHeaderToString(HttpHeader::CONTENT_LENGTH);
         // has no request body
-        if (!httpRequest.hasHeader(contentLengthHttpHeaderName))
+        if (httpRequest.hasHeader(contentLengthHttpHeaderName))
         {
-            return true;
-        }
-        StringType contentLengthStr = httpRequest.getHeader(contentLengthHttpHeaderName);
-        SizeType contentLength = 0;
-        try
-        {
-            contentLength = ::std::stol(contentLengthStr);
-            if (contentLengthStr.length() != ::std::to_string(contentLength).length())
+            StringType contentLengthStr = httpRequest.getHeader(contentLengthHttpHeaderName);
+            SizeType contentLength = 0, pos = 0;
+            try
             {
-                return false;
+                contentLength = ::std::stol(contentLengthStr, &pos);
+            }
+            catch (const ::std::invalid_argument& e)
+            {
+                NETS_SYSTEM_LOG_WARN << "HttpServerCodec parse http request body,Content-Length is invalid";
+            }
+            if (contentLengthStr.length() != pos)
+            {
+                httpRequest.setBody(data.substr(requestBodyStart));
+            }
+            else
+            {
+                httpRequest.setBody(data.substr(requestBodyStart, contentLength));
             }
         }
-        catch (const ::std::invalid_argument& e)
-        {
-            return false;
-        }
-        if (contentLength == 0)
-        {
-            return true;
-        }
-        if (contentLength != data.length() - requestBodyStart)
-        {
-            return false;
-        }
-        httpRequest.setBody(data.substr(requestBodyStart, contentLength));
-        return true;
     }
 } // namespace nets

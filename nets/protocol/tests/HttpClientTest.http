@@ -1,17 +1,12 @@
-GET http://localhost:8080/httptest/query?id=99
+CONNECT
+
+GET http://localhost:8080/httptest/query?n=5
 Accept: application/json
 
 ###
-POST http://localhost:8080/httptest
-Content-Type: application/json
 
-{
-  "name": "guang19",
-  "age": 19,
-  "lang": "CPP"
-}
-
-
+GET http://localhost:8080/httptest/query?id=99
+Accept: application/json
 
 ###
 POST http://localhost:8080/httptest
