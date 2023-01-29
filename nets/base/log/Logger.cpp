@@ -34,10 +34,8 @@ namespace nets
         constexpr LogLevel kDefaultLogLevel = LogLevel::DEBUG;
     } // namespace
 
-    LoggerPtr kNetsRootLogger = LOGGER_MGR->getRootLogger();
-
     LogMessage::LogMessage(LogLevel level, const char* file, Int32Type line)
-        : time_(Timestamp::now()), level_(level), file_(nullptr), line_(line), stream_()
+        : time_(Timestamp::now()), file_(nullptr), line_(line), stream_()
     {
         file_ = ::strrchr(file, '/');
         if (file_ != nullptr)
@@ -47,13 +45,13 @@ namespace nets
     }
 
     LogMessageStream::LogMessageStream(LoggerPtr& logger, LogLevel logLevel, const char* file, Int32Type line)
-        : logger_(logger), logMessage_(logLevel, file, line)
+        : logger_(logger), logLevel_(logLevel), logMessage_(logLevel, file, line)
     {
     }
 
     LogMessageStream::~LogMessageStream()
     {
-        logger_->log(logMessage_.getLevel(), logMessage_);
+        logger_->log(logLevel_, logMessage_);
     }
 
     Logger::Logger(const StringType& name) : Logger(name, kDefaultLogLevel, nullptr, nullptr) {}
@@ -86,10 +84,10 @@ namespace nets
     {
         // format
         LogBuffer logBuffer {};
-        logFormatter_->formatLogMessage(logMessage, logBuffer);
+        logFormatter_->formatLogMessage(level, logMessage, logBuffer);
         // append
         logAppender_->append(logBuffer);
-        if (logMessage.getLevel() == LogLevel::FATAL)
+        if (level == LogLevel::FATAL)
         {
             logAppender_->flush();
             // exit with a delay of one second to allow time for the log in memory to persist
@@ -131,7 +129,7 @@ namespace nets
 
     INIT_SINGLETON(LoggerManager);
 
-    LoggerManager::LoggerManager() : loggers_(), mutex_() {}
+    LoggerManager::LoggerManager() : loggers_(), netsRootLogger_(nullptr), mutex_() {}
 
     LoggerPtr LoggerManager::getLogger(const StringType& loggerName)
     {
@@ -151,8 +149,16 @@ namespace nets
         }
     }
 
-    LoggerPtr LoggerManager::getRootLogger()
+    LoggerPtr& LoggerManager::getRootLogger()
     {
-        return getLogger(kNetsRootLoggerName);
+        if (netsRootLogger_ != nullptr)
+        {
+            return netsRootLogger_;
+        }
+        else
+        {
+            netsRootLogger_ = getLogger(kNetsRootLoggerName);
+            return netsRootLogger_;
+        }
     }
 } // namespace nets

@@ -31,6 +31,7 @@
 
 namespace nets
 {
+    enum class LogLevel;
     class LogMessage;
     class LogFormatter
     {
@@ -39,7 +40,7 @@ namespace nets
         virtual ~LogFormatter() = default;
 
     public:
-        virtual void formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer) = 0;
+        virtual void formatLogMessage(LogLevel logLevel, const LogMessage& logMessage, LogBuffer& logBuffer) = 0;
     };
 
     DECLARE_SINGLETON_CLASS(DefaultLogFormatter), public LogFormatter
@@ -51,7 +52,7 @@ namespace nets
         ~DefaultLogFormatter() override = default;
 
     public:
-        void formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer) override;
+        void formatLogMessage(LogLevel logLevel, const LogMessage& logMessage, LogBuffer& logBuffer) override;
 
     private:
         void formatLogTime(const Timestamp& logTime, LogBuffer& logBuffer);

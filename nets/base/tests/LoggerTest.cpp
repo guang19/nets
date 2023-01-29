@@ -32,7 +32,7 @@ using namespace nets;
 
 TEST(LoggerTest, BasicUse)
 {
-    ASSERT_EQ(kNetsRootLogger->getLevel(), LogLevel::DEBUG);
+    ASSERT_EQ(NETS_SYSTEM_ROOT_LOGGER->getLevel(), LogLevel::DEBUG);
     NETS_SYSTEM_LOG_TRACE << "这是一条trace信息";
     NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息";
     NETS_SYSTEM_LOG_INFO << "这是一条info信息";
@@ -63,7 +63,8 @@ TEST(LoggerTest, SingleFile)
 // for testing,  you better change the constant "kSecondsPerDay(in LogAppender.h)" for short intervals
 TEST(LoggerTest, DailyFile)
 {
-    kNetsRootLogger->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::DAILY_FILE));
+    NETS_SYSTEM_ROOT_LOGGER->setLogAppender(
+        FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::DAILY_FILE));
     NETS_SYSTEM_LOG_TRACE << "这是一条trance信息 stream，验证DailyFile";
     NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息 stream，验证DailyFile";
     NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream，验证DailyFile";
@@ -74,8 +75,9 @@ TEST(LoggerTest, DailyFile)
 
 TEST(LoggerTest, RollingFile)
 {
-    kNetsRootLogger->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::ROLLING_FILE));
-    kNetsRootLogger->setLogFileRollingSize(1);
+    NETS_SYSTEM_ROOT_LOGGER->setLogAppender(
+        FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::ROLLING_FILE));
+    NETS_SYSTEM_ROOT_LOGGER->setLogFileRollingSize(1);
     NETS_SYSTEM_LOG_DEBUG
         << "这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是一条足够长的信息这是"
            "一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息一条足够长的信息"

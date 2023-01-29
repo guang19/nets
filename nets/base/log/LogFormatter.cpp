@@ -53,13 +53,13 @@ namespace nets
         __thread TimeType tCacheSeconds {0};
     } // namespace
 
-    void DefaultLogFormatter::formatLogMessage(const LogMessage& logMessage, LogBuffer& logBuffer)
+    void DefaultLogFormatter::formatLogMessage(LogLevel logLevel, const LogMessage& logMessage, LogBuffer& logBuffer)
     {
         formatLogTime(logMessage.getTime(), logBuffer);
         logBuffer.writeBytes(kOpenSquareBracket, 2);
         logBuffer.writeInt32(currentTid());
         logBuffer.writeBytes(kCloseSquareBracket, 2);
-        logBuffer.writeBytes(kLogLevelName[ENUM_CLASS_TO_INT(logMessage.getLevel())]);
+        logBuffer.writeBytes(kLogLevelName[ENUM_CLASS_TO_INT(logLevel)]);
         logBuffer.writeByte(kSpace);
         logBuffer.writeBytes(logMessage.getFile());
         logBuffer.writeByte(kColon);

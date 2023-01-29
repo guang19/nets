@@ -36,7 +36,7 @@ namespace nets
         // if you want to test DAILY_FILE, you need to adjust kSecondsPerDay for short intervals, not for the whole day
         constexpr TimeType kSecondsPerDay = 60 * 60 * 24;
         // Set SecondsPerDay to 30, then you can watch if the log file is roll back after 30s
-        // constexpr TimeType kSecondsPerDay = 30;
+//         constexpr TimeType kSecondsPerDay = 30;
     } // namespace
 
     INIT_SINGLETON(StdoutLogAppender);

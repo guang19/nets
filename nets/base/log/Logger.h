@@ -30,13 +30,19 @@
 #include "nets/base/log/LogAppender.h"
 #include "nets/base/log/LogFormatter.h"
 
+#define LOGGER_MGR (nets::LoggerManager::getInstance())
+
+#define NETS_SYSTEM_ROOT_LOGGER (LOGGER_MGR->getRootLogger())
+
 #define NETS_LOG(LOGGER, LEVEL)                                                                                             \
     if (LEVEL >= LOGGER->getLevel())                                                                                        \
     nets::LogMessageStream(LOGGER, LEVEL, __FILE__, __LINE__).stream()
 
-#define NETS_SYSTEM_LOG(LEVEL) NETS_LOG(nets::kNetsRootLogger, LEVEL)
+#define NETS_SYSTEM_LOG(LEVEL) NETS_LOG(NETS_SYSTEM_ROOT_LOGGER, LEVEL)
 
-// log by root logger
+/**
+ * log by root logger
+ */
 #define NETS_SYSTEM_LOG_TRACE NETS_SYSTEM_LOG(nets::LogLevel::TRACE)
 
 #define NETS_SYSTEM_LOG_DEBUG NETS_SYSTEM_LOG(nets::LogLevel::DEBUG)
@@ -49,7 +55,9 @@
 
 #define NETS_SYSTEM_LOG_FATAL NETS_SYSTEM_LOG(nets::LogLevel::FATAL)
 
-// log by customized logger
+/**
+ * log by customized logger
+ */
 #define NETS_LOG_TRACE(LOGGER) NETS_LOG(LOGGER, nets::LogLevel::TRACE)
 
 #define NETS_LOG_DEBUG(LOGGER) NETS_LOG(LOGGER, nets::LogLevel::DEBUG)
@@ -61,8 +69,6 @@
 #define NETS_LOG_ERROR(LOGGER) NETS_LOG(LOGGER, nets::LogLevel::ERROR)
 
 #define NETS_LOG_FATAL(LOGGER) NETS_LOG(LOGGER, nets::LogLevel::FATAL)
-
-#define LOGGER_MGR (nets::LoggerManager::getInstance())
 
 namespace nets
 {
@@ -92,11 +98,6 @@ namespace nets
             return time_;
         }
 
-        inline LogLevel getLevel() const
-        {
-            return level_;
-        }
-
         inline const char* getFile() const
         {
             return file_;
@@ -119,7 +120,6 @@ namespace nets
 
     private:
         Timestamp time_;
-        LogLevel level_;
         const char* file_;
         Int32Type line_;
         LogBufferStream stream_;
@@ -139,6 +139,7 @@ namespace nets
 
     private:
         LoggerPtr logger_;
+        LogLevel logLevel_;
         LogMessage logMessage_;
     };
 
@@ -204,14 +205,13 @@ namespace nets
 
     public:
         LoggerPtr getLogger(const StringType& loggerName);
-        LoggerPtr getRootLogger();
+        LoggerPtr& getRootLogger();
 
     private:
         LoggerContainer loggers_;
+        LoggerPtr netsRootLogger_;
         MutexType mutex_;
     };
-
-    extern LoggerPtr kNetsRootLogger;
 } // namespace nets
 
 #endif // NETS_LOGGER_H
