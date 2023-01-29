@@ -74,7 +74,7 @@ namespace nets
         // notify blocking thread
         void notifyBlockingThread()
         {
-            UniqueLockType lock(mutex_);
+//            UniqueLockType lock(mutex_);
             notFullCV_.notify_all();
             notEmptyCV_.notify_all();
         }
@@ -118,57 +118,65 @@ namespace nets
     template <typename T>
     void BoundedBlockingQueue<T>::put(RReferenceType el)
     {
-        UniqueLockType lock(mutex_);
-        notFullCV_.wait(lock,
-                        [this]() -> bool
-                        {
-                            return !isFull();
-                        });
-        queue_.push_back(::std::forward<RReferenceType>(el));
+        {
+            UniqueLockType lock(mutex_);
+            notFullCV_.wait(lock,
+                            [this]() -> bool
+                            {
+                                return !isFull();
+                            });
+            queue_.push_back(::std::forward<RReferenceType>(el));
+        }
         notEmptyCV_.notify_one();
     }
 
     template <typename T>
     void BoundedBlockingQueue<T>::put(ConstReferenceType el)
     {
-        UniqueLockType lock(mutex_);
-        notFullCV_.wait(lock,
-                        [this]() -> bool
-                        {
-                            return !isFull();
-                        });
-        queue_.push_back(el);
+        {
+            UniqueLockType lock(mutex_);
+            notFullCV_.wait(lock,
+                            [this]() -> bool
+                            {
+                                return !isFull();
+                            });
+            queue_.push_back(el);
+        }
         notEmptyCV_.notify_one();
     }
 
     template <typename T>
     void BoundedBlockingQueue<T>::take(LReferenceType el)
     {
-        UniqueLockType lock(mutex_);
-        notEmptyCV_.wait(lock,
-                         [this]() -> bool
-                         {
-                             return !queue_.empty();
-                         });
-        el = queue_.front();
-        queue_.pop_front();
+        {
+            UniqueLockType lock(mutex_);
+            notEmptyCV_.wait(lock,
+                             [this]() -> bool
+                             {
+                                 return !queue_.empty();
+                             });
+            el = queue_.front();
+            queue_.pop_front();
+        }
         notFullCV_.notify_one();
     }
 
     template <typename T>
     bool BoundedBlockingQueue<T>::put(RReferenceType el, const PredicateType& p)
     {
-        UniqueLockType lock(mutex_);
-        notFullCV_.wait(lock,
-                        [&]() -> bool
-                        {
-                            return (!isFull() || p());
-                        });
-        if (p())
         {
-            return false;
+            UniqueLockType lock(mutex_);
+            notFullCV_.wait(lock,
+                            [&]() -> bool
+                            {
+                                return (!isFull() || p());
+                            });
+            if (p())
+            {
+                return false;
+            }
+            queue_.push_back(::std::forward<RReferenceType>(el));
         }
-        queue_.push_back(::std::forward<RReferenceType>(el));
         notEmptyCV_.notify_one();
         return true;
     }
@@ -176,17 +184,19 @@ namespace nets
     template <typename T>
     bool BoundedBlockingQueue<T>::put(ConstReferenceType el, const PredicateType& p)
     {
-        UniqueLockType lock(mutex_);
-        notFullCV_.wait(lock,
-                        [&]() -> bool
-                        {
-                            return (!isFull() || p());
-                        });
-        if (p())
         {
-            return false;
+            UniqueLockType lock(mutex_);
+            notFullCV_.wait(lock,
+                            [&]() -> bool
+                            {
+                                return (!isFull() || p());
+                            });
+            if (p())
+            {
+                return false;
+            }
+            queue_.push_back(el);
         }
-        queue_.push_back(el);
         notEmptyCV_.notify_one();
         return true;
     }
@@ -194,18 +204,20 @@ namespace nets
     template <typename T>
     bool BoundedBlockingQueue<T>::take(LReferenceType el, const PredicateType& p)
     {
-        UniqueLockType lock(mutex_);
-        notEmptyCV_.wait(lock,
-                         [&]() -> bool
-                         {
-                             return (!queue_.empty() || p());
-                         });
-        if (p())
         {
-            return false;
+            UniqueLockType lock(mutex_);
+            notEmptyCV_.wait(lock,
+                             [&]() -> bool
+                             {
+                                 return (!queue_.empty() || p());
+                             });
+            if (p())
+            {
+                return false;
+            }
+            el = queue_.front();
+            queue_.pop_front();
         }
-        el = queue_.front();
-        queue_.pop_front();
         notFullCV_.notify_one();
         return true;
     }
@@ -221,6 +233,7 @@ namespace nets
                                 }))
         {
             queue_.push_back(::std::forward<RReferenceType>(el));
+            lock.unlock();
             notEmptyCV_.notify_one();
             return true;
         }
@@ -238,6 +251,7 @@ namespace nets
                                 }))
         {
             queue_.push_back(el);
+            lock.unlock();
             notEmptyCV_.notify_one();
             return true;
         }
@@ -256,6 +270,7 @@ namespace nets
         {
             el = queue_.front();
             queue_.pop_front();
+            lock.unlock();
             notFullCV_.notify_one();
             return true;
         }
@@ -277,6 +292,7 @@ namespace nets
                 return false;
             }
             queue_.push_back(::std::forward<RReferenceType>(el));
+            lock.unlock();
             notEmptyCV_.notify_one();
             return true;
         }
@@ -298,6 +314,7 @@ namespace nets
                 return false;
             }
             queue_.push_back(el);
+            lock.unlock();
             notEmptyCV_.notify_one();
             return true;
         }
@@ -320,6 +337,7 @@ namespace nets
             }
             el = queue_.front();
             queue_.pop_front();
+            lock.unlock();
             notFullCV_.notify_one();
             return true;
         }
@@ -333,6 +351,7 @@ namespace nets
         if (lock.owns_lock() && !isFull())
         {
             queue_.push_back(::std::forward<RReferenceType>(el));
+            lock.unlock();
             notEmptyCV_.notify_one();
             return true;
         }
@@ -346,6 +365,7 @@ namespace nets
         if (lock.owns_lock() && !isFull())
         {
             queue_.push_back(el);
+            lock.unlock();
             notEmptyCV_.notify_one();
             return true;
         }
@@ -360,6 +380,7 @@ namespace nets
         {
             el = queue_.front();
             queue_.pop_front();
+            lock.unlock();
             notFullCV_.notify_one();
             return true;
         }
