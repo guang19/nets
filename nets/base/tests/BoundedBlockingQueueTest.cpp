@@ -26,7 +26,7 @@
 
 #include <thread>
 
-#include "nets/base/concurrency/BoundedBlockingQueue.h"
+#include "nets/base/BoundedBlockingQueue.h"
 #include "nets/base/Timestamp.h"
 
 using namespace nets;

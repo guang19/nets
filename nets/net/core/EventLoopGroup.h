@@ -25,7 +25,7 @@
 #ifndef NETS_EVENT_LOOP_GROUP_H
 #define NETS_EVENT_LOOP_GROUP_H
 
-#include "nets/base/concurrency/ThreadPool.h"
+#include "nets/base/ThreadPool.h"
 #include "nets/net/core/EventLoop.h"
 
 namespace nets

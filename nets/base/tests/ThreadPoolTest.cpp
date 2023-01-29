@@ -24,8 +24,8 @@
 
 #include <gtest/gtest.h>
 
-#include "nets/base/concurrency/ThreadPool.h"
 #include "nets/base/ThreadHelper.h"
+#include "nets/base/ThreadPool.h"
 
 using namespace nets;
 

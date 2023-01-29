@@ -22,7 +22,7 @@
 
 // @brief C++17 based thread pool
 
-#include "nets/base/concurrency/ThreadPool.h"
+#include "nets/base/ThreadPool.h"
 
 namespace nets
 {
