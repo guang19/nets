@@ -26,7 +26,6 @@
 
 #include <cassert>
 
-#include "nets/base/Common.h"
 #include "nets/base/log/Logger.h"
 #include "nets/net/core/EventLoop.h"
 #include "nets/net/exception/ChannelRegisterException.h"

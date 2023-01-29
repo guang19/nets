@@ -29,6 +29,7 @@
 
 #include <cassert>
 
+#include "nets/base/exception/AbstractException.h"
 #include "nets/base/log/Logger.h"
 #include "nets/net/poller/Poller.h"
 
@@ -81,7 +82,7 @@ namespace nets
             TimeType timeout =
                 remainingExpiredTime == -1 ? kDefaultPollTimeout : ::std::min(remainingExpiredTime, kDefaultPollTimeout);
             poller_->poll(::std::max(kMinimumPollTimeout, timeout), activeChannels_);
-            for (auto& channel : activeChannels_)
+            for (auto& channel: activeChannels_)
             {
                 channel->handleEvent();
             }
@@ -160,7 +161,7 @@ namespace nets
             LockGuardType lock(mutex_);
             tmpTasks.swap(pendingTasks_);
         }
-        for (const auto& t : tmpTasks)
+        for (const auto& t: tmpTasks)
         {
             t();
         }

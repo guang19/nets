@@ -25,32 +25,7 @@
 #ifndef NETS_FILE_OPEN_EXCEPTION_H
 #define NETS_FILE_OPEN_EXCEPTION_H
 
-#include "nets/base/Common.h"
 #include "nets/base/exception/AbstractException.h"
-
-#define THROW_FILE_OPEN_EXCEPTION(ERRNUM)                                                                                   \
-    switch (ERRNUM)                                                                                                         \
-    {                                                                                                                       \
-        case ENOENT:                                                                                                        \
-            THROW_FMT(FileOpenException, "no such file");                                                                   \
-            break;                                                                                                          \
-        case EACCES:                                                                                                        \
-        case EPERM:                                                                                                         \
-            THROW_FMT(FileOpenException, "no permission to access file");                                                   \
-            break;                                                                                                          \
-        case EINVAL:                                                                                                        \
-            THROW_FMT(FileOpenException, "invalid value in flags");                                                         \
-            break;                                                                                                          \
-        case EMFILE:                                                                                                        \
-            THROW_FMT(FileOpenException, "the per-process limit on the number of open file descriptors has been reached");  \
-            break;                                                                                                          \
-        case ENAMETOOLONG:                                                                                                  \
-            THROW_FMT(FileOpenException, "pathname was too long");                                                          \
-            break;                                                                                                          \
-        default:                                                                                                            \
-            THROW_FMT(FileOpenException, "failed to open file for unknown reason,errno=%d", ERRNUM);                        \
-            break;                                                                                                          \
-    }
 
 namespace nets
 {

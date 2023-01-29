@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief C++17 based thread pool
+// @brief Thread pool
 
 #ifndef NETS_THREAD_POOL_H
 #define NETS_THREAD_POOL_H

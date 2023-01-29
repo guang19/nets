@@ -24,7 +24,6 @@
 
 #include "nets/base/log/LogFormatter.h"
 
-#include "nets/base/Common.h"
 #include "nets/base/exception/DateTimeFormatException.h"
 #include "nets/base/log/Logger.h"
 #include "nets/base/ThreadHelper.h"

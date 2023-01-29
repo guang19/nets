@@ -26,7 +26,7 @@
 #define NETS_COMMON_MACRO_H
 
 #include <algorithm>
-#include <cstdarg>
+
 #include <cstdio>
 #include <cstring>
 
@@ -45,21 +45,5 @@
         CLASS_MUST_BE_COMPLETE_TYPE jugg;                                                                                   \
         UNUSED(jugg);                                                                                                       \
     } while (0)
-
-#define THROW_FMT(EXCEPTION, FMT, ...) (nets::throwFmt<EXCEPTION>(#EXCEPTION":" FMT, ##__VA_ARGS__))
-
-namespace nets
-{
-    template <class E>
-    void throwFmt(const char* fmt, ...)
-    {
-        char msgBuf[255] = {0};
-        va_list vl;
-        va_start(vl, fmt);
-        ::vsnprintf(msgBuf, sizeof(msgBuf), fmt, vl);
-        va_end(vl);
-        throw E(msgBuf);
-    }
-} // namespace nets
 
 #endif // NETS_COMMON_MACRO_H

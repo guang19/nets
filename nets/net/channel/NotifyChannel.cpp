@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <sys/eventfd.h>
 
+#include "nets/base/exception/AbstractException.h"
 #include "nets/base/log/Logger.h"
 
 namespace nets

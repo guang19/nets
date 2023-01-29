@@ -28,6 +28,7 @@
 #include <stdexcept>
 #include <unistd.h>
 
+#include "nets/base/exception/AbstractException.h"
 #include "nets/base/log/Logger.h"
 
 namespace nets
@@ -86,11 +87,11 @@ namespace nets
             EventType revents = events_[i].events;
             channel->setReadyEvents(kNoneEvent);
             NETS_SYSTEM_LOG_DEBUG << "revents=" << revents << " [revents & EPOLLIN=" << (revents & EPOLLIN)
-                       << "] [revents & EPOLLERR=" << (revents & EPOLLERR)
-                       << "] [revents & EPOLLHUP=" << (revents & EPOLLHUP)
-                       << "] [revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
-                       << "] [revents & EPOLLPRI=" << (revents & EPOLLPRI)
-                       << "] [revents & EPOLLOUT=" << (revents & EPOLLOUT) << ']';
+                                  << "] [revents & EPOLLERR=" << (revents & EPOLLERR)
+                                  << "] [revents & EPOLLHUP=" << (revents & EPOLLHUP)
+                                  << "] [revents & EPOLLRDHUP=" << (revents & EPOLLRDHUP)
+                                  << "] [revents & EPOLLPRI=" << (revents & EPOLLPRI)
+                                  << "] [revents & EPOLLOUT=" << (revents & EPOLLOUT) << ']';
             // local may shutdown connection or read/write error
             if (revents & EPOLLIN && revents & (EPOLLERR | EPOLLHUP))
             {

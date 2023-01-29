@@ -24,6 +24,7 @@
 
 #include "nets/net/channel/Channel.h"
 
+#include "nets/base/exception/AbstractException.h"
 #include "nets/net/core/EventLoop.h"
 
 namespace nets

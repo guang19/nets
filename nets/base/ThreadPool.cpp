@@ -20,9 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief C++17 based thread pool
+// @brief Thread pool
 
 #include "nets/base/ThreadPool.h"
+
+#include "nets/base/exception/AbstractException.h"
 
 namespace nets
 {

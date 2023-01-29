@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// @brief Base class for all custom exceptions
+
 #include "nets/base/exception/AbstractException.h"
 
 #include "nets/base/ThreadHelper.h"

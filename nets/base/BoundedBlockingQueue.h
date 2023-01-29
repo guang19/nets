@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// @brief Deque based bounded blocking queue
+// @brief Bounded blocking queue
 
 #ifndef NETS_BOUNDED_BLOCKING_QUEUE_H
 #define NETS_BOUNDED_BLOCKING_QUEUE_H

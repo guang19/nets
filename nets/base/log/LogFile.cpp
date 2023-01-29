@@ -60,7 +60,7 @@ namespace nets
         }
         if (nullptr == (fp_ = ::fopen(file, "ae")))
         {
-            THROW_FILE_OPEN_EXCEPTION(errno)
+            THROW_FMT(FileOpenException, "failed to open file,errno=%d", errno);
         }
         getFileInfo(&bytes_, &lastRollTime_);
         MEMZERO(buffer_, sizeof(buffer_));
@@ -133,7 +133,7 @@ namespace nets
         }
         if (nullptr == (fp_ = ::fopen(file_.c_str(), "ae")))
         {
-            THROW_FILE_OPEN_EXCEPTION(errno)
+            THROW_FMT(FileOpenException, "failed to open file,errno=%d", errno);
         }
         getFileInfo(&bytes_, nullptr);
         lastRollTime_ = now;
@@ -163,7 +163,7 @@ namespace nets
                 {
                     if (::mkdir(path, 0775) == -1)
                     {
-                        THROW_FILE_CREATE_EXCEPTION(errno)
+                        THROW_FMT(FileCreateException, "failed to create file,errno=%d", errno);
                     }
                 }
             }
