@@ -96,10 +96,7 @@ namespace nets
         void flush() override;
 
         // if you want to test ROLLING_FILE, you need to adjust logFileRollingSize as small as possible
-        void setLogFileRollingSize(SizeType rollingSize) override
-        {
-            logFileRollingSize_ = rollingSize;
-        }
+        void setLogFileRollingSize(SizeType rollingSize) override;
 
     private:
         void sync();

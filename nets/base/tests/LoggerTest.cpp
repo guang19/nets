@@ -94,6 +94,19 @@ TEST(LoggerTest, RollingFile)
     ::sleep(1);
 }
 
+TEST(LoggerTest, CustomizedLogger)
+{
+    auto myLogger = LOGGER_MGR->getLogger("myLogger");
+    myLogger->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::ROLLING_FILE));
+    myLogger->setLogFileRollingSize(1);
+    NETS_LOG_TRACE(myLogger) << "这是一条trance信息 stream，验证DailyFile";
+    NETS_LOG_DEBUG(myLogger) << "这是一条debug信息 stream，验证DailyFile";
+    NETS_LOG_INFO(myLogger) << "这是一条info信息 stream，验证DailyFile";
+    NETS_LOG_WARN(myLogger) << "这是一条warn信息 stream，验证DailyFile";
+    NETS_LOG_ERROR(myLogger) << "这是一条error信息 stream，验证DailyFile";
+    NETS_LOG_FATAL(myLogger) << "这是一条fatal信息 stream，验证DailyFile";
+}
+
 int main(int argc, char** argv)
 {
     ::testing::InitGoogleTest(&argc, argv);
