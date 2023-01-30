@@ -42,6 +42,7 @@ public:
     {
         NETS_LOG_DEBUG(testLogger) << "TestUdpRecipientHandler::channelRead recv from " << message.recipient().toString()
                                    << "\nmessage is:" << message.byteBuffer().toString();
+        channelContext.write("Hello UdpSender", InetSockAddress("127.0.0.1", 8081));
     }
 };
 
@@ -71,7 +72,6 @@ public:
     {
         NETS_LOG_DEBUG(testLogger) << "TestUdpSenderHandler::channelRead recv from " << message.recipient().toString()
                                    << "\nmessage is:" << message.byteBuffer().toString();
-        channelContext.write(message);
     }
 };
 
@@ -84,6 +84,6 @@ TEST(UdpUnicastTest, UdpUnicastSender)
             {
                 channel.pipeline().addLast(::std::shared_ptr<DatagramChannelHandler>(new TestUdpSenderHandler));
             })
-        .bind()
+        .bind(8081)
         .sync();
 }
