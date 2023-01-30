@@ -112,7 +112,7 @@ namespace nets
         ConditionVariableType notFullCV_;
         ConditionVariableType notEmptyCV_;
 
-        static constexpr SizeType kDefaultMaxQueueSize = INT32_MAX;
+        static constexpr SizeType kDefaultMaxQueueSize = INT32_MAX - 1;
     };
 
     template <typename T>
