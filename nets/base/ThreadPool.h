@@ -74,7 +74,7 @@ namespace nets
         };
 
     public:
-        explicit ThreadPool(Int32Type corePoolSize, Int32Type maxPoolSize, Int32Type maxQueueSize,
+        explicit ThreadPool(Int32Type corePoolSize, Int32Type maximumPoolSize, Int32Type maxQueueSize,
                             const StringType& name = kDefaultThreadPoolName,
                             TimeType keepAliveTime = kDefaultIdleKeepAliveTime);
         ~ThreadPool();
