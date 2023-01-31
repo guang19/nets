@@ -35,10 +35,10 @@ TEST(TimerTest, CopyMove)
     Timestamp now(Timestamp::now());
     Timer timer1(now.plusSeconds(3), 1, 1, false);
     Timer timer2(::std::move(timer1));
-    ASSERT_EQ(timer1.id().key_, -1);
-    ASSERT_EQ(timer1.expiredTime().secondsSinceEpoch(), 0);
-    ASSERT_EQ(timer2.id().key_, 0);
-    ASSERT_EQ(timer2.expiredTime(), now.plusSeconds(3));
+    EXPECT_EQ(timer1.id().key_, -1);
+    EXPECT_EQ(timer1.expiredTime().secondsSinceEpoch(), 0);
+    EXPECT_EQ(timer2.id().key_, 0);
+    EXPECT_EQ(timer2.expiredTime(), now.plusSeconds(3));
 }
 
 TEST(TimerTest, MultiMapStore)

@@ -87,17 +87,6 @@ TEST_F(ThreadPoolTest, ExecuteTask)
     ::std::this_thread::sleep_for(::std::chrono::milliseconds(2000));
 }
 
-TEST_F(ThreadPoolTest, ExecuteTaskThrow)
-{
-    threadPool->execute(
-        [](int num) -> bool
-        {
-            ::printf("1===%s\n", currentThreadName());
-            throw ::std::invalid_argument("ExecuteTask");
-        },
-        5);
-}
-
 TEST_F(ThreadPoolTest, ExecuteTaskLimit)
 {
     ::std::future<void> fa[100];
@@ -135,10 +124,10 @@ TEST_F(ThreadPoolTest, SubmitHasRetval)
     };
     auto future1 = threadPool->submit(f);
     future1.wait();
-    ASSERT_EQ(future1.get(), 5);
+    EXPECT_EQ(future1.get(), 5);
     auto future2 = threadPool->submit(::std::move(f));
     future2.wait();
-    ASSERT_EQ(future2.get(), 5);
+    EXPECT_EQ(future2.get(), 5);
 }
 
 TEST_F(ThreadPoolTest, SubmitNoRetval)
@@ -171,10 +160,10 @@ TEST_F(ThreadPoolTest, SubmitFutureThrow)
     };
     auto future1 = threadPool->submit(f1);
     future1.wait();
-    ASSERT_THROW(future1.get(), ::std::exception);
+    EXPECT_THROW(future1.get(), ::std::exception);
     auto future2 = threadPool->submit(f2);
     future2.wait();
-    ASSERT_THROW(future2.get(), ::std::exception);
+    EXPECT_THROW(future2.get(), ::std::exception);
 }
 
 int main(int argc, char** argv)

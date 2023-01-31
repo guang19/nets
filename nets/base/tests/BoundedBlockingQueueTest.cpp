@@ -59,15 +59,15 @@ TEST_F(BoundedBlockingQueueTest, PutTake)
     blockingQueue->put(1);
     blockingQueue->put(2);
     blockingQueue->put(3);
-    ASSERT_EQ(blockingQueue->size(), 3u);
+    EXPECT_EQ(blockingQueue->size(), 3u);
     Int32Type data = 0;
     blockingQueue->take(data);
-    ASSERT_EQ(data, 1);
+    EXPECT_EQ(data, 1);
     blockingQueue->take(data);
-    ASSERT_EQ(data, 2);
+    EXPECT_EQ(data, 2);
     blockingQueue->take(data);
-    ASSERT_EQ(data, 3);
-    ASSERT_EQ(blockingQueue->size(), 0u);
+    EXPECT_EQ(data, 3);
+    EXPECT_EQ(blockingQueue->size(), 0u);
 }
 
 TEST_F(BoundedBlockingQueueTest, PutTakeMultiThread)
@@ -89,7 +89,7 @@ TEST_F(BoundedBlockingQueueTest, PutTakeMultiThread)
         t2.detach();
     }
     ::std::this_thread::sleep_for(::std::chrono::milliseconds(1000));
-    ASSERT_EQ(blockingQueue->size(), 0u);
+    EXPECT_EQ(blockingQueue->size(), 0u);
 }
 
 TEST_F(BoundedBlockingQueueTest, PutTakeConditionVar)
@@ -99,15 +99,15 @@ TEST_F(BoundedBlockingQueueTest, PutTakeConditionVar)
     {
         return !running;
     };
-    ASSERT_EQ(blockingQueue->put(1, func), true);
+    EXPECT_EQ(blockingQueue->put(1, func), true);
     Int32Type takeVal = 0;
-    ASSERT_EQ(blockingQueue->take(takeVal, func), true);
-    ASSERT_EQ(takeVal, 1);
-    ASSERT_EQ(blockingQueue->put(2, func), true);
+    EXPECT_EQ(blockingQueue->take(takeVal, func), true);
+    EXPECT_EQ(takeVal, 1);
+    EXPECT_EQ(blockingQueue->put(2, func), true);
     running = false;
-    ASSERT_EQ(blockingQueue->take(takeVal, func), false);
-    ASSERT_EQ(takeVal, 1);
-    ASSERT_TRUE(1 == (blockingQueue->size()));
+    EXPECT_EQ(blockingQueue->take(takeVal, func), false);
+    EXPECT_EQ(takeVal, 1);
+    EXPECT_TRUE(1 == (blockingQueue->size()));
 }
 
 TEST_F(BoundedBlockingQueueTest, PutTimeout)
@@ -117,34 +117,34 @@ TEST_F(BoundedBlockingQueueTest, PutTimeout)
     blockingQueue->put(3);
     blockingQueue->put(4);
     blockingQueue->put(5);
-    ASSERT_EQ(blockingQueue->size(), 5U);
+    EXPECT_EQ(blockingQueue->size(), 5U);
     Int32Type takeVal = 0;
     Int64Type start = Timestamp::now().secondsSinceEpoch();
-    ASSERT_EQ(blockingQueue->put(takeVal, 3000L), false);
+    EXPECT_EQ(blockingQueue->put(takeVal, 3000L), false);
     Int64Type end = Timestamp::now().secondsSinceEpoch();
-    ASSERT_GT(end, start);
-    ASSERT_GE((end - start), 3);
-    ASSERT_EQ(takeVal, 0);
+    EXPECT_GT(end, start);
+    EXPECT_GE((end - start), 3);
+    EXPECT_EQ(takeVal, 0);
 }
 
 TEST_F(BoundedBlockingQueueTest, TakeTimeout)
 {
     Int32Type takeVal = 0;
     Int64Type start = Timestamp::now().secondsSinceEpoch();
-    ASSERT_EQ(blockingQueue->isEmpty(), true);
-    ASSERT_EQ(blockingQueue->take(takeVal, 3000L), false);
+    EXPECT_EQ(blockingQueue->isEmpty(), true);
+    EXPECT_EQ(blockingQueue->take(takeVal, 3000L), false);
     Int64Type end = Timestamp::now().secondsSinceEpoch();
-    ASSERT_GT(end, start);
-    ASSERT_GE((end - start), 3);
-    ASSERT_EQ(takeVal, 0);
+    EXPECT_GT(end, start);
+    EXPECT_GE((end - start), 3);
+    EXPECT_EQ(takeVal, 0);
 }
 
 TEST_F(BoundedBlockingQueueTest, TryPushPop)
 {
-    ASSERT_EQ(blockingQueue->tryPush(1), true);
+    EXPECT_EQ(blockingQueue->tryPush(1), true);
     Int32Type takeVal = 0;
-    ASSERT_EQ(blockingQueue->tryPop(takeVal), true);
-    ASSERT_EQ(takeVal, 1);
+    EXPECT_EQ(blockingQueue->tryPop(takeVal), true);
+    EXPECT_EQ(takeVal, 1);
 }
 
 int main(int argc, char** argv)

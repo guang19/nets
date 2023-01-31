@@ -60,14 +60,14 @@ TEST(SocketChannelHandlerPipelineTest, AddRemove)
     pipeline.addFirst(handler5);
     pipeline.addLast(handler6);
     pipeline.addLast(handler7);
-    ASSERT_TRUE(pipeline.remove("handler4") == handler4);
-    ASSERT_TRUE(pipeline.removeFirst() == handler5);
-    ASSERT_TRUE(pipeline.remove("handler3") == handler3);
-    ASSERT_TRUE(pipeline.removeLast() == handler7);
-    ASSERT_TRUE(pipeline.removeFirst() == handler1);
-    ASSERT_TRUE(pipeline.removeFirst() == handler2);
-    ASSERT_TRUE(pipeline.remove(handler6));
-    ASSERT_TRUE(pipeline.removeLast() == nullptr);
+    EXPECT_TRUE(pipeline.remove("handler4") == handler4);
+    EXPECT_TRUE(pipeline.removeFirst() == handler5);
+    EXPECT_TRUE(pipeline.remove("handler3") == handler3);
+    EXPECT_TRUE(pipeline.removeLast() == handler7);
+    EXPECT_TRUE(pipeline.removeFirst() == handler1);
+    EXPECT_TRUE(pipeline.removeFirst() == handler2);
+    EXPECT_TRUE(pipeline.remove(handler6));
+    EXPECT_TRUE(pipeline.removeLast() == nullptr);
 }
 
 TEST(SocketChannelHandlerPipelineTest, StackOverflow)
@@ -104,14 +104,14 @@ TEST(DatagramChannelHandlerPipelineTest, AddRemove)
     pipeline.addFirst(handler5);
     pipeline.addLast(handler6);
     pipeline.addLast(handler7);
-    ASSERT_TRUE(pipeline.remove("handler4") == handler4);
-    ASSERT_TRUE(pipeline.removeFirst() == handler5);
-    ASSERT_TRUE(pipeline.remove("handler3") == handler3);
-    ASSERT_TRUE(pipeline.removeLast() == handler7);
-    ASSERT_TRUE(pipeline.removeFirst() == handler1);
-    ASSERT_TRUE(pipeline.removeFirst() == handler2);
-    ASSERT_TRUE(pipeline.remove(handler6));
-    ASSERT_TRUE(pipeline.removeLast() == nullptr);
+    EXPECT_TRUE(pipeline.remove("handler4") == handler4);
+    EXPECT_TRUE(pipeline.removeFirst() == handler5);
+    EXPECT_TRUE(pipeline.remove("handler3") == handler3);
+    EXPECT_TRUE(pipeline.removeLast() == handler7);
+    EXPECT_TRUE(pipeline.removeFirst() == handler1);
+    EXPECT_TRUE(pipeline.removeFirst() == handler2);
+    EXPECT_TRUE(pipeline.remove(handler6));
+    EXPECT_TRUE(pipeline.removeLast() == nullptr);
 }
 
 int main(int argc, char** argv)

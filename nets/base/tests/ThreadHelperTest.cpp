@@ -30,17 +30,17 @@ using namespace nets;
 
 TEST(ThreadHelperTest, ThreadName)
 {
-    ASSERT_TRUE(0 == (::strcmp("Main", currentThreadName())));
+    EXPECT_TRUE(0 == (::strcmp("Main", currentThreadName())));
     setCurrentThreadName("MainThread");
     const char* name = currentThreadName();
-    ASSERT_TRUE(0 == (::strcmp("MainThread", name)));
-    ASSERT_TRUE(0 == (::strcmp(name, currentThreadName())));
+    EXPECT_TRUE(0 == (::strcmp("MainThread", name)));
+    EXPECT_TRUE(0 == (::strcmp(name, currentThreadName())));
 }
 
 TEST(ThreadHelperTest, Tid)
 {
-    ASSERT_TRUE(isMainThread());
-    ASSERT_EQ(currentTid(), ::getpid());
+    EXPECT_TRUE(isMainThread());
+    EXPECT_EQ(currentTid(), ::getpid());
 }
 
 TEST(ThreadHelperTest, StackTrace)

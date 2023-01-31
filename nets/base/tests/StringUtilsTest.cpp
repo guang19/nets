@@ -36,20 +36,20 @@ TEST(StringUtilsTest, Trim)
     utils::trim(s1);
     utils::trim(s2);
     utils::trim(s3);
-    ASSERT_EQ(s1, s2);
-    ASSERT_EQ(s2, s3);
-    ASSERT_EQ(s1, s3);
+    EXPECT_EQ(s1, s2);
+    EXPECT_EQ(s2, s3);
+    EXPECT_EQ(s1, s3);
 
     StringType s4 = " ";
     utils::trim(s4);
-    ASSERT_GE("", s4);
+    EXPECT_GE("", s4);
     s4 = "  ";
     utils::trimL(s4);
-    ASSERT_GE("", s4);
+    EXPECT_GE("", s4);
 
     s4 = "  ";
     utils::trimR(s4);
-    ASSERT_GE("", s4);
+    EXPECT_GE("", s4);
 }
 
 TEST(StringUtilsTest, Split)
@@ -57,7 +57,7 @@ TEST(StringUtilsTest, Split)
     ::std::vector<StringType> tokens {};
     StringType str = "123googlemetatwitter123youtube123 ";
     utils::split(str, tokens, "123");
-    for (const auto& s : tokens)
+    for (const auto& s: tokens)
     {
         ::printf("%s\n", s.c_str());
     }
@@ -67,7 +67,7 @@ TEST(StringUtilsTest, CaseInsensitiveEqual)
 {
     StringType s1 = " abcdefg";
     StringType s2 = " ABCDEFG";
-    ASSERT_TRUE(utils::caseInsensitiveEqual(s1, s2));
+    EXPECT_TRUE(utils::caseInsensitiveEqual(s1, s2));
 }
 
 int main(int argc, char** argv)

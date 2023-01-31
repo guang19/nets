@@ -31,14 +31,14 @@ using namespace nets;
 TEST(ByteBufferTest, Constructor)
 {
     ByteBuffer buffer {};
-    ASSERT_EQ(buffer.capacity(), 1024U);
+    EXPECT_EQ(buffer.capacity(), 1024U);
     ByteBuffer buffer2 {512};
     ByteBuffer buffer3(512);
-    ASSERT_EQ(buffer.capacity(), 1024U);
-    ASSERT_EQ(buffer2.capacity(), 512U);
-    ASSERT_EQ(buffer3.capacity(), 512U);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_TRUE(buffer.isWritable());
+    EXPECT_EQ(buffer.capacity(), 1024U);
+    EXPECT_EQ(buffer2.capacity(), 512U);
+    EXPECT_EQ(buffer3.capacity(), 512U);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_TRUE(buffer.isWritable());
 }
 
 TEST(ByteBufferTest, WriteBytes)
@@ -46,13 +46,13 @@ TEST(ByteBufferTest, WriteBytes)
     ByteBuffer buffer {};
     const char* s1 = "123";
     buffer.writeBytes(s1, ::strlen(s1));
-    ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), ::strlen(s1));
+    EXPECT_TRUE(buffer.isReadable());
+    EXPECT_EQ(buffer.readableBytes(), ::strlen(s1));
     StringType s = buffer.readBytes(::strlen(s1));
-    ASSERT_STREQ(s.c_str(), s1);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_EQ(buffer.readerIndex(), 0U);
-    ASSERT_EQ(buffer.writerIndex(), 0U);
+    EXPECT_STREQ(s.c_str(), s1);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_EQ(buffer.readerIndex(), 0U);
+    EXPECT_EQ(buffer.writerIndex(), 0U);
 }
 
 TEST(ByteBufferTest, WriteInt16)
@@ -60,12 +60,12 @@ TEST(ByteBufferTest, WriteInt16)
     ByteBuffer buffer {};
     Int16Type n = 1024;
     buffer.writeInt16(n);
-    ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(Int16Type));
-    ASSERT_EQ(buffer.readInt16(), n);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_EQ(buffer.readerIndex(), 0U);
-    ASSERT_EQ(buffer.writerIndex(), 0U);
+    EXPECT_TRUE(buffer.isReadable());
+    EXPECT_EQ(buffer.readableBytes(), sizeof(Int16Type));
+    EXPECT_EQ(buffer.readInt16(), n);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_EQ(buffer.readerIndex(), 0U);
+    EXPECT_EQ(buffer.writerIndex(), 0U);
 }
 
 TEST(ByteBufferTest, WriteInt32)
@@ -73,12 +73,12 @@ TEST(ByteBufferTest, WriteInt32)
     ByteBuffer buffer {};
     Int32Type n = 2048;
     buffer.writeInt32(n);
-    ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(Int32Type));
-    ASSERT_EQ(buffer.readInt32(), n);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_EQ(buffer.readerIndex(), 0U);
-    ASSERT_EQ(buffer.writerIndex(), 0U);
+    EXPECT_TRUE(buffer.isReadable());
+    EXPECT_EQ(buffer.readableBytes(), sizeof(Int32Type));
+    EXPECT_EQ(buffer.readInt32(), n);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_EQ(buffer.readerIndex(), 0U);
+    EXPECT_EQ(buffer.writerIndex(), 0U);
 }
 
 TEST(ByteBufferTest, WriteInt64)
@@ -86,12 +86,12 @@ TEST(ByteBufferTest, WriteInt64)
     ByteBuffer buffer {};
     Int64Type n = 65535L;
     buffer.writeInt64(n);
-    ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(Int64Type));
-    ASSERT_EQ(buffer.readInt64(), n);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_EQ(buffer.readerIndex(), 0U);
-    ASSERT_EQ(buffer.writerIndex(), 0U);
+    EXPECT_TRUE(buffer.isReadable());
+    EXPECT_EQ(buffer.readableBytes(), sizeof(Int64Type));
+    EXPECT_EQ(buffer.readInt64(), n);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_EQ(buffer.readerIndex(), 0U);
+    EXPECT_EQ(buffer.writerIndex(), 0U);
 }
 
 TEST(ByteBufferTest, WriteIntFloat)
@@ -99,12 +99,12 @@ TEST(ByteBufferTest, WriteIntFloat)
     ByteBuffer buffer {};
     float n = 123.123F;
     buffer.writeFloat(n);
-    ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(float));
-    ASSERT_EQ(buffer.readFloat(), n);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_EQ(buffer.readerIndex(), 0U);
-    ASSERT_EQ(buffer.writerIndex(), 0U);
+    EXPECT_TRUE(buffer.isReadable());
+    EXPECT_EQ(buffer.readableBytes(), sizeof(float));
+    EXPECT_EQ(buffer.readFloat(), n);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_EQ(buffer.readerIndex(), 0U);
+    EXPECT_EQ(buffer.writerIndex(), 0U);
 }
 
 TEST(ByteBufferTest, WriteIntDouble)
@@ -112,12 +112,12 @@ TEST(ByteBufferTest, WriteIntDouble)
     ByteBuffer buffer {};
     double n = 123.1234567891012345678910L;
     buffer.writeDouble(n);
-    ASSERT_TRUE(buffer.isReadable());
-    ASSERT_EQ(buffer.readableBytes(), sizeof(double));
-    ASSERT_EQ(buffer.readDouble(), n);
-    ASSERT_FALSE(buffer.isReadable());
-    ASSERT_EQ(buffer.readerIndex(), 0U);
-    ASSERT_EQ(buffer.writerIndex(), 0U);
+    EXPECT_TRUE(buffer.isReadable());
+    EXPECT_EQ(buffer.readableBytes(), sizeof(double));
+    EXPECT_EQ(buffer.readDouble(), n);
+    EXPECT_FALSE(buffer.isReadable());
+    EXPECT_EQ(buffer.readerIndex(), 0U);
+    EXPECT_EQ(buffer.writerIndex(), 0U);
 }
 
 TEST(ByteBufferTest, Comprehensive)
@@ -130,13 +130,13 @@ TEST(ByteBufferTest, Comprehensive)
     buffer.writeInt16(32767);
     buffer.writeInt32(123123123);
     buffer.writeInt64(123123123123);
-    ASSERT_STREQ(buffer.readBytes(::strlen(s)).c_str(), s);
-    ASSERT_EQ(buffer.readByte(), 'C');
-    ASSERT_EQ(buffer.readInt8(), 127);
-    ASSERT_EQ(buffer.readInt16(), 32767);
-    ASSERT_EQ(buffer.readInt32(), 123123123);
-    ASSERT_EQ(buffer.readInt64(), 123123123123);
-    ASSERT_FALSE(buffer.isReadable());
+    EXPECT_STREQ(buffer.readBytes(::strlen(s)).c_str(), s);
+    EXPECT_EQ(buffer.readByte(), 'C');
+    EXPECT_EQ(buffer.readInt8(), 127);
+    EXPECT_EQ(buffer.readInt16(), 32767);
+    EXPECT_EQ(buffer.readInt32(), 123123123);
+    EXPECT_EQ(buffer.readInt64(), 123123123123);
+    EXPECT_FALSE(buffer.isReadable());
 }
 
 TEST(ByteBufferTest, Copy)
@@ -150,17 +150,17 @@ TEST(ByteBufferTest, Copy)
     buffer1.writeInt32(123123123);
     buffer1.writeInt64(123123123123);
     ByteBuffer buffer2(buffer1);
-    ASSERT_EQ(buffer1.readerIndex(), buffer2.readerIndex());
-    ASSERT_EQ(buffer1.writerIndex(), buffer2.writerIndex());
-    ASSERT_EQ(buffer1.capacity(), buffer2.capacity());
-    ASSERT_STREQ(buffer1.readBytes(::strlen(s)).c_str(), buffer2.readBytes(::strlen(s)).c_str());
-    ASSERT_EQ(buffer1.readByte(), buffer2.readByte());
-    ASSERT_EQ(buffer1.readInt8(), buffer2.readInt8());
-    ASSERT_EQ(buffer1.readInt16(), buffer2.readInt16());
-    ASSERT_EQ(buffer1.readInt32(), buffer2.readInt32());
-    ASSERT_EQ(buffer1.readInt64(), buffer2.readInt64());
-    ASSERT_FALSE(buffer1.isReadable());
-    ASSERT_FALSE(buffer2.isReadable());
+    EXPECT_EQ(buffer1.readerIndex(), buffer2.readerIndex());
+    EXPECT_EQ(buffer1.writerIndex(), buffer2.writerIndex());
+    EXPECT_EQ(buffer1.capacity(), buffer2.capacity());
+    EXPECT_STREQ(buffer1.readBytes(::strlen(s)).c_str(), buffer2.readBytes(::strlen(s)).c_str());
+    EXPECT_EQ(buffer1.readByte(), buffer2.readByte());
+    EXPECT_EQ(buffer1.readInt8(), buffer2.readInt8());
+    EXPECT_EQ(buffer1.readInt16(), buffer2.readInt16());
+    EXPECT_EQ(buffer1.readInt32(), buffer2.readInt32());
+    EXPECT_EQ(buffer1.readInt64(), buffer2.readInt64());
+    EXPECT_FALSE(buffer1.isReadable());
+    EXPECT_FALSE(buffer2.isReadable());
 }
 
 TEST(ByteBufferTest, Move)
@@ -174,22 +174,22 @@ TEST(ByteBufferTest, Move)
     buffer1.writeInt32(123123123);
     buffer1.writeInt64(123123123123);
     ByteBuffer buffer2(::std::move(buffer1));
-    ASSERT_FALSE(buffer1.isReadable());
-    ASSERT_FALSE(buffer1.isWritable());
-    ASSERT_STREQ(buffer2.readBytes(::strlen(s)).c_str(), s);
-    ASSERT_EQ(buffer2.readByte(), 'C');
-    ASSERT_EQ(buffer2.readInt8(), 127);
-    ASSERT_EQ(buffer2.readInt16(), 32767);
-    ASSERT_EQ(buffer2.readInt32(), 123123123);
-    ASSERT_EQ(buffer2.readInt64(), 123123123123);
-    ASSERT_FALSE(buffer2.isReadable());
+    EXPECT_FALSE(buffer1.isReadable());
+    EXPECT_FALSE(buffer1.isWritable());
+    EXPECT_STREQ(buffer2.readBytes(::strlen(s)).c_str(), s);
+    EXPECT_EQ(buffer2.readByte(), 'C');
+    EXPECT_EQ(buffer2.readInt8(), 127);
+    EXPECT_EQ(buffer2.readInt16(), 32767);
+    EXPECT_EQ(buffer2.readInt32(), 123123123);
+    EXPECT_EQ(buffer2.readInt64(), 123123123123);
+    EXPECT_FALSE(buffer2.isReadable());
 }
 
 TEST(ByteBufferTest, Expansion)
 {
     ByteBuffer buffer1(5);
     buffer1.writeBytes("123456", 6);
-    ASSERT_STREQ(buffer1.toString().c_str(), "123456");
+    EXPECT_STREQ(buffer1.toString().c_str(), "123456");
     ::printf("%lu", buffer1.capacity());
 }
 

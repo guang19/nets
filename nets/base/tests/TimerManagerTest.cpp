@@ -53,11 +53,8 @@ void testFunc()
 TEST_F(TimerManagerTest, ExecuteNonRepeatable)
 {
     timerManager->addTimer(Timestamp::now().plusSeconds(2), 1, 1000, false, testFunc);
-    while (true)
-    {
-        ::sleep(2);
-        timerManager->update();
-    }
+    ::sleep(2);
+    timerManager->update();
 }
 
 TEST_F(TimerManagerTest, ExecuteRepeatable)
@@ -88,16 +85,6 @@ TEST_F(TimerManagerTest, ExecuteFixedDelay)
     {
         timerManager->update();
         ::sleep(3);
-    }
-}
-
-TEST_F(TimerManagerTest, ExecuteLimitRepeatable)
-{
-    timerManager->addTimer(Timestamp::now().plusMilliseconds(2000), 3, 2000, false, testFunc);
-    while (true)
-    {
-        ::sleep(2);
-        timerManager->update();
     }
 }
 

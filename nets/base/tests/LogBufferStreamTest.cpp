@@ -32,9 +32,9 @@ using namespace nets;
 TEST(LogBufferStreamTest, Append)
 {
     LogBufferStream stream {};
-    ASSERT_EQ(stream.buffer().writerIndex(), 0U);
+    EXPECT_EQ(stream.buffer().writerIndex(), 0U);
     stream << "abc";
-    ASSERT_EQ(stream.buffer().writerIndex(), 3U);
+    EXPECT_EQ(stream.buffer().writerIndex(), 3U);
     Int8Type i8 = 8;
     stream << i8 << &i8 << 12345678U << NAN << 123123.5123123F << 123123123.123123123456 << "我爱你 I love you";
     ::printf("%lu\n", stream.buffer().writerIndex());
@@ -45,13 +45,13 @@ TEST(LogBufferStreamTest, Append)
 TEST(LogBufferStreamTest, AppendBuffer)
 {
     LogBufferStream stream {};
-    ASSERT_EQ(stream.buffer().writerIndex(), 0U);
+    EXPECT_EQ(stream.buffer().writerIndex(), 0U);
     stream << "abc";
-    ASSERT_EQ(stream.buffer().writerIndex(), 3U);
+    EXPECT_EQ(stream.buffer().writerIndex(), 3U);
     LogBufferStream stream2 {};
     stream2 << "abc";
     stream << stream2;
-    ASSERT_EQ(stream.buffer().writerIndex(), 6U);
+    EXPECT_EQ(stream.buffer().writerIndex(), 6U);
 }
 
 int main(int argc, char** argv)

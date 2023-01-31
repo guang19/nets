@@ -44,7 +44,8 @@ TEST(LoggerTest, BasicUse)
             NETS_SYSTEM_LOG_DEBUG << "这是一条debug信息";
         });
     t1.join();
-    NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息";
+
+    EXPECT_EXIT(NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息", ::testing::ExitedWithCode(1), "log fatal,exit");
 }
 
 TEST(LoggerTest, SingleFile)
@@ -56,7 +57,8 @@ TEST(LoggerTest, SingleFile)
     NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream，验证SingleFile";
     NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream，验证SingleFile";
     NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream，验证SingleFile";
-    NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream，验证SingleFile";
+    EXPECT_EXIT(NETS_SYSTEM_LOG_FATAL << "这是一条流式fatal信息 stream，验证SingleFile", ::testing::ExitedWithCode(1),
+                "log fatal,exit");
 }
 
 // before execute:
@@ -70,7 +72,8 @@ TEST(LoggerTest, DailyFile)
     NETS_SYSTEM_LOG_INFO << "这是一条info信息 stream，验证DailyFile";
     NETS_SYSTEM_LOG_WARN << "这是一条warn信息 stream，验证DailyFile";
     NETS_SYSTEM_LOG_ERROR << "这是一条error信息 stream，验证DailyFile";
-    NETS_SYSTEM_LOG_FATAL << "这是一条fatal信息 stream，验证DailyFile";
+    EXPECT_EXIT(NETS_SYSTEM_LOG_FATAL << "这是一条fatal信息 stream，验证DailyFile", ::testing::ExitedWithCode(1),
+                "log fatal,exit");
 }
 
 TEST(LoggerTest, RollingFile)
@@ -99,12 +102,13 @@ TEST(LoggerTest, CustomizedLogger)
     auto myLogger = LOGGER_MGR->getLogger("myLogger");
     myLogger->setLogAppender(FileLogAppender::createFileLogAppender("/tmp/nets/nets.log", LogFileType::ROLLING_FILE));
     myLogger->setLogFileRollingSize(1);
-    NETS_LOG_TRACE(myLogger) << "这是一条trance信息 stream，验证DailyFile";
-    NETS_LOG_DEBUG(myLogger) << "这是一条debug信息 stream，验证DailyFile";
-    NETS_LOG_INFO(myLogger) << "这是一条info信息 stream，验证DailyFile";
-    NETS_LOG_WARN(myLogger) << "这是一条warn信息 stream，验证DailyFile";
-    NETS_LOG_ERROR(myLogger) << "这是一条error信息 stream，验证DailyFile";
-    NETS_LOG_FATAL(myLogger) << "这是一条fatal信息 stream，验证DailyFile";
+    NETS_LOG_TRACE(myLogger) << "这是一条trance信息 stream，验证CustomizedLogger";
+    NETS_LOG_DEBUG(myLogger) << "这是一条debug信息 stream，验证CustomizedLogger";
+    NETS_LOG_INFO(myLogger) << "这是一条info信息 stream，验证CustomizedLogger";
+    NETS_LOG_WARN(myLogger) << "这是一条warn信息 stream，验证CustomizedLogger";
+    NETS_LOG_ERROR(myLogger) << "这是一条error信息 stream，验证CustomizedLogger";
+    EXPECT_EXIT(NETS_LOG_FATAL(myLogger) << "这是一条fatal信息 stream，验证CustomizedLogger", ::testing::ExitedWithCode(1),
+                "log fatal,exit");
 }
 
 int main(int argc, char** argv)
